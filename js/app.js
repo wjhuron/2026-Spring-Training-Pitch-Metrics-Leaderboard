@@ -253,12 +253,6 @@
       sidePanel.classList.add('open');
       panelOverlay.classList.add('visible');
 
-      // Reset chart view toggle
-      ScatterChart.currentView = 'movement';
-      document.querySelectorAll('.chart-view-btn').forEach(function (b) {
-        b.classList.toggle('active', b.getAttribute('data-view') === 'movement');
-      });
-
       ScatterChart.render(pitcherName);
       buildPanelMetricsTable(pitcherName);
     };
@@ -285,17 +279,6 @@
       }
     });
 
-    // Chart view toggle
-    document.querySelectorAll('.chart-view-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        document.querySelectorAll('.chart-view-btn').forEach(function (b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        var view = btn.getAttribute('data-view');
-        if (ScatterChart.currentPitcher) {
-          ScatterChart.render(ScatterChart.currentPitcher, view);
-        }
-      });
-    });
   }
 
   function buildPanelMetricsTable(pitcherName) {
