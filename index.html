@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ST 2026 Pitching Leaderboard</title>
+  <link rel="stylesheet" href="css/styles.css?v=4">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-main">
+      <h1>ST 2026 Pitching Leaderboard</h1>
+      <p class="subtitle">Spring Training Pitch-Level Analytics</p>
+    </div>
+    <div class="header-actions">
+      <button id="dark-mode-toggle" class="icon-btn" title="Toggle dark mode">
+        <span class="icon-sun">&#9788;</span><span class="icon-moon" style="display:none;">&#9790;</span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="tab-bar">
+    <button class="tab active" data-tab="pitch">Pitch Leaderboard</button>
+    <button class="tab" data-tab="pitcher">Pitcher Leaderboard</button>
+  </nav>
+
+  <section class="controls">
+    <div class="filter-group">
+      <label for="team-filter">Team</label>
+      <select id="team-filter">
+        <option value="all">All Teams</option>
+      </select>
+    </div>
+
+    <div class="filter-group" id="pitch-type-filter-group">
+      <label>Pitch Type</label>
+      <div id="pitch-type-chips" class="pitch-type-chips"></div>
+    </div>
+
+    <div class="filter-group" id="throws-filter-group">
+      <label for="throws-filter">Throws</label>
+      <select id="throws-filter">
+        <option value="all">All</option>
+        <option value="R">R</option>
+        <option value="L">L</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="min-count">Min Pitches</label>
+      <input type="number" id="min-count" value="10" min="1" max="500" step="1">
+    </div>
+
+    <div class="filter-group search-group">
+      <label for="search-input">Search</label>
+      <input type="text" id="search-input" placeholder="Pitcher name...">
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <div class="toolbar-left">
+      <span class="result-count"><span id="row-count">0</span> results</span>
+      <button id="league-avg-toggle" class="toolbar-btn" title="Toggle league average row">Avg</button>
+    </div>
+    <div class="toolbar-right">
+      <button id="compare-btn" class="toolbar-btn" title="Compare selected pitchers" disabled>Compare (0)</button>
+      <div class="col-settings-wrapper">
+        <button id="col-settings-btn" class="toolbar-btn" title="Show/hide columns">Columns</button>
+        <div id="col-settings-panel" class="col-settings-panel"></div>
+      </div>
+      <button id="export-csv-btn" class="toolbar-btn" title="Export to CSV">CSV</button>
+      <button id="copy-clipboard-btn" class="toolbar-btn" title="Copy to clipboard">Copy</button>
+    </div>
+  </section>
+
+  <section class="table-wrapper">
+    <div class="table-container" id="table-container">
+      <table id="leaderboard-table">
+        <thead><tr id="table-header"></tr></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div id="no-results" class="no-results" style="display:none;">No results match your filters.</div>
+  </section>
+
+  <section class="pagination" id="pagination">
+    <button id="page-prev" class="page-btn">&larr; Prev</button>
+    <span id="page-info" class="page-info">Page 1 of 1</span>
+    <button id="page-next" class="page-btn">Next &rarr;</button>
+    <select id="page-size" class="page-size-select">
+      <option value="50" selected>50 / page</option>
+      <option value="100">100 / page</option>
+      <option value="250">250 / page</option>
+      <option value="0">Show all</option>
+    </select>
+  </section>
+
+  <aside id="side-panel" class="side-panel">
+    <div class="side-panel-header">
+      <div>
+        <h2 id="panel-pitcher-name"></h2>
+        <p id="panel-pitcher-info" class="panel-info"></p>
+      </div>
+      <button id="panel-close" class="panel-close">&times;</button>
+    </div>
+    <div class="side-panel-body">
+      <div class="chart-view-toggle">
+        <button class="chart-view-btn active" data-view="movement">Movement</button>
+        <button class="chart-view-btn" data-view="release">Release Point</button>
+      </div>
+      <div class="chart-container">
+        <canvas id="pitch-chart"></canvas>
+      </div>
+      <div id="panel-metrics-table" class="panel-metrics-table"></div>
+      <h3 class="panel-section-title">Velocity Distribution</h3>
+      <div class="velo-chart-container">
+        <canvas id="velo-chart"></canvas>
+      </div>
+    </div>
+  </aside>
+  <div id="panel-overlay" class="panel-overlay"></div>
+
+  <!-- Compare Modal -->
+  <div id="compare-modal" class="compare-modal" style="display:none;">
+    <div class="compare-modal-content">
+      <div class="compare-modal-header">
+        <h2>Pitcher Comparison</h2>
+        <button id="compare-close" class="panel-close">&times;</button>
+      </div>
+      <div class="compare-modal-body">
+        <canvas id="compare-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Percentile Tooltip -->
+  <div id="pctl-tooltip" class="pctl-tooltip"></div>
+
+  <footer>
+    <p>Data: Spring Training 2026 | Generated <span id="generated-date"></span></p>
+  </footer>
+
+  <script src="data/data_embedded.js?v=4"></script>
+  <script src="js/utils.js?v=4"></script>
+  <script src="js/data.js?v=4"></script>
+  <script src="js/leaderboard.js?v=4"></script>
+  <script src="js/scatter.js?v=4"></script>
+  <script src="js/app.js?v=4"></script>
+</body>
+</html>
