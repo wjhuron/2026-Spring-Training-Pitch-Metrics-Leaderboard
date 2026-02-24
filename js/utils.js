@@ -116,6 +116,21 @@ var Utils = {
     'CSW%': 'Called Strike + Whiff Rate',
     'Chase%': 'Out-of-Zone Swing Rate',
     'GB%': 'Ground Ball Rate',
+    // Hitter tooltips
+    'Hitter': 'Hitter name',
+    'Stands': 'Batting side (R/L)',
+    'Swing%': 'Swing Rate (swings / total pitches)',
+    'IZSw%': 'In-Zone Swing Rate',
+    'IZSw-Ch': 'Discipline Spread (IZ Swing% − Chase%)',
+    'Whiff%': 'Whiff Rate (misses / total swings)',
+    'Med EV': 'Median Exit Velocity (mph, LA > 0 only)',
+    'Max EV': 'Max Exit Velocity (mph, LA > 0 only)',
+    'Barrel%': 'Barrel Rate (Statcast definition)',
+    'xBA': 'Expected Batting Average (on batted balls)',
+    'xSLG': 'Expected Slugging (on batted balls)',
+    'LD%': 'Line Drive Rate',
+    'FB%': 'Fly Ball + Popup Rate',
+    'Med LA': 'Median Launch Angle (degrees)',
   },
 
   // URL state helpers

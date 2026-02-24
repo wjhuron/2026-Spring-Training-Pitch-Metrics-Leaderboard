@@ -122,9 +122,24 @@
         Leaderboard.currentSort = { key: 'count', dir: 'desc' };
         Leaderboard.currentPage = 1;
         Leaderboard.keyboardFocusIndex = -1;
+
         // Show/hide pitch type filter
         document.getElementById('pitch-type-filter-group').style.display =
           currentTab === 'pitch' ? '' : 'none';
+
+        // Update throws/stands label
+        var throwsLabel = document.querySelector('#throws-filter-group label');
+        if (throwsLabel) {
+          throwsLabel.textContent = currentTab === 'hitter' ? 'Stands' : 'Throws';
+        }
+
+        // Update search placeholder
+        searchInput.placeholder = currentTab === 'hitter' ? 'Hitter name...' : 'Pitcher name...';
+
+        // Hide compare button on hitter tab (no scatter compare for hitters)
+        document.getElementById('compare-btn').style.display =
+          currentTab === 'hitter' ? 'none' : '';
+
         refresh();
       });
     });
@@ -243,24 +258,43 @@
   function setupSidePanel() {
     window.App = window.App || {};
 
-    App.openSidePanel = function (pitcherName, team, throws) {
-      document.getElementById('panel-pitcher-name').textContent = pitcherName;
+    App.openSidePanel = function (name, team, hand, rowData) {
+      document.getElementById('panel-pitcher-name').textContent = name;
       var info = [];
       if (team) info.push(team);
-      if (throws) info.push(throws === 'R' ? 'RHP' : 'LHP');
+      if (currentTab === 'hitter') {
+        if (hand) info.push(hand === 'R' ? 'RHH' : hand === 'L' ? 'LHH' : hand);
+      } else {
+        if (hand) info.push(hand === 'R' ? 'RHP' : 'LHP');
+      }
       document.getElementById('panel-pitcher-info').textContent = info.join(' | ');
 
       sidePanel.classList.add('open');
       panelOverlay.classList.add('visible');
 
-      ScatterChart.render(pitcherName);
-      buildPanelMetricsTable(pitcherName);
+      // Chart container and metrics table
+      var chartContainer = sidePanel.querySelector('.chart-container');
+
+      if (currentTab === 'hitter') {
+        // Hide scatter chart for hitters
+        if (chartContainer) chartContainer.style.display = 'none';
+        ScatterChart.destroy();
+        buildHitterPanelTable(name);
+      } else {
+        // Show scatter chart for pitchers
+        if (chartContainer) chartContainer.style.display = '';
+        ScatterChart.render(name);
+        buildPanelMetricsTable(name);
+      }
     };
 
     App.closeSidePanel = function () {
       sidePanel.classList.remove('open');
       panelOverlay.classList.remove('visible');
       ScatterChart.destroy();
+      // Restore chart container visibility
+      var chartContainer = sidePanel.querySelector('.chart-container');
+      if (chartContainer) chartContainer.style.display = '';
       var active = document.querySelectorAll('.active-row');
       for (var i = 0; i < active.length; i++) active[i].classList.remove('active-row');
     };
@@ -321,6 +355,62 @@
     pitcherRows.forEach(function (row) {
       var tr = document.createElement('tr');
       metricCols.forEach(function (mc) {
+        var td = document.createElement('td');
+        if (mc.key === 'pitchType') {
+          var badge = document.createElement('span');
+          badge.className = 'pitch-badge';
+          badge.textContent = row[mc.key];
+          badge.style.backgroundColor = Utils.getPitchColor(row[mc.key]);
+          if (row[mc.key] === 'SI' || row[mc.key] === 'SV') badge.style.color = '#1a1a2e';
+          td.appendChild(badge);
+          td.style.textAlign = 'left';
+        } else {
+          td.textContent = mc.format(row[mc.key]);
+        }
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    container.appendChild(table);
+  }
+
+  function buildHitterPanelTable(hitterName) {
+    var container = document.getElementById('panel-metrics-table');
+    container.innerHTML = '';
+
+    var details = window.HITTER_PITCH_DETAILS;
+    if (!details || !details[hitterName]) return;
+
+    var ptData = details[hitterName];
+    if (ptData.length === 0) return;
+
+    var statCols = [
+      { key: 'pitchType', label: 'Pitch', format: function (v) { return v; } },
+      { key: 'count', label: '#', format: Utils.formatInt },
+      { key: 'swingPct', label: 'Swing%', format: Utils.formatPct },
+      { key: 'whiffPct', label: 'Whiff%', format: Utils.formatPct },
+      { key: 'medEV', label: 'Med EV', format: Utils.formatDecimal(1) },
+      { key: 'xBA', label: 'xBA', format: Utils.formatDecimal(3) },
+      { key: 'xSLG', label: 'xSLG', format: Utils.formatDecimal(3) },
+    ];
+
+    var table = document.createElement('table');
+    var thead = document.createElement('thead');
+    var headerTr = document.createElement('tr');
+    statCols.forEach(function (mc) {
+      var th = document.createElement('th');
+      th.textContent = mc.label;
+      if (mc.key === 'pitchType') th.style.textAlign = 'left';
+      headerTr.appendChild(th);
+    });
+    thead.appendChild(headerTr);
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    ptData.forEach(function (row) {
+      var tr = document.createElement('tr');
+      statCols.forEach(function (mc) {
         var td = document.createElement('td');
         if (mc.key === 'pitchType') {
           var badge = document.createElement('span');
@@ -567,6 +657,18 @@
       });
       document.getElementById('pitch-type-filter-group').style.display =
         currentTab === 'pitch' ? '' : 'none';
+      // Update throws/stands label
+      var throwsLabel = document.querySelector('#throws-filter-group label');
+      if (throwsLabel) {
+        throwsLabel.textContent = currentTab === 'hitter' ? 'Stands' : 'Throws';
+      }
+      // Update search placeholder
+      if (searchInput) {
+        searchInput.placeholder = currentTab === 'hitter' ? 'Hitter name...' : 'Pitcher name...';
+      }
+      // Hide compare on hitter tab
+      document.getElementById('compare-btn').style.display =
+        currentTab === 'hitter' ? 'none' : '';
     }
     if (params.team) teamSelect.value = params.team;
     if (params.throws) throwsSelect.value = params.throws;

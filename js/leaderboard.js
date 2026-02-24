@@ -41,6 +41,30 @@ var COLUMNS = {
     { key: 'chasePct',    label: 'Chase%',   format: Utils.formatPct, sortType: 'numeric', group: 'stats' },
     { key: 'gbPct',       label: 'GB%',      format: Utils.formatPct, sortType: 'numeric', group: 'stats' },
   ],
+  hitter: [
+    { key: '_rank',       label: '#',        format: function(v){ return v; }, sortType: null, align: 'center', noPercentile: true, noToggle: true, group: 'info', width: '36px' },
+    { key: 'hitter',      label: 'Hitter',   format: function(v){ return v || '--'; }, sortType: 'string', align: 'left', sticky: true, cls: 'col-pitcher', noPercentile: true, noToggle: true, group: 'info' },
+    { key: 'team',        label: 'Team',     format: function(v){ return v || '--'; }, sortType: 'string', align: 'left', noPercentile: true, group: 'info', isTeam: true },
+    { key: 'stands',      label: 'Stands',   format: function(v){ return v || '--'; }, sortType: 'string', align: 'left', noPercentile: true, group: 'info' },
+    { key: 'count',       label: 'Count',    format: Utils.formatInt, sortType: 'numeric', noPercentile: true, group: 'info' },
+    // Discipline
+    { key: 'swingPct',    label: 'Swing%',   format: Utils.formatPct, sortType: 'numeric', sectionStart: true, group: 'discipline' },
+    { key: 'izSwingPct',  label: 'IZSw%',    format: Utils.formatPct, sortType: 'numeric', group: 'discipline' },
+    { key: 'chasePct',    label: 'Chase%',   format: Utils.formatPct, sortType: 'numeric', group: 'discipline' },
+    { key: 'izSwChase',   label: 'IZSw-Ch',  format: Utils.formatPct, sortType: 'numeric', group: 'discipline' },
+    { key: 'whiffPct',    label: 'Whiff%',   format: Utils.formatPct, sortType: 'numeric', group: 'discipline' },
+    // Quality
+    { key: 'medEV',       label: 'Med EV',   format: Utils.formatDecimal(1), sortType: 'numeric', sectionStart: true, group: 'quality' },
+    { key: 'maxEV',       label: 'Max EV',   format: Utils.formatDecimal(1), sortType: 'numeric', group: 'quality' },
+    { key: 'barrelPct',   label: 'Barrel%',  format: Utils.formatPct, sortType: 'numeric', group: 'quality' },
+    { key: 'xBA',         label: 'xBA',      format: Utils.formatDecimal(3), sortType: 'numeric', group: 'quality' },
+    { key: 'xSLG',        label: 'xSLG',     format: Utils.formatDecimal(3), sortType: 'numeric', group: 'quality' },
+    // Batted Ball
+    { key: 'gbPct',       label: 'GB%',      format: Utils.formatPct, sortType: 'numeric', sectionStart: true, group: 'batted_ball' },
+    { key: 'ldPct',       label: 'LD%',      format: Utils.formatPct, sortType: 'numeric', group: 'batted_ball' },
+    { key: 'fbPct',       label: 'FB%',      format: Utils.formatPct, sortType: 'numeric', group: 'batted_ball' },
+    { key: 'medLA',       label: 'Med LA',   format: Utils.formatDecimal(1), sortType: 'numeric', group: 'batted_ball' },
+  ],
 };
 
 var Leaderboard = {
@@ -55,7 +79,7 @@ var Leaderboard = {
   keyboardFocusIndex: -1,
 
   initHiddenColumns: function () {
-    var allCols = COLUMNS.pitch.concat(COLUMNS.pitcher);
+    var allCols = COLUMNS.pitch.concat(COLUMNS.pitcher).concat(COLUMNS.hitter);
     for (var i = 0; i < allCols.length; i++) {
       if (allCols[i].defaultHidden) {
         this.hiddenColumns[allCols[i].key] = true;
@@ -213,7 +237,7 @@ var Leaderboard = {
       var globalRank = startIdx + ri + 1;
       var tr = this._createRow(row, visCols, globalRank, isDark, false);
       tr.classList.add('clickable-row');
-      tr._pitcherName = row.pitcher;
+      tr._pitcherName = row.pitcher || row.hitter;
       tr._rowIndex = ri;
 
       // Click handler
@@ -224,14 +248,15 @@ var Leaderboard = {
           // Remove active from all rows
           var prev = tbody.querySelectorAll('.active-row');
           for (var k = 0; k < prev.length; k++) prev[k].classList.remove('active-row');
-          // Highlight all rows for this pitcher
+          // Highlight all rows for this person
+          var personName = r.pitcher || r.hitter;
           var allRows = tbody.querySelectorAll('tr');
           allRows.forEach(function (row) {
-            if (row._pitcherName === r.pitcher) row.classList.add('active-row');
+            if (row._pitcherName === personName) row.classList.add('active-row');
           });
           self.keyboardFocusIndex = idx;
           if (typeof App !== 'undefined' && App.openSidePanel) {
-            App.openSidePanel(r.pitcher, r.team, r.throws);
+            App.openSidePanel(personName, r.team, r.throws || r.stands, r);
           }
         });
       })(row, ri);
