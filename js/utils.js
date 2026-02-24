@@ -119,6 +119,8 @@ var Utils = {
     // Hitter tooltips
     'Hitter': 'Hitter name',
     'Stands': 'Batting side (R/L)',
+    'Pitches': 'Total pitches seen',
+    'Swings': 'Total swings',
     'Swing%': 'Swing Rate (swings / total pitches)',
     'IZSw%': 'In-Zone Swing Rate',
     'IZSw-Ch': 'Discipline Spread (IZ Swing% − Chase%)',

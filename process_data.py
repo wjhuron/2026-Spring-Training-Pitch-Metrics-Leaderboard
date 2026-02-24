@@ -44,6 +44,8 @@ HITTER_STAT_KEYS = [
     'xBA', 'xSLG',
     'gbPct', 'ldPct', 'fbPct', 'medLA',
 ]
+# Hitter stats where lower is better (invert percentile so low value = red/high pctl)
+HITTER_INVERT_PCTL = {'swingPct', 'chasePct', 'whiffPct', 'gbPct'}
 
 
 def break_tilt_to_minutes(val):
@@ -227,6 +229,7 @@ def compute_hitter_stats(pitches):
     xslg_vals = [safe_float(p.get('xSLG')) for p in bip if safe_float(p.get('xSLG')) is not None]
 
     return {
+        'nSwings': n_swings,
         'swingPct': n_swings / total if total > 0 else None,
         'izSwingPct': iz_swing_pct,
         'chasePct': chase_pct,
@@ -539,6 +542,13 @@ def main():
     # Compute percentiles across all hitters
     for stat in HITTER_STAT_KEYS:
         compute_percentile_ranks(hitter_leaderboard, stat)
+
+    # Invert percentiles where lower is better (Swing%, Chase%, Whiff%, GB%)
+    for row in hitter_leaderboard:
+        for stat in HITTER_INVERT_PCTL:
+            pctl_key = stat + '_pctl'
+            if row.get(pctl_key) is not None:
+                row[pctl_key] = 100 - row[pctl_key]
 
     hitter_leaderboard.sort(key=lambda r: r['count'], reverse=True)
     print(f"Hitter leaderboard: {len(hitter_leaderboard)} rows")
