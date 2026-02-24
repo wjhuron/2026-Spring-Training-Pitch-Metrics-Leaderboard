@@ -5,7 +5,7 @@
   var allData = []; // current filtered + sorted data (full, before pagination)
 
   // ---- DOM refs ----
-  var teamSelect, throwsSelect, minCountInput, searchInput;
+  var teamSelect, throwsSelect, minCountInput, minSwingsInput, searchInput;
   var sidePanel, panelOverlay, panelClose;
 
   // ---- Init ----
@@ -36,6 +36,7 @@
     teamSelect = document.getElementById('team-filter');
     throwsSelect = document.getElementById('throws-filter');
     minCountInput = document.getElementById('min-count');
+    minSwingsInput = document.getElementById('min-swings');
     searchInput = document.getElementById('search-input');
     sidePanel = document.getElementById('side-panel');
     panelOverlay = document.getElementById('panel-overlay');
@@ -63,6 +64,7 @@
     teamSelect.addEventListener('change', function () { Leaderboard.currentPage = 1; refresh(); });
     throwsSelect.addEventListener('change', function () { Leaderboard.currentPage = 1; refresh(); });
     minCountInput.addEventListener('input', function () { Leaderboard.currentPage = 1; refresh(); });
+    minSwingsInput.addEventListener('input', function () { Leaderboard.currentPage = 1; refresh(); });
 
     var searchTimer = null;
     searchInput.addEventListener('input', function () {
@@ -127,6 +129,10 @@
         document.getElementById('pitch-type-filter-group').style.display =
           currentTab === 'pitch' ? '' : 'none';
 
+        // Show/hide min swings filter (hitter tab only)
+        document.getElementById('min-swings-filter-group').style.display =
+          currentTab === 'hitter' ? '' : 'none';
+
         // Update throws/stands label
         var throwsLabel = document.querySelector('#throws-filter-group label');
         if (throwsLabel) {
@@ -152,6 +158,7 @@
       pitchTypes: selectedPitchTypes.length > 0 ? selectedPitchTypes : 'all',
       throws: throwsSelect.value,
       minCount: parseInt(minCountInput.value) || 1,
+      minSwings: parseInt(minSwingsInput.value) || 1,
       search: searchInput.value.trim(),
     };
   }
@@ -657,6 +664,8 @@
       });
       document.getElementById('pitch-type-filter-group').style.display =
         currentTab === 'pitch' ? '' : 'none';
+      document.getElementById('min-swings-filter-group').style.display =
+        currentTab === 'hitter' ? '' : 'none';
       // Update throws/stands label
       var throwsLabel = document.querySelector('#throws-filter-group label');
       if (throwsLabel) {

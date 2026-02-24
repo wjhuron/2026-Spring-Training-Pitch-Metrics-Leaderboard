@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ST 2026 Leaderboard</title>
-  <link rel="stylesheet" href="css/styles.css?v=6">
+  <link rel="stylesheet" href="css/styles.css?v=7">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -51,6 +51,11 @@
     <div class="filter-group">
       <label for="min-count">Min Pitches</label>
       <input type="number" id="min-count" value="10" min="1" max="500" step="1">
+    </div>
+
+    <div class="filter-group" id="min-swings-filter-group" style="display:none;">
+      <label for="min-swings">Min Swings</label>
+      <input type="number" id="min-swings" value="1" min="1" max="500" step="1">
     </div>
 
     <div class="filter-group search-group">
@@ -134,11 +139,11 @@
     <p>Data: Spring Training 2026 | Generated <span id="generated-date"></span></p>
   </footer>
 
-  <script src="data/data_embedded.js?v=6"></script>
-  <script src="js/utils.js?v=6"></script>
-  <script src="js/data.js?v=6"></script>
-  <script src="js/leaderboard.js?v=6"></script>
-  <script src="js/scatter.js?v=6"></script>
-  <script src="js/app.js?v=6"></script>
+  <script src="data/data_embedded.js?v=7"></script>
+  <script src="js/utils.js?v=7"></script>
+  <script src="js/data.js?v=7"></script>
+  <script src="js/leaderboard.js?v=7"></script>
+  <script src="js/scatter.js?v=7"></script>
+  <script src="js/app.js?v=7"></script>
 </body>
 </html>

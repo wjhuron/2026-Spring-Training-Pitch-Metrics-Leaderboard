@@ -60,6 +60,7 @@ var DataStore = {
         if (selectedPitchTypes.indexOf(row.pitchType) === -1) return false;
       }
       if (row.count < filters.minCount) return false;
+      if (tab === 'hitter' && filters.minSwings && row.nSwings < filters.minSwings) return false;
       if (filters.search) {
         var name = (row.pitcher || row.hitter || '').toLowerCase();
         if (name.indexOf(filters.search.toLowerCase()) === -1) return false;
