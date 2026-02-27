@@ -43,10 +43,10 @@
     "ST",
     "SV"
   ],
-  "generatedAt": "2026-02-26 22:06",
+  "generatedAt": "2026-02-27 13:07",
   "totalPitches": 30227,
   "totalPitchers": 1087,
-  "totalHitters": 1124,
+  "totalHitters": 1270,
   "leagueAverages": {
     "FF": {
       "velocity": 93.83,
@@ -268,20 +268,20 @@
     "count": 1087
   },
   "hitterLeagueAverages": {
-    "swingPct": 0.4653,
-    "izSwingPct": 0.6761,
-    "chasePct": 0.2645,
-    "izSwChase": 0.4084,
-    "whiffPct": 0.2645,
-    "medEV": 90.9873,
-    "maxEV": 96.2235,
-    "barrelPct": 0.0725,
-    "xBA": 0.3159,
-    "xSLG": 0.5154,
+    "swingPct": 0.4693,
+    "izSwingPct": 0.6784,
+    "chasePct": 0.2742,
+    "izSwChase": 0.4021,
+    "whiffPct": 0.2641,
+    "medEV": 91.4096,
+    "maxEV": 98.6399,
+    "barrelPct": 0.0713,
+    "xBA": 0.3172,
+    "xSLG": 0.5144,
     "gbPct": 0.4197,
-    "ldPct": 0.2485,
-    "fbPct": 0.3305,
-    "medLA": 12.9391,
-    "count": 1124
+    "ldPct": 0.2406,
+    "fbPct": 0.3369,
+    "medLA": 12.6985,
+    "count": 1270
   }
 }
