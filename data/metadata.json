@@ -43,7 +43,7 @@
     "ST",
     "SV"
   ],
-  "generatedAt": "2026-02-26 20:55",
+  "generatedAt": "2026-02-26 22:06",
   "totalPitches": 30227,
   "totalPitchers": 1087,
   "totalHitters": 1124,
@@ -112,10 +112,10 @@
       "count": 464
     },
     "SI": {
-      "velocity": 93.36,
-      "spinRate": 2167.91,
-      "indVertBrk": 8.03,
-      "horzBrk": 6.76,
+      "velocity": 93.37,
+      "spinRate": 2168.02,
+      "indVertBrk": 8.02,
+      "horzBrk": 6.8,
       "relPosZ": 5.53,
       "relPosX": -0.77,
       "extension": 6.34,
@@ -123,14 +123,14 @@
       "haa": 0.15,
       "vra": -1.76,
       "hra": 1.35,
-      "izPct": 0.5159,
-      "swStrPct": 0.0702,
-      "cswPct": 0.2537,
-      "chasePct": 0.2543,
+      "izPct": 0.5168,
+      "swStrPct": 0.0703,
+      "cswPct": 0.2541,
+      "chasePct": 0.2547,
       "gbPct": 0.5822,
-      "breakTiltMinutes": 253,
-      "breakTilt": "4:13",
-      "count": 630
+      "breakTiltMinutes": 252,
+      "breakTilt": "4:12",
+      "count": 629
     },
     "CH": {
       "velocity": 85.87,
