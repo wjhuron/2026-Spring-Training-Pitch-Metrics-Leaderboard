@@ -1,0 +1,50 @@
+name: Update Leaderboard
+
+on:
+  # Manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+  # Auto-run daily at 8 AM ET (1 PM UTC)
+  schedule:
+    - cron: '0 13 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install gspread google-auth
+
+      - name: Write service account credentials
+        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+
+      - name: Fetch data and build leaderboard
+        run: python3 process_data.py
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f service_account.json
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ index.html css/ js/
+          if git diff --cached --quiet; then
+            echo "No changes to deploy."
+          else
+            git commit -m "Update leaderboard $(date '+%Y-%m-%d %H:%M')"
+            git push origin main
+          fi
