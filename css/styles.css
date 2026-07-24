@@ -1154,6 +1154,34 @@ body.compact #table-pinned-body td { padding: 4px 8px; font-size: 12px; }
 @media (max-width: 768px) {
   header { padding: 16px; }
   .tab-bar { padding: 0 16px; }
+
+  /* Tab strips scroll instead of overflowing the page. The nav rows kept
+     their desktop `padding: 0 32px` on top of .tab-bar's 16px, eating 96px
+     of a 375px viewport, so "Plate Discipline"/"Batted Ball" pushed the
+     document ~58px wider than the screen and the whole page scrolled
+     sideways. Inner padding is dropped (.tab-bar already insets) and each
+     row becomes its own horizontal scroller, so every tab stays reachable
+     and only the strip moves. Scrollbar hidden — it reads as chrome on a
+     4-item nav, and the cut-off tab edge is the affordance. */
+  .nav-sections, .nav-subtabs {
+    padding: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .nav-sections::-webkit-scrollbar,
+  .nav-subtabs::-webkit-scrollbar { display: none; }
+  .section-tab, .tab { flex: 0 0 auto; white-space: nowrap; }
+  .tab { padding: 10px 14px; }
+  .section-tab { padding: 10px 16px; }
+
+  /* .pitch-type-chips already sets overflow-x:auto, but it never engaged:
+     .filter-group is a flex item, and a flex item defaults to
+     min-width:auto, so it inflates to its content's intrinsic width (552px
+     for the full FF/SI/FC/SL/... chip row) instead of shrinking. That
+     widened the document ~193px on the Arsenal and Batted Ball views.
+     min-width:0 lets it shrink so the chips scroll inside it as intended. */
+  .filter-group { min-width: 0; }
   .controls { padding: 12px 16px; gap: 12px; }
   .toolbar { padding: 8px 16px; flex-wrap: wrap; gap: 8px; }
   .table-wrapper { margin: 0 8px; border-radius: 4px; }
