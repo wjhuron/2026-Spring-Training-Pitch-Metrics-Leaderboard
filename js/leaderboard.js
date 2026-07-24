@@ -55,6 +55,7 @@ const COLUMNS = {
     { key: 'stuffScore',  label: 'Stuff+',   format: Utils.formatInt, sortType: 'numeric', sectionStart: true, desc: 'Stuff+ — overall pitch quality from physical characteristics only (velocity, movement, release, arm angle), usage-weighted across the arsenal and independent of location or outcome. 100 = league avg, +10 = 1 SD better.', group: 'run_value' },
     { key: 'locPlus',     label: 'Loc+',     format: Utils.formatInt, sortType: 'numeric', desc: 'Location+ — per-pitch location quality scored against an xRV-weighted (zone × count × pitch-type × handedness) model. Command independent of stuff or contact luck. 100 = league avg, +10 = 1 SD better.', group: 'run_value' },
     { key: 'pitchingScore', label: 'Pitching+', format: Utils.formatInt, sortType: 'numeric', desc: 'Pitching+ — overall arsenal quality: exactly 0.7 x Stuff+ + 0.3 x Loc+ (weights validated on future run prevention). Auditable from the two component columns.', group: 'run_value' },
+    { key: 'pitcherPlus', label: 'Pitcher+', format: Utils.formatInt, sortType: 'numeric', desc: 'Pitcher+ — the all-encompassing pitcher metric: 0.20 Stuff+ + 0.06 Loc+ + 0.21 K% + 0.19 Z-Whiff% + 0.23 xRV/100 + 0.12 GB%, each z-scored against the MLB pool and shrunk toward league average by its own stabilization rate (Stuff+ ~42 pitches, xRV/100 ~1046), so one scale serves relievers and starters. 100 = league avg, +10 = 1 SD better. No role adjustment by design. Out-of-fold it predicts future xRV/100 at r=.55 vs .46 for Pitching+.', group: 'run_value' },
     { key: 'kPct',        label: 'K%',       format: Utils.formatPct, sortType: 'numeric', sectionStart: true, desc: 'Strikeout rate (K / TBF)', group: 'stats' },
     { key: 'bbPct',       label: 'BB%',      format: Utils.formatPct, sortType: 'numeric', desc: 'Walk rate (BB / TBF)', group: 'stats' },
     { key: 'kbbPct',      label: 'K-BB%',    format: Utils.formatPct, sortType: 'numeric', desc: 'K% minus BB%', group: 'stats' },
@@ -512,6 +513,7 @@ const Leaderboard = {
     avg.xWRCplus = 100;
     avg.stuffScore = 100;
     avg.pitchingScore = 100;
+    avg.pitcherPlus = 100;
     return avg;
   },
 

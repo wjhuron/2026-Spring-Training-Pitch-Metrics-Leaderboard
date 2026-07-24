@@ -1362,11 +1362,31 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None):
                 v = row.get(f)
                 row[f + '_pctl'] = (_pctl(v, pools_o[f])
                                     if v is not None and pools_o[f] else None)
+    # ── Pitcher+ (must run LAST: it consumes the fresh stuffScore/locPlus
+    # written above, plus the rate stats process_data already set) ──
+    from pipeline_pitcherplus import apply_pitcher_plus, serialize_baseline
+    _pp_base = apply_pitcher_plus(pp)
+    n_pplus = sum(1 for row in pp if row.get('pitcherPlus') is not None)
+
     json.dump(pp, open(pp_path, 'w'))
+
+    # Baseline goes to metadata so the client can recompute Pitcher+ under
+    # filters against the season-long league scale.
+    if _pp_base:
+        _md_path = os.path.join(DATA, 'metadata_rs.json')
+        try:
+            _md = json.load(open(_md_path))
+            _md['pitcherPlusBaseline'] = serialize_baseline(_pp_base)
+            json.dump(_md, open(_md_path, 'w'))
+        except Exception as _e:
+            print(f'  (metadata baseline write skipped: {_e})')
+
     print(f'  injected stuffScore: pitch-level {n_pl}/{len(pl)} rows, '
           f'pitcher-level {n_pp}/{len(pp)} rows (qualified pool = {len(qpool)})')
     print(f'  injected pitchingScore: pitch-level {n_ps_pl}/{len(pl)} rows, '
           f'pitcher-level {n_ps_pp}/{len(pp)} rows')
+    print(f'  injected Pitcher+: pitcher-level {n_pplus}/{len(pp)} rows'
+          + ('' if _pp_base else ' (pool too thin — all None)'))
     if xrvoe_ov:
         print(f'  injected xRVOE/100: pitcher-level {n_x}/{len(pp)} rows '
               f'(floors {XRVOE_MIN_PT}/{XRVOE_MIN_OV} pitches, n0 {XRVOE_N0})')

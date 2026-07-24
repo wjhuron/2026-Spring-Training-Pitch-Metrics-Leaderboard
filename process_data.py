@@ -51,7 +51,13 @@ from pipeline_compute import (
 # Pitching+ — omitting it here once shipped an embed with a blank Pitching+
 # column whenever process_data ran without a subsequent --inject (2026-07-18).
 XRVOE_KEYS = ('xrvoe100', 'rvoe100', 'rvoe', 'xrvoe',
-              'pitchingScore', 'pitchingRuns100')
+              'pitchingScore', 'pitchingRuns100',
+              # Pitcher+ is computed in the inject step too (it consumes the
+              # fresh stuffScore), so it must survive a process_data-only run
+              # the same way Pitching+ does. The carry-over loop appends
+              # '_pctl' itself — listing the rank key here would look for
+              # 'pitcherPlus_pctl_pctl'.
+              'pitcherPlus')
 
 # ── Runtime state (set in main) ──────────────────────────────────────────
 WOBA_WEIGHTS = None

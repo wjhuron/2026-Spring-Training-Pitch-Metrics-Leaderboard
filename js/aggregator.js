@@ -768,6 +768,12 @@ const Aggregator = {
                      'locPlusRaw', 'stuffScore_lowSupport', 'pitchingRuns100',
                      'xrvoe100', 'xrvoe100_pctl', 'rvoe100', 'rvoe100_pctl',
                      'rvoe', 'rvoe_pctl', 'xrvoe', 'xrvoe_pctl',
+                     // Pitcher+ is season-level like SIERA/FIP/xRV100: its
+                     // heaviest component (xRv100, weight .23) is itself
+                     // boxscore-merged and doesn't refilter, so recomputing
+                     // the composite from half-filtered parts would be less
+                     // honest than carrying the season value through.
+                     'pitcherPlus', 'pitcherPlus_pctl',
                      'armAngle'];
     const preAgg = window.PITCHER_DATA || [];
     const preAggMap = {};

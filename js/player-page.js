@@ -12,6 +12,10 @@ var PlayerPage = {
     { key: 'stuffScore',        label: 'Stuff+',           format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'locPlus',           label: 'Loc+',             format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'pitchingScore',     label: 'Pitching+',        format: function(v) { return v != null ? Math.round(v) : '—'; } },
+    // Pitcher+ (2026-07-24): the all-encompassing composite. Sits with the
+    // grades but is pitcher-level, not a per-pitch atom mean — see
+    // pipeline_pitcherplus.py.
+    { key: 'pitcherPlus',       label: 'Pitcher+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
     // Rate stats and their composite estimator.
     { key: 'kPct',              label: 'K%',               format: function(v) { return Utils.formatPct(v); } },
     { key: 'bbPct',             label: 'BB%',              format: function(v) { return Utils.formatPct(v); } },
