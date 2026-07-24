@@ -49,6 +49,8 @@ merged through js/aggregator.js boxFields. The (mu, sigma) baseline is
 still published to metadata as pitcherPlusBaseline for auditability and to
 leave the door open for a fully-filtered recompute later.
 """
+import os
+
 from pipeline_utils import safe_float
 
 # component -> (weight, stabilization constant in pitches, invert)
@@ -87,6 +89,40 @@ MIN_POOL = 50         # below this many qualified pitchers, don't score at all
 # year-pairs is 0.0370-0.0411 (2021->22 .0385, 22->23 .0391, 23->24 .0370,
 # 24->25 .0411), pooled 0.03897.
 PRED_SLOPE = 0.039
+
+# ── Results+ / gap / projection ─────────────────────────────────────────
+# Results+ = xRV/100 rescaled to 100 +/- 10. NOT a new metric and must never
+# be presented as one: a composite fit to maximize SAME-season xRV/100 puts
+# 99.9% of its weight on xRV/100 and adds +0.0000 over using xRV/100 alone
+# (scripts/pitcherplus_v2_architecture.py). The rescale exists purely so
+# results read directly against Pitcher+ on one scale. Deliberately
+# UNSHRUNK — describing what happened should not regress toward the mean,
+# which is the one place it differs from every Pitcher+ component.
+RESULTS_KEY = 'xRv100'
+
+# pitcherGap = Pitcher+ - Results+ (talent minus results, in points).
+# Quintile backtest on 2021-25 year-pairs: top fifth of the gap improved
+# run prevention by +0.45 SD the next season, bottom fifth declined 0.75
+# SD, monotonic across all five. Gap full-season reliability .544. (Part of
+# that relationship is mechanical — gap and next-year change share the
+# -xRV/100 noise term — but the underlying claim stands on its own: Pitcher+
+# predicts next season at .55 vs xRV/100's .49.)
+
+# Pitcher+ Proj = 70% current / 30% prior-season Pitcher+, re-standardized.
+# Validated on 2021-25 year-pairs predicting NEXT-SEASON xRV/100: OOF r
+# .6104 -> .6271. A free 2-variable fit independently lands on 32% prior.
+# Settled by research (scripts/pitcherplus_v2_architecture.py):
+#   - blend the COMPOSITE, not the components (free component-level fitting
+#     overfits: .6113; component-70/30-then-weight is algebraically the
+#     same as composite 70/30 anyway)
+#   - do NOT sample-weight the prior (n-weighting it is strictly worse:
+#     .6253/.6237/.6213 at k=500/1000/2000; dual weighting buys +.002)
+#   - two years only; a third adds +.002 (fitted shares 59/33/8)
+#   - pitchers with no prior season keep their current-only Pitcher+, the
+#     standard Marcel/Steamer pattern
+# NOT aging-adjusted (no birthdates in the pipeline) — a known limitation.
+PROJ_CUR_W, PROJ_PRIOR_W = 0.70, 0.30
+PRIOR_ASSET = 'pitcher_plus_prior.json'
 
 
 def _count_of(row):
@@ -186,6 +222,42 @@ def score_row(row, base):
     return round(100.0 + SCALE_K * (raw - rmu) / rsd, 1)
 
 
+def load_prior(data_dir):
+    """{mlbId(str): prior-season Pitcher+}. Empty when the asset is absent —
+    the projection then simply equals Pitcher+ for everyone."""
+    import json
+    path = os.path.join(data_dir, PRIOR_ASSET)
+    try:
+        with open(path) as f:
+            blob = json.load(f)
+        return blob.get('values') or {}, blob.get('season')
+    except (OSError, ValueError):
+        return {}, None
+
+
+def _results_baseline(rows, aaa_teams):
+    """(mu, sigma) of xRV/100 over the qualified MLB pool. Count-weighted
+    mean, unweighted between-pitcher SD — same convention as the Pitcher+
+    components."""
+    vals, wts = [], []
+    for r in rows:
+        if not _is_baseline(r, aaa_teams):
+            continue
+        v = safe_float(r.get(RESULTS_KEY))
+        if v is None:
+            continue
+        vals.append(v)
+        wts.append(_count_of(r))
+    if len(vals) < MIN_POOL:
+        return None
+    tw = sum(wts)
+    mu = (sum(v * w for v, w in zip(vals, wts)) / tw if tw
+          else sum(vals) / len(vals))
+    mean_u = sum(vals) / len(vals)
+    sd = (sum((v - mean_u) ** 2 for v in vals) / (len(vals) - 1)) ** 0.5
+    return (mu, sd) if sd else None
+
+
 def _pctl(v, pool):
     """Percentile rank of v within pool (ties averaged), 0-100."""
     if v is None or not pool:
@@ -195,7 +267,7 @@ def _pctl(v, pool):
     return round(100.0 * (below + 0.5 * equal) / len(pool), 1)
 
 
-def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA')):
+def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None):
     """Set row['pitcherPlus'] + row['pitcherPlus_pctl'] in place. Returns the
     baseline bundle (for metadata / the client-side aggregator), or None if
     the pool was too thin to calibrate.
@@ -205,16 +277,62 @@ def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA')):
     pitchingScore convention), and qualification stays a render-time
     coloring gate on the leaderboard.
     """
+    aaa = set(aaa_teams)
     base = build_baseline(rows, aaa_teams)
     for r in rows:
         v = score_row(r, base) if base else None
         r['pitcherPlus'] = v
         r['pitcherRuns100'] = (round(PRED_SLOPE * (v - 100.0), 2)
                                if v is not None else None)
-    pool = [r['pitcherPlus'] for r in rows
-            if r.get('pitcherPlus') is not None and _is_baseline(r, set(aaa_teams))]
+
+    # ── Results+ (rescale of xRV/100) and the talent-minus-results gap ──
+    rb = _results_baseline(rows, aaa)
     for r in rows:
-        r['pitcherPlus_pctl'] = _pctl(r.get('pitcherPlus'), pool)
+        rv = safe_float(r.get(RESULTS_KEY))
+        rp = (round(100.0 + SCALE_K * (rv - rb[0]) / rb[1], 1)
+              if (rb and rv is not None) else None)
+        r['resultsPlus'] = rp
+        r['pitcherGap'] = (round(r['pitcherPlus'] - rp, 1)
+                           if (rp is not None
+                               and r.get('pitcherPlus') is not None) else None)
+
+    # ── Pitcher+ Proj: 70/30 with the frozen prior season ──
+    prior, prior_season = load_prior(data_dir) if data_dir else ({}, None)
+    blended, n_prior = [], 0
+    for r in rows:
+        v = r.get('pitcherPlus')
+        if v is None:
+            r['_projRaw'] = None
+            continue
+        pv = prior.get(str(r.get('mlbId'))) if r.get('mlbId') else None
+        if pv is not None:
+            r['_projRaw'] = PROJ_CUR_W * v + PROJ_PRIOR_W * float(pv)
+            n_prior += 1
+        else:
+            r['_projRaw'] = v          # no prior -> current-only (Marcel)
+        if _is_baseline(r, aaa):
+            blended.append(r['_projRaw'])
+    # Re-standardize: blending two imperfectly-correlated 100+/-10 values
+    # compresses the SD (~9.4), so rescale to keep "+10 = 1 SD" true.
+    if len(blended) >= MIN_POOL:
+        bmu = sum(blended) / len(blended)
+        bsd = (sum((x - bmu) ** 2 for x in blended)
+               / (len(blended) - 1)) ** 0.5
+    else:
+        bmu = bsd = None
+    for r in rows:
+        raw = r.pop('_projRaw', None)
+        r['pitcherPlusProj'] = (round(100.0 + SCALE_K * (raw - bmu) / bsd, 1)
+                                if (raw is not None and bsd) else None)
+
+    for key in ('pitcherPlus', 'resultsPlus', 'pitcherPlusProj'):
+        pool = [r[key] for r in rows
+                if r.get(key) is not None and _is_baseline(r, aaa)]
+        for r in rows:
+            r[key + '_pctl'] = _pctl(r.get(key), pool)
+    if base is not None:
+        base['_projPriorSeason'] = prior_season
+        base['_projNPrior'] = n_prior
     return base
 
 
@@ -230,4 +348,7 @@ def serialize_baseline(base):
         'composite': {'mu': round(base['_composite'][0], 6),
                       'sd': round(base['_composite'][1], 6)},
         'qualN': QUAL_N, 'scaleK': SCALE_K, 'predSlope': PRED_SLOPE,
+        'proj': {'curW': PROJ_CUR_W, 'priorW': PROJ_PRIOR_W,
+                 'priorSeason': base.get('_projPriorSeason'),
+                 'nWithPrior': base.get('_projNPrior')},
     }

@@ -57,7 +57,8 @@ XRVOE_KEYS = ('xrvoe100', 'rvoe100', 'rvoe', 'xrvoe',
               # the same way Pitching+ does. The carry-over loop appends
               # '_pctl' itself — listing the rank key here would look for
               # 'pitcherPlus_pctl_pctl'.
-              'pitcherPlus', 'pitcherRuns100')
+              'pitcherPlus', 'pitcherRuns100',
+              'resultsPlus', 'pitcherGap', 'pitcherPlusProj')
 
 # ── Runtime state (set in main) ──────────────────────────────────────────
 WOBA_WEIGHTS = None

@@ -774,6 +774,8 @@ const Aggregator = {
                      // the composite from half-filtered parts would be less
                      // honest than carrying the season value through.
                      'pitcherPlus', 'pitcherPlus_pctl', 'pitcherRuns100',
+                     'resultsPlus', 'resultsPlus_pctl', 'pitcherGap',
+                     'pitcherPlusProj', 'pitcherPlusProj_pctl',
                      'armAngle'];
     const preAgg = window.PITCHER_DATA || [];
     const preAggMap = {};

@@ -1365,8 +1365,9 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None):
     # ── Pitcher+ (must run LAST: it consumes the fresh stuffScore/locPlus
     # written above, plus the rate stats process_data already set) ──
     from pipeline_pitcherplus import apply_pitcher_plus, serialize_baseline
-    _pp_base = apply_pitcher_plus(pp)
+    _pp_base = apply_pitcher_plus(pp, data_dir=DATA)
     n_pplus = sum(1 for row in pp if row.get('pitcherPlus') is not None)
+    n_proj = sum(1 for row in pp if row.get('pitcherPlusProj') is not None)
 
     json.dump(pp, open(pp_path, 'w'))
 
@@ -1387,6 +1388,10 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None):
           f'pitcher-level {n_ps_pp}/{len(pp)} rows')
     print(f'  injected Pitcher+: pitcher-level {n_pplus}/{len(pp)} rows'
           + ('' if _pp_base else ' (pool too thin — all None)'))
+    if _pp_base:
+        print(f'  injected Results+/gap + Pitcher+ Proj: {n_proj} rows '
+              f'({_pp_base.get("_projNPrior", 0)} with a '
+              f'{_pp_base.get("_projPriorSeason")} prior)')
     if xrvoe_ov:
         print(f'  injected xRVOE/100: pitcher-level {n_x}/{len(pp)} rows '
               f'(floors {XRVOE_MIN_PT}/{XRVOE_MIN_OV} pitches, n0 {XRVOE_N0})')

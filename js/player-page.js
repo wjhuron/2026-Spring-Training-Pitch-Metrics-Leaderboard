@@ -16,6 +16,8 @@ var PlayerPage = {
     // grades but is pitcher-level, not a per-pitch atom mean — see
     // pipeline_pitcherplus.py.
     { key: 'pitcherPlus',       label: 'Pitcher+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
+    { key: 'resultsPlus',       label: 'Results+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
+    { key: 'pitcherPlusProj',   label: 'Pitcher+ Proj',    format: function(v) { return v != null ? Math.round(v) : '—'; } },
     // Rate stats and their composite estimator.
     { key: 'kPct',              label: 'K%',               format: function(v) { return Utils.formatPct(v); } },
     { key: 'bbPct',             label: 'BB%',              format: function(v) { return Utils.formatPct(v); } },
