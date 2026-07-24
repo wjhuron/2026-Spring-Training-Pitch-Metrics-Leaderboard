@@ -1718,6 +1718,12 @@ var PlayerPage = {
           if (col.key === 'pitchingScore' && row.pitchingRuns100 != null) {
             td.title = parseFloat(row.pitchingRuns100).toFixed(2) + ' runs/100 vs avg';
           }
+          // Pitcher+ companion reads 'expected', not 'vs avg': its slope is
+          // predictive (next-season xRV/100 on this-season Pitcher+), not
+          // the same-season fit pitchingRuns100 uses.
+          if (col.key === 'pitcherPlus' && row.pitcherRuns100 != null) {
+            td.title = parseFloat(row.pitcherRuns100).toFixed(2) + ' runs/100 expected';
+          }
         }
         tr.appendChild(td);
       }

@@ -864,6 +864,12 @@ const Leaderboard = {
           row.pitchingRuns100 !== null && row.pitchingRuns100 !== undefined) {
         td.setAttribute('data-runs100', row.pitchingRuns100);
       }
+      // Same for Pitcher+ — app.js words this one 'expected' rather than
+      // 'vs avg' (its slope is predictive, not same-season).
+      if (col.key === 'pitcherPlus' && !isAvgRow &&
+          row.pitcherRuns100 !== null && row.pitcherRuns100 !== undefined) {
+        td.setAttribute('data-runs100', row.pitcherRuns100);
+      }
 
       // Percentile coloring (only for qualified players, with exceptions)
       if (!col.noPercentile && !isAvgRow) {

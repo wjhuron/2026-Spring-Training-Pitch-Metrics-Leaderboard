@@ -773,7 +773,7 @@ const Aggregator = {
                      // boxscore-merged and doesn't refilter, so recomputing
                      // the composite from half-filtered parts would be less
                      // honest than carrying the season value through.
-                     'pitcherPlus', 'pitcherPlus_pctl',
+                     'pitcherPlus', 'pitcherPlus_pctl', 'pitcherRuns100',
                      'armAngle'];
     const preAgg = window.PITCHER_DATA || [];
     const preAggMap = {};

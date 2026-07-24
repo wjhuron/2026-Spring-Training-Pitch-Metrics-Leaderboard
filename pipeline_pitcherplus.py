@@ -67,6 +67,27 @@ QUAL_N = 300          # min pitches to enter the (mu, sigma) baseline pool
 SCALE_K = 10          # points per SD of the composite
 MIN_POOL = 50         # below this many qualified pitchers, don't score at all
 
+# pitcherRuns100 = PRED_SLOPE * (Pitcher+ - 100): the run-denominated
+# companion for the hover tooltip, and — like pitchingRuns100 — deliberately
+# a MONOTONIC transform of the displayed number so it can never invert
+# against the column it annotates.
+#
+# The slope is FROZEN and PREDICTIVE (0.039 runs/100 per Pitcher+ point, so
+# +10 = +0.39 runs/100), fit as future-season xRV/100 on current-season
+# Pitcher+ over the 2021-25 year-pair panel. Two reasons it is not the
+# same-season OLS that pitchingRuns100 uses:
+#   1. Circularity. xRV/100 is a COMPONENT of Pitcher+ (weight 0.23), so a
+#      same-season fit partly regresses a variable on itself and inflates
+#      the slope to 0.061 — a ~55% overstatement of the runs claim.
+#      Pitching+ has no results term, so its descriptive slope is clean.
+#   2. It answers the question the metric is for: "a pitcher at this
+#      Pitcher+ prevents about this many runs/100 GOING FORWARD."
+# Frozen rather than re-fit per run because the predictive slope needs a
+# following season that doesn't exist mid-year. Stability across the four
+# year-pairs is 0.0370-0.0411 (2021->22 .0385, 22->23 .0391, 23->24 .0370,
+# 24->25 .0411), pooled 0.03897.
+PRED_SLOPE = 0.039
+
 
 def _count_of(row):
     return safe_float(row.get('count')) or 0.0
@@ -186,7 +207,10 @@ def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA')):
     """
     base = build_baseline(rows, aaa_teams)
     for r in rows:
-        r['pitcherPlus'] = score_row(r, base) if base else None
+        v = score_row(r, base) if base else None
+        r['pitcherPlus'] = v
+        r['pitcherRuns100'] = (round(PRED_SLOPE * (v - 100.0), 2)
+                               if v is not None else None)
     pool = [r['pitcherPlus'] for r in rows
             if r.get('pitcherPlus') is not None and _is_baseline(r, set(aaa_teams))]
     for r in rows:
@@ -205,5 +229,5 @@ def serialize_baseline(base):
                        for k, w, kk in COMPONENTS],
         'composite': {'mu': round(base['_composite'][0], 6),
                       'sd': round(base['_composite'][1], 6)},
-        'qualN': QUAL_N, 'scaleK': SCALE_K,
+        'qualN': QUAL_N, 'scaleK': SCALE_K, 'predSlope': PRED_SLOPE,
     }

@@ -1332,7 +1332,10 @@
       if (runs100 !== null) {
         // toFixed keeps the '-' on negatives and adds no '+' on positives
         // (house number-format rule).
-        text += ' · ' + parseFloat(runs100).toFixed(2) + ' runs/100 vs avg';
+        // Pitcher+'s slope is predictive (next-season xRV/100 on this-season
+        // Pitcher+), so it reads 'expected' where Pitching+ reads 'vs avg'.
+        text += ' · ' + parseFloat(runs100).toFixed(2) + ' runs/100 '
+              + (colKey === 'pitcherPlus' ? 'expected' : 'vs avg');
       }
       if (td.getAttribute('data-low-support')) {
         text += ' · low model support (unusual profile, score less certain)';
