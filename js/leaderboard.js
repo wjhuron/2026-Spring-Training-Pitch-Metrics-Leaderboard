@@ -56,8 +56,6 @@ const COLUMNS = {
     { key: 'locPlus',     label: 'Loc+',     format: Utils.formatInt, sortType: 'numeric', desc: 'Location+ — per-pitch location quality scored against an xRV-weighted (zone × count × pitch-type × handedness) model. Command independent of stuff or contact luck. 100 = league avg, +10 = 1 SD better.', group: 'run_value' },
     { key: 'pitchingScore', label: 'Pitching+', format: Utils.formatInt, sortType: 'numeric', desc: 'Pitching+ — overall arsenal quality: exactly 0.7 x Stuff+ + 0.3 x Loc+ (weights validated on future run prevention). Auditable from the two component columns.', group: 'run_value' },
     { key: 'pitcherPlus', label: 'Pitcher+', format: Utils.formatInt, sortType: 'numeric', desc: 'Pitcher+ — the all-encompassing pitcher metric: 0.20 Stuff+ + 0.06 Loc+ + 0.21 K% + 0.19 Z-Whiff% + 0.23 xRV/100 + 0.12 GB%, each z-scored against the MLB pool and shrunk toward league average by its own stabilization rate (Stuff+ ~42 pitches, xRV/100 ~1046), so one scale serves relievers and starters. 100 = league avg, +10 = 1 SD better. No role adjustment by design. Out-of-fold it predicts future xRV/100 at r=.55 vs .46 for Pitching+.', group: 'run_value' },
-    { key: 'resultsPlus', label: 'Results+', format: Utils.formatInt, sortType: 'numeric', desc: 'Results+ — xRV/100 rescaled to 100 = league avg, +10 = 1 SD. NOT a new metric: a composite fit to describe same-season run prevention puts 99.9% of its weight on xRV/100, so this is that column on the Pitcher+ scale, so results read directly against talent. Deliberately unshrunk — it describes what happened rather than estimating talent.', group: 'run_value' },
-    { key: 'pitcherGap',  label: 'Gap',      format: Utils.formatInt, sortType: 'numeric', noPercentile: true, desc: 'Pitcher+ minus Results+ — talent above (or below) results, in points. Deliberately uncolored, like BABIP: a big positive gap is good news for a buyer and bad news for a current stat line, so a good/bad ramp would mislead. Backtest on 2021-25: the top fifth of this gap improved run prevention by 0.45 SD the next season, the bottom fifth declined 0.75 SD, monotonic across all five.', group: 'run_value' },
     { key: 'pitcherPlusProj', label: 'Pitcher+ Proj', format: Utils.formatInt, sortType: 'numeric', desc: 'Projected NEXT-SEASON Pitcher+: 70% this season + 30% last season, re-standardized to 100 = league avg. Pitchers without a prior season keep their current Pitcher+ (the standard Marcel/Steamer pattern). Blending two years lifts out-of-fold prediction of next-season xRV/100 from .61 to .63; a third year adds nothing. Not age-adjusted.', group: 'run_value' },
     { key: 'kPct',        label: 'K%',       format: Utils.formatPct, sortType: 'numeric', sectionStart: true, desc: 'Strikeout rate (K / TBF)', group: 'stats' },
     { key: 'bbPct',       label: 'BB%',      format: Utils.formatPct, sortType: 'numeric', desc: 'Walk rate (BB / TBF)', group: 'stats' },
@@ -517,9 +515,7 @@ const Leaderboard = {
     avg.stuffScore = 100;
     avg.pitchingScore = 100;
     avg.pitcherPlus = 100;
-    avg.resultsPlus = 100;
     avg.pitcherPlusProj = 100;
-    avg.pitcherGap = 0;
     return avg;
   },
 

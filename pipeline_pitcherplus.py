@@ -90,24 +90,26 @@ MIN_POOL = 50         # below this many qualified pitchers, don't score at all
 # 24->25 .0411), pooled 0.03897.
 PRED_SLOPE = 0.039
 
-# ── Results+ / gap / projection ─────────────────────────────────────────
-# Results+ = xRV/100 rescaled to 100 +/- 10. NOT a new metric and must never
-# be presented as one: a composite fit to maximize SAME-season xRV/100 puts
-# 99.9% of its weight on xRV/100 and adds +0.0000 over using xRV/100 alone
-# (scripts/pitcherplus_v2_architecture.py). The rescale exists purely so
-# results read directly against Pitcher+ on one scale. Deliberately
-# UNSHRUNK — describing what happened should not regress toward the mean,
-# which is the one place it differs from every Pitcher+ component.
-RESULTS_KEY = 'xRv100'
+# ── Rejected: Results+ and a talent-minus-results Gap column ────────────
+# Both were built on 2026-07-24 and removed the same day. Recorded here so
+# they don't get reinvented:
+#   Results+ (xRV/100 rescaled to 100 +/- 10) was a strictly LOSSY transform.
+#   Indexing earns its place when the raw unit is meaningless (Stuff+, Loc+,
+#   Pitcher+) or when the index adds an adjustment the raw lacks (ERA- adds
+#   park/league). A plain rescale of xRV/100 does neither: "0.8 runs per 100
+#   pitches" is already concrete, and 112 is less informative. It also runs
+#   backwards against pitchingRuns100/pitcherRuns100, which exist to convert
+#   indexes INTO runs precisely because runs mean more.
+#   Gap (Pitcher+ - Results+) was worse: unit-incoherent. One Pitcher+ point
+#   is 0.039 runs/100 (heavily shrunk); one Results+ point is 0.079
+#   (unshrunk) — 2.04x apart — so subtracting them compares different
+#   currencies. Misiorowski showed +26 points = +0.06 runs while Hader showed
+#   -16 points = -1.92 runs, i.e. the display ranked them backwards.
+#   The coherent runs version (pitcherRuns100 - xRv100) then correlates
+#   -0.784 with the xRVOE/100 column that already ships, so it was a
+#   near-duplicate of existing work. Use xRVOE/100 for results-vs-process.
 
-# pitcherGap = Pitcher+ - Results+ (talent minus results, in points).
-# Quintile backtest on 2021-25 year-pairs: top fifth of the gap improved
-# run prevention by +0.45 SD the next season, bottom fifth declined 0.75
-# SD, monotonic across all five. Gap full-season reliability .544. (Part of
-# that relationship is mechanical — gap and next-year change share the
-# -xRV/100 noise term — but the underlying claim stands on its own: Pitcher+
-# predicts next season at .55 vs xRV/100's .49.)
-
+# ── Pitcher+ Proj ───────────────────────────────────────────────────────
 # Pitcher+ Proj = 70% current / 30% prior-season Pitcher+, re-standardized.
 # Validated on 2021-25 year-pairs predicting NEXT-SEASON xRV/100: OOF r
 # .6104 -> .6271. A free 2-variable fit independently lands on 32% prior.
@@ -222,40 +224,48 @@ def score_row(row, base):
     return round(100.0 + SCALE_K * (raw - rmu) / rsd, 1)
 
 
-def load_prior(data_dir):
-    """{mlbId(str): prior-season Pitcher+}. Empty when the asset is absent —
-    the projection then simply equals Pitcher+ for everyone."""
+def load_prior(data_dir, current_season=None):
+    """{mlbId(str): prior-season Pitcher+}, plus the season it covers.
+
+    LOUD on failure by design. Without the asset the projection silently
+    collapses to an exact copy of Pitcher+ — a column that still looks like
+    a projection but no longer is, with no error and no visual tell. That is
+    the worst failure mode available here, so a missing, unreadable or STALE
+    asset prints a warning; the caller surfaces it in the inject log. The
+    asset covers season Y and is only valid for season Y+1, so it must be
+    regenerated every year:
+        python3 scripts/pitcherplus_build_prior.py --season <last season>
+    """
     import json
     path = os.path.join(data_dir, PRIOR_ASSET)
     try:
         with open(path) as f:
             blob = json.load(f)
-        return blob.get('values') or {}, blob.get('season')
-    except (OSError, ValueError):
+    except OSError:
+        print(f'  [WARN] Pitcher+ prior missing ({path}) — Pitcher+ Proj '
+              f'will equal Pitcher+. Run scripts/pitcherplus_build_prior.py')
         return {}, None
-
-
-def _results_baseline(rows, aaa_teams):
-    """(mu, sigma) of xRV/100 over the qualified MLB pool. Count-weighted
-    mean, unweighted between-pitcher SD — same convention as the Pitcher+
-    components."""
-    vals, wts = [], []
-    for r in rows:
-        if not _is_baseline(r, aaa_teams):
-            continue
-        v = safe_float(r.get(RESULTS_KEY))
-        if v is None:
-            continue
-        vals.append(v)
-        wts.append(_count_of(r))
-    if len(vals) < MIN_POOL:
-        return None
-    tw = sum(wts)
-    mu = (sum(v * w for v, w in zip(vals, wts)) / tw if tw
-          else sum(vals) / len(vals))
-    mean_u = sum(vals) / len(vals)
-    sd = (sum((v - mean_u) ** 2 for v in vals) / (len(vals) - 1)) ** 0.5
-    return (mu, sd) if sd else None
+    except ValueError as e:
+        print(f'  [WARN] Pitcher+ prior unreadable ({e}) — Pitcher+ Proj '
+              f'will equal Pitcher+')
+        return {}, None
+    values = blob.get('values') or {}
+    season = blob.get('season')
+    if not values:
+        print('  [WARN] Pitcher+ prior has no values — Pitcher+ Proj will '
+              'equal Pitcher+')
+    elif current_season is not None and season is not None:
+        try:
+            stale = int(current_season) - int(season)
+        except (TypeError, ValueError):
+            stale = None
+        if stale is not None and stale != 1:
+            print(f'  [WARN] Pitcher+ prior covers {season} but the current '
+                  f'season is {current_season} — expected exactly one season '
+                  f'back. Regenerate: python3 '
+                  f'scripts/pitcherplus_build_prior.py --season '
+                  f'{int(current_season) - 1}')
+    return values, season
 
 
 def _pctl(v, pool):
@@ -267,7 +277,8 @@ def _pctl(v, pool):
     return round(100.0 * (below + 0.5 * equal) / len(pool), 1)
 
 
-def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None):
+def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None,
+                       current_season=None):
     """Set row['pitcherPlus'] + row['pitcherPlus_pctl'] in place. Returns the
     baseline bundle (for metadata / the client-side aggregator), or None if
     the pool was too thin to calibrate.
@@ -285,19 +296,9 @@ def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None):
         r['pitcherRuns100'] = (round(PRED_SLOPE * (v - 100.0), 2)
                                if v is not None else None)
 
-    # ── Results+ (rescale of xRV/100) and the talent-minus-results gap ──
-    rb = _results_baseline(rows, aaa)
-    for r in rows:
-        rv = safe_float(r.get(RESULTS_KEY))
-        rp = (round(100.0 + SCALE_K * (rv - rb[0]) / rb[1], 1)
-              if (rb and rv is not None) else None)
-        r['resultsPlus'] = rp
-        r['pitcherGap'] = (round(r['pitcherPlus'] - rp, 1)
-                           if (rp is not None
-                               and r.get('pitcherPlus') is not None) else None)
-
     # ── Pitcher+ Proj: 70/30 with the frozen prior season ──
-    prior, prior_season = load_prior(data_dir) if data_dir else ({}, None)
+    prior, prior_season = (load_prior(data_dir, current_season)
+                           if data_dir else ({}, None))
     blended, n_prior = [], 0
     for r in rows:
         v = r.get('pitcherPlus')
@@ -325,7 +326,7 @@ def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None):
         r['pitcherPlusProj'] = (round(100.0 + SCALE_K * (raw - bmu) / bsd, 1)
                                 if (raw is not None and bsd) else None)
 
-    for key in ('pitcherPlus', 'resultsPlus', 'pitcherPlusProj'):
+    for key in ('pitcherPlus', 'pitcherPlusProj'):
         pool = [r[key] for r in rows
                 if r.get(key) is not None and _is_baseline(r, aaa)]
         for r in rows:
