@@ -112,8 +112,22 @@ def main():
             # append the full original rows whose PitchID is missing
             add = [r for r in o_rows if o_idx < len(r) and r[o_idx].strip() in missing]
             if add:
-                cws.append_rows(add, value_input_option="USER_ENTERED")
+                resp = cws.append_rows(add, value_input_option="USER_ENTERED")
                 print(f"      synced {len(add)} rows -> {team}")
+                # USER_ENTERED parses "2026-07-24" into a date serial and
+                # "12:56" into a day fraction; without a number format the
+                # cells render as 46227 / 0.045138. append_rows applies no
+                # formatting of its own, so mirror what sheets_append does.
+                try:
+                    from sheets_append import apply_block_format
+                    rng = resp['updates']['updatedRange'].split('!')[1]
+                    start = int(''.join(c for c in rng.split(':')[0] if c.isdigit()))
+                    apply_block_format(cws, cws.row_values(1),
+                                       start, start + len(add) - 1)
+                except Exception as e:
+                    print(f"      WARNING: could not format synced rows "
+                          f"({type(e).__name__}: {e}); run "
+                          f"scripts/fix_unformatted_blocks.py --apply")
         time.sleep(0.4)  # be gentle on the read quota
 
     print("-" * 50)

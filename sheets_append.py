@@ -131,41 +131,163 @@ def _col_letter(n):
     return s
 
 
-def _paste_number_formats_from_row(ws, src_row_1idx, dest_start_1idx, dest_end_1idx, n_cols):
-    """Paste the cell formatting (incl. number format) from a single existing
-    row onto a destination range. Used right after appending new data so the
-    new rows inherit the column-specific number formats already set up on the
-    sheet — e.g. Velocity (`0.0`), Extension (`0.00`), PlateX (`0.000`),
-    RTilt/OTilt (`h:mm`). Without this, appended cells default to "Automatic"
-    and round values like 82.0 render as 82.
+# Google returns sporadic 429s (write quota is 60 requests/min/user) and
+# transient 5xx on any Sheets endpoint — metadata reads included. Historically
+# only ws.update() here was retried, and only on 429, so a single blip on any
+# of the ~10 follow-up formatting calls left the just-appended rows raw:
+# Game Date rendering as the date serial (46227) and RTilt/OTilt as decimals.
+# Every round-trip in this module now goes through this wrapper, mirroring
+# pipeline_fetch.sheets_call_with_retry.
+_TRANSIENT_CODES = ('429', '500', '502', '503', '504')
 
-    Safe to call only when there's at least one existing data row to copy from
-    (i.e. dest_start_1idx > src_row_1idx). The destination range can be any
-    number of rows — the Sheets API repeats the source format to fill it.
+
+def _sheets_retry(fn, label='sheets call', max_retries=5, verbose=True):
+    """Run a gspread call, retrying rate-limit and transient backend errors."""
+    import time as _time
+    import gspread as _gspread
+    for attempt in range(max_retries):
+        try:
+            return fn()
+        except _gspread.exceptions.APIError as e:
+            msg = str(e)
+            code = next((c for c in _TRANSIENT_CODES if c in msg), None)
+            if code is None or attempt >= max_retries - 1:
+                raise
+            # Write quota is a per-minute bucket, so a 429 needs to outwait the
+            # whole window; 5xx clears much faster.
+            wait = 70 if code == '429' else min(60, 5 * (2 ** attempt))
+            if verbose:
+                kind = 'rate limited (429)' if code == '429' else f'transient {code}'
+                print(f"  [sheets] {label}: {kind}; waiting {wait}s "
+                      f"(retry {attempt + 1}/{max_retries - 1})...")
+            _time.sleep(wait)
+
+
+def _format_requests(ws, columns, start_row_1idx, end_row_1idx, src_row_1idx=2):
+    """Build the full batch_update request list that makes an appended block
+    look like the rest of the sheet.
+
+    Returned as ONE list so the caller can issue a single atomic API call:
+    the Sheets API applies the requests in order and rejects the batch as a
+    whole, so the block can never end up half-formatted. This replaces the old
+    sequence of ~10 independent calls (copyPaste + 2 ws.format + 7 per-column
+    ws.format), which was both the quota hog and the corruption window.
+
+    Order matters and mirrors the original sequence:
+      1. copyPaste PASTE_FORMAT from row 2 — inherits every per-column number
+         format Wally set up (Velocity `0.0`, Extension `0.00`, PlateX
+         `0.000`, Game Date `yyyy-mm-dd`, RTilt/OTilt `h:mm`).
+      2. Base cell format — Helvetica Neue 8, centered, top, 1px solid borders.
+      3. Column A (Game Date) bold on top of the base.
+      4. EXPLICIT_NUMBER_FORMATS, which don't trust row 2's state.
     """
-    # 0-indexed conversion. endRowIndex is exclusive.
-    src_row_0 = src_row_1idx - 1
-    request = {
-        'copyPaste': {
-            'source': {
-                'sheetId': ws.id,
-                'startRowIndex': src_row_0,
-                'endRowIndex': src_row_0 + 1,
-                'startColumnIndex': 0,
-                'endColumnIndex': n_cols,
-            },
-            'destination': {
-                'sheetId': ws.id,
-                'startRowIndex': dest_start_1idx - 1,
-                'endRowIndex': dest_end_1idx,
-                'startColumnIndex': 0,
-                'endColumnIndex': n_cols,
-            },
+    n_cols = len(columns)
+    start_0 = start_row_1idx - 1
+    end_0 = end_row_1idx          # exclusive
+    grid = {'sheetId': ws.id, 'startRowIndex': start_0, 'endRowIndex': end_0,
+            'startColumnIndex': 0, 'endColumnIndex': n_cols}
+    reqs = []
+
+    # 1. Inherit per-column formats from the canonical data row. Only valid
+    #    when there's an existing data row above the new block.
+    if start_row_1idx > src_row_1idx:
+        reqs.append({'copyPaste': {
+            'source': {'sheetId': ws.id,
+                       'startRowIndex': src_row_1idx - 1,
+                       'endRowIndex': src_row_1idx,
+                       'startColumnIndex': 0, 'endColumnIndex': n_cols},
+            'destination': dict(grid),
             'pasteType': 'PASTE_FORMAT',
             'pasteOrientation': 'NORMAL',
-        }
+        }})
+
+    # 2. Base look. `fields` deliberately omits numberFormat so this never
+    #    clobbers what step 1 inherited.
+    _SOLID = {'style': 'SOLID', 'width': 1}
+    base_fmt = {
+        'textFormat': {'fontFamily': 'Helvetica Neue', 'fontSize': 8, 'bold': False},
+        'horizontalAlignment': 'CENTER',
+        'verticalAlignment': 'TOP',
+        'borders': {'top': _SOLID, 'bottom': _SOLID,
+                    'left': _SOLID, 'right': _SOLID},
     }
-    ws.spreadsheet.batch_update({'requests': [request]})
+    fmt_fields = ('userEnteredFormat.textFormat,'
+                  'userEnteredFormat.horizontalAlignment,'
+                  'userEnteredFormat.verticalAlignment,'
+                  'userEnteredFormat.borders')
+    reqs.append({'repeatCell': {'range': dict(grid),
+                                'cell': {'userEnteredFormat': base_fmt},
+                                'fields': fmt_fields}})
+
+    # 3. Bold pass on column A (Game Date).
+    reqs.append({'repeatCell': {
+        'range': {**grid, 'endColumnIndex': 1},
+        'cell': {'userEnteredFormat': {
+            **base_fmt,
+            'textFormat': {**base_fmt['textFormat'], 'bold': True}}},
+        'fields': fmt_fields}})
+
+    # 4. Number formats we pin by name rather than inherit.
+    cols = list(columns)
+    for col_name, fmt_spec in EXPLICIT_NUMBER_FORMATS.items():
+        if col_name not in cols:
+            continue
+        idx0 = cols.index(col_name)
+        reqs.append({'repeatCell': {
+            'range': {**grid, 'startColumnIndex': idx0, 'endColumnIndex': idx0 + 1},
+            'cell': {'userEnteredFormat': {'numberFormat': fmt_spec}},
+            'fields': 'userEnteredFormat.numberFormat'}})
+
+    return reqs
+
+
+def _column_a_is_dated(ws, row_1idx):
+    """True if column A of `row_1idx` carries a DATE number format.
+
+    The single cheapest tell that formatting landed: an unformatted Game Date
+    cell falls back to Automatic and renders (and CSV-exports) as the raw
+    serial, e.g. 46227 instead of 2026-07-24.
+    """
+    rng = f"'{ws.title}'!A{row_1idx}"
+    meta = _sheets_retry(
+        lambda: ws.spreadsheet.fetch_sheet_metadata({
+            'includeGridData': True, 'ranges': [rng],
+            'fields': 'sheets(data(rowData(values(effectiveFormat(numberFormat/type)))))',
+        }),
+        label=f'{ws.title} format check')
+    try:
+        cell = meta['sheets'][0]['data'][0]['rowData'][0]['values'][0]
+        return cell['effectiveFormat']['numberFormat']['type'] == 'DATE'
+    except (KeyError, IndexError, TypeError):
+        return False
+
+
+def apply_block_format(ws, columns, start_row_1idx, end_row_1idx, verbose=True):
+    """Format an appended block atomically, then verify and re-apply once.
+
+    Raises if the block is still unformatted after the retry — leaving raw
+    date serials in the sheet silently is the failure this whole path exists
+    to prevent, so it must be loud.
+    """
+    reqs = _format_requests(ws, columns, start_row_1idx, end_row_1idx)
+    label = f'{ws.title} rows {start_row_1idx}-{end_row_1idx} format'
+    _sheets_retry(lambda: ws.spreadsheet.batch_update({'requests': reqs}), label=label)
+
+    # Cheap read-back on the first appended row. Catches the case where the
+    # batch reported success but the formatting didn't stick.
+    if _column_a_is_dated(ws, start_row_1idx):
+        return True
+    if verbose:
+        print(f"  [sheets] {ws.title}: format verify failed on row "
+              f"{start_row_1idx}; re-applying...")
+    _sheets_retry(lambda: ws.spreadsheet.batch_update({'requests': reqs}),
+                  label=label + ' (retry)')
+    if not _column_a_is_dated(ws, start_row_1idx):
+        raise RuntimeError(
+            f"[sheets] {ws.title}: rows {start_row_1idx}-{end_row_1idx} were "
+            f"appended but could NOT be formatted — Game Date will render as a "
+            f"raw serial. Re-run scripts/fix_unformatted_blocks.py to repair.")
+    return True
 
 
 # Columns whose string values would otherwise be misparsed by USER_ENTERED.
@@ -279,7 +401,8 @@ def push_team_data(df, team, gc=None, verbose=True):
     # migrated tab, fails here with an explicit diff instead of appending
     # misaligned rows. An entirely empty header row (brand-new tab) is
     # allowed through — there is nothing to misalign against.
-    sheet_header = ws.row_values(1)
+    sheet_header = _sheets_retry(lambda: ws.row_values(1),
+                                 label=f'{team} header read')
     expected = [str(c) for c in df.columns]
     if sheet_header and sheet_header != expected:
         diffs = [f"col {i+1}: sheet={sh!r} != df={ex!r}"
@@ -296,7 +419,7 @@ def push_team_data(df, team, gc=None, verbose=True):
     # First blank row in column A. Header row 1 stays untouched. Using
     # col_values('A') is more reliable than get_all_values() because trailing
     # blank rows are correctly trimmed.
-    col_a = ws.col_values(1)
+    col_a = _sheets_retry(lambda: ws.col_values(1), label=f'{team} col A read')
     next_row = len(col_a) + 1
     if next_row < 2:
         next_row = 2  # never overwrite a (possibly missing) header row
@@ -312,7 +435,8 @@ def push_team_data(df, team, gc=None, verbose=True):
     # Resize first, with a 1000-row buffer so back-to-back pushes don't have
     # to resize every single time.
     if end_row > ws.row_count:
-        ws.add_rows(end_row - ws.row_count + 1000)
+        _sheets_retry(lambda: ws.add_rows(end_row - ws.row_count + 1000),
+                      label=f'{team} add_rows')
 
     # Grow the tab's grid width too. Tabs are provisioned at the exact schema
     # width, so a push whose block is wider than the current grid (e.g. after a
@@ -320,85 +444,19 @@ def push_team_data(df, team, gc=None, verbose=True):
     # "exceeds grid limits" just like the row ceiling above.
     n_cols = len(df.columns)
     if n_cols > ws.col_count:
-        ws.add_cols(n_cols - ws.col_count)
+        _sheets_retry(lambda: ws.add_cols(n_cols - ws.col_count),
+                      label=f'{team} add_cols')
 
-    # Retry on write-quota 429s (60 writes/min/user): a single daily team
-    # push never trips this, but multi-team pushes (ROC splits, bulk
-    # backfills like 2026-07-13's 50-team recovery) can. Non-quota errors
-    # raise immediately.
-    import time as _time
-    import gspread as _gspread
-    for _attempt in range(4):
-        try:
-            ws.update(range_name, rows, value_input_option='USER_ENTERED')
-            break
-        except _gspread.exceptions.APIError as _e:
-            if '429' in str(_e) and _attempt < 3:
-                _wait = 70
-                print(f"  [sheets] write quota hit for {team}; waiting {_wait}s "
-                      f"(retry {_attempt + 1}/3)...")
-                _time.sleep(_wait)
-            else:
-                raise
+    _sheets_retry(
+        lambda: ws.update(range_name, rows, value_input_option='USER_ENTERED'),
+        label=f'{team} rows {next_row}-{end_row} write')
 
-    # Inherit per-column number formats from an existing data row so values
-    # like Velocity 82.0 don't display as "82" (Automatic format strips
-    # trailing zeros). Row 2 is the canonical source — it's the first data
-    # row Wally set up with per-column formats. Only safe when there's at
-    # least one existing data row above the new block.
-    if next_row > 2:
-        try:
-            _paste_number_formats_from_row(
-                ws, src_row_1idx=2,
-                dest_start_1idx=next_row, dest_end_1idx=end_row,
-                n_cols=len(df.columns),
-            )
-        except Exception as e:
-            if verbose:
-                print(f"  [sheets] number-format paste failed "
-                      f"({type(e).__name__}: {e}); continuing")
-
-    # Match the existing data rows in the sheet:
-    #   font Helvetica Neue 8, center horiz, top vert, SOLID 1px borders all sides.
-    #   Column A (Game Date) is additionally bold.
-    _SOLID = {'style': 'SOLID', 'width': 1}
-    base_fmt = {
-        'textFormat': {'fontFamily': 'Helvetica Neue', 'fontSize': 8},
-        'horizontalAlignment': 'CENTER',
-        'verticalAlignment': 'TOP',
-        'borders': {
-            'top':    _SOLID,
-            'bottom': _SOLID,
-            'left':   _SOLID,
-            'right':  _SOLID,
-        },
-    }
-    ws.format(range_name, base_fmt)
-    # Bold pass on column A (Game Date) — second call overrides textFormat
-    # for that column while preserving the rest of base_fmt.
-    col_a_range = f'A{next_row}:A{end_row}'
-    ws.format(col_a_range, {
-        **base_fmt,
-        'textFormat': {**base_fmt['textFormat'], 'bold': True},
-    })
-
-    # Explicitly enforce number formats on columns we don't want to rely on
-    # row 2 having set up correctly. Currently: RTilt + OTilt (TIME h:mm) —
-    # AAA's row 2 had RTilt empty, which made the whole RTilt column render
-    # as raw decimals after a push. This pass guarantees the right format
-    # regardless of row 2's state on any tab.
-    for col_name, fmt_spec in EXPLICIT_NUMBER_FORMATS.items():
-        if col_name not in df.columns:
-            continue
-        col_idx_1 = df.columns.get_loc(col_name) + 1
-        col_a1 = _col_letter(col_idx_1)
-        rng = f'{col_a1}{next_row}:{col_a1}{end_row}'
-        try:
-            ws.format(rng, {'numberFormat': fmt_spec})
-        except Exception as e:
-            if verbose:
-                print(f"  [sheets] failed to apply {fmt_spec} to {col_name} "
-                      f"({type(e).__name__}: {e}); continuing")
+    # Format the block. This is NOT cosmetic: without the number formats the
+    # USER_ENTERED-parsed values render as their raw storage — Game Date as a
+    # date serial (46227), RTilt/OTilt as day fractions (0.045138) — and that
+    # is exactly what a CSV export then contains. apply_block_format issues a
+    # single atomic batch_update, verifies it stuck, and raises if it didn't.
+    apply_block_format(ws, list(df.columns), next_row, end_row, verbose=verbose)
 
     if verbose:
         wb_label = WORKBOOK_LABEL.get(wb_id, wb_id)
@@ -437,6 +495,7 @@ def push_csv_to_sheets(df, verbose=True):
 
     gc = None  # lazy: only authenticate once we hit a mappable team
     unmapped = []
+    failures = []
     for team, group in valid.groupby('PTeam', sort=False):
         team = str(team)
         if _workbook_id_for_team(team) is None:
@@ -447,5 +506,19 @@ def push_csv_to_sheets(df, verbose=True):
             continue
         if gc is None:
             gc = _get_client()  # auth once, shared across the mappable groups
-        push_team_data(group, team, gc=gc, verbose=verbose)
+        # Isolate each team. Previously a raise mid-loop (e.g. a formatting
+        # failure on the first team) aborted the whole push, silently dropping
+        # every remaining team's rows — a game pull would land one side of the
+        # matchup and lose the other.
+        try:
+            push_team_data(group, team, gc=gc, verbose=verbose)
+        except Exception as e:
+            failures.append((team, e))
+            print(f"  [sheets] {team}: PUSH FAILED ({type(e).__name__}: {e}) "
+                  f"— continuing with remaining teams")
+
+    if failures:
+        raise RuntimeError(
+            "[sheets] push failed for " +
+            ", ".join(f"{t} ({type(e).__name__}: {e})" for t, e in failures))
     return unmapped

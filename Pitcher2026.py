@@ -2044,7 +2044,18 @@ def main():
             print("\nPushing to Google Sheets...")
             unmapped_teams = push_csv_to_sheets(combined)
         except Exception as e:
-            print(f"\nSheets push failed: {e}")
+            # Loud, not a one-liner: a push can fail AFTER the rows have
+            # landed (e.g. the formatting pass dies), in which case the sheet
+            # holds real data that renders as raw serials — Game Date as
+            # 46227, RTilt/OTilt as decimals. That looks like a bad download
+            # but is purely a formatting miss, and it's repairable in place.
+            print("\n" + "!" * 72)
+            print(f"SHEETS PUSH FAILED: {e}")
+            print("Rows may already be in the sheet but unformatted "
+                  "(Game Date showing as e.g. 46227).")
+            print("Check and repair with:")
+            print("  python scripts/fix_unformatted_blocks.py --apply")
+            print("!" * 72)
             # Fallback: write the CSV locally so the data isn't lost.
             # We skipped the local write above because push_to_sheets was True,
             # so this is the only on-disk copy if Sheets is down.
