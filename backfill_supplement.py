@@ -182,12 +182,19 @@ MILB_TEAMS = {'ROC', 'AAA'}
 # the opposing pitchers in those games), so both filter on the same club.
 MILB_SAVANT_TEAM = {'ROC': 'ROC', 'AAA': 'ROC'}
 
-# Which supplement columns the MiLB path may write. Deliberately narrow: the
-# minors CSV also carries RunExp / xBA / xSLG / xwOBA / Barrel, and those are
-# real, but filling them changes numbers the leaderboard already publishes, so
-# widening this is a separate deliberate call. Add names here to do it —
-# nothing else needs to change.
-MILB_SUPPLEMENT_COLS = {'ArmAngle'}
+# Which supplement columns the MiLB path may write. Everything here was
+# verified present in the minors search on real ROC games (2026-07-25):
+#   ArmAngle 99.6% of pitches | RunExp 99.6% of pitches
+#   Barrel (official launch_speed_angle 1-6) 100% of balls in play
+#   xwOBA 98.3% of in-play plus every K/BB/HBP | xBA/xSLG 96% of in-play
+# Deliberately EXCLUDED:
+#   - bat tracking (BatSpeed/SwingLength/Attack*/SwingPathTilt): 100% null.
+#   - Outs/Runners/Description: already 100% from the MLB Stats API feed.
+#   - ExitVelo/LaunchAngle/BBType/HC_X/HC_Y: already complete for balls in
+#     play. Savant additionally carries EV/LA on FOULS, which the feed does
+#     not; filling from here would silently redefine ExitVelo from "in play"
+#     to "in play + fouls" and shift every EV-based metric.
+MILB_SUPPLEMENT_COLS = {'ArmAngle', 'RunExp', 'xBA', 'xSLG', 'xwOBA', 'Barrel'}
 
 # Days per minors request (~5.5k rows/day across all levels vs the 25k cap).
 MILB_CHUNK_DAYS = 3
@@ -266,6 +273,11 @@ def _date_windows(date_min, date_max, span_days):
     return out
 
 
+# (club, window_start, window_end) -> filtered DataFrame (or None if the
+# window failed). Lives for the process so a multi-tab run downloads once.
+_MINORS_WINDOW_CACHE = {}
+
+
 def _download_statcast_minors(team_tab, date_min, date_max, session):
     """Fetch the minor-league Statcast Search for one affiliate's games.
 
@@ -282,6 +294,14 @@ def _download_statcast_minors(team_tab, date_min, date_max, session):
     url = "https://baseballsavant.mlb.com/statcast-search-minors/csv"
     frames = []
     for w_start, w_end in windows:
+        # ROC and AAA are the same games from opposite sides, so the second tab
+        # would otherwise re-download ~40 windows of identical data.
+        cache_key = (club, w_start, w_end)
+        if cache_key in _MINORS_WINDOW_CACHE:
+            cached = _MINORS_WINDOW_CACHE[cache_key]
+            if cached is not None and len(cached):
+                frames.append(cached)
+            continue
         params = {
             'all': 'true',
             'type': 'details',
@@ -296,6 +316,7 @@ def _download_statcast_minors(team_tab, date_min, date_max, session):
         }
         df = _fetch_savant_csv(url, params, session, f"{team_tab} {w_start}..{w_end}")
         if df is None:
+            _MINORS_WINDOW_CACHE[cache_key] = None
             continue
         if len(df) >= MILB_ROW_CAP:
             # Never let a capped window pass as complete data.
@@ -307,6 +328,7 @@ def _download_statcast_minors(team_tab, date_min, date_max, session):
             print(f"    WARNING: {w_start}..{w_end} has no home/away columns; skipping")
             continue
         keep = df[(df['home_team'] == club) | (df['away_team'] == club)]
+        _MINORS_WINDOW_CACHE[cache_key] = keep
         if len(keep):
             frames.append(keep)
         time.sleep(1.5)  # be polite to Savant across ~40 windows
