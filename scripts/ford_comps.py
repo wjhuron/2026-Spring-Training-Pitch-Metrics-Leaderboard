@@ -785,13 +785,13 @@ def interactive():
     role       = "both"     # "hitter", "pitcher", or "both"
     player     = ""         # "Last, First" for one player, or "" for whole team
     team       = "ROC"      # batch mode: team whose players get comped
-    level      = "AAA"     # which of the TARGET's stat lines to use: "mlb",
+    level      = "both"    # which of the TARGET's stat lines to use: "mlb",
                             #   "aaa", or "both" (comp pool is ALWAYS MLB-only)
     start_date = None       # "yyyy-mm-dd", or None for full season
     end_date   = None       # "yyyy-mm-dd", or None for through today
     exclude    = ""         # batch mode: semicolon-separated names to skip
-    min_pa     = 145        # batch mode: min PA to include a hitter
-    min_ip     = 7         # batch mode: min IP to include a pitcher
+    min_pa     = 100        # batch mode: min PA to include a hitter
+    min_ip     = 25         # batch mode: min IP to include a pitcher
     csv_path   = "~/Downloads/roc_comps.csv"   # "" = no CSV
 
     args = argparse.Namespace(player=player or None, player_team=None,
