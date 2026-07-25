@@ -36,7 +36,11 @@ var QUAL = {
   // 0.18; gating at k itself means "color only when >= half the variance is
   // signal". Keep in sync with pipeline_locplus.py STABILIZE_N_PT.
   MIN_PITCH_LOCPLUS:         { FF: 81, SI: 96, FC: 122, SL: 70, CU: 93, CH: 72 },
-  MIN_PITCH_LOCPLUS_DEFAULT: 135,   // overall crossing; unmeasured types (KN, SC, OTHER)
+  // Pitch types with NO measured constant (today only EP: 40 cells, largest
+  // 105 pitches, so k can't be measured). Policy, not a measurement: don't
+  // color what we can't validate. Colors zero cells today either way.
+  // Note KN/SC are NOT unmeasured — they map to the CH group below.
+  MIN_PITCH_LOCPLUS_DEFAULT: Infinity,
   MIN_SACQ:          20,    // Minimum zone count for SACQ wOBA lookup
   MIN_ELLIPSE_PTS:   6,     // Minimum points for scatter ellipse computation
 };

@@ -138,6 +138,11 @@ BIN_Z = 0.10
 NZ = int(round((Z_MAX - Z_MIN) / BIN_Z))           # 22
 PHYS_X_IN = 4.5                    # physical smoothing bandwidths
 PHYS_Z_FRAC = 0.22
+# Optional per-group bandwidth override, {group: (x_inches, z_frac)}. Empty
+# means one bandwidth for every pitch-type group. Applies to the physical
+# surfaces built per (group, bh, ph) — whiff / foul / xwOBAcon / swing. The
+# called-strike surface is per hand only, so it always uses the global pair.
+PHYS_BW_PT = {}
 
 # Per-surface shrinkage pseudo-counts toward the group mean
 K_WHIFF, K_FOUL, K_XWCON = 8, 8, 200
@@ -184,7 +189,15 @@ N_PRIOR_PT_DEFAULT = 0
 # seed spread; CH moved 104 -> 72 with a seed range of 62-82 that excludes the
 # old value, consistent with that pooling inflating k for the most
 # heterogeneous group.
-STABILIZE_N_OVERALL = 135   # not re-measured at cell level; fallback only
+# Fallback for a pitch type with NO measured constant. Nothing reaches it
+# today — EP was the only type that did, and it's excluded outright as a
+# position-player tag (see EXCLUDE_PT) — so this is a safety net for a genuinely
+# novel pitch type appearing mid-season. Policy, not a measurement: don't color
+# what we can't validate. (It replaced a hardcoded 135, the old (pitcher,
+# group)-level OVERALL crossing, which looked measured but was never a gate
+# anyone had validated at the cell level.) To start coloring a new type, measure
+# it with scripts/locplus_stabilize_celllevel.py and add it to STABILIZE_N_PT.
+STABILIZE_N_UNVALIDATED = float('inf')
 STABILIZE_N_PT = {'FF': 81, 'SI': 96, 'FC': 122, 'SL': 70, 'CU': 93, 'CH': 72}
 # Leaderboard pitch-CATEGORY rows pool several types (js/aggregator.js
 # PITCH_CATEGORIES), so they take the stiffest member gate.
@@ -198,7 +211,7 @@ def stabilize_n(pitch_type):
     row, matching the all-MLB-pool convention."""
     if pitch_type in STABILIZE_N_CATEGORY:
         return STABILIZE_N_CATEGORY[pitch_type]
-    return STABILIZE_N_PT.get(GROUP.get(pitch_type), STABILIZE_N_OVERALL)
+    return STABILIZE_N_PT.get(GROUP.get(pitch_type), STABILIZE_N_UNVALIDATED)
 LOC_SCALE_K = 10
 MIN_POOL_OVERALL = 250             # min pitches to enter the (mu,sigma) pool
 MIN_POOL_PT = 60                   # min pitches of a type to enter its group pool
@@ -209,6 +222,12 @@ SWING_DESC = {'Swinging Strike', 'Foul', 'In Play'}
 TAKE_DESC = {'Ball', 'Called Strike'}
 EXCLUDE_DESC = {'Hit By Pitch', 'Foul Bunt', 'Missed Bunt', 'Bunt Foul Tip',
                 'Pitchout', 'Swinging Pitchout', 'Foul Pitchout'}
+# EP tags a POSITION PLAYER on the mound, not a pitch a pitcher throws (Wally,
+# 2026-07-25). The data bears it out: all 40 EP throwers this season are 100%
+# EP with no other pitch type — Trevino, McCann, Higashioka, Rojas, Straw.
+# So EP pitches neither define the league surfaces nor get scored. Excluding
+# them here covers both, since is_eligible_baseline() delegates to _is_scorable().
+EXCLUDE_PT = {'EP'}
 BUNT_BB = {'bunt', 'bunt_grounder', 'bunt_popup', 'bunt_line_drive'}
 
 
@@ -248,6 +267,8 @@ def _is_scorable(p):
         return False
     if p.get('BBType') in BUNT_BB:
         return False
+    if p.get('Pitch Type') in EXCLUDE_PT:
+        return False
     if group_of(p) is None:
         return False
     if safe_float(p.get('PlateX')) is None or _znorm(p) is None:
@@ -275,15 +296,26 @@ _KZ = _k1d(PHYS_Z_FRAC / BIN_Z)
 def _zeros():
     return [[0.0] * NZ for _ in range(NX)]
 
-def _smooth(num, den, prior, kprior):
+def _kernels_for(grp):
+    """(_KX, _KZ) for a pitch-type group, honoring PHYS_BW_PT."""
+    bw = PHYS_BW_PT.get(grp)
+    if not bw:
+        return _KX, _KZ
+    return _k1d(bw[0] / 2.0), _k1d(bw[1] / BIN_Z)
+
+
+def _smooth(num, den, prior, kprior, kx=None, kz=None):
     """Nadaraya-Watson kernel regression (num/den are NX×NZ arrays) with a
-    prior pseudo-count. `prior` is a scalar or an NX×NZ array."""
+    prior pseudo-count. `prior` is a scalar or an NX×NZ array. kx/kz default to
+    the global bandwidth kernels."""
+    _kx = kx if kx is not None else _KX
+    _kz = kz if kz is not None else _KZ
     tn, td = _zeros(), _zeros()
     for i in range(NX):
         ni, di_, tni, tdi = num[i], den[i], tn[i], td[i]
         for j in range(NZ):
             sn = sd = 0.0
-            for dj, w in _KZ:
+            for dj, w in _kz:
                 jj = j + dj
                 if 0 <= jj < NZ:
                     sn += w * ni[jj]; sd += w * di_[jj]
@@ -294,7 +326,7 @@ def _smooth(num, den, prior, kprior):
         oi = out[i]
         for j in range(NZ):
             sn = sd = 0.0
-            for di2, w in _KX:
+            for di2, w in _kx:
                 ii = i + di2
                 if 0 <= ii < NX:
                     sn += w * tn[ii][j]; sd += w * td[ii][j]
@@ -438,11 +470,12 @@ def build_surfaces(baseline, lg_woba, woba_scale):
 
     WH, FL, XW, SW = {}, {}, {}, {}
     for key, a in A.items():
+        kx, kz = _kernels_for(key[0])
         swn = _gsum(a['swn']); swd = _gsum(a['swd']); bipd = _gsum(a['bipd'])
-        WH[key] = _smooth(a['whn'], a['swn'], _gsum(a['whn']) / max(swn, 1), K_WHIFF)
-        FL[key] = _smooth(a['fln'], a['swn'], _gsum(a['fln']) / max(swn, 1), K_FOUL)
-        XW[key] = _smooth(a['bipn'], a['bipd'], _gsum(a['bipn']) / max(bipd, 1), K_XWCON)
-        coll = _smooth(a['swn'], a['swd'], swn / swd if swd else 0.0, K_SWING_COLL)
+        WH[key] = _smooth(a['whn'], a['swn'], _gsum(a['whn']) / max(swn, 1), K_WHIFF, kx, kz)
+        FL[key] = _smooth(a['fln'], a['swn'], _gsum(a['fln']) / max(swn, 1), K_FOUL, kx, kz)
+        XW[key] = _smooth(a['bipn'], a['bipd'], _gsum(a['bipn']) / max(bipd, 1), K_XWCON, kx, kz)
+        coll = _smooth(a['swn'], a['swd'], swn / swd if swd else 0.0, K_SWING_COLL, kx, kz)
         if SWING_PRIOR_COUNT_LEVEL:
             SW[key] = {}
             for c in COUNTS:
@@ -450,9 +483,10 @@ def build_surfaces(baseline, lg_woba, woba_scale):
                 prior_c = [[min(1.0, coll[i][j] * m) for j in range(NZ)]
                            for i in range(NX)]
                 SW[key][c] = _smooth(AC[(key, c)]['swn'], AC[(key, c)]['swd'],
-                                     prior_c, K_SWING_COUNT)
+                                     prior_c, K_SWING_COUNT, kx, kz)
         else:
-            SW[key] = {c: _smooth(AC[(key, c)]['swn'], AC[(key, c)]['swd'], coll, K_SWING_COUNT)
+            SW[key] = {c: _smooth(AC[(key, c)]['swn'], AC[(key, c)]['swd'], coll,
+                                  K_SWING_COUNT, kx, kz)
                        for c in COUNTS}
 
     # Count-anchoring offsets for the BIP value branch (empty dict = off).

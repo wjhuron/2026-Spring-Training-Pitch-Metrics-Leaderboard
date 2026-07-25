@@ -1602,7 +1602,17 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     from pipeline_compute import build_bip_count_means
     _xrv_lg = GUTS_EXTRA.get('lgWOBA') if GUTS_EXTRA else None
     _xrv_scale = GUTS_EXTRA.get('wOBAScale') if GUTS_EXTRA else None
-    _mlb_for_xrv = [p for p in all_pitches if p.get('_source', 'MLB') == 'MLB']
+    # Position-player pitching is excluded from the BASELINE (2026-07-25). These
+    # offsets/means are the league yardstick a BIP is measured against, and 40
+    # catchers lobbing eephuses are not league-average pitching. This is a
+    # yardstick, not a PA count, so it does not conflict with the 2026-07-13
+    # policy that keeps EP PAs in hitter/league totals — those still count, they
+    # are just scored against a pitcher-only baseline. Measured effect is below
+    # display resolution (max offset shift 0.0007 runs, BIP count mean 0.0029),
+    # so this is a correctness cleanup rather than a visible change.
+    _mlb_for_xrv = [p for p in all_pitches
+                    if p.get('_source', 'MLB') == 'MLB'
+                    and (p.get('Pitcher'), p.get('PTeam')) not in ep_pitchers]
     XRV_COUNT_OFFSETS = build_bip_count_offsets(_mlb_for_xrv, _xrv_lg, _xrv_scale)
     XRV_BIP_COUNT_MEANS = build_bip_count_means(_mlb_for_xrv, _xrv_lg, _xrv_scale,
                                                 XRV_COUNT_OFFSETS)
