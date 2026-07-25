@@ -17,7 +17,7 @@ import pandas as pd
 from io import StringIO
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # ── USER CONFIGURATION ──────────────────────────────────────────────────────
 # Set date range (inclusive). Leave both as None to backfill all dates.
@@ -35,12 +35,12 @@ produce_report = "no"
 # recalibration); this catches up the last RESYNC_PLATEZ_DAYS of games. Off by
 # default — flip to "yes" (or pass --resync-platez yes) when you want it.
 resync_platez = "no"
-resync_platez_days = 35
+resync_platez_days = 200
 
-# Also backfill the ROC/AAA (MiLB) tabs? "yes" or "no". The main loop above is
-# MLB-only (Savant serves no minor-league supplement data), so ROC/AAA are filled
-# separately from the MLB Stats API feed — the only two recoverable columns are
-# Outs and Runners (ArmAngle/xStats/bat-tracking don't exist for MiLB). Fill-only.
+# Also run the MLB Stats API feed pass over ROC/AAA? "yes" or "no". This fills
+# Outs and Runners from the feed. It is separate from (and complementary to)
+# the Savant minor-league supplement pass, which the main loop now runs for
+# ROC/AAA to fill MILB_SUPPLEMENT_COLS — see the MiLB block below. Fill-only.
 backfill_milb = "yes"
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -155,11 +155,45 @@ MLB_TEAMS = {
     'DET', 'HOU', 'KCR', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY',
     'PHI', 'PIT', 'SDP', 'SEA', 'SFG', 'STL', 'TBR', 'TEX', 'TOR', 'WSH',
 }
-# Baseball Savant only publishes the Statcast supplement (arm_angle, swing
-# tracking, launch_speed_angle, etc.) for MLB. The MiLB/affiliate tabs
-# (ROC/AAA/FCL in NLE2026) never return supplement data, so the backfill skips
-# them entirely rather than wasting a download attempt per run.
-ALL_TRACKED_TEAMS = set(MLB_TEAMS)
+# ── MiLB (Savant minor-league Statcast Search) ───────────────────────────────
+# Savant serves the affiliate levels from a SEPARATE endpoint
+# (statcast-search-minors), which Pitcher2026 already uses in player_id mode.
+# Verified 2026-07-25 against 7 ROC games: arm_angle, release_pos_y and
+# delta_pitcher_run_exp come back on 99.6% of pitches, and the batted-ball
+# fields (launch_speed_angle, bb_type, hc_x/hc_y, expected stats) on ~100% of
+# balls in play. Arm angle is the same measurement as MLB's, not an estimate:
+# across 138 pitchers who threw at both levels in 2026, MLB vs MiLB season
+# means correlate r=0.991 with a 1.4 deg mean absolute difference.
+#
+# Bat tracking is the one genuinely MLB-only cluster — bat_speed,
+# swing_length, attack_angle, attack_direction, swing_path_tilt and
+# miss_distance are 100% null for MiLB, so SWING_CLUSTER_COLS stay empty.
+#
+# Two quirks drive the code below:
+#   1. The `team` param is silently ignored here (team=ROC returns 0 rows), so
+#      the club filter has to be applied client-side on home_team/away_team.
+#   2. Responses are hard-capped at 25,000 rows and an all-levels day runs
+#      ~5,500 rows, so a season range must be requested in small windows or it
+#      is silently truncated.
+MILB_TEAMS = {'ROC', 'AAA'}
+
+# Tab -> club code as it appears in the minors CSV's home_team/away_team.
+# Both tabs cover the same Rochester games (ROC tab = ROC pitchers, AAA tab =
+# the opposing pitchers in those games), so both filter on the same club.
+MILB_SAVANT_TEAM = {'ROC': 'ROC', 'AAA': 'ROC'}
+
+# Which supplement columns the MiLB path may write. Deliberately narrow: the
+# minors CSV also carries RunExp / xBA / xSLG / xwOBA / Barrel, and those are
+# real, but filling them changes numbers the leaderboard already publishes, so
+# widening this is a separate deliberate call. Add names here to do it —
+# nothing else needs to change.
+MILB_SUPPLEMENT_COLS = {'ArmAngle'}
+
+# Days per minors request (~5.5k rows/day across all levels vs the 25k cap).
+MILB_CHUNK_DAYS = 3
+MILB_ROW_CAP = 25000
+
+ALL_TRACKED_TEAMS = set(MLB_TEAMS) | MILB_TEAMS
 
 
 def date_in_range(date_str):
@@ -173,66 +207,152 @@ def date_in_range(date_str):
     return True
 
 
-def download_statcast(team_tab, date_min, date_max, session):
-    """Download Statcast Search CSV for a team and date range.
-    Returns a dict keyed by (game_pk, at_bat_number, pitch_number) -> row dict."""
-    statcast_team = STATCAST_TEAM_MAP.get(team_tab, team_tab)
-    print(f"    Downloading Statcast for {team_tab} ({statcast_team}) "
-          f"{date_min} to {date_max}...")
+def _fetch_savant_csv(url, params, session, label):
+    """GET a Savant CSV endpoint and parse it, retrying transient failures.
 
-    url = "https://baseballsavant.mlb.com/statcast_search/csv"
-    params = {
-        'all': 'true',
-        'type': 'details',
-        'game_date_gt': date_min,
-        'game_date_lt': date_max,
-        'team': statcast_team,
-        'player_type': 'pitcher',
-        'min_pitches': '0',
-        'min_results': '0',
-        'sort_col': 'pitches',
-        'sort_order': 'desc',
-    }
-
-    # Retry transient Savant errors (timeouts, 5xx, connection resets)
-    # so a single hiccup doesn't drop a team's worth of supplement data.
-    response = None
+    Retries 5xx, timeouts and connection resets, and also malformed bodies:
+    Savant intermittently returns an HTML error page with a 200, which pandas
+    surfaces as a ParserError rather than an HTTP failure. Returns a DataFrame,
+    or None when the query legitimately has no rows.
+    """
     for attempt in range(4):
         try:
-            response = session.get(url, params=params, timeout=120)
-            if response.status_code == 200:
-                break
-            if response.status_code >= 500 and attempt < 3:
-                wait = 5 * (2 ** attempt)  # 5, 10, 20 s
-                print(f"    Savant returned {response.status_code}, retrying in {wait}s...")
-                time.sleep(wait)
-                continue
-            print(f"    Statcast returned status {response.status_code}")
-            return None
+            response = session.get(url, params=params, timeout=180)
+            if response.status_code != 200:
+                if response.status_code >= 500 and attempt < 3:
+                    wait = 5 * (2 ** attempt)  # 5, 10, 20 s
+                    print(f"    Savant returned {response.status_code} for {label}, "
+                          f"retrying in {wait}s...")
+                    time.sleep(wait)
+                    continue
+                print(f"    Statcast returned status {response.status_code}")
+                return None
+
+            csv_text = response.text
+            if not csv_text or csv_text.strip() == '' or 'No Results' in csv_text[:100]:
+                print(f"    No Statcast data available yet ({label})")
+                return None
+
+            df = pd.read_csv(StringIO(csv_text), low_memory=False)
+            if df.empty:
+                print(f"    Empty DataFrame ({label})")
+                return None
+            return df
+
         except (requests.exceptions.Timeout,
-                requests.exceptions.ConnectionError) as e:
+                requests.exceptions.ConnectionError,
+                requests.exceptions.ChunkedEncodingError,
+                pd.errors.ParserError) as e:
             if attempt < 3:
                 wait = 5 * (2 ** attempt)
-                print(f"    Savant request failed ({type(e).__name__}), retrying in {wait}s...")
+                print(f"    Savant request failed for {label} "
+                      f"({type(e).__name__}), retrying in {wait}s...")
                 time.sleep(wait)
                 continue
-            print(f"    Timeout downloading Statcast data")
+            print(f"    Giving up on {label} ({type(e).__name__})")
             return None
+    return None
 
-    if response is None or response.status_code != 200:
+
+def _date_windows(date_min, date_max, span_days):
+    """Split an inclusive date range into consecutive windows of span_days."""
+    d = datetime.strptime(date_min, '%Y-%m-%d').date()
+    end = datetime.strptime(date_max, '%Y-%m-%d').date()
+    out = []
+    while d <= end:
+        stop = min(d + timedelta(days=span_days - 1), end)
+        out.append((d.isoformat(), stop.isoformat()))
+        d = stop + timedelta(days=1)
+    return out
+
+
+def _download_statcast_minors(team_tab, date_min, date_max, session):
+    """Fetch the minor-league Statcast Search for one affiliate's games.
+
+    The endpoint ignores `team`, so every window comes back with all levels'
+    rows and is filtered client-side on home_team/away_team. Windows are kept
+    small because the response is capped at MILB_ROW_CAP rows with no error —
+    a truncated window would silently drop pitches.
+    """
+    club = MILB_SAVANT_TEAM.get(team_tab, team_tab)
+    windows = _date_windows(date_min, date_max, MILB_CHUNK_DAYS)
+    print(f"    Downloading minor-league Statcast for {team_tab} (club {club}) "
+          f"{date_min} to {date_max} in {len(windows)} windows...")
+
+    url = "https://baseballsavant.mlb.com/statcast-search-minors/csv"
+    frames = []
+    for w_start, w_end in windows:
+        params = {
+            'all': 'true',
+            'type': 'details',
+            'game_date_gt': w_start,
+            'game_date_lt': w_end,
+            'player_type': 'pitcher',
+            'min_pitches': '0',
+            'min_results': '0',
+            'sort_col': 'pitches',
+            'sort_order': 'desc',
+            'minors': 'true',
+        }
+        df = _fetch_savant_csv(url, params, session, f"{team_tab} {w_start}..{w_end}")
+        if df is None:
+            continue
+        if len(df) >= MILB_ROW_CAP:
+            # Never let a capped window pass as complete data.
+            print(f"    WARNING: {w_start}..{w_end} returned {len(df)} rows "
+                  f"(cap {MILB_ROW_CAP}) — results were truncated. Lower "
+                  f"MILB_CHUNK_DAYS and re-run; this window is being skipped.")
+            continue
+        if 'home_team' not in df.columns or 'away_team' not in df.columns:
+            print(f"    WARNING: {w_start}..{w_end} has no home/away columns; skipping")
+            continue
+        keep = df[(df['home_team'] == club) | (df['away_team'] == club)]
+        if len(keep):
+            frames.append(keep)
+        time.sleep(1.5)  # be polite to Savant across ~40 windows
+
+    if not frames:
+        print(f"    No {club} rows found in the minor-league search")
+        return None
+    return pd.concat(frames, ignore_index=True)
+
+
+def download_statcast(team_tab, date_min, date_max, session):
+    """Download Statcast Search CSV for a team and date range.
+    Returns a dict keyed by (game_pk, at_bat_number, pitch_number) -> row dict.
+
+    MLB tabs use the standard Statcast Search; ROC/AAA use the minor-league
+    search, which needs windowed requests and a client-side club filter.
+    """
+    is_milb = team_tab.upper() in MILB_TEAMS
+    allowed_cols = MILB_SUPPLEMENT_COLS if is_milb else None
+
+    if is_milb:
+        df = _download_statcast_minors(team_tab, date_min, date_max, session)
+    else:
+        statcast_team = STATCAST_TEAM_MAP.get(team_tab, team_tab)
+        print(f"    Downloading Statcast for {team_tab} ({statcast_team}) "
+              f"{date_min} to {date_max}...")
+        df = _fetch_savant_csv(
+            "https://baseballsavant.mlb.com/statcast_search/csv",
+            {
+                'all': 'true',
+                'type': 'details',
+                'game_date_gt': date_min,
+                'game_date_lt': date_max,
+                'team': statcast_team,
+                'player_type': 'pitcher',
+                'min_pitches': '0',
+                'min_results': '0',
+                'sort_col': 'pitches',
+                'sort_order': 'desc',
+            },
+            session, team_tab)
+
+    if df is None:
         return None
 
     try:
-        csv_text = response.text
-        if not csv_text or csv_text.strip() == '' or 'No Results' in csv_text[:100]:
-            print(f"    No Statcast data available yet")
-            return None
-
-        df = pd.read_csv(StringIO(csv_text))
-        if df.empty:
-            print(f"    Empty DataFrame")
-            return None
-
         # Verify merge keys exist
         for col in ['game_pk', 'at_bat_number', 'pitch_number']:
             if col not in df.columns:
@@ -280,6 +400,10 @@ def download_statcast(team_tab, date_min, date_max, session):
         formatted = {}
         for sheet_col, csv_col in SUPPLEMENT_MAP.items():
             if csv_col not in df.columns:
+                continue
+            # MiLB: only the columns the minors search actually serves and that
+            # we've opted into (MILB_SUPPLEMENT_COLS).
+            if allowed_cols is not None and sheet_col not in allowed_cols:
                 continue
             series = df[csv_col]
             if sheet_col in STRING_COLS:
@@ -337,7 +461,7 @@ def download_statcast(team_tab, date_min, date_max, session):
                     data[sheet_col] = formatted[sheet_col].at[i]
                 elif sheet_col in ALWAYS_OVERWRITE_COLS:
                     data[sheet_col] = ''
-            if has_runners:
+            if has_runners and (allowed_cols is None or 'Runners' in allowed_cols):
                 data['Runners'] = runners.at[i]
             if data:
                 lookup[key] = data
@@ -501,12 +625,19 @@ def main():
                 print(f"  No PitchID column — skipping")
                 continue
 
-            # Find supplement column indices (SUPPLEMENT_MAP + Runners)
+            # Find supplement column indices (SUPPLEMENT_MAP + Runners).
+            # ROC/AAA are limited to MILB_SUPPLEMENT_COLS — the minors search
+            # serves no bat tracking at all, and the columns it does serve
+            # beyond that set are opt-in (see MILB_SUPPLEMENT_COLS).
+            is_milb_tab = tab_name in MILB_TEAMS
+            allowed = MILB_SUPPLEMENT_COLS if is_milb_tab else None
             supp_col_idx = {}
             for sheet_col in SUPPLEMENT_MAP:
+                if allowed is not None and sheet_col not in allowed:
+                    continue
                 if sheet_col in col_idx:
                     supp_col_idx[sheet_col] = col_idx[sheet_col]
-            if 'Runners' in col_idx:
+            if 'Runners' in col_idx and (allowed is None or 'Runners' in allowed):
                 supp_col_idx['Runners'] = col_idx['Runners']
             if not supp_col_idx:
                 print(f"  No supplement columns found — skipping")
