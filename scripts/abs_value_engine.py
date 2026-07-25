@@ -329,40 +329,51 @@ def wp_mid_batting(inning, half, diff, bases, out, tables):
     return total
 
 
+def run_slope(inning, half, diff, bases, out, tables):
+    """Win-probability value of one more run to the BATTING team, right here.
+
+    A local derivative of wp_mid_batting at this exact base-out-score state.
+    This is what makes the two branches of a flip commensurable: terminal
+    outcomes are priced as exact WP transitions, so a continuation outcome
+    priced as runs must be converted with the same local WP curve rather than
+    with G (which is a half-end, fresh-inning average and disagrees with the
+    exact calculation whenever WP is curved -- i.e. whenever a team is ahead).
+    """
+    sgn = -1 if half == "top" else 1
+    base = wp_mid_batting(inning, half, diff, bases, out, tables)
+    up = wp_mid_batting(inning, half, clamp(diff + sgn), bases, out, tables)
+    return up - base, base
+
+
 def value_of_flip(b, s, bases, out, inning, half, diff, tables):
     """Price a called-strike vs called-ball flip at a given state.
 
-    Continuation branches use base-out-conditioned count values (RV288) times
-    the run-leverage factor G. Terminal branches (ball four / strike three)
-    are priced as EXACT win-probability transitions, so walk-off states no
-    longer overpay for runs beyond the winning one. Both branches are measured
-    against the count-agnostic PA-start baseline, and the result is expressed
-    in leveraged runs (delta-WP / gAvg) for currency consistency.
+    Both branches are valued in win probability off the same local curve:
+    terminal outcomes (ball four / strike three) as exact WP transitions, and
+    continuation outcomes as their base-out-conditioned count value (RV288)
+    times the local WP-per-run slope at this state. Result is expressed in
+    leveraged runs (delta-WP / gAvg).
 
     Returns dict with leveragedRuns (batting-team gain if the call is a BALL;
-    >= 0), li, and dRE (= leveragedRuns / li, the run-equivalent).
+    >= 0), li (local run leverage), and dRE (the run-equivalent).
     diff is home minus away score at the time of the pitch.
     """
     rv288 = tables["countRV288"]
-    g_run = tables["G"][(min(inning, EXTRA_INNING), half, clamp(diff))]
-    wp_base = None
+    slope, wp_base = run_slope(inning, half, diff, bases, out, tables)
 
     if b == 3:   # ball four: exact WP after the forced walk
-        wp_base = wp_mid_batting(inning, half, diff, bases, out, tables)
         nb, runs = walk_bases(bases)
         d2 = diff - runs if half == "top" else diff + runs
         ball_wp = wp_mid_batting(inning, half, d2, nb, out, tables) - wp_base
     else:
-        ball_wp = rv288[(b + 1, s, bases, out)] * g_run
+        ball_wp = rv288[(b + 1, s, bases, out)] * slope
 
     if s == 2:   # strike three: exact WP after the out
-        if wp_base is None:
-            wp_base = wp_mid_batting(inning, half, diff, bases, out, tables)
         strike_wp = wp_mid_batting(inning, half, diff, bases, out + 1, tables) - wp_base
     else:
-        strike_wp = rv288[(b, s + 1, bases, out)] * g_run
+        strike_wp = rv288[(b, s + 1, bases, out)] * slope
 
-    li = g_run / tables["gAvg"]
+    li = slope / tables["gAvg"]
     leveraged = (ball_wp - strike_wp) / tables["gAvg"]
     return {"dRE": leveraged / li if li > 1e-9 else 0.0, "li": li,
             "leveragedRuns": leveraged}

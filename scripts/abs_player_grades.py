@@ -207,7 +207,9 @@ def main():
            "bat": defaultdict(lambda: {"bins": defaultdict(lambda: [0, 0]), "nChal": 0})}
     zm = defaultdict(lambda: [0, 0, 0])   # (xi, zi) -> [takes, wrongStrike, wrongBall]
     for r in data["records"]:
-        if r["distMidIn"] is None:
+        # position players mopping up in a blowout are not a fair test of
+        # anyone's decisions (Wally's rule), so they are dropped everywhere
+        if r["distMidIn"] is None or r.get("posPitcher"):
             continue
         # --- zone-miss heatmap: every near-zone take, human call vs ABS truth
         if r.get("pXmid") is not None:

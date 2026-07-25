@@ -250,7 +250,7 @@ window.ABS = (function () {
     backtest: [['team', 'Team', 'l'], ['games', 'G'], ['actW', 'ActualWins'], ['optW', 'OptimalWins'], ['gapW', 'LeftOnTable']]
   };
   const NOTES = {
-    catchers: 'TWO orthogonal metrics. <b>Skill+</b> = leverage-blind decision quality indexed to 100, independent of the stakes a catcher faced. <b>Value/100</b> = leveraged runs added per 100 consequential decisions (skill x leverage x volume). They rank differently on purpose: the highest-Value catchers are not the highest-Skill ones. Both empirical-Bayes shrunk with 95% CIs, shown only where reliable (reliability &ge; 0.40). Wide Skill+ CIs (~&plusmn;20) mean most catchers are statistically indistinguishable in pure skill with half a season. Sort by either column.',
+    catchers: 'TWO orthogonal metrics. <b>Skill+</b> = leverage-blind decision quality indexed to 100 &mdash; the talent estimate, so it is shown only for catchers whose sample clears a reliability bar and reads "provisional" otherwise. <b>Value/100</b> = leveraged runs added per 100 consequential decisions; it deliberately keeps the leverage a catcher happened to be handed, so it is <b>descriptive, not a talent estimate</b>, and never stabilizes &mdash; its 95% CI carries that uncertainty. The two rank differently on purpose: the highest-Value catchers are not the highest-Skill ones, because raw value is mostly leverage and volume rather than judgment. Wide Skill+ CIs (~&plusmn;20) mean most catchers are still statistically indistinguishable in pure skill.',
     hitters: 'DESCRIPTIVE ONLY. Half a season of hitter challenges shows no detectable talent spread yet, so no hitter is a reliable talent estimate. Records of what happened, ranked by NetVal. Expect this to firm up over 2-3 seasons.',
     teams: 'Team totals across all deciders, including pitcher-initiated challenges. Ranked by NetVal (descriptive).',
     backtest: 'Season replay: value captured by actual challenge usage vs the matrix policy run with league-average perception (no hindsight). Wins = leveraged runs times the league run-to-win factor. Negative LeftOnTable = the team already beats the league-perceiver benchmark.'
@@ -258,13 +258,18 @@ window.ABS = (function () {
   const DEFSORT = { catchers: 'skill', hitters: 'net', teams: 'net', backtest: 'gapW' };
 
   function slimRow(r) {
-    const sq = r.skillQual, vq = r.valueQual;
+    // Skill+ is the TALENT claim, so it is gated on reliability and reads
+    // "provisional" below the bar. Value/100 is descriptive by nature -- it
+    // deliberately keeps the leverage a player was handed, so it never
+    // stabilizes as a talent estimate and is always shown, with its CI
+    // carrying the uncertainty.
+    const sq = r.skillQual;
     return {
       player: r.player, team: r.team,
       skill: (r.skill == null || !sq) ? null : Math.round(r.skill),
       skci: (r.skillCI == null || !sq) ? null : Math.round(r.skillCI),
-      value: (r.value == null || !vq) ? null : +r.value.toFixed(2),
-      vci: (r.valueCI == null || !vq) ? null : +r.valueCI.toFixed(2),
+      value: r.value == null ? null : +r.value.toFixed(2),
+      vci: r.valueCI == null ? null : +r.valueCI.toFixed(2),
       cons: r.consN || 0, chal: r.challenges,
       succ: r.successPct == null ? null : Math.round(r.successPct), net: +r.netValue.toFixed(2)
     };

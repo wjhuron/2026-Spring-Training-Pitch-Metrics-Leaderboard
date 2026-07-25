@@ -66,7 +66,7 @@ def main():
     # chronological opportunity stream per (gamePk, team)
     streams = defaultdict(list)
     for r in data["records"]:
-        if r["distMidIn"] is None:
+        if r["distMidIn"] is None or r.get("posPitcher"):
             continue
         if r["originalCall"] == "strike":
             side, m = "bat", r["distMidIn"] - thr

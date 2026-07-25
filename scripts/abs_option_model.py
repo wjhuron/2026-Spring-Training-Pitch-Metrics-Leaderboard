@@ -76,7 +76,7 @@ def load_opportunities(dataset_path, tables):
         data = json.load(f)
     opps, side_mismatch = [], 0
     for r in data["records"]:
-        if r["distMidIn"] is None:
+        if r["distMidIn"] is None or r.get("posPitcher"):
             continue
         if r["originalCall"] == "strike":
             side = "bat"                      # batting team wants a ball

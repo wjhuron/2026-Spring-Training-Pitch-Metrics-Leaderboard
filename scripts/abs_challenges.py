@@ -47,6 +47,7 @@ TAKE_CODES = {"B": "ball", "*B": "ball", "C": "strike"}
 ZONE_HALF_WIDTH_IN = 8.5          # 17" plate width / 2
 KEEP_BAND_IN = 4.5                # keep takes within this |edge distance|
 CHALLENGES_PER_TEAM = 2
+GHOST_RUNNER = -1        # sentinel for the extra-innings automatic runner
 DEFAULT_OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                            "data", "abs_challenges_2026.json")
 
@@ -127,8 +128,11 @@ def zone_distance_in(px, pz, sz_top, sz_bot):
 def apply_movements(bases, entries):
     """Apply one playIndex batch of runner movements to the base-state dict.
 
-    Removals first (by runner id), then placements, so same-index chains like
-    batter->1B + R1->2B can't clobber each other.
+    Removals first (by runner id AND by the base being vacated), then
+    placements, so same-index chains like batter->1B + R1->2B can't clobber
+    each other. Vacating movement["start"] matters for the extra-innings
+    automatic runner: he is pre-placed by the rule and never appears in a
+    runners entry until he moves, so he has no id we could have tracked.
     Returns runs scored in this batch.
     """
     runs = 0
@@ -136,6 +140,10 @@ def apply_movements(bases, entries):
     for base in list(bases):
         if bases[base] in ids:
             del bases[base]
+    for e in entries:
+        start = e["movement"].get("start")
+        if start in ("1B", "2B", "3B"):
+            bases.pop(start, None)
     for e in entries:
         mv = e["movement"]
         end = mv.get("end")
@@ -182,6 +190,10 @@ def parse_game(feed):
                        for p in gd.get("players", {}).values()}
     players_by_name_nodots = {k.replace(".", ""): v for k, v in players_by_name.items()}
     players_by_id = {p["id"]: p["fullName"] for p in gd.get("players", {}).values()}
+    # Position players mopping up in a blowout are not a fair test of anyone's
+    # umpiring or challenge decisions; flag them so consumers can drop them.
+    pos_pitcher = {p["id"] for p in gd.get("players", {}).values()
+                   if (p.get("primaryPosition") or {}).get("code") not in ("1", "Y")}
     catchers = starting_catchers(live)
     fielder_chal = {"n": 0, "catcherMatch": 0}
 
@@ -196,7 +208,11 @@ def parse_game(feed):
         about = play["about"]
         half_key = (about["inning"], about["halfInning"])
         if half_key != prev_half:
-            bases = {}
+            # Extra innings start with the automatic runner on 2nd. The feed
+            # pre-places him, so he never shows up in a runners entry unless he
+            # moves -- without this the highest-leverage innings of the season
+            # are recorded as bases empty.
+            bases = {"2B": GHOST_RUNNER} if about["inning"] >= 10 else {}
             prev_half = half_key
         bat_side = "away" if about["halfInning"] == "top" else "home"
 
@@ -310,6 +326,7 @@ def parse_game(feed):
                     "batter": play["matchup"]["batter"]["fullName"],
                     "pitcherId": play["matchup"]["pitcher"]["id"],
                     "pitcher": play["matchup"]["pitcher"]["fullName"],
+                    "posPitcher": play["matchup"]["pitcher"]["id"] in pos_pitcher,
                     "catcherId": catchers[fld_side],
                     "catcher": players_by_id.get(catchers[fld_side]),
                     "batHand": play["matchup"]["batSide"]["code"],
