@@ -149,7 +149,7 @@ window.ABS = (function () {
   const COL_DESC = {
     player: 'Player name. Click to pull their reel in the Film Room.',
     team: 'Team the player was with for most of these decisions.',
-    skill: 'Skill+ : leverage-blind decision quality, indexed so 100 = league average and 15 points = one talent standard deviation. Independent of the stakes a player happened to face.',
+    skill: 'Skill+ : leverage-blind decision quality, indexed so 100 = league average and 15 points = one talent standard deviation. Independent of the stakes faced, and balanced so that simply challenging rarely cannot inflate it. Catchers only; no hitter sample is large enough yet.',
     skci: '95% confidence interval on Skill+. If it spans 100, this player is not distinguishable from average yet.',
     value: 'Leveraged runs added per 100 consequential decisions. Combines judgment, the leverage faced, and volume.',
     vci: '95% confidence interval on Value/100.',
@@ -251,7 +251,7 @@ window.ABS = (function () {
   };
   const NOTES = {
     catchers: 'TWO orthogonal metrics. <b>Skill+</b> = leverage-blind decision quality indexed to 100 &mdash; the talent estimate, so it is shown only for catchers whose sample clears a reliability bar and reads "provisional" otherwise. <b>Value/100</b> = leveraged runs added per 100 consequential decisions; it deliberately keeps the leverage a catcher happened to be handed, so it is <b>descriptive, not a talent estimate</b>, and never stabilizes &mdash; its 95% CI carries that uncertainty. The two rank differently on purpose: the highest-Value catchers are not the highest-Skill ones, because raw value is mostly leverage and volume rather than judgment. Wide Skill+ CIs (~&plusmn;20) mean most catchers are still statistically indistinguishable in pure skill.',
-    hitters: 'DESCRIPTIVE ONLY. Half a season of hitter challenges shows no detectable talent spread yet, so no hitter is a reliable talent estimate. Records of what happened, ranked by NetVal. Expect this to firm up over 2-3 seasons.',
+    hitters: 'DESCRIPTIVE ONLY &mdash; no Skill+ is shown for hitters on purpose. Out-of-sample testing found no hitter skill metric that predicts forward without mostly measuring how <i>rarely</i> a hitter challenges (the naive version correlates -0.91 with challenge rate). The median hitter has about 32 real decisions, which is not a season. These rows are a record of what happened, ranked by NetVal. Expect this to firm up over 2-3 seasons.',
     teams: 'Team totals across all deciders, including pitcher-initiated challenges. Ranked by NetVal (descriptive).',
     backtest: 'Season replay: value captured by actual challenge usage vs the matrix policy run with league-average perception (no hindsight). Wins = leveraged runs times the league run-to-win factor. Negative LeftOnTable = the team already beats the league-perceiver benchmark.'
   };

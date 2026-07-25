@@ -137,7 +137,35 @@ def new_ledger():
     return {"chalN": 0, "chalWon": 0, "cva": 0.0, "procVal": 0.0, "badChalN": 0,
             "chalMarginSum": 0.0, "missN": 0, "missValue": 0.0, "oppN": 0,
             "consN": 0, "consSum": 0.0, "consSq": 0.0,
-            "sklSum": 0.0, "sklSq": 0.0, "teams": defaultdict(int)}
+            "sklSum": 0.0, "sklSq": 0.0,
+            # skill is accumulated per confidence class so the two can be
+            # weighted equally later (see balance_skill)
+            "sklHiSum": 0.0, "sklHiSq": 0.0, "sklHiN": 0,
+            "sklLoSum": 0.0, "sklLoSq": 0.0, "sklLoN": 0,
+            "teams": defaultdict(int)}
+
+
+def balance_skill(ledgers):
+    """Give the two confidence classes equal weight in the skill score.
+
+    Scoring every decision equally lets a player who simply never challenges
+    harvest the abundant low-confidence pitches and post a high, very stable
+    number -- measured at r=-0.91 with challenge rate for hitters, i.e. the
+    metric was largely a passivity meter. Reweighting each decision by
+    n / (2 * n_class) makes the plain mean equal the balanced mean, so the
+    existing variance machinery still applies. Out-of-sample this lifted
+    catcher prediction from r=0.295 to r=0.368 and cut contamination by
+    challenge frequency from -0.35 to +0.16.
+    """
+    for l in ledgers.values():
+        nh, nl = l["sklHiN"], l["sklLoN"]
+        n = nh + nl
+        if not n or not nh or not nl:
+            l["sklSum"] = l["sklSq"] = 0.0
+            continue
+        wh, wl = n / (2.0 * nh), n / (2.0 * nl)
+        l["sklSum"] = wh * l["sklHiSum"] + wl * l["sklLoSum"]
+        l["sklSq"] = wh * wh * l["sklHiSq"] + wl * wl * l["sklLoSq"]
 
 
 def shrinkage(ledgers, sumkey="consSum", sqkey="consSq"):
@@ -336,8 +364,12 @@ def main():
                 led["consN"] += 1
                 led["consSum"] += contrib
                 led["consSq"] += contrib * contrib
-                led["sklSum"] += skl
-                led["sklSq"] += skl * skl
+                if pc >= SKILL_PREF:
+                    led["sklHiSum"] += skl; led["sklHiSq"] += skl * skl
+                    led["sklHiN"] += 1
+                else:
+                    led["sklLoSum"] += skl; led["sklLoSq"] += skl * skl
+                    led["sklLoN"] += 1
 
         if chal is not None and chal.get("side") == wronged:
             k = chal.get("remainingBefore") or rem or 1
@@ -399,6 +431,8 @@ def main():
                                "result": "would-win" if m > 0 else "would-lose",
                                "playId": play_id, **situation})
 
+    balance_skill(catchers)
+    balance_skill(hitters)
     cat_val, cat_vpop = shrinkage(catchers, "consSum", "consSq")
     hit_val, hit_vpop = shrinkage(hitters, "consSum", "consSq")
     cat_skl, cat_spop = shrinkage(catchers, "sklSum", "sklSq")
@@ -410,7 +444,7 @@ def main():
           f"SKILL n0={n0str(cat_spop)}; hitter VALUE n0={n0str(hit_vpop)}, "
           f"SKILL n0={n0str(hit_spop)}")
 
-    def rows(book, val, skl, min_opp=0):
+    def rows(book, val, skl, min_opp=0, skill_is_talent=True):
         out = []
         for pid, led in book.items():
             if led["chalN"] == 0 and led["missN"] == 0:
@@ -423,7 +457,10 @@ def main():
             vrel = vs["reliability"] if vs else None
             krel = ks["reliability"] if ks else None
             vq = bool(vrel is not None and vrel >= QUAL_REL)
-            kq = bool(krel is not None and krel >= QUAL_REL)
+            # Hitters get no talent claim: out-of-sample testing found no
+            # hitter skill metric that predicts forward without simply
+            # measuring passivity (median hitter has ~32 decisions).
+            kq = bool(skill_is_talent and krel is not None and krel >= QUAL_REL)
             out.append({
                 "playerId": pid, "player": names.get(pid, str(pid)), "team": team,
                 "challenges": led["chalN"], "won": led["chalWon"],
@@ -467,7 +504,7 @@ def main():
                          "runs added per 100 consequential decisions (skill x leverage "
                          "faced). netValue/successPct are descriptive, not talent."},
         "catchers": rows(catchers, cat_val, cat_skl),
-        "hitters": rows(hitters, hit_val, hit_skl),
+        "hitters": rows(hitters, hit_val, hit_skl, skill_is_talent=False),
         "pitchers": rows(pitchers, {}, {}), "teams": rows(teams, {}, {}),
     }
     with open(OUT_JSON, "w") as f:
