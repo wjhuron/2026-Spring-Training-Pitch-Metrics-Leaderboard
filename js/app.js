@@ -193,7 +193,7 @@
     if (routePart === 'hitters/swing-decisions') routePart = 'hitters/plate-discipline';
     if (routePart === 'abs' || routePart.indexOf('abs/') === 0) {
       const av = routePart.split('/')[1] || 'leaders';
-      showAbs(['leaders', 'matrix', 'film'].indexOf(av) >= 0 ? av : 'leaders', true);
+      showAbs(['leaders', 'matrix', 'film', 'zone'].indexOf(av) >= 0 ? av : 'leaders', true, parts[1]);
       return;
     }
     const tab = ROUTE_TAB[routePart];
@@ -258,7 +258,7 @@
     if (as) as.style.display = 'none';
   }
 
-  function showAbs(view, skipHash) {
+  function showAbs(view, skipHash, absQuery) {
     currentSection = 'abs';
     if (!skipHash) window.location.hash = 'abs/' + (view || 'leaders');
     // hide the pitch-data leaderboard UI and home
@@ -280,7 +280,7 @@
       const on = t.getAttribute('data-absview') === (view || 'leaders');
       t.classList.toggle('active', on); t.setAttribute('aria-selected', on ? 'true' : 'false');
     });
-    if (window.ABS) { ABS.setView(view || 'leaders'); ABS.render(); }
+    if (window.ABS) { ABS.setView(view || 'leaders', absQuery); ABS.render(); }
   }
 
   function showLeaderboard() {

@@ -8,6 +8,13 @@
   "qualRel": 0.4,
   "consGmin": 0.05,
   "consMmax": 2.5,
+  "league": {
+   "challenges": 6333,
+   "won": 3380,
+   "missN": 5419,
+   "missValue": 147.5,
+   "blownCalls": 5003
+  },
   "note": "TWO orthogonal talent metrics, each empirical-Bayes shrunk with a 95% CI and qualified only at reliability>=0.40. skill = leverage-blind decision quality (confidence-weighted correctness x100), independent of stakes. value = leveraged runs added per 100 consequential decisions (skill x leverage faced). netValue/successPct are descriptive, not talent."
  },
  "catchers": [

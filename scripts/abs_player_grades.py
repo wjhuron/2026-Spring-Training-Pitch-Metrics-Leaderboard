@@ -63,6 +63,11 @@ TABLES = os.path.join(REPO_ROOT, "data", "abs_value_tables_2026.json")
 OPTION = os.path.join(REPO_ROOT, "data", "abs_option_model_2026.json")
 OUT_JSON = os.path.join(REPO_ROOT, "data", "abs_player_grades_2026.json")
 EVENTS_JSON = os.path.join(REPO_ROOT, "data", "abs_challenge_events_2026.json")
+ZONEMISS_JSON = os.path.join(REPO_ROOT, "data", "abs_zone_misses_2026.json")
+# heatmap grid: x in inches from plate center, z normalized to each batter's
+# own zone (0 = bottom edge, 1 = top edge) so every hitter is comparable
+ZM_X0, ZM_X1, ZM_XSTEP = -14.0, 14.0, 2.0
+ZM_Z0, ZM_Z1, ZM_ZSTEP = -0.40, 1.40, 0.15
 DOWNLOADS = os.path.expanduser("~/Downloads")
 VIDEO_URL = "https://baseballsavant.mlb.com/sporty-videos?playId={pid}"
 
@@ -200,9 +205,30 @@ def main():
     parsed = []
     obs = {"fld": defaultdict(lambda: {"bins": defaultdict(lambda: [0, 0]), "nChal": 0}),
            "bat": defaultdict(lambda: {"bins": defaultdict(lambda: [0, 0]), "nChal": 0})}
+    zm = defaultdict(lambda: [0, 0, 0])   # (xi, zi) -> [takes, wrongStrike, wrongBall]
     for r in data["records"]:
         if r["distMidIn"] is None:
             continue
+        # --- zone-miss heatmap: every near-zone take, human call vs ABS truth
+        if r.get("pXmid") is not None:
+            zspan = (r["szTop"] - r["szBot"]) * 12.0
+            if zspan > 1e-6:
+                zx = r["pXmid"] * 12.0
+                zz = (r["pZmid"] * 12.0 - r["szBot"] * 12.0) / zspan
+                if ZM_X0 <= zx < ZM_X1 and ZM_Z0 <= zz < ZM_Z1:
+                    xi = int((zx - ZM_X0) / ZM_XSTEP)
+                    zi = int((zz - ZM_Z0) / ZM_ZSTEP)
+                    cell = zm[(xi, zi)]
+                    cell[0] += 1
+                    truth_strike = r["distMidIn"] <= thr
+                    called_strike = r["originalCall"] == "strike"
+                    if truth_strike != called_strike:
+                        # wrongStrike = rung up on a true ball; wrongBall = a
+                        # true strike called a ball (the catcher's grievance)
+                        if called_strike:
+                            cell[1] += 1
+                        else:
+                            cell[2] += 1
         if r["originalCall"] == "strike":
             side, m = "bat", r["distMidIn"] - thr
             wronged = r["batSide"]
@@ -229,7 +255,11 @@ def main():
         else:
             owner_id, owner_name = r["catcherId"], r["catcher"]
         extra = (r["playId"], r["date"], r["balls"], r["strikes"],
-                 r["inning"], r["half"], r["batter"], r["catcher"], r["pitcher"])
+                 r["inning"], r["half"], r["batter"], r["catcher"], r["pitcher"],
+                 # full situation so a Film Room row can be loaded into the
+                 # matrix tool; midpoint coords so the margin reproduces exactly
+                 r["outs"], r["bases"], r["awayScore"], r["homeScore"],
+                 r["pXmid"], r["pZmid"], r["szTop"], r["szBot"])
         parsed.append((side, m, wronged, rem, team_abbr, d_team, g, T, chal,
                        owner_id, owner_name, reg, cls, extra))
         if rem > 0 and owner_id is not None:
@@ -264,7 +294,12 @@ def main():
     events = []   # every challenge + every counted miss, with Savant video ids
     for (side, m, wronged, rem, team_abbr, d_team, g, T, chal,
          owner_id, owner_name, reg, cls, extra) in parsed:
-        play_id, ev_date, balls, strikes, inning, half, ev_batter, ev_catcher, ev_pitcher = extra
+        (play_id, ev_date, balls, strikes, inning, half, ev_batter, ev_catcher,
+         ev_pitcher, ev_outs, ev_bases, ev_away, ev_home, ev_px, ev_pz,
+         ev_sztop, ev_szbot) = extra
+        situation = {"outs": ev_outs, "bases": ev_bases, "away": ev_away,
+                     "home": ev_home, "px": ev_px, "pz": ev_pz,
+                     "szTop": ev_sztop, "szBot": ev_szbot}
         if side == "bat":
             book = hitters
         else:
@@ -339,7 +374,7 @@ def main():
                            "half": half, "marginIn": round(m, 2),
                            "gain": round(g, 3), "ev": round(ev, 3),
                            "result": "won" if chal["overturned"] else "lost",
-                           "playId": play_id})
+                           "playId": play_id, **situation})
         elif chal is None and rem > 0 and g > 0:
             cost = cost_at(rem, T, d_team)
             p_conf = posterior_at(p_look_L[f"{side}|{reg}"],
@@ -360,7 +395,7 @@ def main():
                                "half": half, "marginIn": round(m, 2),
                                "gain": round(g, 3), "ev": round(ev, 3),
                                "result": "would-win" if m > 0 else "would-lose",
-                               "playId": play_id})
+                               "playId": play_id, **situation})
 
     cat_val, cat_vpop = shrinkage(catchers, "consSum", "consSq")
     hit_val, hit_vpop = shrinkage(hitters, "consSum", "consSq")
@@ -415,6 +450,14 @@ def main():
                  "games": data["meta"]["games"], "rulingThrIn": thr,
                  "catValN0": round(cat_vpop["n0"], 1), "catSklN0": round(cat_spop["n0"], 1),
                  "qualRel": QUAL_REL, "consGmin": CONS_G_MIN, "consMmax": CONS_M_MAX,
+                 "league": {
+                     "challenges": sum(l["chalN"] for l in teams.values()),
+                     "won": sum(l["chalWon"] for l in teams.values()),
+                     "missN": sum(l["missN"] for l in teams.values()),
+                     "missValue": round(sum(l["missValue"] for l in teams.values()), 1),
+                     "blownCalls": sum(1 for e in events
+                                       if e["result"] in ("won", "would-win")),
+                 },
                  "note": "TWO orthogonal talent metrics, each empirical-Bayes shrunk "
                          "with a 95% CI and qualified only at reliability>=0.40. "
                          "skill = leverage-blind decision quality (confidence-weighted "
@@ -428,6 +471,24 @@ def main():
     with open(OUT_JSON, "w") as f:
         json.dump(result, f, indent=1)
     print(f"wrote {OUT_JSON}")
+
+    with open(ZONEMISS_JSON, "w") as f:
+        json.dump({"meta": {"generated": date.today().isoformat(),
+                            "x0": ZM_X0, "xStep": ZM_XSTEP,
+                            "z0": ZM_Z0, "zStep": ZM_ZSTEP,
+                            "zoneHalfWidthIn": 8.5, "thrIn": thr,
+                            "note": "z is normalized to each batter's own ABS "
+                                    "zone: 0 = bottom edge, 1 = top edge. cells "
+                                    "are [takes, calledStrikeButBall, "
+                                    "calledBallButStrike]."},
+                   "cells": {f"{xi}|{zi}": v for (xi, zi), v in sorted(zm.items())}},
+                  f, separators=(",", ":"))
+    tot_takes = sum(v[0] for v in zm.values())
+    tot_ws = sum(v[1] for v in zm.values())
+    tot_wb = sum(v[2] for v in zm.values())
+    print(f"wrote {ZONEMISS_JSON} ({len(zm)} cells, {tot_takes} takes, "
+          f"{100*tot_ws/tot_takes:.1f}% wrongly rung up, "
+          f"{100*tot_wb/tot_takes:.1f}% true strikes called balls)")
 
     events.sort(key=lambda e: (e["date"], e["team"], e["inning"]))
     with open(EVENTS_JSON, "w") as f:

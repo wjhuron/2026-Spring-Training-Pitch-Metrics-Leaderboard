@@ -2,7 +2,12 @@
    Matrix, Film Room) into #abs-page from committed data/abs_*.json at runtime.
    Isolated from the pitch-data leaderboard engine. Exposed as window.ABS. */
 window.ABS = (function () {
-  let styled = false, core = null, events = null;
+  let styled = false, core = null, events = null, zoneMiss = null;
+  // Film Room filters live at module scope so they survive view switches and
+  // can be driven by leaderboard click-through and by the URL.
+  const film = { date: null, bat: '', cat: '', team: '', type: '', wrong: 'wrong', count: '', inning: '' };
+  let filmSort = 'value', filmDir = -1;
+  let pendingPitch = null;   // a Film Room row waiting to be loaded into the matrix
   const state = {
     view: 'leaders', tab: 'catchers', sort: 'skill', dir: -1, q: '',
     // matrix state
@@ -75,6 +80,43 @@ window.ABS = (function () {
 #abs-page .verdict.hold .word{color:var(--accent)}
 #abs-page .verdict .why{font-size:13px;color:var(--text-secondary)}
 #abs-page .zplot{border:1px solid var(--border);border-radius:9px;background:var(--bg-primary);cursor:crosshair;touch-action:manipulation}
+#abs-page th[title]{text-decoration:underline dotted rgba(120,110,95,.5);text-underline-offset:3px}
+#abs-page .lead-link{color:inherit;text-decoration:underline dotted rgba(120,110,95,.6);text-underline-offset:2px;cursor:pointer}
+#abs-page .lead-link:hover{color:var(--accent)}
+#abs-page tr.row-click{cursor:pointer}
+#abs-page tr.row-click:hover td{background:var(--row-hover)}
+#abs-page .empty{padding:26px 18px;text-align:center;color:var(--text-muted);font-size:14px}
+#abs-page .empty b{color:var(--text-primary)}
+#abs-page details.howto{border:1px solid var(--border);border-radius:10px;background:var(--bg-card);padding:10px 14px;margin-bottom:14px}
+#abs-page details.howto summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--accent);list-style:none}
+#abs-page details.howto summary::-webkit-details-marker{display:none}
+#abs-page details.howto summary::before{content:"\\25B8 ";display:inline-block;transition:transform .15s}
+#abs-page details.howto[open] summary::before{content:"\\25BE "}
+#abs-page details.howto dl{margin:10px 0 2px;font-size:13px;line-height:1.55;color:var(--text-secondary)}
+#abs-page details.howto dt{font-weight:600;color:var(--text-primary);margin-top:7px}
+#abs-page details.howto dd{margin:0 0 2px}
+#abs-page .strip{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+#abs-page .strip .s{border:1px solid var(--border);border-radius:9px;background:var(--bg-card);padding:8px 13px;min-width:104px}
+#abs-page .strip .s .k{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted)}
+#abs-page .strip .s .v{font-family:'Bitter',serif;font-weight:700;font-size:19px;margin-top:1px}
+#abs-page .heatwrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--bg-card);padding:14px}
+#abs-page .heatlegend{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--text-muted)}
+@media (max-width:720px){
+  #abs-page{padding:6px 2px 48px}
+  #abs-page h2{font-size:19px}
+  #abs-page .abs-sub{font-size:13px}
+  #abs-page .abs-bar{gap:6px}
+  #abs-page .abs-bar .abs-inp,#abs-page .abs-bar input[type=search]{flex:1 1 128px;min-width:0;font-size:16px}
+  #abs-page .abs-count{width:100%;margin-left:0}
+  #abs-page .mx-ctrls{gap:10px 14px}
+  #abs-page .seg button,#abs-page .chip{padding:8px 11px}
+  #abs-page .cell{min-width:34px;font-size:11px;padding:7px 1px}
+  #abs-page .mx-grid th.rowh{font-size:11px;padding-right:5px}
+  #abs-page .strip .s{flex:1 1 44%;min-width:0}
+  #abs-page .abs-tblwrap{max-height:64vh}
+  #abs-page td,#abs-page th{padding:6px 7px}
+  #abs-page .zplot{width:100%;height:auto;max-width:224px}
+}
 `;
     const s = document.createElement('style'); s.id = 'abs-styles'; s.textContent = css;
     document.head.appendChild(s);
@@ -101,6 +143,100 @@ window.ABS = (function () {
   // ---------- shared ----------
   const el = () => document.getElementById('abs-page');
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // One-line definitions for every column, mirroring the `desc:` convention the
+  // main leaderboard uses. Rendered as native title tooltips.
+  const COL_DESC = {
+    player: 'Player name. Click to pull their reel in the Film Room.',
+    team: 'Team the player was with for most of these decisions.',
+    skill: 'Skill+ : leverage-blind decision quality, indexed so 100 = league average and 15 points = one talent standard deviation. Independent of the stakes a player happened to face.',
+    skci: '95% confidence interval on Skill+. If it spans 100, this player is not distinguishable from average yet.',
+    value: 'Leveraged runs added per 100 consequential decisions. Combines judgment, the leverage faced, and volume.',
+    vci: '95% confidence interval on Value/100.',
+    cons: 'Consequential decisions: near-zone calls with real stakes that this player could actually have challenged.',
+    chal: 'Challenges this player personally initiated.',
+    succ: 'Share of their challenges that were overturned.',
+    net: 'Descriptive season total in leveraged runs: value earned from challenges minus value left on the table by declining good ones.',
+    games: 'Team games in the sample.',
+    actW: 'Wins the team actually captured from the challenge system.',
+    optW: 'Wins the matrix policy would have captured, played with league-average eyesight and no hindsight.',
+    gapW: 'Wins left on the table: optimal minus actual. Negative means the team already beats the benchmark.',
+    date: 'Game date.',
+    batter: 'Hitter at the plate. Click to filter to them.',
+    catcher: 'Catcher behind the plate. Click to filter to them.',
+    side: 'Which side owned the decision: the hitter (on a called strike) or the catcher (on a called ball).',
+    type: 'Challenged = someone used a challenge. Missed = nobody did, though the matrix says it was worth it.',
+    result: 'won / would-win = the call was genuinely wrong. lost / would-lose = the call was right.',
+    count: 'Count the pitch was thrown on.',
+    inning: 'Inning.',
+    marginIn: 'Inches in the challenger\'s favor. Positive means ABS would have flipped the call.',
+    ev: 'Expected value of the decision at the moment it was made, in leveraged runs.',
+    playId: 'Opens the pitch on Baseball Savant.'
+  };
+  const th = (k, label, cls, sortKey, dir) =>
+    `<th class="${cls || ''}" data-k="${k}"${COL_DESC[k] ? ` title="${esc(COL_DESC[k])}"` : ''}` +
+    ` aria-sort="${sortKey === k ? (dir < 0 ? 'descending' : 'ascending') : 'none'}">${label}</th>`;
+
+  function emptyState(msg, hint) {
+    return `<div class="empty"><b>${esc(msg)}</b>${hint ? `<br>${hint}` : ''}</div>`;
+  }
+
+  function toCSV(cols, rows) {
+    const q = v => {
+      const s = v == null ? '' : String(v);
+      return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    return [cols.map(c => q(c[1])).join(',')]
+      .concat(rows.map(r => cols.map(c => q(r[c[0]])).join(',')))
+      .join('\n');
+  }
+  function downloadCSV(name, cols, rows) {
+    const blob = new Blob([toCSV(cols, rows)], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  }
+
+  // ---- URL <-> state (replaceState so we never re-trigger the router) ----
+  function writeUrl() {
+    const q = [];
+    if (state.view === 'film') {
+      if (film.date) q.push('date=' + film.date);
+      if (film.bat) q.push('bat=' + encodeURIComponent(film.bat));
+      if (film.cat) q.push('cat=' + encodeURIComponent(film.cat));
+      if (film.team) q.push('team=' + film.team);
+      if (film.type) q.push('type=' + film.type);
+      if (film.count) q.push('count=' + film.count);
+      if (film.inning) q.push('inning=' + film.inning);
+      if (film.wrong !== 'wrong') q.push('all=1');
+      if (filmSort !== 'value') q.push('sort=' + filmSort);
+    } else if (state.view === 'leaders') {
+      if (state.tab !== 'catchers') q.push('tab=' + state.tab);
+      if (state.q) q.push('q=' + encodeURIComponent(state.q));
+    }
+    const hash = '#abs/' + state.view + (q.length ? '?' + q.join('&') : '');
+    if (location.hash !== hash) history.replaceState(null, '', hash);
+  }
+  function applyUrl(query) {
+    if (!query) return;
+    const p = {};
+    query.split('&').forEach(kv => {
+      const i = kv.indexOf('='); if (i < 0) return;
+      p[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1));
+    });
+    if (p.tab) state.tab = p.tab;
+    if (p.q) state.q = p.q;
+    if (p.date) film.date = p.date;
+    if (p.bat) film.bat = p.bat;
+    if (p.cat) film.cat = p.cat;
+    if (p.team) film.team = p.team;
+    if (p.type) film.type = p.type;
+    if (p.count) film.count = p.count;
+    if (p.inning) film.inning = p.inning;
+    if (p.all) film.wrong = '';
+    if (p.sort) filmSort = p.sort;
+  }
 
   // view switching is handled by the nav sub-tabs (#abs-subtabs) in app.js,
   // so the in-page switcher is intentionally empty
@@ -147,19 +283,45 @@ window.ABS = (function () {
     if (['player', 'team'].includes(k)) return 'l';
     return ['skci', 'vci', 'cons', 'succ', 'chal'].includes(k) ? 'dim' : '';
   }
+  function leagueStrip() {
+    const L = (core.grades.meta && core.grades.meta.league) || null;
+    if (!L) return '';
+    const gap = core.backtest.reduce((s, t) => s + (t.gapW || 0), 0);
+    const pct = L.challenges ? Math.round(100 * L.won / L.challenges) : 0;
+    const s = (k, v) => `<div class="s"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+    return `<div class="strip">
+      ${s('Challenges', L.challenges.toLocaleString())}
+      ${s('Overturned', pct + '%')}
+      ${s('Blown calls', L.blownCalls.toLocaleString())}
+      ${s('Declined &amp; worth it', L.missN.toLocaleString())}
+      ${s('Value left on table', L.missValue + ' runs')}
+      ${s('Wins left on table', gap.toFixed(1))}
+    </div>`;
+  }
+
+  const HOWTO_LEADERS = `<details class="howto"><summary>How to read this</summary><dl>
+    <dt>Leveraged runs</dt><dd>The currency here. A run's worth scaled by how much the moment matters, so a flipped call in a tie game in the 9th counts for far more than the same call in a blowout.</dd>
+    <dt>A lost challenge can still be a good decision</dt><dd>Everything is graded on the expected value at the moment of the call, not the outcome. A justified challenge that loses still grades positive; a reckless one that happens to win does not.</dd>
+    <dt>Skill+ vs Value/100</dt><dd>Skill+ strips leverage out to isolate judgment (100 = average). Value/100 keeps it in, so it rewards judgment plus the stakes faced plus volume. They rank differently on purpose.</dd>
+    <dt>Why some cells say "provisional"</dt><dd>Half a season is not enough to call most players good or bad. Only players whose sample clears a reliability bar get a number; everyone else stays descriptive.</dd>
+  </dl></details>`;
+
   function renderLeaders() {
     const g = core.grades;
     const rowsFor = t => t === 'backtest' ? core.backtest : (g[t] || []).map(slimRow);
     const p = el();
     p.innerHTML = viewTabs() +
-      `<h2>Challenge grades</h2><p class="abs-sub" id="abs-note"></p>
+      `<h2>Challenge grades</h2>` + leagueStrip() + HOWTO_LEADERS +
+      `<p class="abs-sub" id="abs-note"></p>
        <div class="abs-bar">
          <div class="abs-vtabs" id="abs-ltabs">${['catchers', 'hitters', 'teams', 'backtest'].map(t =>
         `<button data-ltab="${t}" aria-pressed="${state.tab === t}">${t[0].toUpperCase() + t.slice(1)}</button>`).join('')}</div>
          <input type="search" id="abs-q" placeholder="Search player or team" value="${esc(state.q)}">
+         <button id="abs-csv" class="chip" title="Download the rows currently shown">CSV</button>
          <span class="abs-count" id="abs-cnt"></span>
        </div>
-       <div class="abs-tblwrap"><table id="abs-tbl"></table></div>`;
+       <div class="abs-tblwrap"><table id="abs-tbl"></table></div>
+       <div id="abs-empty"></div>`;
     bindViewTabs();
     p.querySelectorAll('#abs-ltabs button').forEach(b => b.addEventListener('click', () => {
       state.tab = b.dataset.ltab; state.sort = DEFSORT[state.tab]; state.dir = -1;
@@ -180,14 +342,45 @@ window.ABS = (function () {
         if (x == null) return 1; if (y == null) return -1;
         return (x < y ? -1 : x > y ? 1 : 0) * state.dir * (typeof x === 'string' ? -1 : 1);
       });
-      let h = '<thead><tr>' + cols.map(c => `<th class="${c[2] || ''}" data-k="${c[0]}" aria-sort="${state.sort === c[0] ? (state.dir < 0 ? 'descending' : 'ascending') : 'none'}">${c[1]}</th>`).join('') + '</tr></thead><tbody>';
-      for (const r of rows) h += '<tr>' + cols.map(c => `<td class="${cellCls(r[c[0]], c[0])}">${fmt(r[c[0]], c[0])}</td>`).join('') + '</tr>';
+      let h = '<thead><tr>' + cols.map(c => th(c[0], c[1], c[2], state.sort, state.dir)).join('') + '</tr></thead><tbody>';
+      for (const r of rows) h += '<tr>' + cols.map(c => {
+        // player names click through to that player's reel in the Film Room
+        if (c[0] === 'player' && r.player) {
+          const who = state.tab === 'catchers' ? 'cat' : 'bat';
+          return `<td class="l"><span class="lead-link" data-who="${who}" data-name="${esc(r.player)}" role="link" tabindex="0">${esc(r.player)}</span></td>`;
+        }
+        return `<td class="${cellCls(r[c[0]], c[0])}">${fmt(r[c[0]], c[0])}</td>`;
+      }).join('') + '</tr>';
       p.querySelector('#abs-tbl').innerHTML = h + '</tbody>';
       p.querySelector('#abs-cnt').textContent = rows.length + ' rows';
       p.querySelector('#abs-note').innerHTML = NOTES[state.tab];
-      p.querySelectorAll('#abs-tbl th').forEach(th => th.addEventListener('click', () => {
-        const k = th.dataset.k; if (state.sort === k) state.dir *= -1; else { state.sort = k; state.dir = -1; } drawTable();
+      const emptyBox = p.querySelector('#abs-empty');
+      if (!rows.length) {
+        emptyBox.innerHTML = emptyState(
+          state.q ? `No ${state.tab} match "${state.q}".` : `Nothing to show here yet.`,
+          state.q ? 'Check the spelling, or clear the search box.' : '');
+        p.querySelector('.abs-tblwrap').style.display = 'none';
+      } else { emptyBox.innerHTML = ''; p.querySelector('.abs-tblwrap').style.display = ''; }
+      p.querySelectorAll('#abs-tbl th').forEach(t => t.addEventListener('click', () => {
+        const k = t.dataset.k; if (state.sort === k) state.dir *= -1; else { state.sort = k; state.dir = -1; } drawTable();
       }));
+      const jump = elm => {
+        film.date = ''; film.bat = ''; film.cat = ''; film.team = ''; film.type = '';
+        film.count = ''; film.inning = ''; film.wrong = 'wrong';
+        film[elm.dataset.who] = elm.dataset.name;
+        state.view = 'film';
+        document.querySelectorAll('.abs-tab').forEach(t2 => {
+          const on = t2.getAttribute('data-absview') === 'film';
+          t2.classList.toggle('active', on); t2.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        render();
+      };
+      p.querySelectorAll('.lead-link').forEach(elm => {
+        elm.addEventListener('click', () => jump(elm));
+        elm.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); jump(elm); } });
+      });
+      p.querySelector('#abs-csv').onclick = () => downloadCSV(`abs_${state.tab}_2026.csv`, cols, rows);
+      writeUrl();
     }
   }
 
@@ -326,6 +519,7 @@ window.ABS = (function () {
        <h2 style="margin-top:26px">Price a specific pitch</h2>
        <p class="abs-sub">Click a cell to load that situation, then set where the ball was. Pick a hitter for their exact zone, or type Gameday plate_x / plate_z.</p>
        <div class="panel">
+        <div id="mFrom" style="display:none;border:1px solid var(--border);border-radius:9px;background:var(--accent-light);padding:9px 13px;margin-bottom:12px;font-size:13px"></div>
         <div class="mx-live" style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;background:var(--bg-primary)">
           <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">Load from a live game</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
@@ -433,16 +627,27 @@ window.ABS = (function () {
       mvPitches.innerHTML = '';
       syncControls(); drawZone(); drawGrid(); drawPanel();
     });
+    // Accepts a live-feed pitch (balls/strikes) or a Film Room event (count
+    // string, explicit zone, and the side that owned the decision).
     function loadPitch(pt) {
-      state.sel = { b: pt.balls, s: pt.strikes, inning: Math.min(pt.inning, 10) };
+      const b = pt.balls != null ? pt.balls : +String(pt.count).split('-')[0];
+      const s = pt.strikes != null ? pt.strikes : +String(pt.count).split('-')[1];
+      state.sel = { b: b, s: s, inning: Math.min(pt.inning, 10) };
       state.half = pt.half; state.outs = Math.min(pt.outs, 2);
       state.bases = [pt.bases[0] === '1', pt.bases[1] === '1', pt.bases[2] === '1'];
-      state.away = pt.away; state.home = pt.home; state.side = 'bat';
+      state.away = pt.away; state.home = pt.home;
+      state.side = pt.role ? (pt.role === 'batter' ? 'bat' : 'fld') : 'bat';
       state.px = pt.px * 12; state.pz = pt.pz * 12;
-      const z = core.zones.find(x => x.n === pt.batter);
-      if (z) { state.ztop = z.t * 12; state.zbot = z.b * 12; p.querySelector('#mZone').textContent = `zone ${z.t.toFixed(2)} / ${z.b.toFixed(2)} ft (${pt.batter})`; }
-      else { state.ztop = 39.6; state.zbot = 19.2; p.querySelector('#mZone').textContent = 'zone 3.30 / 1.60 ft (league average)'; }
-      p.querySelector('#mHit').value = z ? pt.batter : '';
+      if (pt.szTop != null && pt.szBot != null) {
+        state.ztop = pt.szTop * 12; state.zbot = pt.szBot * 12;
+        p.querySelector('#mZone').textContent = `zone ${pt.szTop.toFixed(2)} / ${pt.szBot.toFixed(2)} ft (${pt.batter})`;
+        p.querySelector('#mHit').value = pt.batter || '';
+      } else {
+        const z = core.zones.find(x => x.n === pt.batter);
+        if (z) { state.ztop = z.t * 12; state.zbot = z.b * 12; p.querySelector('#mZone').textContent = `zone ${z.t.toFixed(2)} / ${z.b.toFixed(2)} ft (${pt.batter})`; }
+        else { state.ztop = 39.6; state.zbot = 19.2; p.querySelector('#mZone').textContent = 'zone 3.30 / 1.60 ft (league average)'; }
+        p.querySelector('#mHit').value = z ? pt.batter : '';
+      }
       syncControls(); drawZone(); drawGrid(); drawPanel();
     }
     function showPitches(bid) {
@@ -482,6 +687,16 @@ window.ABS = (function () {
     loadSchedule(mvDate.value);
 
     drawGrid(); drawPanel();
+    if (pendingPitch) {                 // arrived here from a Film Room row
+      const pp = pendingPitch; pendingPitch = null;
+      loadPitch(pp);
+      const banner = p.querySelector('#mFrom');
+      if (banner) {
+        banner.style.display = '';
+        banner.innerHTML = `Loaded from the Film Room: <b>${esc(pp.batter)}</b> vs <b>${esc(pp.pitcher || '')}</b>, ${pp.date}, ${pp.count} count &mdash; ${pp.result === 'won' || pp.result === 'would-win' ? 'a blown call' : 'the call was right'}.`;
+      }
+      p.querySelector('#mState').scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
 
     function drawGrid() {
       const mx = p.querySelector('#mGrid');
@@ -541,9 +756,17 @@ window.ABS = (function () {
   }
 
   // ================= FILM ROOM =================
+  const HOWTO_FILM = `<details class="howto"><summary>How to read this</summary><dl>
+    <dt>What counts as an opportunity</dt><dd>A pitch ABS would have called the other way. "Challenged" means someone spent a challenge on it; "Missed" means nobody did even though the matrix says it was worth it.</dd>
+    <dt>Value</dt><dd>Leveraged runs riding on that single call &mdash; the run swing scaled by how much the moment mattered. This is what the board ranks by.</dd>
+    <dt>Margin</dt><dd>How many inches the call was wrong by, from the challenger's point of view. Bigger margin = easier to spot live.</dd>
+    <dt>Blown calls only</dt><dd>On by default. Turn it off to also see challenges spent on calls that were actually correct &mdash; including high-leverage gambles that were right to take and still lost.</dd>
+    <dt>Click any row</dt><dd>Loads that exact pitch into the Matrix tool so you can see the full decision math behind it.</dd>
+  </dl></details>`;
+
   async function renderFilm() {
     const p = el();
-    p.innerHTML = viewTabs() + `<h2>Film room</h2><p class="abs-sub">Loading clips...</p>`;
+    p.innerHTML = viewTabs() + `<h2>Top challenge opportunities</h2><p class="abs-sub">Loading clips...</p>`;
     bindViewTabs();
     if (!events) { try { events = (await fetch('data/abs_challenge_events_2026.json').then(r => r.json())).events; } catch (e) { events = []; } }
     if (state.view !== 'film') return;
@@ -552,70 +775,192 @@ window.ABS = (function () {
       side: e.role === 'batter' ? 'Hitter' : (e.role === 'pitcher' ? 'Pitcher' : 'Catcher'),
       type: e.type, result: e.result, count: e.count, inning: e.inning,
       marginIn: e.marginIn, value: +(+e.gain).toFixed(2), ev: +(+e.ev).toFixed(2),
-      playId: e.playId
+      playId: e.playId, _raw: e
     }));
     const dates = [...new Set(rows.map(r => r.date))].sort().reverse();
     const teams = [...new Set(rows.map(r => r.team))].sort();
     const batters = [...new Set(rows.map(r => r.batter).filter(Boolean))].sort();
     const catchers = [...new Set(rows.map(r => r.catcher).filter(Boolean))].sort();
     const latest = dates[0];
+    if (film.date === null) film.date = latest || '';   // first visit defaults to the newest day
+    const COUNTS_L = ['0-0', '0-1', '0-2', '1-0', '1-1', '1-2', '2-0', '2-1', '2-2', '3-0', '3-1', '3-2'];
+    const sel = (v, cur) => v === cur ? ' selected' : '';
     p.innerHTML = viewTabs() +
-      `<h2>Top challenge opportunities</h2>
-       <p class="abs-sub">Blown calls ranked by <b>Value</b> &mdash; the leveraged runs riding on that pitch &mdash; whether or not anyone challenged. Defaults to the most recent day (data runs through <b>${latest}</b>; today's games post after the next morning refresh). Filter by day, hitter, or catcher to pull anyone's reel. Margin = inches in the challenger's favor. Switch to "Every decision" to also see challenges on calls that were correct.</p>
+      `<h2>Top challenge opportunities</h2>` + HOWTO_FILM +
+      `<p class="abs-sub">Blown calls ranked by <b>Value</b> &mdash; the leveraged runs riding on that pitch &mdash; whether or not anyone challenged. Data runs through <b>${latest}</b>; today's games post after the next morning refresh. Click a row to price it in the Matrix.</p>
        <div class="abs-bar">
-         <select id="fDate" class="abs-inp"><option value="">All dates</option>${dates.map(d => `<option value="${d}"${d === latest ? ' selected' : ''}>${d}</option>`).join('')}</select>
-         <input id="fBat" class="abs-inp" list="fBatList" placeholder="Hitter" style="width:150px"><datalist id="fBatList">${batters.map(b => `<option value="${esc(b)}"></option>`).join('')}</datalist>
-         <input id="fCat" class="abs-inp" list="fCatList" placeholder="Catcher" style="width:150px"><datalist id="fCatList">${catchers.map(c => `<option value="${esc(c)}"></option>`).join('')}</datalist>
-         <select id="fTeam" class="abs-inp"><option value="">All teams</option>${teams.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
-         <select id="fType" class="abs-inp"><option value="">Taken &amp; declined</option><option value="challenge">Challenged</option><option value="miss">Declined (missed)</option></select>
-         <select id="fWrong" class="abs-inp"><option value="wrong" selected>Blown calls only</option><option value="">Every decision</option></select>
+         <select id="fDate" class="abs-inp" title="Game date"><option value="">All dates</option>${dates.map(d => `<option value="${d}"${sel(d, film.date)}>${d}</option>`).join('')}</select>
+         <input id="fBat" class="abs-inp" list="fBatList" placeholder="Hitter" style="width:140px" value="${esc(film.bat)}"><datalist id="fBatList">${batters.map(b => `<option value="${esc(b)}"></option>`).join('')}</datalist>
+         <input id="fCat" class="abs-inp" list="fCatList" placeholder="Catcher" style="width:140px" value="${esc(film.cat)}"><datalist id="fCatList">${catchers.map(c => `<option value="${esc(c)}"></option>`).join('')}</datalist>
+         <select id="fTeam" class="abs-inp"><option value="">All teams</option>${teams.map(t => `<option value="${t}"${sel(t, film.team)}>${t}</option>`).join('')}</select>
+         <select id="fCount" class="abs-inp"><option value="">Any count</option>${COUNTS_L.map(c => `<option value="${c}"${sel(c, film.count)}>${c}</option>`).join('')}</select>
+         <select id="fInning" class="abs-inp"><option value="">Any inning</option>${[1,2,3,4,5,6,7,8,9].map(i => `<option value="${i}"${sel(String(i), film.inning)}>Inn ${i}</option>`).join('')}<option value="10"${sel('10', film.inning)}>Inn 10+</option></select>
+         <select id="fType" class="abs-inp"><option value="">Taken &amp; declined</option><option value="challenge"${sel('challenge', film.type)}>Challenged</option><option value="miss"${sel('miss', film.type)}>Declined (missed)</option></select>
+         <select id="fWrong" class="abs-inp"><option value="wrong"${sel('wrong', film.wrong)}>Blown calls only</option><option value=""${sel('', film.wrong)}>Every decision</option></select>
          <button id="fClear" class="chip">Clear</button>
+         <button id="fCsv" class="chip" title="Download the rows currently shown">CSV</button>
          <span class="abs-count" id="fcnt"></span>
        </div>
-       <div class="abs-tblwrap"><table id="ftbl"></table></div>`;
+       <div class="abs-tblwrap"><table id="ftbl"></table></div>
+       <div id="fempty"></div>`;
     bindViewTabs();
     const cols = [['date', 'Date', 'l'], ['batter', 'Hitter', 'l'], ['catcher', 'Catcher', 'l'],
     ['team', 'Tm', 'l'], ['side', 'Decider', 'l'], ['type', 'Type', 'l'], ['result', 'Result', 'l'],
     ['count', 'Cnt'], ['inning', 'Inn'], ['marginIn', 'Margin'], ['value', 'Value'], ['ev', 'EV'],
     ['playId', 'Video', 'l']];
-    let fsort = 'value', fdir = -1;
     // 'wrong' keeps only calls ABS would have flipped (won / would-win), i.e.
     // real opportunities. Without it, high-leverage +EV gambles on correct
     // calls float to the top and the board stops meaning what it says.
-    const F = { date: latest || '', bat: '', cat: '', team: '', type: '', wrong: 'wrong' };
     const isWrong = x => x.result === 'won' || x.result === 'would-win';
     function draw() {
       let r = rows.filter(x =>
-        (!F.date || x.date === F.date) &&
-        (!F.team || x.team === F.team) &&
-        (!F.type || x.type === F.type) &&
-        (!F.wrong || isWrong(x)) &&
-        (!F.bat || x.batter.toLowerCase().includes(F.bat.toLowerCase())) &&
-        (!F.cat || x.catcher.toLowerCase().includes(F.cat.toLowerCase())));
-      r.sort((a, b) => { const x = a[fsort], y = b[fsort]; if (x == null) return 1; if (y == null) return -1; return (x < y ? -1 : x > y ? 1 : 0) * fdir * (typeof x === 'string' ? -1 : 1); });
+        (!film.date || x.date === film.date) &&
+        (!film.team || x.team === film.team) &&
+        (!film.type || x.type === film.type) &&
+        (!film.count || x.count === film.count) &&
+        (!film.inning || String(film.inning === '10' ? Math.min(x.inning, 10) : x.inning) === film.inning) &&
+        (!film.wrong || isWrong(x)) &&
+        (!film.bat || x.batter.toLowerCase().includes(film.bat.toLowerCase())) &&
+        (!film.cat || x.catcher.toLowerCase().includes(film.cat.toLowerCase())));
+      r.sort((a, b) => { const x = a[filmSort], y = b[filmSort]; if (x == null) return 1; if (y == null) return -1; return (x < y ? -1 : x > y ? 1 : 0) * filmDir * (typeof x === 'string' ? -1 : 1); });
       const tot = r.length; r = r.slice(0, 500);
-      let h = '<thead><tr>' + cols.map(c => `<th class="${c[2] || ''}" data-k="${c[0]}" aria-sort="${fsort === c[0] ? (fdir < 0 ? 'descending' : 'ascending') : 'none'}">${c[1]}</th>`).join('') + '</tr></thead><tbody>';
-      for (const x of r) h += '<tr>' + cols.map(c => {
-        if (c[0] === 'playId') return `<td class="l"><a class="abs-vid" href="https://baseballsavant.mlb.com/sporty-videos?playId=${x.playId}" target="_blank" rel="noopener">&#9654; watch</a></td>`;
-        const v = x[c[0]];
-        const cl = (c[0] === 'ev' || c[0] === 'value') ? (v > 0.005 ? 'pos' : v < -0.005 ? 'neg' : '')
-          : (['batter', 'catcher', 'team', 'date', 'type', 'result', 'side'].includes(c[0]) ? 'l' : 'dim');
-        const txt = (c[0] === 'ev' || c[0] === 'value' || c[0] === 'marginIn') ? (+v).toFixed(2) : v;
-        return `<td class="${cl}">${txt}</td>`;
-      }).join('') + '</tr>';
+      let h = '<thead><tr>' + cols.map(c => th(c[0], c[1], c[2], filmSort, filmDir)).join('') + '</tr></thead><tbody>';
+      r.forEach((x, i) => {
+        h += `<tr class="row-click" data-i="${i}" title="Click to price this pitch in the Matrix">` + cols.map(c => {
+          if (c[0] === 'playId') return `<td class="l"><a class="abs-vid" href="https://baseballsavant.mlb.com/sporty-videos?playId=${x.playId}" target="_blank" rel="noopener">&#9654; watch</a></td>`;
+          const v = x[c[0]];
+          const cl = (c[0] === 'ev' || c[0] === 'value') ? (v > 0.005 ? 'pos' : v < -0.005 ? 'neg' : '')
+            : (['batter', 'catcher', 'team', 'date', 'type', 'result', 'side'].includes(c[0]) ? 'l' : 'dim');
+          const txt = (c[0] === 'ev' || c[0] === 'value' || c[0] === 'marginIn') ? (+v).toFixed(2) : v;
+          return `<td class="${cl}">${txt}</td>`;
+        }).join('') + '</tr>';
+      });
       p.querySelector('#ftbl').innerHTML = h + '</tbody>';
       p.querySelector('#fcnt').textContent = tot > 500 ? `${tot} rows (showing 500)` : tot + ' rows';
-      p.querySelectorAll('#ftbl th').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; if (fsort === k) fdir *= -1; else { fsort = k; fdir = -1; } draw(); }));
+      const box = p.querySelector('#fempty');
+      if (!tot) {
+        const who = film.bat || film.cat;
+        const bits = [];
+        if (film.date) bits.push('that date');
+        if (film.count) bits.push('that count');
+        if (film.inning) bits.push('that inning');
+        box.innerHTML = emptyState(
+          who ? `No blown calls for ${who} with these filters.` : 'No blown calls match these filters.',
+          bits.length ? `Try clearing ${bits.join(' or ')} &mdash; most players only have a handful of opportunities on any single day.`
+            : 'Try switching to "Every decision", or use Clear to start over.');
+        p.querySelector('.abs-tblwrap').style.display = 'none';
+      } else { box.innerHTML = ''; p.querySelector('.abs-tblwrap').style.display = ''; }
+      p.querySelectorAll('#ftbl th').forEach(t => t.addEventListener('click', () => {
+        const k = t.dataset.k; if (filmSort === k) filmDir *= -1; else { filmSort = k; filmDir = -1; } draw();
+      }));
+      p.querySelectorAll('#ftbl tr.row-click').forEach(tr => tr.addEventListener('click', e => {
+        if (e.target.closest('a')) return;          // let the video link do its job
+        const x = r[+tr.dataset.i]; if (!x || !x._raw) return;
+        pendingPitch = x._raw;
+        state.view = 'matrix';
+        document.querySelectorAll('.abs-tab').forEach(t2 => {
+          const on = t2.getAttribute('data-absview') === 'matrix';
+          t2.classList.toggle('active', on); t2.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        render();
+      }));
+      p.querySelector('#fCsv').onclick = () => downloadCSV('abs_opportunities_2026.csv', cols, r);
+      writeUrl();
     }
-    const bind = (id, key) => p.querySelector(id).addEventListener('input', e => { F[key] = e.target.value; draw(); });
+    const bind = (id, key) => p.querySelector(id).addEventListener('input', e => { film[key] = e.target.value; draw(); });
     bind('#fDate', 'date'); bind('#fBat', 'bat'); bind('#fCat', 'cat');
     bind('#fTeam', 'team'); bind('#fType', 'type'); bind('#fWrong', 'wrong');
+    bind('#fCount', 'count'); bind('#fInning', 'inning');
     p.querySelector('#fClear').addEventListener('click', () => {
-      F.date = ''; F.bat = ''; F.cat = ''; F.team = ''; F.type = ''; F.wrong = '';
-      p.querySelector('#fDate').value = ''; p.querySelector('#fBat').value = '';
-      p.querySelector('#fCat').value = ''; p.querySelector('#fTeam').value = '';
-      p.querySelector('#fType').value = ''; p.querySelector('#fWrong').value = ''; draw();
+      film.date = ''; film.bat = ''; film.cat = ''; film.team = ''; film.type = '';
+      film.count = ''; film.inning = ''; film.wrong = '';
+      ['#fDate', '#fBat', '#fCat', '#fTeam', '#fType', '#fCount', '#fInning'].forEach(s => p.querySelector(s).value = '');
+      p.querySelector('#fWrong').value = ''; draw();
     });
+    draw();
+  }
+
+  // ================= ZONE MAP =================
+  const HOWTO_ZONE = `<details class="howto"><summary>How to read this</summary><dl>
+    <dt>What the grid shows</dt><dd>Every near-zone taken pitch of the season, binned by where it crossed. Each cell is the share of those calls the human umpire got wrong compared to the ABS zone.</dd>
+    <dt>Why the height is normalized</dt><dd>The ABS zone is set to each batter's height, so a fixed grid would smear tall and short hitters together. Here 0 is every batter's own bottom edge and 1 is their own top edge, which makes the edges line up.</dd>
+    <dt>The two error types</dt><dd><b>Rung up</b> = a true ball called a strike (the hitter's grievance). <b>Stolen strike</b> = a true strike called a ball (the catcher's grievance).</dd>
+  </dl></details>`;
+
+  async function renderZone() {
+    const p = el();
+    p.innerHTML = viewTabs() + `<h2>Where umpires miss</h2><p class="abs-sub">Loading zone map...</p>`;
+    bindViewTabs();
+    if (!zoneMiss) { try { zoneMiss = await fetch('data/abs_zone_misses_2026.json').then(r => r.json()); } catch (e) { zoneMiss = { cells: {}, meta: {} }; } }
+    if (state.view !== 'zone') return;
+    const M = zoneMiss.meta, C = zoneMiss.cells;
+    let mode = 'all';   // all | strike (rung up) | ball (stolen strike)
+    const xs = [], zs = [];
+    Object.keys(C).forEach(k => { const [a, b] = k.split('|').map(Number); xs.push(a); zs.push(b); });
+    const xMin = Math.min(...xs), xMax = Math.max(...xs), zMin = Math.min(...zs), zMax = Math.max(...zs);
+    const nx = xMax - xMin + 1, nz = zMax - zMin + 1;
+    const CELL = 30, PAD = 46;
+    const W = nx * CELL + PAD + 16, H = nz * CELL + PAD + 20;
+    p.innerHTML = viewTabs() +
+      `<h2>Where umpires miss</h2>` + HOWTO_ZONE +
+      `<p class="abs-sub">Every near-zone take this season, binned by location. Darker = the human call was wrong more often. The solid box is the ABS strike zone; height is normalized to each batter's own zone so the edges line up.</p>
+       <div class="abs-bar">
+         <span class="seg" id="zMode">
+           <button data-v="all" aria-pressed="true">All misses</button>
+           <button data-v="strike">Rung up</button>
+           <button data-v="ball">Stolen strikes</button></span>
+         <span class="abs-count" id="zcnt"></span>
+       </div>
+       <div class="heatwrap"><svg id="zsvg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="max-width:100%;height:auto"></svg></div>
+       <div class="heatlegend"><span>0%</span><div class="mx-grad" id="zgrad" style="height:9px;border-radius:5px;flex:1;max-width:300px"></div><span id="zmax">max</span><span style="margin-left:auto">catcher's view &middot; x in inches from plate center</span></div>`;
+    bindViewTabs();
+    const ramp = t => {
+      const R = [[240, 228, 216], [236, 206, 168], [214, 143, 96], [166, 59, 34], [120, 34, 22]];
+      const x = Math.max(0, Math.min(1, t)) * (R.length - 1), i = Math.min(Math.floor(x), R.length - 2), f = x - i;
+      const c = R[i].map((v, j) => Math.round(v + (R[i + 1][j] - v) * f));
+      return `rgb(${c.join(',')})`;
+    };
+    function draw() {
+      const rate = c => {
+        const n = c[0]; if (!n) return null;
+        const w = mode === 'strike' ? c[1] : mode === 'ball' ? c[2] : (c[1] + c[2]);
+        return w / n;
+      };
+      let peak = 0, shown = 0;
+      Object.values(C).forEach(c => { if (c[0] >= 20) { const r = rate(c); if (r != null && r > peak) peak = r; } });
+      peak = Math.max(peak, 0.05);
+      let h = '';
+      for (let zi = zMin; zi <= zMax; zi++) {
+        for (let xi = xMin; xi <= xMax; xi++) {
+          const c = C[xi + '|' + zi]; if (!c || c[0] < 20) continue;
+          const r = rate(c); if (r == null) continue;
+          shown += c[0];
+          const px = PAD + (xi - xMin) * CELL, py = 8 + (zMax - zi) * CELL;
+          h += `<rect x="${px}" y="${py}" width="${CELL - 1}" height="${CELL - 1}" fill="${ramp(r / peak)}" rx="2"><title>${(100 * r).toFixed(0)}% wrong (${c[0]} takes)</title></rect>`;
+        }
+      }
+      // ABS zone outline: x = +-8.5in, z = 0..1 normalized
+      const zx0 = PAD + ((-8.5 - M.x0) / M.xStep - xMin) * CELL;
+      const zx1 = PAD + ((8.5 - M.x0) / M.xStep - xMin) * CELL;
+      const zyTop = 8 + (zMax - ((1 - M.z0) / M.zStep) + 1) * CELL;
+      const zyBot = 8 + (zMax - ((0 - M.z0) / M.zStep) + 1) * CELL;
+      h += `<rect x="${zx0}" y="${zyTop}" width="${zx1 - zx0}" height="${zyBot - zyTop}" fill="none" stroke="var(--text-primary)" stroke-width="2" rx="2"></rect>`;
+      h += `<text x="${PAD - 8}" y="${zyTop + 4}" text-anchor="end" font-size="11" fill="var(--text-muted)">top</text>`;
+      h += `<text x="${PAD - 8}" y="${zyBot + 4}" text-anchor="end" font-size="11" fill="var(--text-muted)">bottom</text>`;
+      for (const inch of [-12, -8, -4, 0, 4, 8, 12]) {
+        const gx = PAD + ((inch - M.x0) / M.xStep - xMin) * CELL + CELL / 2;
+        h += `<text x="${gx}" y="${H - 6}" text-anchor="middle" font-size="10" fill="var(--text-muted)">${inch}</text>`;
+      }
+      p.querySelector('#zsvg').innerHTML = h;
+      p.querySelector('#zcnt').textContent = shown.toLocaleString() + ' takes';
+      p.querySelector('#zmax').textContent = Math.round(peak * 100) + '%';
+      const stops = []; for (let i = 0; i <= 10; i++) stops.push(ramp(i / 10) + ' ' + (i * 10) + '%');
+      p.querySelector('#zgrad').style.background = 'linear-gradient(90deg,' + stops.join(',') + ')';
+    }
+    p.querySelectorAll('#zMode button').forEach(b => b.addEventListener('click', () => {
+      p.querySelectorAll('#zMode button').forEach(x => x.setAttribute('aria-pressed', 'false'));
+      b.setAttribute('aria-pressed', 'true'); mode = b.dataset.v; draw();
+    }));
     draw();
   }
 
@@ -625,8 +970,12 @@ window.ABS = (function () {
     if (!core) { p.innerHTML = `<p class="abs-sub" style="padding:20px">Loading ABS data...</p>`; try { await ensureCore(); } catch (e) { p.innerHTML = `<p class="abs-sub" style="padding:20px">Could not load ABS data.</p>`; return; } }
     if (state.view === 'leaders') renderLeaders();
     else if (state.view === 'matrix') renderMatrix();
+    else if (state.view === 'zone') renderZone();
     else renderFilm();
   }
 
-  return { render: render, setView: function (v) { state.view = v; } };
+  return {
+    render: render,
+    setView: function (v, query) { state.view = v; applyUrl(query); }
+  };
 })();
