@@ -172,11 +172,23 @@ N_PRIOR_PT_DEFAULT = 0
 # rows, 30% of all colored pitch-type Loc+ cells, sat below r=0.5).
 # MIRRORED in js/aggregator.js (QUAL.MIN_PITCH_LOCPLUS) and process_data.py
 # (LOCPLUS_MIN_PITCH) — keep all three in sync.
-STABILIZE_N_OVERALL = 135
-STABILIZE_N_PT = {'FF': 71, 'SI': 85, 'FC': 117, 'SL': 74, 'CU': 95, 'CH': 104}
+# Re-measured 2026-07-25 (scripts/locplus_stabilize_celllevel.py, 10 seeds) at
+# the unit the leaderboard actually renders: cells are per PITCH TYPE, surfaces
+# are built once on the full season (surface estimation noise is common to all
+# cells, so charging it to a pitcher understates his reliability), and each
+# cell is split RANDOMLY (the displayed number estimates a season aggregate, so
+# a chronological split would wrongly charge for in-season drift).
+# The superseded values came from locplus_nprior_multiseed.py, which measured
+# at the (pitcher, GROUP) level — a different unit that pools a pitcher's CH
+# with his FS. Five of six moved <15% and the old values sit inside the new
+# seed spread; CH moved 104 -> 72 with a seed range of 62-82 that excludes the
+# old value, consistent with that pooling inflating k for the most
+# heterogeneous group.
+STABILIZE_N_OVERALL = 135   # not re-measured at cell level; fallback only
+STABILIZE_N_PT = {'FF': 81, 'SI': 96, 'FC': 122, 'SL': 70, 'CU': 93, 'CH': 72}
 # Leaderboard pitch-CATEGORY rows pool several types (js/aggregator.js
 # PITCH_CATEGORIES), so they take the stiffest member gate.
-STABILIZE_N_CATEGORY = {'Hard': 85, 'Breaking': 117, 'Offspeed': 104}
+STABILIZE_N_CATEGORY = {'Hard': 96, 'Breaking': 122, 'Offspeed': 72}
 
 
 def stabilize_n(pitch_type):
