@@ -246,11 +246,11 @@ window.ABS = (function () {
   // ================= LEADERBOARDS =================
   const COLS = {
     player: [['player', 'Player', 'l'], ['team', 'Tm', 'l'], ['skill', 'Skill+'], ['skci', '95% CI'],
-    ['value', 'Value/100'], ['vci', '95% CI'], ['cons', 'Dec'], ['chal', 'Chal'], ['succ', 'Succ%'], ['net', 'NetVal']],
+    ['cons', 'Dec'], ['chal', 'Chal'], ['succ', 'Succ%'], ['net', 'NetVal']],
     backtest: [['team', 'Team', 'l'], ['games', 'G'], ['actW', 'ActualWins'], ['optW', 'OptimalWins'], ['gapW', 'LeftOnTable']]
   };
   const NOTES = {
-    catchers: 'TWO orthogonal metrics. <b>Skill+</b> = leverage-blind decision quality indexed to 100 &mdash; the talent estimate, so it is shown only for catchers whose sample clears a reliability bar and reads "provisional" otherwise. <b>Value/100</b> = leveraged runs added per 100 consequential decisions; it deliberately keeps the leverage a catcher happened to be handed, so it is <b>descriptive, not a talent estimate</b>, and never stabilizes &mdash; its 95% CI carries that uncertainty. The two rank differently on purpose: the highest-Value catchers are not the highest-Skill ones, because raw value is mostly leverage and volume rather than judgment. Wide Skill+ CIs (~&plusmn;20) mean most catchers are still statistically indistinguishable in pure skill.',
+    catchers: '<b>Skill+</b> is the talent estimate: leverage-blind decision quality indexed to 100, balanced so that simply challenging rarely cannot inflate it. It is shown only for catchers whose sample clears a reliability bar and reads "provisional" otherwise, and the wide CIs (~&plusmn;20) mean most catchers are still statistically indistinguishable from one another. <b>NetVal</b> is separate and purely descriptive &mdash; the leveraged runs a catcher actually gained and left on the table this season. It is <b>not</b> a talent estimate: tested season-half against season-half it has no forward signal at all, because it is mostly the leverage a catcher happened to be handed. <b>Succ%</b> is shown for transparency but is the wrong lens on purpose &mdash; it runs slightly <i>negative</i> against value, since the safest challengers are usually the ones being too conservative.',
     hitters: 'DESCRIPTIVE ONLY &mdash; no Skill+ is shown for hitters on purpose. Out-of-sample testing found no hitter skill metric that predicts forward without mostly measuring how <i>rarely</i> a hitter challenges (the naive version correlates -0.91 with challenge rate). The median hitter has about 32 real decisions, which is not a season. These rows are a record of what happened, ranked by NetVal. Expect this to firm up over 2-3 seasons.',
     teams: 'Team totals across all deciders, including pitcher-initiated challenges. Ranked by NetVal (descriptive).',
     backtest: 'Season replay: value captured by actual challenge usage vs the matrix policy run with league-average perception (no hindsight). Wins = leveraged runs times the league run-to-win factor. Negative LeftOnTable = the team already beats the league-perceiver benchmark.'
@@ -810,7 +810,7 @@ window.ABS = (function () {
        <div id="fempty"></div>`;
     bindViewTabs();
     const cols = [['date', 'Date', 'l'], ['batter', 'Hitter', 'l'], ['catcher', 'Catcher', 'l'],
-    ['team', 'Tm', 'l'], ['side', 'Decider', 'l'], ['type', 'Type', 'l'], ['result', 'Result', 'l'],
+    ['team', 'Tm', 'l'], ['side', 'Decider', 'l'], ['result', 'Result', 'l'],
     ['count', 'Cnt'], ['inning', 'Inn'], ['marginIn', 'Margin'], ['value', 'Value'], ['ev', 'EV'],
     ['playId', 'Video', 'l']];
     // 'wrong' keeps only calls ABS would have flipped (won / would-win), i.e.
