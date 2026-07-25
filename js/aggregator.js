@@ -28,8 +28,39 @@ var QUAL = {
   MIN_SPRINT_RUNS:   10,    // Minimum competitive runs for sprint speed (kept low: sprint runs are naturally scarce)
   MIN_PITCH_PCTL:    25,    // Minimum pitches for outcome-metric percentiles (pitch-type level)
   MIN_HITTER_PT:     25,    // Minimum pitches seen for hitter pitch-type percentile coloring
+  // Loc+ is the one pitch-type outcome metric that cannot ride the flat 25.
+  // Displayed Loc+ is an UNSHRUNK mean (pipeline_locplus.py zeroes N_PRIOR_PT
+  // for the coherent-canon ledger property), so reliability at n pitches is
+  // n/(n+k) where k is that pitch type's measured split-half r=0.5 crossing.
+  // At 25 pitches an FF cell is only 25/(25+71) = 0.26 reliable and a cutter
+  // 0.18; gating at k itself means "color only when >= half the variance is
+  // signal". Keep in sync with pipeline_locplus.py STABILIZE_N_PT.
+  MIN_PITCH_LOCPLUS:         { FF: 71, SI: 85, FC: 117, SL: 74, CU: 95, CH: 104 },
+  MIN_PITCH_LOCPLUS_DEFAULT: 135,   // overall crossing; unmeasured types (KN, SC, OTHER)
   MIN_SACQ:          20,    // Minimum zone count for SACQ wOBA lookup
   MIN_ELLIPSE_PTS:   6,     // Minimum points for scatter ellipse computation
+};
+
+// Pitch type -> Loc+ group. Mirrors pipeline_locplus.py GROUP exactly; the
+// stabilization constants above are measured per GROUP, not per raw type.
+QUAL.LOCPLUS_GROUP = {
+  FF: 'FF', FA: 'FF',
+  SI: 'SI',
+  FC: 'FC', CF: 'FC',
+  SL: 'SL', ST: 'SL', SW: 'SL', SV: 'SL',
+  CU: 'CU', KC: 'CU', CS: 'CU',
+  CH: 'CH', FS: 'CH', KN: 'CH', SC: 'CH'
+};
+// Category rows (PITCH_CATEGORIES) pool several types — take the stiffest
+// member gate. Mirrors pipeline_locplus.py STABILIZE_N_CATEGORY.
+QUAL.LOCPLUS_CATEGORY = { Hard: 85, Breaking: 117, Offspeed: 104 };
+
+// Minimum pitches for a pitch-type (or category) Loc+ cell to clear r >= 0.5.
+QUAL.locPlusMinPitches = function (pitchType) {
+  if (QUAL.LOCPLUS_CATEGORY[pitchType] != null) return QUAL.LOCPLUS_CATEGORY[pitchType];
+  const g = QUAL.LOCPLUS_GROUP[pitchType];
+  const k = g ? QUAL.MIN_PITCH_LOCPLUS[g] : null;
+  return k != null ? k : QUAL.MIN_PITCH_LOCPLUS_DEFAULT;
 };
 
 const Aggregator = {
@@ -1796,7 +1827,11 @@ const Aggregator = {
       const minPctl = SHAPE_METRICS[key] ? 0 : (isBBQual ? QUAL.MIN_BIP_PCTL : MIN_PITCH_TYPE_PCTL);
       const countKey = isBBQual ? 'nBip' : 'count';
       for (let pt in ptGroups) {
-        self._computePercentiles(ptGroups[pt], key, minPctl, countKey, ABS_PCTL_KEYS[key] || false);
+        // Loc+ gates on its own measured stabilization constant per pitch type
+        // (see QUAL.MIN_PITCH_LOCPLUS) — it's displayed unshrunk, so the flat
+        // 25 would color cells that are only ~0.26 reliable.
+        const ptMin = (key === 'locPlus') ? QUAL.locPlusMinPitches(pt) : minPctl;
+        self._computePercentiles(ptGroups[pt], key, ptMin, countKey, ABS_PCTL_KEYS[key] || false);
       }
     });
 
@@ -1808,7 +1843,8 @@ const Aggregator = {
       for (let ptc in ptGroups) {
         if (!Aggregator.PITCH_CATEGORIES[ptc]) continue;
         CAT_MERGED_KEYS.forEach(function (key) {
-          self._computePercentiles(ptGroups[ptc], key, MIN_PITCH_TYPE_PCTL, 'count', false);
+          const catMin = (key === 'locPlus') ? QUAL.locPlusMinPitches(ptc) : MIN_PITCH_TYPE_PCTL;
+          self._computePercentiles(ptGroups[ptc], key, catMin, 'count', false);
         });
       }
     }

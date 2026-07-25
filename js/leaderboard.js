@@ -929,6 +929,12 @@ const Leaderboard = {
                                       fbPct: true, puPct: true, gbPct: true, babip: true };
             if (PITCH_BIP_GATED[col.key]) {
               showColor = (row.nBip || 0) >= QUAL.MIN_BIP_PCTL;
+            } else if (col.key === 'locPlus') {
+              // Loc+ is displayed unshrunk, so it needs its pitch type's own
+              // measured r=0.5 crossing instead of the flat 25 (an FF cell at
+              // 25 pitches is only 0.26 reliable). Rank still shows in the
+              // tooltip; this suppresses the color only.
+              showColor = (row.count || 0) >= QUAL.locPlusMinPitches(row.pitchType);
             } else {
               showColor = PITCH_SHAPE_ALWAYS_COLOR[col.key] || (row.count || 0) >= QUAL.MIN_PITCH_PCTL;
             }

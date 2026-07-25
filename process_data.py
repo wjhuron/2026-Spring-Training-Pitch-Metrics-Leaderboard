@@ -3977,6 +3977,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     # so pitches thrown rarely (e.g., 5 sliders) don't pollute the per-pitch
     # percentile pool. Shape metrics (velo, IVB, HB, etc.) need no minimum.
     MIN_PITCH_TYPE_OUTCOME = 25
+    # Loc+ is the one exception: it's displayed unshrunk, so its gate is the
+    # pitch type's own measured split-half r=0.5 crossing, not the flat 25.
+    # Mirrored in js/aggregator.js QUAL.MIN_PITCH_LOCPLUS.
+    from pipeline_locplus import stabilize_n as locplus_min_pitch
     PITCH_SHAPE_KEYS = set(METRIC_KEYS.values()) | {'nVAA', 'nHAA', 'ivbOE', 'hbOE'}
     # Hand-signed shape metrics stored in an absolute frame — rank on |value| so
     # LHP/RHP aren't split by sign. Mirrors js/aggregator.js ABS_PCTL_KEYS.
@@ -4001,7 +4005,11 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
             mc, ck = MIN_PITCH_TYPE_OUTCOME, 'count'
         av = metric in ABS_PCTL_KEYS
         for pt, pt_rows in pt_groups.items():
-            compute_percentile_ranks_with_aaa(pt_rows, metric, min_count=mc, count_key=ck, abs_val=av)
+            # Loc+ gates on its own measured stabilization constant rather than
+            # the flat 25 (see locplus_min_pitch): displayed Loc+ is unshrunk,
+            # so a 25-pitch cell is only ~0.26 reliable.
+            mc_pt = locplus_min_pitch(pt) if metric == 'locPlus' else mc
+            compute_percentile_ranks_with_aaa(pt_rows, metric, min_count=mc_pt, count_key=ck, abs_val=av)
 
     # 2. Pitcher percentiles (all stats including boxscore-derived).
     # Pool: ALL MLB pitchers (no qualifier). This matches the convention used

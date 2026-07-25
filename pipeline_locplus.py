@@ -62,11 +62,28 @@ BIP_COUNT_ANCHOR = False       # add offset(c) to the BIP value branch
                                # velo leak 0.29->0.38, whiff leak
                                # 0.031->0.072, predictive 0.079->-0.029.
                                # Anchoring makes ExpRV strongly count-mix
-                               # dependent, and count mix is a stuff/
-                               # sequencing effect — exactly the contamination
-                               # Loc+ exists to exclude. (The anchor is
-                               # correct and ON in SD+/CT+, which score
-                               # hitter decisions against the count state.)
+                               # dependent. (The anchor is correct and ON in
+                               # SD+/CT+, which score hitter decisions against
+                               # the count state.)
+                               # RE-TESTED 2026-07-25 under CS_COUNT_TRANSFORM
+                               # (scripts/locplus_phase3_eval.py) — still loses:
+                               # rel 0.600->0.586, whiff leak 0.056->0.089,
+                               # velo 0.305->0.382, pred 0.075->-0.025.
+                               # CORRECTION to the original reasoning: count
+                               # mix is NOT purely a stuff/sequencing effect.
+                               # Neutralizing it directly (count-mix post-
+                               # stratification: per-count means recombined at
+                               # LEAGUE count weights) DOUBLED the stuff leak
+                               # and killed prediction outright (0.075->-0.002),
+                               # and did not rescue the anchor underneath it
+                               # (0.576/-0.024). Throwing quality strikes is HOW
+                               # a pitcher gets ahead, so count mix carries real
+                               # LOCATION signal; stripping it discards skill and
+                               # upweights sparse counts (3-0, 3-1) where
+                               # per-pitcher samples are noisiest. The BIP
+                               # branch's count-invariance is therefore an
+                               # ACCEPTED cost, not an open item — do not
+                               # re-litigate without a new mechanism.
 SWING_PRIOR_COUNT_LEVEL = True # count-specific swing surfaces shrink toward
                                # collapsed-surface × league count multiplier
                                # (a sparse 3-0 surface otherwise shrinks
@@ -145,6 +162,31 @@ K_SWING_COLL, K_SWING_COUNT, K_CS = 6, 20, 10
 N_PRIOR_OVERALL = 0
 N_PRIOR_PT = {}
 N_PRIOR_PT_DEFAULT = 0
+
+# The measured r=0.5 crossings themselves, kept live even though the priors
+# above are zeroed. With an UNSHRUNK displayed mean, reliability at n pitches
+# is n/(n+k) for the group's k, so these values ARE the render-time
+# qualification gates the canon note defers to: a 25-pitch FF cell is only
+# 25/(25+71) = 0.26 reliable, which is why pitch-type Loc+ cannot ride the flat
+# 25-pitch outcome gate the other per-pitch metrics use (2026-07-25 audit: 771
+# rows, 30% of all colored pitch-type Loc+ cells, sat below r=0.5).
+# MIRRORED in js/aggregator.js (QUAL.MIN_PITCH_LOCPLUS) and process_data.py
+# (LOCPLUS_MIN_PITCH) — keep all three in sync.
+STABILIZE_N_OVERALL = 135
+STABILIZE_N_PT = {'FF': 71, 'SI': 85, 'FC': 117, 'SL': 74, 'CU': 95, 'CH': 104}
+# Leaderboard pitch-CATEGORY rows pool several types (js/aggregator.js
+# PITCH_CATEGORIES), so they take the stiffest member gate.
+STABILIZE_N_CATEGORY = {'Hard': 85, 'Breaking': 117, 'Offspeed': 104}
+
+
+def stabilize_n(pitch_type):
+    """Minimum pitches for a pitch-type (or pitch-category) Loc+ cell to reach
+    split-half r >= 0.5, i.e. at least half the variance is signal. Used as a
+    render-time coloring gate; the percentile RANK is still stored for every
+    row, matching the all-MLB-pool convention."""
+    if pitch_type in STABILIZE_N_CATEGORY:
+        return STABILIZE_N_CATEGORY[pitch_type]
+    return STABILIZE_N_PT.get(GROUP.get(pitch_type), STABILIZE_N_OVERALL)
 LOC_SCALE_K = 10
 MIN_POOL_OVERALL = 250             # min pitches to enter the (mu,sigma) pool
 MIN_POOL_PT = 60                   # min pitches of a type to enter its group pool
