@@ -115,7 +115,8 @@ def main():
                 # Re-send unchanged; USER_ENTERED parses the numerics this time.
                 body = [[(v[0] if v else '')] for v in vals]
                 _sheets_retry(
-                    lambda: ws.update(f"{col}2:{col}{len(body) + 1}", body,
+                    lambda: ws.update(values=body,
+                                      range_name=f"{col}2:{col}{len(body) + 1}",
                                       value_input_option='USER_ENTERED'),
                     label=f'{ws.title}.{name} rewrite')
                 grand_fixed += n_text
