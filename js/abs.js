@@ -155,7 +155,8 @@ window.ABS = (function () {
     vci: '95% confidence interval on Value/100.',
     cons: 'Consequential decisions: near-zone calls with real stakes that this player could actually have challenged.',
     chal: 'Challenges this player personally initiated.',
-    succ: 'Share of their challenges that were overturned.',
+    succ: 'Share of their challenges that were overturned. Shown for transparency, but it is deliberately the wrong lens: it runs slightly negative against value, because the safest challengers are usually the over-conservative ones.',
+    skci: 'How precisely Skill+ is known from this sample. It is currently wider than the entire spread between the best and worst catcher, which is why the board is a shortlist rather than a ranking.',
     net: 'Descriptive season total in leveraged runs: value earned from challenges minus value left on the table by declining good ones.',
     games: 'Team games in the sample.',
     actW: 'Wins the team actually captured from the challenge system.',
@@ -246,7 +247,7 @@ window.ABS = (function () {
   // ================= LEADERBOARDS =================
   const COLS = {
     player: [['player', 'Player', 'l'], ['team', 'Tm', 'l'], ['skill', 'Skill+'], ['skci', '95% CI'],
-    ['cons', 'Dec'], ['chal', 'Chal'], ['succ', 'Succ%'], ['net', 'NetVal']],
+    ['cons', 'Dec'], ['chal', 'Chal'], ['succ', 'Success%'], ['net', 'NetVal']],
     backtest: [['team', 'Team', 'l'], ['games', 'G'], ['actW', 'ActualWins'], ['optW', 'OptimalWins'], ['gapW', 'LeftOnTable']]
   };
   const NOTES = {
@@ -358,7 +359,16 @@ window.ABS = (function () {
       }).join('') + '</tr>';
       p.querySelector('#abs-tbl').innerHTML = h + '</tbody>';
       p.querySelector('#abs-cnt').textContent = rows.length + ' rows';
-      p.querySelector('#abs-note').innerHTML = NOTES[state.tab];
+      let note = NOTES[state.tab];
+      if (state.tab === 'catchers') {
+        const q = rows.filter(r => r.skill != null && r.skci != null);
+        const sep = q.filter(r => r.skill - r.skci > 100 || r.skill + r.skci < 100).length;
+        if (q.length) {
+          note += ` <b>As of today ${sep} of ${q.length}</b> qualified catchers have an interval that clears league average` +
+            (sep === 0 ? ' &mdash; nobody has separated from the pack yet, so read this as a shortlist, not a ranking.' : '.');
+        }
+      }
+      p.querySelector('#abs-note').innerHTML = note;
       const emptyBox = p.querySelector('#abs-empty');
       if (!rows.length) {
         emptyBox.innerHTML = emptyState(
