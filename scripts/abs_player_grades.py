@@ -229,7 +229,7 @@ def main():
         else:
             owner_id, owner_name = r["catcherId"], r["catcher"]
         extra = (r["playId"], r["date"], r["balls"], r["strikes"],
-                 r["inning"], r["half"])
+                 r["inning"], r["half"], r["batter"], r["catcher"], r["pitcher"])
         parsed.append((side, m, wronged, rem, team_abbr, d_team, g, T, chal,
                        owner_id, owner_name, reg, cls, extra))
         if rem > 0 and owner_id is not None:
@@ -264,7 +264,7 @@ def main():
     events = []   # every challenge + every counted miss, with Savant video ids
     for (side, m, wronged, rem, team_abbr, d_team, g, T, chal,
          owner_id, owner_name, reg, cls, extra) in parsed:
-        play_id, ev_date, balls, strikes, inning, half = extra
+        play_id, ev_date, balls, strikes, inning, half, ev_batter, ev_catcher, ev_pitcher = extra
         if side == "bat":
             book = hitters
         else:
@@ -332,6 +332,8 @@ def main():
             teams[team_abbr]["procVal"] += ev
             teams[team_abbr]["badChalN"] += ev < 0
             events.append({"type": "challenge", "player": pname, "team": team_abbr,
+                           "batter": ev_batter, "catcher": ev_catcher,
+                           "pitcher": ev_pitcher,
                            "date": ev_date, "role": chal["role"],
                            "count": f"{balls}-{strikes}", "inning": inning,
                            "half": half, "marginIn": round(m, 2),
@@ -350,6 +352,8 @@ def main():
                 teams[team_abbr]["missN"] += 1
                 teams[team_abbr]["missValue"] += ev
                 events.append({"type": "miss", "player": owner_name,
+                               "batter": ev_batter, "catcher": ev_catcher,
+                               "pitcher": ev_pitcher,
                                "team": team_abbr, "date": ev_date,
                                "role": "fielder" if side == "fld" else "batter",
                                "count": f"{balls}-{strikes}", "inning": inning,

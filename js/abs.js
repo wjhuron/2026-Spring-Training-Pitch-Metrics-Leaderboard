@@ -11,6 +11,12 @@ window.ABS = (function () {
     ztop: 39.6, zbot: 19.2
   };
   const ZHW = 8.5, THR = 1.4495, PXIN = 8, PLOT_Z0 = 12;
+  // starting situation for the matrix tool; Reset restores exactly this
+  const MX_DEFAULTS = {
+    k: 2, half: 'top', outs: 0, bases: [false, false, false], away: 0, home: 0,
+    sel: { b: 1, s: 1, inning: 7 }, side: 'fld', px: 8.95, pz: 29.4,
+    ztop: 39.6, zbot: 19.2
+  };
 
   function injectStyles() {
     if (styled) return; styled = true;
@@ -313,6 +319,7 @@ window.ABS = (function () {
             <input id="mHome" class="abs-inp" type="number" min="0" max="30" value="0" style="width:52px" aria-label="Home score"></span>
           <div style="font-size:11px;color:var(--text-muted);margin-top:4px" id="mScoreNote">tie game</div></div>
         <div class="mx-ctl"><label>Deciding side</label><span class="seg" id="mSide"><button data-v="fld" aria-pressed="true">Catcher</button><button data-v="bat">Hitter</button></span></div>
+        <div class="mx-ctl"><label>&nbsp;</label><button id="mReset" class="chip" title="Reset every input to the default situation">Reset</button></div>
        </div>
        <div class="mx-scroll"><table class="mx-grid" id="mGrid"></table></div>
        <div class="mx-legend"><span>Challenge freely</span><div class="mx-grad" id="mGrad"></div><span>Hold</span><span style="margin-left:auto">cells = break-even confidence %</span></div>
@@ -419,6 +426,13 @@ window.ABS = (function () {
       p.querySelector('#mAway').value = state.away; p.querySelector('#mHome').value = state.home;
       p.querySelector('#mX').value = (state.px / 12).toFixed(2); p.querySelector('#mZ').value = (state.pz / 12).toFixed(2);
     }
+    p.querySelector('#mReset').addEventListener('click', () => {
+      Object.assign(state, JSON.parse(JSON.stringify(MX_DEFAULTS)));
+      p.querySelector('#mHit').value = '';
+      p.querySelector('#mZone').textContent = 'zone 3.30 / 1.60 ft (league average)';
+      mvPitches.innerHTML = '';
+      syncControls(); drawZone(); drawGrid(); drawPanel();
+    });
     function loadPitch(pt) {
       state.sel = { b: pt.balls, s: pt.strikes, inning: Math.min(pt.inning, 10) };
       state.half = pt.half; state.outs = Math.min(pt.outs, 2);
@@ -534,34 +548,74 @@ window.ABS = (function () {
     if (!events) { try { events = (await fetch('data/abs_challenge_events_2026.json').then(r => r.json())).events; } catch (e) { events = []; } }
     if (state.view !== 'film') return;
     const rows = events.map(e => ({
-      date: e.date, player: e.player, team: e.team, type: e.type, result: e.result,
-      count: e.count, inning: e.inning, half: (e.half || '').slice(0, 3),
-      marginIn: e.marginIn, ev: +(+e.ev).toFixed(2), playId: e.playId
+      date: e.date, batter: e.batter || '', catcher: e.catcher || '', team: e.team,
+      side: e.role === 'batter' ? 'Hitter' : (e.role === 'pitcher' ? 'Pitcher' : 'Catcher'),
+      type: e.type, result: e.result, count: e.count, inning: e.inning,
+      marginIn: e.marginIn, value: +(+e.gain).toFixed(2), ev: +(+e.ev).toFixed(2),
+      playId: e.playId
     }));
+    const dates = [...new Set(rows.map(r => r.date))].sort().reverse();
+    const teams = [...new Set(rows.map(r => r.team))].sort();
+    const batters = [...new Set(rows.map(r => r.batter).filter(Boolean))].sort();
+    const catchers = [...new Set(rows.map(r => r.catcher).filter(Boolean))].sort();
+    const latest = dates[0];
     p.innerHTML = viewTabs() +
-      `<h2>Film room</h2>
-       <p class="abs-sub">Every challenge and counted miss with its Savant clip. Margin = inches in the challenger's favor (negative = the call was right). Sorted by decision EV; search a player to pull their reel. Showing up to 500 rows.</p>
-       <div class="abs-bar"><input type="search" id="fq" placeholder="Search player or team"><span class="abs-count" id="fcnt"></span></div>
+      `<h2>Top challenge opportunities</h2>
+       <p class="abs-sub">Blown calls ranked by <b>Value</b> &mdash; the leveraged runs riding on that pitch &mdash; whether or not anyone challenged. Defaults to the most recent day (data runs through <b>${latest}</b>; today's games post after the next morning refresh). Filter by day, hitter, or catcher to pull anyone's reel. Margin = inches in the challenger's favor. Switch to "Every decision" to also see challenges on calls that were correct.</p>
+       <div class="abs-bar">
+         <select id="fDate" class="abs-inp"><option value="">All dates</option>${dates.map(d => `<option value="${d}"${d === latest ? ' selected' : ''}>${d}</option>`).join('')}</select>
+         <input id="fBat" class="abs-inp" list="fBatList" placeholder="Hitter" style="width:150px"><datalist id="fBatList">${batters.map(b => `<option value="${esc(b)}"></option>`).join('')}</datalist>
+         <input id="fCat" class="abs-inp" list="fCatList" placeholder="Catcher" style="width:150px"><datalist id="fCatList">${catchers.map(c => `<option value="${esc(c)}"></option>`).join('')}</datalist>
+         <select id="fTeam" class="abs-inp"><option value="">All teams</option>${teams.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
+         <select id="fType" class="abs-inp"><option value="">Taken &amp; declined</option><option value="challenge">Challenged</option><option value="miss">Declined (missed)</option></select>
+         <select id="fWrong" class="abs-inp"><option value="wrong" selected>Blown calls only</option><option value="">Every decision</option></select>
+         <button id="fClear" class="chip">Clear</button>
+         <span class="abs-count" id="fcnt"></span>
+       </div>
        <div class="abs-tblwrap"><table id="ftbl"></table></div>`;
     bindViewTabs();
-    const cols = [['date', 'Date', 'l'], ['player', 'Player', 'l'], ['team', 'Tm', 'l'], ['type', 'Type', 'l'], ['result', 'Result', 'l'], ['count', 'Cnt'], ['inning', 'Inn'], ['half', 'Half', 'l'], ['marginIn', 'Margin'], ['ev', 'EV'], ['playId', 'Video', 'l']];
-    let fsort = 'ev', fdir = -1, fq = '';
+    const cols = [['date', 'Date', 'l'], ['batter', 'Hitter', 'l'], ['catcher', 'Catcher', 'l'],
+    ['team', 'Tm', 'l'], ['side', 'Decider', 'l'], ['type', 'Type', 'l'], ['result', 'Result', 'l'],
+    ['count', 'Cnt'], ['inning', 'Inn'], ['marginIn', 'Margin'], ['value', 'Value'], ['ev', 'EV'],
+    ['playId', 'Video', 'l']];
+    let fsort = 'value', fdir = -1;
+    // 'wrong' keeps only calls ABS would have flipped (won / would-win), i.e.
+    // real opportunities. Without it, high-leverage +EV gambles on correct
+    // calls float to the top and the board stops meaning what it says.
+    const F = { date: latest || '', bat: '', cat: '', team: '', type: '', wrong: 'wrong' };
+    const isWrong = x => x.result === 'won' || x.result === 'would-win';
     function draw() {
-      let r = rows.slice();
-      if (fq) { const q = fq.toLowerCase(); r = r.filter(x => (x.player || '').toLowerCase().includes(q) || String(x.team).toLowerCase().includes(q)); }
+      let r = rows.filter(x =>
+        (!F.date || x.date === F.date) &&
+        (!F.team || x.team === F.team) &&
+        (!F.type || x.type === F.type) &&
+        (!F.wrong || isWrong(x)) &&
+        (!F.bat || x.batter.toLowerCase().includes(F.bat.toLowerCase())) &&
+        (!F.cat || x.catcher.toLowerCase().includes(F.cat.toLowerCase())));
       r.sort((a, b) => { const x = a[fsort], y = b[fsort]; if (x == null) return 1; if (y == null) return -1; return (x < y ? -1 : x > y ? 1 : 0) * fdir * (typeof x === 'string' ? -1 : 1); });
       const tot = r.length; r = r.slice(0, 500);
-      let h = '<thead><tr>' + cols.map(c => `<th class="${c[2] || ''}" data-k="${c[0]}">${c[1]}</th>`).join('') + '</tr></thead><tbody>';
+      let h = '<thead><tr>' + cols.map(c => `<th class="${c[2] || ''}" data-k="${c[0]}" aria-sort="${fsort === c[0] ? (fdir < 0 ? 'descending' : 'ascending') : 'none'}">${c[1]}</th>`).join('') + '</tr></thead><tbody>';
       for (const x of r) h += '<tr>' + cols.map(c => {
         if (c[0] === 'playId') return `<td class="l"><a class="abs-vid" href="https://baseballsavant.mlb.com/sporty-videos?playId=${x.playId}" target="_blank" rel="noopener">&#9654; watch</a></td>`;
-        const v = x[c[0]]; const cl = c[0] === 'ev' ? (v > 0.005 ? 'pos' : v < -0.005 ? 'neg' : '') : (['player', 'team', 'date', 'type', 'result', 'half'].includes(c[0]) ? 'l' : 'dim');
-        return `<td class="${cl}">${c[0] === 'ev' || c[0] === 'marginIn' ? (v).toFixed(2) : v}</td>`;
+        const v = x[c[0]];
+        const cl = (c[0] === 'ev' || c[0] === 'value') ? (v > 0.005 ? 'pos' : v < -0.005 ? 'neg' : '')
+          : (['batter', 'catcher', 'team', 'date', 'type', 'result', 'side'].includes(c[0]) ? 'l' : 'dim');
+        const txt = (c[0] === 'ev' || c[0] === 'value' || c[0] === 'marginIn') ? (+v).toFixed(2) : v;
+        return `<td class="${cl}">${txt}</td>`;
       }).join('') + '</tr>';
       p.querySelector('#ftbl').innerHTML = h + '</tbody>';
       p.querySelector('#fcnt').textContent = tot > 500 ? `${tot} rows (showing 500)` : tot + ' rows';
       p.querySelectorAll('#ftbl th').forEach(th => th.addEventListener('click', () => { const k = th.dataset.k; if (fsort === k) fdir *= -1; else { fsort = k; fdir = -1; } draw(); }));
     }
-    p.querySelector('#fq').addEventListener('input', e => { fq = e.target.value; draw(); });
+    const bind = (id, key) => p.querySelector(id).addEventListener('input', e => { F[key] = e.target.value; draw(); });
+    bind('#fDate', 'date'); bind('#fBat', 'bat'); bind('#fCat', 'cat');
+    bind('#fTeam', 'team'); bind('#fType', 'type'); bind('#fWrong', 'wrong');
+    p.querySelector('#fClear').addEventListener('click', () => {
+      F.date = ''; F.bat = ''; F.cat = ''; F.team = ''; F.type = ''; F.wrong = '';
+      p.querySelector('#fDate').value = ''; p.querySelector('#fBat').value = '';
+      p.querySelector('#fCat').value = ''; p.querySelector('#fTeam').value = '';
+      p.querySelector('#fType').value = ''; p.querySelector('#fWrong').value = ''; draw();
+    });
     draw();
   }
 
