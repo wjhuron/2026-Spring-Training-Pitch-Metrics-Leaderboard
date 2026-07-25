@@ -1872,9 +1872,14 @@ def render_card(config, pitches, output_file):
     # exclude only when Arm Angle data exists (Arm Angle conveys the same release
     # info more compactly); keep RelZ/RelX as a fallback when Arm Angle is missing.
     has_arm_angle = any(sf(p.get('ArmAngle')) is not None for p in pitches)
-    # ROC: always show RelZ/RelX (no arm angle at AAA). MLB: unchanged — exclude on
-    # season cards and on single-game cards that have Arm Angle.
-    if not is_milb and (is_season or has_arm_angle):
+    # Drop RelZ/RelX once Arm Angle is present — it conveys the same release
+    # information more compactly. ROC/AAA used to be special-cased here because
+    # AAA had no arm angle at all; the minor-league Statcast backfill
+    # (2026-07-25) ended that, so the rule is now purely data-driven. The
+    # is_season shortcut stays MLB-only: a MiLB card for a pitcher whose games
+    # Savant hasn't processed yet keeps RelZ/RelX rather than losing release
+    # info entirely (the all-'—' Arm Angle column gets dropped below).
+    if has_arm_angle or (is_season and not is_milb):
         force_exclude.add('RelZ')
         force_exclude.add('RelX')
 

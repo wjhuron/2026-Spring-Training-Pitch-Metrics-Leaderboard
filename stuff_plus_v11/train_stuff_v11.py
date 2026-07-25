@@ -400,9 +400,11 @@ def design(df, feats=BASE_FEATS):
     return pd.concat([df[feats].reset_index(drop=True),
                       df[['platoon_same']].reset_index(drop=True)], axis=1)
 
-# ROC/AAA has no arm angle (0% populated), so ROC pitchers are scored with a
-# companion model trained on the same MLB data minus arm_angle, then anchored to
-# the MLB (no-arm) distribution. This applies ONLY to ROC; MLB keeps the full model.
+# Companion model trained on the same MLB data minus arm_angle. Until
+# 2026-07-25 this scored ALL of ROC/AAA, whose arm angle was 0% populated. The
+# minor-league Statcast Search backfill fixed that, so ROC now uses the full
+# model like MLB and this companion is only the fallback for pitches that still
+# have no arm angle (games Savant hasn't processed, stale caches).
 NOARM_FEATS = [f for f in BASE_FEATS if f != 'arm_angle']
 
 # ── Low-model-support indicator (2026-07-04) ──
@@ -421,8 +423,8 @@ NOARM_FEATS = [f for f in BASE_FEATS if f != 'arm_angle']
 # appended per-unit alongside the shared subsample. The worst
 # (100 - SUPPORT_FLAG_PCT)% of units flag as low-support; surfaced as
 # stuffScore_lowSupport on both leaderboards, a tooltip note on the site, and
-# a dagger on season cards. ROC units are NOT scored for support (companion
-# no-arm model, anchored baseline, never in the training pool) — always False.
+# a dagger on season cards. ROC units are NOT scored for support (never in the
+# training pool or the support manifold) — always False.
 SUPPORT_K = 25
 SUPPORT_POOL_MAX = 60000
 SUPPORT_FLAG_PCT = 98.5
@@ -634,8 +636,9 @@ def main():
         df['stuff_raw'], fold_models, fold_pitchers = _oof_predict(X)
 
         # full-data model: kept in the bundle for scoring pitches outside the
-        # training set (ROC uses the no-arm companion; any future out-of-sample
-        # scoring uses this). It no longer scores MLB leaderboard rows.
+        # training set (ROC is scored with this full model, and with the no-arm
+        # companion only where arm angle is still missing). It no longer scores
+        # MLB leaderboard rows.
         X_all = pd.concat([X, design(df_prior).reindex(columns=X.columns, fill_value=0)],
                           ignore_index=True) if df_prior is not None else X
         y_all = (np.concatenate([y, df_prior['target_xrv'].values])
@@ -753,42 +756,76 @@ def main():
 
     roc_df = build_df(roc_pitches)   # target_xrv is None at ROC — we only score
     if len(roc_df):
-        Xroc = design(roc_df, NOARM_FEATS).reindex(columns=Xna.columns, fill_value=0)
-        roc_df['raw_na'] = -model_na.predict(Xroc)
+        # ── Per-pitcher arm branch (2026-07-25) ──
+        # ROC/AAA now carries real arm angle, backfilled from Savant's
+        # minor-league Statcast Search (~99.6% of pitches). It is the same
+        # measurement MLB gets, not an estimate: across 138 pitchers who threw
+        # at both levels in 2026, MLB vs MiLB means correlate r=0.991 with a
+        # 1.4 deg mean absolute difference. So a ROC pitcher WITH arm angle is
+        # now scored by the SAME full model against the SAME MLB per-type
+        # anchors (`league`) as an MLB pitcher — mirroring MLB exactly, and
+        # restoring the single most load-bearing feature in BASE_FEATS.
+        #
+        # build_df imputes arm angle within (pitcher, pitch_type) then pitcher,
+        # so a pitcher is effectively all-or-nothing here. Anyone still without
+        # any arm angle — a game Savant has not processed yet, or a stale
+        # cache — falls back to the no-arm companion and its anchored baseline,
+        # exactly as before. Both paths stay out-of-sample: ROC pitches never
+        # enter the training pool.
+        _arm = roc_df['arm_angle'].notna().values
+        roc_df['_raw'] = np.nan
+        if _arm.any():
+            Xr = design(roc_df[_arm]).reindex(columns=X.columns, fill_value=0)
+            roc_df.loc[_arm, '_raw'] = -model.predict(Xr)
+        if (~_arm).any():
+            Xr_na = design(roc_df[~_arm], NOARM_FEATS).reindex(
+                columns=Xna.columns, fill_value=0)
+            roc_df.loc[~_arm, '_raw'] = -model_na.predict(Xr_na)
+        # The anchor set must follow the model that produced the raw value.
+        roc_df['_use_arm'] = _arm
 
-        def _score_roc(keys, scale, per_type):
-            a = roc_df.groupby(keys)['raw_na'].agg(rawmean='mean', n='size').reset_index()
-            a['stuff_mean'] = 100.0
-            groups = a.groupby('pitch_type') if per_type else [('ALL', a)]
-            for key, sub in groups:
-                sc = scale.get(key) if per_type else scale
-                if not sc or not np.isfinite(sc.get('sd', np.nan)) or sc['sd'] <= 0:
+        def _roc_atoms(frame, rounded):
+            """Per-pitch grades using each row's own anchor set: full-model rows
+            against the MLB per-type anchors, no-arm fallback rows against the
+            companion's. rounded=True gives the integer atoms written to the
+            Sheets grade column; rounded=False the full-precision value."""
+            out = pd.Series(np.nan, index=frame.index)
+            for use_arm, anchors in ((True, league), (False, na_pt)):
+                m = (frame['_use_arm'] == use_arm).values
+                if not m.any():
                     continue
-                mu, sd = sc['mu'], sc['sd']
-                # plain average, unclipped (coherent canon)
-                a.loc[sub.index, 'stuff_mean'] = 100 + K_SCALE * (sub['rawmean'] - mu) / sd
-            a['stuff_mean'] = a['stuff_mean'].round(1)
-            return a
-        roc_agg = _score_roc(['pitcher', 'team', 'pitch_type'], na_pt, True)
-        def _roc_atom(row):
-            sc = na_pt.get(row['pitch_type'])
-            if not sc or not np.isfinite(sc.get('sd', np.nan)) or sc['sd'] <= 0:
-                return np.nan
-            return 100 + K_SCALE * (row['raw_na'] - sc['mu']) / sc['sd']
-        roc_df['_atom'] = roc_df.apply(_roc_atom, axis=1)
-        roc_overall = (roc_df.dropna(subset=['_atom'])
-                         .groupby(['pitcher', 'team', 'throws'])['_atom']
-                         .agg(rawmean='mean', n='size').reset_index())
+                sub = frame.loc[m]
+                vals = pd.Series(np.nan, index=sub.index)
+                for pt, sc in anchors.items():
+                    if (not isinstance(sc, dict)
+                            or not np.isfinite(sc.get('sd', np.nan)) or sc['sd'] <= 0):
+                        continue
+                    mm = (sub['pitch_type'] == pt).values
+                    if mm.any():
+                        vals[mm] = (100 + K_SCALE
+                                    * (sub.loc[mm, '_raw'] - sc['mu']) / sc['sd'])
+                out[m] = vals.round() if rounded else vals
+            return out
+
+        roc_df['_atom'] = _roc_atoms(roc_df, rounded=False)
+        _scored = roc_df.dropna(subset=['_atom'])
+        roc_agg = (_scored.groupby(['pitcher', 'team', 'pitch_type'])['_atom']
+                          .agg(rawmean='mean', n='size').reset_index())
+        roc_agg['stuff_mean'] = roc_agg['rawmean'].round(1)
+        roc_overall = (_scored.groupby(['pitcher', 'team', 'throws'])['_atom']
+                              .agg(rawmean='mean', n='size').reset_index())
         roc_overall['stuff_mean'] = roc_overall['rawmean'].round(1)
-        # ROC is scored by the no-arm companion model against an anchored MLB
-        # baseline and never enters the training pool — the support diagnostic
-        # doesn't apply there (see compute_support docstring).
+        # ROC never enters the training pool or the support manifold, so the
+        # low-support diagnostic still doesn't apply (see compute_support).
         roc_agg['low_support'] = False
         roc_overall['low_support'] = False
         agg = pd.concat([agg, roc_agg], ignore_index=True)
         overall = pd.concat([overall, roc_overall], ignore_index=True)
-        print(f'  ROC (no-arm, vs MLB baseline): {len(roc_agg)} pitch-type rows, '
-              f'{len(roc_overall)} pitchers')
+        _n_arm = int(_arm.sum())
+        print(f'  ROC vs MLB baseline: {len(roc_agg)} pitch-type rows, '
+              f'{len(roc_overall)} pitchers | {_n_arm}/{len(roc_df)} pitches '
+              f'by the FULL arm-angle model, {len(roc_df) - _n_arm} by the '
+              f'no-arm companion')
 
     # ── COHERENT CANON display aggregation (2026-07-18, per Wally) ──
     # Every displayed Stuff+ — per-type unit AND pitcher overall — is the
@@ -835,8 +872,10 @@ def main():
     _mlb_disp = _mlb_disp.dropna(subset=['_ai'])
     _atom_frames = [_mlb_disp]
     if len(roc_df):
-        _roc_disp = roc_df[_DISP_COLS + ['raw_na']].copy()
-        _roc_disp['_ai'] = _atom_series(_roc_disp, na_pt, 'raw_na')
+        # Integer atoms with each row's own anchor set (full-model rows anchor
+        # to `league`, no-arm fallback rows to `na_pt`).
+        _roc_disp = roc_df[_DISP_COLS + ['_raw', '_use_arm']].copy()
+        _roc_disp['_ai'] = _roc_atoms(_roc_disp, rounded=True)
         _roc_disp = _roc_disp.dropna(subset=['_ai'])
         _atom_frames.append(_roc_disp)
 
@@ -921,7 +960,12 @@ def main():
         if len(df_extra):
             _emit(df_extra, 'stuff_raw', league)
         if len(roc_df):
-            _emit(roc_df, 'raw_na', na_pt)
+            # Unrounded, per-row anchors — the same values the leaderboard uses.
+            _rg = _roc_atoms(roc_df, rounded=False)
+            for tab, rownum, g in zip(roc_df['sheet_tab'], roc_df['sheet_row'], _rg):
+                if tab is None or rownum is None or not np.isfinite(g):
+                    continue
+                grades[f'{tab}\t{int(rownum)}'] = round(float(g), 2)
         with open(args.dump_pitch_grades, 'w') as f:
             json.dump(grades, f, separators=(',', ':'))
         print(f'  per-pitch grade dump: {len(grades)} pitches -> {args.dump_pitch_grades}')
