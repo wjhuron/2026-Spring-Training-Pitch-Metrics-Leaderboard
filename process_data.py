@@ -2725,8 +2725,25 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
                                 bip_count_means=XRV_BIP_COUNT_MEANS,
                                 negate=True))
 
-        row['xwOBAsp'] = compute_xwobasp(pitches)
-        row['sprayVal'] = compute_sprayval(pitches)
+        # SKILL METRICS EXCLUDE POSITION-PLAYER PITCHING (2026-07-25).
+        # The rule: EP counts for the official ledger, not for skill estimation.
+        # Counting stats, the slash line, wOBA and xwOBA above keep every EP PA
+        # (the 2026-07-13 policy, so pitch-derived totals still reconcile to
+        # official). But xwOBAcon / xwOBAsp / sprayVal are ABILITY estimates
+        # with no official total to match, and a catcher's 48mph eephus is not
+        # evidence about a hitter's contact quality. Measured: 445 EP batted
+        # balls league-wide, median |BB+| shift 0.16 but up to 2.9 points, in
+        # BOTH directions — so this removes noise rather than a bias.
+        # hitter_league_avgs['xwOBAcon'] (the BB+ denominator) is derived from
+        # these rows, so it inherits the exclusion automatically.
+        _skill = ([p for p in pitches
+                   if (p.get('Pitcher'), p.get('PTeam')) not in ep_pitchers]
+                  if ep_pitchers else pitches)
+        if len(_skill) != len(pitches):
+            row['xwOBAcon'] = compute_expected_stats(
+                _skill, woba_weights=WOBA_WEIGHTS).get('xwOBAcon')
+        row['xwOBAsp'] = compute_xwobasp(_skill)
+        row['sprayVal'] = compute_sprayval(_skill)
 
         hitter_leaderboard.append(row)
 
@@ -3088,9 +3105,19 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     # xwOBAcon). The qualified-pool re-anchor downstream is MLB-only,
     # so any minor lg_raw shift from ROC entering regress_and_normalize
     # is normalized out at the final sdPlus / ctPlus scale.
-    sd_pitches_by_hitter = dict(hitter_groups)
+    # Position-player pitching is excluded from BOTH the league cell tables and
+    # the per-hitter accumulation (2026-07-25), same rule as xwOBAcon above:
+    # SD+/CT+ are skill estimates with no official total to reconcile to, and a
+    # 48mph eephus is not evidence about a hitter's swing decisions. Those PAs
+    # still count in the slash line / wOBA / wRC+ per the 2026-07-13 policy.
+    _sd_league = ([p for p in all_pitches
+                   if (p.get('Pitcher'), p.get('PTeam')) not in ep_pitchers]
+                  if ep_pitchers else all_pitches)
+    sd_pitches_by_hitter = {
+        k: [p for p in v if (p.get('Pitcher'), p.get('PTeam')) not in ep_pitchers]
+        for k, v in hitter_groups.items()} if ep_pitchers else dict(hitter_groups)
     sd_results, sd_weights = compute_sd_plus(
-        all_pitches, sd_pitches_by_hitter,
+        _sd_league, sd_pitches_by_hitter,
         lg_woba=GUTS_EXTRA.get('lgWOBA') if GUTS_EXTRA else None,
         woba_scale=GUTS_EXTRA.get('wOBAScale') if GUTS_EXTRA else None,
     )
@@ -3125,7 +3152,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     # belong. See pipeline_contact.py.
     from pipeline_contact import compute_ct_plus
     ct_results, ct_weights = compute_ct_plus(
-        all_pitches, sd_pitches_by_hitter,
+        _sd_league, sd_pitches_by_hitter,
         lg_woba=GUTS_EXTRA.get('lgWOBA') if GUTS_EXTRA else None,
         woba_scale=GUTS_EXTRA.get('wOBAScale') if GUTS_EXTRA else None,
     )
