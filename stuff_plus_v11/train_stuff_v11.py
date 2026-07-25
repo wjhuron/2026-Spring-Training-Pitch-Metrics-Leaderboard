@@ -1034,7 +1034,8 @@ def main():
     print(f'\n  saved bundle + pitcher_stuff_v11.csv to {HERE}')
 
     if args.inject:
-        xrvoe_pt, xrvoe_ov = compute_xrvoe(df, pitches)
+        xrvoe_pt, xrvoe_ov = compute_xrvoe(df, pitches,
+                                           roc_df=roc_df, roc_pitches=roc_pitches)
         inject(agg, overall, league, xrvoe_pt=xrvoe_pt, xrvoe_ov=xrvoe_ov,
                pc_maps=pc_maps)
     else:
@@ -1169,12 +1170,21 @@ XRVOE_FIELDS = {'xrvoe100': 'v', 'rvoe100': 'rvoe100',
                 'rvoe': 'rvoe', 'xrvoe': 'xrvoe'}
 
 
-def compute_xrvoe(df, pitches):
+def compute_xrvoe(df, pitches, roc_df=None, roc_pitches=None):
     """Per-unit xRVOE/100 (pitcher-positive) from the OOF stuff predictions
     already in df['stuff_raw'] and per-pitch Loc ExpRV built here.
     Stacking is fit PER PITCH GROUP (fixes the loc-correlation calibration
     wrinkle found in feasibility). Returns (per_pitch_type, per_pitcher)
-    dicts: key -> {'v': shrunk xRVOE/100, 'n': pitches}."""
+    dicts: key -> {'v': shrunk xRVOE/100, 'n': pitches}.
+
+    ROC/AAA (2026-07-25): scored, never baseline — the same translation
+    framing Stuff+ and Loc+ use. The Loc surfaces and the stacking betas are
+    fit on MLB rows only; ROC pitches are then scored against them, and the
+    percentile pools downstream already exclude AAA. This was previously
+    impossible because both sides of the residual come from RunExp
+    (target_xrv on non-BIP, rv_raw everywhere) and ROC's RunExp was 0%
+    populated; the minor-league Statcast backfill filled it.
+    """
     import pipeline_locplus as LOC
     baseline = [p for p in pitches if LOC.is_eligible_baseline(p)]
     S = LOC.build_surfaces(baseline, LG_WOBA, WOBA_SCALE)
@@ -1183,33 +1193,60 @@ def compute_xrvoe(df, pitches):
         v = LOC.score_pitch(p, S)
         if v is not None and p.get('PitchID'):
             exprv[p['PitchID']] = v
+    # ROC scored against the MLB surfaces. is_eligible_baseline() is
+    # MLB-only by design, so ROC never shaped them; _is_scorable is the
+    # scoring-side check (documented as the one that lets ROC through).
+    if roc_pitches:
+        for p in roc_pitches:
+            if not LOC._is_scorable(p):
+                continue
+            v = LOC.score_pitch(p, S)
+            if v is not None and p.get('PitchID'):
+                exprv[p['PitchID']] = v
 
-    d = df[['pid', 'pitcher', 'team', 'pitch_type', 'target_xrv', 'stuff_raw',
-            'rv_raw']].copy()
-    d['loc_exprv'] = d['pid'].map(exprv)
-    d = d[d['loc_exprv'].notna() & d['stuff_raw'].notna()]
-    d['stuff_hit'] = -d['stuff_raw']          # back to hitter perspective
-    d['grp'] = d['pitch_type'].map(LOC.group_of_code)
+    def _prep(frame):
+        d = frame[['pid', 'pitcher', 'team', 'pitch_type', 'target_xrv',
+                   'stuff_raw', 'rv_raw']].copy()
+        d['loc_exprv'] = d['pid'].map(exprv)
+        # target_xrv is non-null by construction on the MLB training frame;
+        # the ROC frame carries scored-but-untargeted pitches, so filter here.
+        d = d[d['loc_exprv'].notna() & d['stuff_raw'].notna()
+              & d['target_xrv'].notna()]
+        d['stuff_hit'] = -d['stuff_raw']      # back to hitter perspective
+        d['grp'] = d['pitch_type'].map(LOC.group_of_code)
+        return d
 
-    # global stacking as fallback, then per-group where the sample allows
+    d = _prep(df)
+
+    # global stacking as fallback, then per-group where the sample allows.
+    # Fit on MLB only — ROC is measured against this expectation, never in it.
     def _stack(sub):
         A = np.column_stack([np.ones(len(sub)), sub['stuff_hit'].values,
                              sub['loc_exprv'].values])
         beta, *_ = np.linalg.lstsq(A, sub['target_xrv'].values, rcond=None)
         return beta, A
     beta_g, _ = _stack(d)
-    d['expect'] = np.nan
-    for grp, sub in d.groupby('grp'):
-        beta = _stack(sub)[0] if len(sub) >= 5000 else beta_g
-        A = np.column_stack([np.ones(len(sub)), sub['stuff_hit'].values,
-                             sub['loc_exprv'].values])
-        d.loc[sub.index, 'expect'] = A @ beta
-    d['resid'] = d['target_xrv'] - d['expect']
-    # RVOE: same expectation, but the actual side is raw RV (RunExp, luck
-    # included). RVOE - xRVOE = contact luck. Accounting flavor -> unshrunk.
-    d['resid_raw'] = d['rv_raw'] - d['expect']
+    betas = {grp: (_stack(sub)[0] if len(sub) >= 5000 else beta_g)
+             for grp, sub in d.groupby('grp')}
 
-    # calibration report (unit level, n>=100): should be ~0 after per-group fit
+    def _apply(dd):
+        dd = dd.copy()
+        dd['expect'] = np.nan
+        for grp, sub in dd.groupby('grp'):
+            beta = betas.get(grp, beta_g)
+            A = np.column_stack([np.ones(len(sub)), sub['stuff_hit'].values,
+                                 sub['loc_exprv'].values])
+            dd.loc[sub.index, 'expect'] = A @ beta
+        dd['resid'] = dd['target_xrv'] - dd['expect']
+        # RVOE: same expectation, but the actual side is raw RV (RunExp, luck
+        # included). RVOE - xRVOE = contact luck. Accounting flavor -> unshrunk.
+        dd['resid_raw'] = dd['rv_raw'] - dd['expect']
+        return dd
+
+    d = _apply(d)
+
+    # calibration report (unit level, n>=100): should be ~0 after per-group
+    # fit. MLB only — that is what the betas were fit on.
     gq = d.groupby(['pitcher', 'team', 'pitch_type']).agg(
         resid=('resid', 'mean'), n=('resid', 'size'),
         stuff=('stuff_hit', 'mean'), loc=('loc_exprv', 'mean'))
@@ -1219,14 +1256,24 @@ def compute_xrvoe(df, pitches):
               f"{np.corrcoef(gq['resid'], gq['stuff'])[0,1]:+.3f}, "
               f"corr(resid, loc) {np.corrcoef(gq['resid'], gq['loc'])[0,1]:+.3f}")
 
+    d_all = d
+    if roc_df is not None and len(roc_df):
+        _r = roc_df.rename(columns={'_raw': 'stuff_raw'})
+        if 'stuff_raw' in _r.columns:
+            d_roc = _prep(_r)
+            if len(d_roc):
+                d_all = pd.concat([d, _apply(d_roc)], ignore_index=True)
+                print(f'  xRVOE: {len(d_roc)} ROC/AAA pitches scored against '
+                      f'the MLB expectation')
+
     def _units(keys, min_n):
         # v (xRVOE/100) is the shrunk skill estimate; xrvoe/rvoe/rvoe100 are
         # raw accounting (unshrunk, full precision — display layer rounds),
         # matching the site's RV/xRV convention.
-        g = d.groupby(keys).agg(resid=('resid', 'mean'), n=('resid', 'size'),
-                                resid_sum=('resid', 'sum'),
-                                raw_sum=('resid_raw', 'sum'),
-                                raw_n=('resid_raw', 'count'))
+        g = d_all.groupby(keys).agg(resid=('resid', 'mean'), n=('resid', 'size'),
+                                    resid_sum=('resid', 'sum'),
+                                    raw_sum=('resid_raw', 'sum'),
+                                    raw_n=('resid_raw', 'count'))
         out = {}
         for key, r in g.iterrows():
             if r['n'] < min_n:
@@ -1316,8 +1363,10 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None):
                              and r.get('team') not in AAA_TEAMS
                              and not _is_combined_team(r['team'])),
         pc_lookup=_pc_pt_lookup)
-    # ── xRVOE -> pitch rows (MLB only; ROC lacks non-BIP RunExp for the
-    # actual side, and combined rows stay None — stints carry the value) ──
+    # ── xRVOE -> pitch rows. ROC/AAA now carries it too (its RunExp was
+    # backfilled 2026-07-25); the pools below still exclude AAA, so ROC is
+    # ranked against MLB without defining the distribution. Combined rows
+    # stay None — stints carry the value. ──
     if xrvoe_pt:
         pools = {f: defaultdict(list) for f in XRVOE_FIELDS}
         for row in pl:

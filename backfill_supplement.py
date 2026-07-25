@@ -127,6 +127,62 @@ STATCAST_TO_MLB_EVENT = {
     'force_out': 'Forceout',
 }
 
+# Number format pinned on every numeric supplement column we write.
+#
+# These columns used to be written with value_input_option='RAW', which stores
+# "53.6" as the STRING "53.6". The values read back fine (safe_float parses
+# them, so the website was never wrong), but Sheets sorts them lexicographically
+# — "9.9" above "74.8" — which makes the column useless to sort or filter in the
+# spreadsheet itself. Writing USER_ENTERED stores real numbers and fixes that.
+#
+# The pinned format is what makes the switch invisible to everything else: this
+# script decides "already filled" and "identical to existing" by string compare
+# against get_all_values(), which returns the FORMATTED value. Pinning ArmAngle
+# to 0.0 keeps 41 reading back as "41.0", and RunExp to 0.000 keeps 0 reading
+# back as "0.000" — exactly the strings RAW stored. Without the pin, Automatic
+# format would render those as "41" and "0" and every later run would see a
+# mismatch and phantom-overwrite the cell.
+SUPPLEMENT_NUMBER_FORMATS = {
+    'ArmAngle':        {'type': 'NUMBER', 'pattern': '0.0'},
+    'BatSpeed':        {'type': 'NUMBER', 'pattern': '0.0'},
+    'SwingLength':     {'type': 'NUMBER', 'pattern': '0.0'},
+    'AttackAngle':     {'type': 'NUMBER', 'pattern': '0.0'},
+    'AttackDirection': {'type': 'NUMBER', 'pattern': '0.0'},
+    'SwingPathTilt':   {'type': 'NUMBER', 'pattern': '0.0'},
+    'RunExp':          {'type': 'NUMBER', 'pattern': '0.000'},
+    'xBA':             {'type': 'NUMBER', 'pattern': '0.000'},
+    'xSLG':            {'type': 'NUMBER', 'pattern': '0.000'},
+    'xwOBA':           {'type': 'NUMBER', 'pattern': '0.000'},
+    'Outs':            {'type': 'NUMBER', 'pattern': '0'},
+    'Barrel':          {'type': 'NUMBER', 'pattern': '0'},
+    # Event is a free-form string (STRING_COLS) — deliberately absent.
+}
+
+
+def pin_supplement_formats(ws, header, cols):
+    """Pin SUPPLEMENT_NUMBER_FORMATS on the full data range of `cols`.
+
+    Applied to the whole column rather than just the rows written, so it is
+    idempotent and also corrects historical rows whose format was left
+    Automatic. One batch_update per tab.
+    """
+    reqs = []
+    for name in cols:
+        fmt = SUPPLEMENT_NUMBER_FORMATS.get(name)
+        if fmt is None or name not in header:
+            continue
+        idx0 = header.index(name)
+        reqs.append({'repeatCell': {
+            'range': {'sheetId': ws.id, 'startRowIndex': 1,
+                      'startColumnIndex': idx0, 'endColumnIndex': idx0 + 1},
+            'cell': {'userEnteredFormat': {'numberFormat': fmt}},
+            'fields': 'userEnteredFormat.numberFormat'}})
+    if not reqs:
+        return
+    _retry_sheets_call(lambda: ws.spreadsheet.batch_update({'requests': reqs}),
+                       'number-format pin')
+
+
 # Per-column rounding (default is 1 decimal for anything not listed)
 ROUND_DECIMALS = {
     'ArmAngle': 1,
@@ -791,7 +847,17 @@ def main():
             if cells_to_update:
                 print(f"  Writing {len(cells_to_update)} cells "
                       f"({new_fill_cells} new, {overwrite_cells} overwritten)...")
-                update_cells_with_retry(ws, cells_to_update, value_input_option='RAW')
+                # USER_ENTERED so numeric supplement columns land as real
+                # numbers and sort correctly in the sheet; the format pin below
+                # keeps the read-back strings byte-identical to what RAW wrote.
+                update_cells_with_retry(ws, cells_to_update,
+                                        value_input_option='USER_ENTERED')
+                try:
+                    pin_supplement_formats(ws, header, supp_col_idx.keys())
+                except Exception as _e:
+                    print(f"    WARNING: number-format pin failed "
+                          f"({type(_e).__name__}: {_e}); values are still "
+                          f"correct, run scripts/fix_text_typed_supplements.py")
                 total_filled += new_fill_cells
                 total_overwritten += overwrite_cells
                 time.sleep(2)  # Rate limit buffer after write
