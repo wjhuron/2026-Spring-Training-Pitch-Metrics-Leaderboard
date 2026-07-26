@@ -226,17 +226,34 @@ MLB_TEAMS = {
 # miss_distance are 100% null for MiLB, so SWING_CLUSTER_COLS stay empty.
 #
 # Two quirks drive the code below:
-#   1. The `team` param is silently ignored here (team=ROC returns 0 rows), so
-#      the club filter has to be applied client-side on home_team/away_team.
-#   2. Responses are hard-capped at 25,000 rows and an all-levels day runs
-#      ~5,500 rows, so a season range must be requested in small windows or it
-#      is silently truncated.
+#   1. `team` is honoured only as the NUMERIC MiLB club id, not the three-letter
+#      code: team=ROC returns 0 rows, team=534 returns Rochester's. Verified
+#      2026-07-26. Because it filters on the queried side, one request covers
+#      only half of a ROC game — player_type=pitcher gives ROC's own pitchers,
+#      player_type=batter gives the pitches thrown TO ROC batters, i.e. the
+#      opponent's. Both are needed, and their union is exactly the set the old
+#      client-side home_team/away_team filter produced: on 2026-05-29..31,
+#      477 + 482 = 959 keys, identical to the 959 filtered out of an unfiltered
+#      18,486-row pull.
+#   2. Responses are hard-capped at 25,000 rows with no error, so a range must
+#      be requested in windows or it is silently truncated.
+#
+# Server-side filtering is worth roughly 25x: the unfiltered query returns every
+# affiliate level (ROC is ~5% of it), so the old path moved ~470 MB across 41
+# windows to keep ~29k rows. The full season now costs 18.5 MB.
 MILB_TEAMS = {'ROC', 'AAA'}
 
 # Tab -> club code as it appears in the minors CSV's home_team/away_team.
 # Both tabs cover the same Rochester games (ROC tab = ROC pitchers, AAA tab =
 # the opposing pitchers in those games), so both filter on the same club.
 MILB_SAVANT_TEAM = {'ROC': 'ROC', 'AAA': 'ROC'}
+
+# Tab -> numeric MiLB club id for the server-side `team` filter (quirk 1 above).
+# Rochester Red Wings = 534. Both tabs are the same Rochester games.
+MILB_SAVANT_TEAM_ID = {'ROC': 534, 'AAA': 534}
+
+# Both sides of every ROC game. See quirk 1: neither alone is complete.
+MILB_PLAYER_TYPES = ('pitcher', 'batter')
 
 # Which supplement columns the MiLB path may write. Everything here was
 # verified present in the minors search on real ROC games (2026-07-25):
@@ -252,8 +269,12 @@ MILB_SAVANT_TEAM = {'ROC': 'ROC', 'AAA': 'ROC'}
 #     to "in play + fouls" and shift every EV-based metric.
 MILB_SUPPLEMENT_COLS = {'ArmAngle', 'RunExp', 'xBA', 'xSLG', 'xwOBA', 'Barrel'}
 
-# Days per minors request (~5.5k rows/day across all levels vs the 25k cap).
-MILB_CHUNK_DAYS = 3
+# Days per minors request. Was 3 when every request dragged back all four
+# affiliate levels (~5.5k rows/day vs the 25k cap). With the server-side club
+# filter a request carries only ROC's own pitches, ~120/day/side, so 30 days
+# runs ~3.6k rows and keeps a ~7x margin under the cap even in the densest
+# stretch. The cap check below is still the thing that enforces this.
+MILB_CHUNK_DAYS = 30
 MILB_ROW_CAP = 25000
 
 ALL_TRACKED_TEAMS = set(MLB_TEAMS) | MILB_TEAMS
@@ -270,6 +291,45 @@ def date_in_range(date_str):
     return True
 
 
+# requests' `timeout` is per socket operation, not a budget for the request: the
+# clock restarts every time any bytes arrive, so a server dribbling one chunk
+# per read interval keeps a GET alive forever. These responses are megabytes
+# delivered over hundreds of chunks, which is exactly the shape that can stall
+# without ever tripping it. SAVANT_TOTAL_TIMEOUT is the real ceiling, enforced
+# below against the wall clock; the other two only bound individual operations.
+# The largest response observed is ~11.5 MB in ~25s, so 180s is ~7x headroom.
+SAVANT_CONNECT_TIMEOUT = 15
+SAVANT_READ_TIMEOUT = 60
+SAVANT_TOTAL_TIMEOUT = 180
+
+
+def _get_savant_body(url, params, session):
+    """GET a Savant CSV under a hard wall-clock deadline.
+
+    Streams the body so elapsed time can be checked between chunks, and raises
+    requests.exceptions.Timeout — the same type a per-socket timeout raises, so
+    the caller's retry arm already handles it — once SAVANT_TOTAL_TIMEOUT is
+    exceeded. Returns (status_code, text); text is '' for non-200 responses.
+    """
+    started = time.monotonic()
+    with session.get(url, params=params, stream=True,
+                     timeout=(SAVANT_CONNECT_TIMEOUT, SAVANT_READ_TIMEOUT)) as response:
+        if response.status_code != 200:
+            return response.status_code, ''
+        body = bytearray()
+        for chunk in response.iter_content(chunk_size=1 << 16):
+            body.extend(chunk)
+            elapsed = time.monotonic() - started
+            if elapsed > SAVANT_TOTAL_TIMEOUT:
+                raise requests.exceptions.Timeout(
+                    f"exceeded {SAVANT_TOTAL_TIMEOUT}s total after "
+                    f"{len(body)} bytes")
+        # Matches response.text: requests decodes with the header charset and
+        # errors='replace', falling back to a sniff when the header omits one.
+        encoding = response.encoding or response.apparent_encoding or 'utf-8'
+        return response.status_code, str(bytes(body), encoding, errors='replace')
+
+
 def _fetch_savant_csv(url, params, session, label):
     """GET a Savant CSV endpoint and parse it, retrying transient failures.
 
@@ -280,18 +340,17 @@ def _fetch_savant_csv(url, params, session, label):
     """
     for attempt in range(4):
         try:
-            response = session.get(url, params=params, timeout=180)
-            if response.status_code != 200:
-                if response.status_code >= 500 and attempt < 3:
+            status_code, csv_text = _get_savant_body(url, params, session)
+            if status_code != 200:
+                if status_code >= 500 and attempt < 3:
                     wait = 5 * (2 ** attempt)  # 5, 10, 20 s
-                    print(f"    Savant returned {response.status_code} for {label}, "
+                    print(f"    Savant returned {status_code} for {label}, "
                           f"retrying in {wait}s...")
                     time.sleep(wait)
                     continue
-                print(f"    Statcast returned status {response.status_code}")
+                print(f"    Statcast returned status {status_code}")
                 return None
 
-            csv_text = response.text
             if not csv_text or csv_text.strip() == '' or 'No Results' in csv_text[:100]:
                 print(f"    No Statcast data available yet ({label})")
                 return None
@@ -329,70 +388,111 @@ def _date_windows(date_min, date_max, span_days):
     return out
 
 
-# (club, window_start, window_end) -> filtered DataFrame (or None if the
-# window failed). Lives for the process so a multi-tab run downloads once.
+# (club, player_type, window_start, window_end) -> club-filtered DataFrame (or
+# None if the request failed). Lives for the process so a multi-tab run
+# downloads once: ROC and AAA are the same Rochester games from opposite sides.
 _MINORS_WINDOW_CACHE = {}
 
 
 def _download_statcast_minors(team_tab, date_min, date_max, session):
     """Fetch the minor-league Statcast Search for one affiliate's games.
 
-    The endpoint ignores `team`, so every window comes back with all levels'
-    rows and is filtered client-side on home_team/away_team. Windows are kept
-    small because the response is capped at MILB_ROW_CAP rows with no error —
-    a truncated window would silently drop pitches.
+    Requests are filtered server-side by numeric club id, once per player_type
+    so both sides of each ROC game come back (see the MiLB block above). The
+    response is capped at MILB_ROW_CAP rows with no error, so the range is still
+    windowed and a capped window is refused rather than passed off as complete.
     """
     club = MILB_SAVANT_TEAM.get(team_tab, team_tab)
+    club_id = MILB_SAVANT_TEAM_ID.get(team_tab)
+    if club_id is None:
+        # Config error, not a runtime condition: without an id every request
+        # would go out as team=None and come back empty, which reads like a
+        # season with no games rather than a missing mapping.
+        raise KeyError(f"{team_tab} is in MILB_TEAMS but has no "
+                       f"MILB_SAVANT_TEAM_ID entry; add its numeric club id")
     windows = _date_windows(date_min, date_max, MILB_CHUNK_DAYS)
+    reqs = [(w, pt) for w in windows for pt in MILB_PLAYER_TYPES]
     print(f"    Downloading minor-league Statcast for {team_tab} (club {club}) "
-          f"{date_min} to {date_max} in {len(windows)} windows...")
+          f"{date_min} to {date_max} in {len(windows)} windows "
+          f"x {len(MILB_PLAYER_TYPES)} sides...")
 
     url = "https://baseballsavant.mlb.com/statcast-search-minors/csv"
     frames = []
-    for w_start, w_end in windows:
-        # ROC and AAA are the same games from opposite sides, so the second tab
-        # would otherwise re-download ~40 windows of identical data.
-        cache_key = (club, w_start, w_end)
+    failed = []
+    kept_rows = 0
+    for r_i, ((w_start, w_end), player_type) in enumerate(reqs, 1):
+        cache_key = (club, player_type, w_start, w_end)
         if cache_key in _MINORS_WINDOW_CACHE:
             cached = _MINORS_WINDOW_CACHE[cache_key]
             if cached is not None and len(cached):
                 frames.append(cached)
+                kept_rows += len(cached)
             continue
         params = {
             'all': 'true',
             'type': 'details',
             'game_date_gt': w_start,
             'game_date_lt': w_end,
-            'player_type': 'pitcher',
+            'team': str(club_id),
+            'player_type': player_type,
             'min_pitches': '0',
             'min_results': '0',
             'sort_col': 'pitches',
             'sort_order': 'desc',
             'minors': 'true',
         }
-        df = _fetch_savant_csv(url, params, session, f"{team_tab} {w_start}..{w_end}")
+        label = f"{team_tab} {w_start}..{w_end} {player_type}"
+        df = _fetch_savant_csv(url, params, session, label)
         if df is None:
+            # None is ambiguous here: a legitimately empty window (off days) and
+            # a window whose retries were exhausted both land on it. Only the
+            # latter leaves a hole, and _fetch_savant_csv has already said which
+            # it was — record it so the end-of-download summary can flag it.
             _MINORS_WINDOW_CACHE[cache_key] = None
+            failed.append(label)
             continue
         if len(df) >= MILB_ROW_CAP:
             # Never let a capped window pass as complete data.
-            print(f"    WARNING: {w_start}..{w_end} returned {len(df)} rows "
+            print(f"    WARNING: {label} returned {len(df)} rows "
                   f"(cap {MILB_ROW_CAP}) — results were truncated. Lower "
                   f"MILB_CHUNK_DAYS and re-run; this window is being skipped.")
+            failed.append(f"{label} (truncated)")
             continue
         if 'home_team' not in df.columns or 'away_team' not in df.columns:
-            print(f"    WARNING: {w_start}..{w_end} has no home/away columns; skipping")
+            print(f"    WARNING: {label} has no home/away columns; skipping")
+            failed.append(f"{label} (no team cols)")
             continue
+        # Redundant while the server-side filter holds, and that is the point:
+        # `team` is undocumented, and an id Savant stops honouring goes back to
+        # returning every affiliate level rather than erroring. This keeps a
+        # silently-ignored filter from widening the result set.
         keep = df[(df['home_team'] == club) | (df['away_team'] == club)]
+        if len(keep) != len(df):
+            print(f"    WARNING: {label} returned {len(df) - len(keep)} non-{club} "
+                  f"rows — the server-side team={club_id} filter was ignored. "
+                  f"Falling back to the client-side filter for this request.")
         _MINORS_WINDOW_CACHE[cache_key] = keep
         if len(keep):
             frames.append(keep)
-        time.sleep(1.5)  # be polite to Savant across ~40 windows
+            kept_rows += len(keep)
+        # A long run of silent requests reads as a hang, especially right after
+        # a 502-retry line. Say where we are on every one.
+        print(f"      [{r_i}/{len(reqs)}] {w_start}..{w_end} {player_type}: "
+              f"{len(keep)} {club} (running {kept_rows})", flush=True)
+        time.sleep(1.5)  # be polite to Savant
 
+    if failed:
+        print(f"    NOTE: {len(failed)} of {len(reqs)} requests returned no "
+              f"data (off days, or exhausted retries — see the messages above): "
+              f"{', '.join(failed)}")
     if not frames:
         print(f"    No {club} rows found in the minor-league search")
         return None
-    return pd.concat(frames, ignore_index=True)
+    # The two sides are disjoint (a pitch is thrown either by ROC or to ROC),
+    # but dedupe on the PitchID key rather than assume it.
+    out = pd.concat(frames, ignore_index=True)
+    return out.drop_duplicates(['game_pk', 'at_bat_number', 'pitch_number'],
+                               ignore_index=True)
 
 
 def download_statcast(team_tab, date_min, date_max, session):
