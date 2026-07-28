@@ -47,7 +47,7 @@ import train_stuff_v11 as T
 
 LG, SCALE = 0.3169, 1.2393
 MIN_PITCH, MIN_ACTUAL = 200, 200
-W_GRID = [round(0.05 * i, 2) for i in range(21)]
+W_GRID = [round(0.01 * i, 2) for i in range(101)]
 SEASONS = [2021, 2022, 2023, 2024, 2025]
 GUTS = dict(T.HIST_GUTS); GUTS[2025] = (T.PRIOR_LG_WOBA, T.PRIOR_WOBA_SCALE)
 TRAIN_PKL = {y: (T.HIST_PKL.format(year=y) if y != 2025 else T.PRIOR_PKL) for y in SEASONS}
@@ -193,6 +193,41 @@ def main():
     if not bests:
         print("\nno seasons evaluated")
         return
+    # ── CROSS-SEASON OPTIMUM ──────────────────────────────────────────────
+    # Picking the median of five per-season argmaxes is eyeballing. The actual
+    # objective is "one w for all seasons", so optimize THAT: average each
+    # season's correlation via Fisher z (the correct way to average r), then
+    # find the argmin and, just as important, how flat it is around there.
+    import pickle as _pk
+    _pk.dump({'curves': curves, 'bests': bests},
+             open(os.path.join(ROOT, 'data', '_pplus_loso_curves.pkl'), 'wb'))
+
+    def fisher(r):
+        r = max(-0.999999, min(0.999999, r))
+        return 0.5 * math.log((1 + r) / (1 - r))
+
+    agg = {}
+    for w in W_GRID:
+        zs = [fisher(curves[y][w]) for y in curves]
+        agg[w] = sum(zs) / len(zs)
+    wbest = min(agg, key=lambda w: agg[w])          # most negative = best
+    zbest = agg[wbest]
+    # Flat region: every w whose mean-z is within 1% of the best in magnitude.
+    tol = abs(zbest) * 0.01
+    flat = [w for w in W_GRID if agg[w] <= zbest + tol]
+    print()
+    print(f"CROSS-SEASON OPTIMUM (mean Fisher-z over {len(curves)} seasons)")
+    print(f"  argmin w = {wbest:.2f}   (mean z {zbest:.4f})")
+    print(f"  flat region within 1% of best: w in [{min(flat):.2f}, {max(flat):.2f}]")
+    print(f"  interior optimum: {'YES' if 0 < wbest < 1 and min(flat) > 0 and max(flat) < 1 else 'NO — at a grid edge'}")
+    print()
+    print(f"{'w':>6s} {'mean z':>8s} " + "".join(f"{y:>8d}" for y in sorted(curves)))
+    for w in [round(x, 2) for x in (0.60, 0.65, 0.70, 0.75, 0.78, 0.80, 0.82,
+                                    0.85, 0.90, 0.95, 1.00)]:
+        cells = "".join(f"{curves[y][w]:>8.3f}" for y in sorted(curves))
+        mark = '  <- argmin' if abs(w - wbest) < 1e-9 else (
+               '  <- shipped' if abs(w - 0.70) < 1e-9 else '')
+        print(f"{w:>6.2f} {agg[w]:>8.4f} {cells}{mark}")
     print()
     print("(cells are corr(Pitching+, next-half xRV allowed); MORE NEGATIVE = better)")
     print("SD(S+) vs SD(L+) is the scale gap — where nominal and effective weight diverge.")
