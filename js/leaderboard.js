@@ -240,7 +240,7 @@ const COLUMNS = {
     { key: 'hardHitPct',  label: 'Hard-Hit%', format: Utils.formatPct, sortType: 'numeric', desc: 'Pct of BIP with EV ≥ 95 mph vs this pitch type (denominator = BIP with valid EV)', group: 'batted_ball' },
     { key: 'barrelPct',   label: 'Barrel%',  format: Utils.formatPct, sortType: 'numeric', desc: 'Barrel rate (denominator = BIP with valid EV)', group: 'batted_ball' },
     { key: 'gbPct',       label: 'GB%',      format: Utils.formatPct, sortType: 'numeric', sectionStart: true, desc: 'Ground ball rate', group: 'batted_ball' },
-    { key: 'runValue', rocHide: true,    label: 'PitchRV',  format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Pitch-level run value vs this pitch type (positive = better for hitter)', group: 'info' },
+    { key: 'runValue',                   label: 'PitchRV',  format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Pitch-level run value vs this pitch type (positive = better for hitter)', group: 'info' },
     { key: 'xRunValue',  label: 'xPitchRV', format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Expected pitch-level run value vs this pitch type (positive = better for hitter)', group: 'info' },
     { key: 'avg',         label: 'AVG',      format: Utils.formatDecimal(3), sortType: 'numeric', sectionStart: true, desc: 'Batting average vs this pitch type', group: 'stats' },
     { key: 'slg',         label: 'SLG',      format: Utils.formatDecimal(3), sortType: 'numeric', desc: 'Slugging vs this pitch type', group: 'stats' },
