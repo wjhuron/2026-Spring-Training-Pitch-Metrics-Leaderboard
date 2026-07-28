@@ -152,7 +152,12 @@ def main():
         gc.collect()
 
         te = dfs[y]
-        te = te[te['game_date'].astype(str) < mids[y]] if 'game_date' in te.columns else te
+        # BUGFIX: build_df emits 'date', not 'game_date'. The old guarded form
+        # silently skipped filtering entirely, so Stuff+ was computed from the
+        # WHOLE season including the second half that is the prediction target
+        # — target leakage into the predictor, biasing w upward. Superseded by
+        # scripts/pitchingplus_loso_full.py, which also fixes the scales.
+        te = te[te['date'].astype(str) < mids[y]].reset_index(drop=True)
         Xte = T.design(te).reindex(columns=model.get_booster().feature_names,
                                    fill_value=0)
         pred = model.predict(Xte)
