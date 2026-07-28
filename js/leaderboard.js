@@ -300,6 +300,12 @@ const Leaderboard = {
     // Always hide these regardless of tab
     this.hiddenColumns['vaa'] = true;
     this.hiddenColumns['haa'] = true;
+    // Pitcher+ Proj (2026-07-28, per Wally): hidden across every leaderboard.
+    // Not deleted — the column stays in the picker and on the player page, so
+    // the projection is still reachable; it just isn't a default leaderboard
+    // column. Deliberately NOT registered in _tabDefaultHidden, which is
+    // cleared on tab switch — this one persists like vaa/haa.
+    this.hiddenColumns['pitcherPlusProj'] = true;
 
     // Per-tab defaults
     var defaults = this._TAB_HIDDEN_DEFAULTS[tab];
