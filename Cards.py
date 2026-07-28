@@ -2183,7 +2183,7 @@ def _pitching_blend(stuff, loc):
         from train_stuff_v11 import _blend
         return _blend(stuff, loc)
     except Exception:
-        return 0.70 * (stuff - 100.0) / 10.0 + 0.30 * (loc - 100.0) / 10.0
+        return 0.80 * (stuff - 100.0) / 10.0 + 0.20 * (loc - 100.0) / 10.0
 
 
 def _pitching_scale(rows, min_pitches=25):
@@ -2200,12 +2200,14 @@ def _pitching_scale(rows, min_pitches=25):
 
 
 def _pitching_score(stuff, loc, scale=None):
-    # COHERENT CANON (2026-07-18): Pitching+ = 0.7*Stuff+ + 0.3*Loc+ exactly —
+    # COHERENT CANON (2026-07-18): Pitching+ = 0.8*Stuff+ + 0.2*Loc+ exactly
+    # (weight re-derived LOSO across 2021-2025 on 2026-07-25; see
+    # train_stuff_v11.PITCHING_W_STUFF) —
     # no restandardization, no clip. `scale` is accepted for call-site compat
     # and ignored.
     if stuff is None or loc is None:
         return None
-    return round(0.7 * stuff + 0.3 * loc, 1)
+    return round(0.8 * stuff + 0.2 * loc, 1)
 
 
 def _normalize_scratch_pitch(row):
@@ -2669,10 +2671,10 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "ROC"
+    team            = "BOS"
     start_date      = None    # Set to None for full season
     end_date        = None              # Set to a date for date range, or None for single day
-    filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
+    filter_pitchers = "Early, Connelly"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     output_dir      = OUTPUT_DIR
 

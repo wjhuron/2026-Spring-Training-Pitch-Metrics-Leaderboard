@@ -899,7 +899,7 @@ def main():
     # re-save the CSV so it carries the displayed (atom-mean) values
     agg.to_csv(os.path.join(HERE, 'pitcher_stuff_v11.csv'), index=False)
 
-    # Pitching+ atoms: pc = round(0.7·S + 0.3·L) of the two INTEGER atoms —
+    # Pitching+ atoms: pc = round(0.8·S + 0.2·L) of the two INTEGER atoms —
     # identical to the sheet's Z cells — averaged per unit / per pitcher.
     # Loc atoms come from process_data's dump (written earlier in the same
     # pipeline run); if it's absent the maps stay empty and injection falls
@@ -1067,16 +1067,35 @@ def _pctl(sc, pool):
 # ── Pitching+ (2026-07-07) ──
 # Validated composite of the two shipped scales (scripts/
 # pitching_plus_experiment.py + pitching_plus_stage2.py): 0.70·z(Stuff+) +
-# 0.30·z(Loc+), re-standardized so between-pitcher SD = 10 (the components
-# are near-orthogonal, r=+0.04, so the raw blend has SD ~7.6). w=0.70 is the
-# bootstrap-median optimum (2000 resamples, 95% CI [0.51, 0.91]; flat plateau
-# 0.60-0.80); pred future xRV 0.359 (stuff-only) -> 0.389. The FG-style JOINT
-# model (stuff + location + count in one XGBoost, season-blocked protocol)
-# was built and RACED — it loses to this composite on both axes (best joint:
-# pred 0.373 / rel 0.756 vs composite 0.389 / 0.764; adding count wrecks its
-# reliability, same count-mix contamination as the Loc+ anchoring lesson).
-# Don't revisit joint without multi-season training data.
-PITCHING_W_STUFF = 0.70
+# 0.20·z(Loc+), re-standardized so between-pitcher SD = 10 (the components
+# are near-orthogonal, r=+0.04, so the raw blend has SD ~7.6).
+#
+# 0.70 -> 0.80 (2026-07-25, scripts/pitchingplus_loso_full.py). The old 0.70
+# came from a bootstrap median on a single season (95% CI [0.51, 0.91], flat
+# plateau 0.60-0.80). Re-derived leave-one-season-out across 2021-2025 — each
+# season scored by a model fit on the other four, so no season sees itself —
+# and measured on the SHIPPED scales rather than z-scores. That last part is
+# what moved the answer: Stuff+ is the mean of per-pitch-type atoms, so
+# averaging across an arsenal shrinks it to SD ~7.1, while Loc+ is z-scored to
+# SD ~9.6. A nominal 0.70 was therefore delivering Stuff+ only ~63% of the
+# real influence. Solving for a true 70% influence gives w ~ 0.77, adjacent to
+# the measured optimum — the original 70/30 INTENT was right, the
+# implementation under-weighted Stuff+ because the components were never on a
+# common spread.
+#
+# Cross-season argmin (mean Fisher-z) is 0.82, but the objective is flat
+# within 1% across [0.75, 0.90], so 0.82 beats 0.80 by 0.0002 — unmeasurable.
+# 0.80 is chosen inside that flat region: near its centre (0.825), robust if
+# the region drifts, and auditable by eye from the two adjacent columns, which
+# 0.82/0.18 is not. What IS settled is that 0.70 sits OUTSIDE the flat region
+# (mean z -0.3882 vs -0.3981) and loses to 0.80 in four of five seasons.
+#
+# The FG-style JOINT model (stuff + location + count in one XGBoost,
+# season-blocked protocol) was built and RACED — it loses to this composite on
+# both axes (best joint: pred 0.373 / rel 0.756 vs composite 0.389 / 0.764;
+# adding count wrecks its reliability, same count-mix contamination as the
+# Loc+ anchoring lesson). Don't revisit joint without multi-season training data.
+PITCHING_W_STUFF = 0.80
 
 def _blend(stuff, loc):
     return (PITCHING_W_STUFF * (stuff - 100.0) / 10.0
@@ -1104,7 +1123,7 @@ def _inject_pitching(rows, key_of, qualifies, pc_lookup=None):
     gate). key_of(row) -> pool bucket (pitch type at pitch level, 'ALL' at
     pitcher level); qualifies(row) -> pool membership."""
     # COHERENT CANON: pitchingScore = plain mean of the per-pitch Pitching+
-    # atoms (round(0.7·S + 0.3·L) of the two INTEGER atoms — the sheet's Z
+    # atoms (round(0.8·S + 0.2·L) of the two INTEGER atoms — the sheet's Z
     # cells), supplied via pc_lookup. Rows the maps can't serve (loc dump
     # absent) fall back to the blend of the two displayed components, which
     # matches to within rounding since both are now atom means themselves.
@@ -1133,7 +1152,7 @@ def _inject_pitching(rows, key_of, qualifies, pc_lookup=None):
     # pitchingRuns100 — a run-denominated companion for the hover tooltip.
     # Deliberately a MONOTONIC transform of pitchingScore (slope * (P+ - 100)),
     # so it can never invert against the displayed number the way a run-space
-    # re-blend (0.7*stuffRuns + 0.3*locRuns) would (stuff and loc have
+    # re-blend (0.8*stuffRuns + 0.2*locRuns) would (stuff and loc have
     # different run SDs, so that reordering lopsided arms — the exact
     # FanGraphs-style inconsistency we avoid). The slope is the pooled OLS of
     # actual xRV/100 on Pitching+ over the qualified pool: it answers "a
