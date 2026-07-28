@@ -521,6 +521,30 @@ def main():
                and (p.get('Pitcher'), p.get('PTeam')) not in _ep]
     roc_pitches = [p for p in D if p.get('_source') in ('ROC', 'AAA')
                    and (p.get('Pitcher'), p.get('PTeam')) not in _ep]
+    # MiLB RunExp currency correction (2026-07-28). Statcast's delta_run_exp
+    # is built on each league's own RE matrix, so ROC/AAA RunExp in the raw
+    # cache is MiLB-denominated (~1.27x MLB for the identical event).
+    # process_data corrects this in ITS memory only — this trainer reads the
+    # pickle directly and never saw the fix, so ROC xRVOE subtracted a
+    # MiLB-currency actual from an MLB-currency expectation (measured bias:
+    # ROC pitcher mean +0.178 -> +0.098 runs/100 once corrected;
+    # scripts/xrvoe_roc_validity.py). Same per-(Description,Count) factors as
+    # process_data, via the shared pipeline_utils implementation. Mutating in
+    # place is safe: `pitches` (MLB) is disjoint, and no other trainer
+    # consumer reads ROC RunExp before this point.
+    from pipeline_utils import compute_runexp_scale, runexp_factor
+    _re_scale = compute_runexp_scale(D)
+    if _re_scale:
+        _n_fx = 0
+        for p in roc_pitches:
+            _sc = _re_scale.get(p.get('_source'))
+            _v = sf(p.get('RunExp'))
+            if _sc and _v is not None:
+                _f = runexp_factor(_sc, p.get('Description'), p.get('Count'))
+                if _f:
+                    p['RunExp'] = _v / _f
+                    _n_fx += 1
+        print(f'  MiLB RunExp -> MLB currency: {_n_fx} ROC/AAA pitches rescaled')
     df_full = build_df(pitches)
     df = df_full[df_full['target_xrv'].notna()].reset_index(drop=True)
     # Pitches with no outcome target yet (pre-supplement, non-BIP with RunExp
