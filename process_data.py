@@ -1949,9 +1949,14 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
         Returns dict keyed by 'pitchType_throws' with 'mlb' and/or 'roc' sub-models.
 
         Both models are fit on MLB pitches ONLY: the 'roc' variant is the
-        MLB baseline expressed in release-point features (arm angle is absent
-        at ROC), and ROC pitchers are scored against it — so ROC pitches must
-        not contribute to the baseline they're measured against.
+        MLB baseline expressed in release-point features, and ROC pitchers
+        are scored against it — so ROC pitches must not contribute to the
+        baseline they're measured against. (Historically the 'roc' variant
+        was ROC's ONLY path because arm angle was absent there; since the
+        minors Statcast backfill (2026-07-25) ROC rows are 96-97% arm-angle
+        populated, so compute_expected_movement's arm-angle-first lookup now
+        serves nearly all ROC rows too and the release-point variant is a
+        thin fallback.)
 
         Interpretation note: velocity is a conditioning variable, so the OE
         residuals are "movement vs a typical arm from this slot/extension at

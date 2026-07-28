@@ -288,8 +288,11 @@ def build_df(pitches, prefer_true_fastball=True):
     # angle hasn't backfilled yet (it lags games ~1-2 days). Arm angle is nearly
     # constant per pitcher, so his own per-pitch-type average (or overall average
     # for a brand-new pitch) is essentially the real value; the actual number
-    # replaces it on the next run after backfill. ROC has no arm history so this
-    # fills nothing there (ROC uses the no-arm companion model instead).
+    # replaces it on the next run after backfill. (STALE-NOTE FIXED 2026-07-28:
+    # ROC arm angle is 96-97% populated since the minors Statcast backfill, so
+    # ROC rows WITH arm angle score through the full model; the no-arm
+    # companion is now only the fallback for the few rows still missing it —
+    # see the per-pitch _arm mask in the ROC scoring block.)
     arm_pt = defaultdict(lambda: [0.0, 0]); arm_all = defaultdict(lambda: [0.0, 0])
     for p in pitches:
         aa = sf(p.get('ArmAngle'))
@@ -717,8 +720,10 @@ def main():
     overall = overall.merge(_fs, on=['pitcher', 'team'], how='left')
     overall['low_support'] = overall['low_support'].fillna(False).astype(bool)
 
-    # ── ROC/AAA: no-arm companion model, scored against the MLB baseline. This
-    #    ONLY affects ROC; MLB above is untouched (keeps real arm angle). ──
+    # ── ROC/AAA scoring, against the MLB baseline. Per-pitch adaptive since
+    #    the minors backfill: rows WITH arm angle (96-97%) use the FULL model,
+    #    rows without fall back to the no-arm companion (the _arm mask below).
+    #    This block ONLY affects ROC; MLB above is untouched. ──
     Xna = design(df, NOARM_FEATS)
     if B is not None:
         Xna = Xna.reindex(columns=B['features_na'], fill_value=0)
