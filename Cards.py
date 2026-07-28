@@ -867,14 +867,28 @@ def _bubble_columns_for(config, p_row):
         d = pitch_lb.get(pt) or {}
         return d.get('velocity'), d.get('velocity_pctl')
     velo_rows = []
-    ff_v, ff_p = _vel('FF')
-    si_v, si_p = _vel('SI')
-    if ff_v is not None:
-        p_row['ffVelo'], p_row['ffVelo_pctl'] = ff_v, ff_p
-        velo_rows.append(('Fastball Velo', 'ffVelo', 'ffVelo_pctl', 'mph'))
-    if si_v is not None:
-        p_row['siVelo'], p_row['siVelo_pctl'] = si_v, si_p
-        velo_rows.append(('Sinker Velo', 'siVelo', 'siVelo_pctl', 'mph'))
+    # ONE fastball bubble (2026-07-28, per Wally): count-weighted average velo
+    # across every fastball variant (FF/FA/SI) instead of separate FF and SI
+    # rows that almost always read within half a tick of each other. The
+    # percentile is the leaderboard's fbVelo rank (primary-fastball
+    # definition) — the combined average differs by <0.2 mph in practice and
+    # keeps the bubble on the same pool as the site. Falls back to the plain
+    # per-type value when counts are missing (older leaderboard JSONs).
+    _fbs = []
+    for _t in ('FF', 'FA', 'SI'):
+        _d = pitch_lb.get(_t) or {}
+        if _d.get('velocity') is not None:
+            _fbs.append((_d['velocity'], _d.get('count') or 0, _d.get('velocity_pctl')))
+    if _fbs:
+        _wsum = sum(n for _v, n, _p in _fbs)
+        if _wsum > 0:
+            p_row['fbCombVelo'] = round(sum(v * n for v, n, _p in _fbs) / _wsum, 1)
+        else:
+            p_row['fbCombVelo'] = round(sum(v for v, _n, _p in _fbs) / len(_fbs), 1)
+        p_row['fbCombVelo_pctl'] = (p_row.get('fbVelo_pctl')
+                                    if p_row.get('fbVelo_pctl') is not None
+                                    else _fbs[0][2])
+        velo_rows.append(('Fastball Velo', 'fbCombVelo', 'fbCombVelo_pctl', 'mph'))
     if not velo_rows:
         fc_v, _ = _vel('FC')
         if fc_v is not None:
@@ -2560,6 +2574,7 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
     for pt, pp in by_pt.items():
         npt = len(pp)
         d = {}
+        d['count'] = npt
         velos = [v for v in (sf(x.get('Velocity')) for x in pp) if v is not None]
         d['velocity'] = round(sum(velos) / len(velos), 1) if velos else None
 
@@ -2845,6 +2860,7 @@ def main():
                         'nVAA': _r.get('nVAA'), 'nVAA_pctl': _r.get('nVAA_pctl'),
                         'nHAA': _r.get('nHAA'),
                         'velocity': _r.get('velocity'), 'velocity_pctl': _r.get('velocity_pctl'),
+                        'count': _r.get('count'),
                         'xRunValue': _r.get('xRunValue'), 'xRv100': _r.get('xRv100'),
                         'rv100': _r.get('rv100'), 'runValue': _r.get('runValue'),
                         'xwOBAcon': _r.get('xwOBAcon'),
