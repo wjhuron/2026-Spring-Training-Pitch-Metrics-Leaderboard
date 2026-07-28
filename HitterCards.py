@@ -204,8 +204,8 @@ HITTER_STAT_LINE_COLOR = {
 # Bubbles already carry BB%, K%, SD+, CT+, BB+, Hitter+ and the QoC family,
 # so the strip focuses on the slash line and the bottom-line production
 # stats (wOBA = true linear-weighted runs, wRC+ = park/league-adjusted).
-HEADLINE_STATS_MLB = ['PA', 'AVG', 'OBP', 'SLG', 'OPS', 'wOBA', 'wRC+']
-HEADLINE_STATS_ROC = ['PA', 'AVG', 'OBP', 'SLG', 'OPS', 'wOBA', 'wRC+']
+HEADLINE_STATS_MLB = ['PA', 'HR', 'AVG', 'OBP', 'SLG', 'OPS', 'wOBA', 'wRC+']
+HEADLINE_STATS_ROC = ['PA', 'HR', 'AVG', 'OBP', 'SLG', 'OPS', 'wOBA', 'wRC+']
 HEADLINE_STATS = HEADLINE_STATS_MLB  # default; render switches based on team
 
 # ─────────────────────────────────────────────────────────────────────
@@ -780,7 +780,6 @@ def fmt_signed_decimal(v, decimals=1):
 
 BUBBLE_COLUMNS = [
     ('RESULT', [
-        ('Run Value (All Pitches)', 'xRv100',     'xRv100_pctl',       'dec1+'),
         ('xwOBA',             'xwOBA',            'xwOBA_pctl',        '3dec'),
         ('Hitter+',           'hitterPlus',       'hitterPlus_pctl',   'int'),
         ('Swing Decisions+',  'sdPlus',           'sdPlus_pctl',       'int'),
@@ -792,11 +791,9 @@ BUBBLE_COLUMNS = [
     # (contact axis covered by Z-Contact% + K%). Both stay in page tables.
     ('QUALITY OF CONTACT', [
         ('xwOBAcon',    'xwOBAcon',     'xwOBAcon_pctl',     '3dec'),
-        ('EV50',        'ev50',         'ev50_pctl',         'mph'),
         ('Max EV',      'maxEV',        'maxEV_pctl',        'mph'),
         ('Hard-Hit%',   'hardHitPct',   'hardHitPct_pctl',   'pct1'),
         ('Barrel%',     'barrelPct',    'barrelPct_pctl',    'pct1'),
-        ('xwOBAsp',     'xwOBAsp',      'xwOBAsp_pctl',      '3dec'),
         ('Air Pull%',   'airPullPct',   'airPullPct_pctl',   'pct1'),
     ]),
     ('PLATE DISCIPLINE', [
@@ -1313,6 +1310,10 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     for k in headline_stats:
         if k == 'PA':
             stat_values.append(str(h_row.get('pa', '—')))
+        # HR uncolored like PA: counting stats tinted against a league mean
+        # mostly reflect playing time, not quality (2026-07-28, per Wally's
+        # card review — the one number every casual reader asks for).
+        elif k == 'HR':   stat_values.append(fmt_int(h_row.get('hr')))
         elif k == 'AVG':  stat_values.append(fmt_3dec(h_row.get('avg')))
         elif k == 'OBP':  stat_values.append(fmt_3dec(h_row.get('obp')))
         elif k == 'SLG':  stat_values.append(fmt_3dec(h_row.get('slg')))

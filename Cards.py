@@ -1690,7 +1690,7 @@ def render_card(config, pitches, output_file):
         rv_cols = {'per100': ['PitchRV/100', 'xPitchRV/100'],
                    'totals': ['PitchRV', 'xPitchRV'],
                    'both':   ['PitchRV', 'xPitchRV', 'PitchRV/100', 'xPitchRV/100'],
-                   }[config.get('rv_mode') or 'per100'] + ['xRVOE/100']
+                   }[config.get('rv_mode') or 'per100']
     else:
         rv_cols = ['xPitchRV']
     _pt_qual_min = config.get('pitch_qual') or PITCH_QUAL_MIN
@@ -2106,7 +2106,9 @@ def render_card(config, pitches, output_file):
             continue
         _col_px[_c] = max(_col_px[_c], _txt.get_window_extent(renderer).width)
     _fit_fracs = [(_w + _pad_px) / _ax_w_px for _w in _col_px]
-    _shrink = min(1.0, 1.0 / sum(_fit_fracs))
+    # Normalize to FILL the band: with fewer columns the table keeps its
+    # full span (cells widen) instead of centering narrower.
+    _shrink = 1.0 / sum(_fit_fracs)
     for (_r, _c), _cell in table.get_celld().items():
         _cell.set_width(_fit_fracs[_c] * _shrink)
 
@@ -2136,7 +2138,8 @@ def render_card(config, pitches, output_file):
     if is_season and 'Stuff+' in col_headers:
         _sp_cell = table.get_celld()[(0, col_headers.index('Stuff+'))]
         _sp_x = _sp_cell.get_window_extent(renderer).x0 / fig_bbox.width
-        _sp_note = ('Per-pitch Stuff+ graded vs same pitch type (100 = average for that type)\n'
+        _sp_note = ('PitchRV/100 actual · xPitchRV/100 expected (luck-neutral) runs saved per 100 pitches: the gap is fortune\n'
+                    'Per-pitch Stuff+ graded vs same pitch type (100 = average for that type)\n'
                     'Overall Stuff+ = pitch-weighted average of per-pitch grades')
         if any(stuff_lowsup_by_pt.get(_pt) and stuff_by_pt.get(_pt) is not None
                for _pt, _ in pitch_stats):
