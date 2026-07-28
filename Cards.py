@@ -1368,10 +1368,16 @@ def render_card(config, pitches, output_file):
         # in inches) anchored to the TOP of the taller card so the plot keeps
         # its exact size/position relative to the header; the sparkline's
         # extra height falls into the gap below the legend.
-        _mv_h_in = 0.355 * FIG_H
-        _mv_y0_in = fig_h - (1 - 0.575 - 0.355) * FIG_H - _mv_h_in
-        ax_plot = fig.add_axes([0.5125, _mv_y0_in / fig_h, 0.405, _mv_h_in / fig_h])
-        _mv_cx, _mv_ty = 0.715, (fig_h - (1 - 0.947) * FIG_H) / fig_h
+        # Enlarged 2026-07-28 (per Wally): the plot claims the dead gutter to
+        # its left plus the slack above/below — 6.48x6.21in -> 7.75x7.43in
+        # (+43% area), near-square kept so movement still reads to-scale.
+        # The pitch legend moves ABOVE the plot (below the title): with the
+        # taller box there is no longer room for xlabel + legend beneath it
+        # before the VS RHH/LHH titles at 0.480*FIG_H.
+        _mv_h_in = 7.43
+        _mv_y0_in = 9.37
+        ax_plot = fig.add_axes([0.501, _mv_y0_in / fig_h, 0.484, _mv_h_in / fig_h])
+        _mv_cx, _mv_ty = 0.743, 0.956
     else:
         ax_plot = fig.add_axes([0.585, 0.575, 0.405, 0.385]); _mv_cx, _mv_ty = 0.7875, 0.975
     ax_plot.set_xlim(-25,25); ax_plot.set_ylim(-25,25)
@@ -1381,9 +1387,10 @@ def render_card(config, pitches, output_file):
              fontfamily='IBM Plex Sans')
     ax_plot.axhline(y=0, color=GRID_COLOR, linestyle='--', linewidth=0.6)
     ax_plot.axvline(x=0, color=GRID_COLOR, linestyle='--', linewidth=0.6)
-    ax_plot.set_xlabel('Horizontal Break (in)', fontsize=10, color=TEXT_MUTED, fontweight='bold', fontfamily='IBM Plex Sans')
-    ax_plot.set_ylabel('Induced Vertical Break (in)', fontsize=10, color=TEXT_MUTED, fontweight='bold', fontfamily='IBM Plex Sans')
-    ax_plot.tick_params(labelsize=8, colors=TEXT_MUTED)
+    _mv_big = bool(config.get('mvn_models'))
+    ax_plot.set_xlabel('Horizontal Break (in)', fontsize=12 if _mv_big else 10, color=TEXT_MUTED, fontweight='bold', fontfamily='IBM Plex Sans')
+    ax_plot.set_ylabel('Induced Vertical Break (in)', fontsize=12 if _mv_big else 10, color=TEXT_MUTED, fontweight='bold', fontfamily='IBM Plex Sans')
+    ax_plot.tick_params(labelsize=9.5 if _mv_big else 8, colors=TEXT_MUTED)
     ax_plot.set_xticks(range(-25,26,5)); ax_plot.set_yticks(range(-25,26,5))
     ax_plot.grid(True, alpha=0.5, color=GRID_COLOR); ax_plot.set_facecolor(PLOT_PANEL)
     for spine in ax_plot.spines.values(): spine.set_color(TEXT_FAINT)
@@ -1439,7 +1446,11 @@ def render_card(config, pitches, output_file):
                 angle=np.degrees(np.arctan2(vecs[1,1], vecs[0,1])), fill=False, edgecolor=color, linewidth=1.2, linestyle='--', alpha=0.7))
 
     legend_handles = [mpatches.Patch(color=PITCH_COLORS[pt], label=f'{pt} - {PITCH_NAMES[pt]}') for pt in sorted_types]
-    leg = ax_plot.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5,-0.09), ncol=min(len(sorted_types),5), fontsize=7.5, frameon=False, handlelength=1.2, columnspacing=1.2)
+    if config.get('mvn_models'):
+        # Season: legend rides just above the plot, under the title.
+        leg = ax_plot.legend(handles=legend_handles, loc='lower center', bbox_to_anchor=(0.5, 1.004), ncol=min(len(sorted_types),5), fontsize=9, frameon=False, handlelength=1.2, columnspacing=1.2)
+    else:
+        leg = ax_plot.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5,-0.09), ncol=min(len(sorted_types),5), fontsize=7.5, frameon=False, handlelength=1.2, columnspacing=1.2)
     for t in leg.get_texts(): t.set_color(TEXT_SECONDARY)
     # Add movement plot annotations
     if exp_movement:
