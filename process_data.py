@@ -84,6 +84,109 @@ def _bip_woba_value(event):
     return 0.0
 
 
+def compute_runexp_scale(all_pitches, min_cell=30, min_mag=0.005):
+    """Per-`_source` factors converting MiLB RunExp into MLB run currency.
+
+    Statcast's delta_run_exp is built on each league's own run-expectancy
+    matrix, so the SAME event carries a larger magnitude in MiLB.
+
+    A SINGLE global factor is not enough — measured 2026-07-25, one WLS slope
+    per source cut the weighted cell-level error only 49% -> 21%, and the
+    residual was not uniform (Ball over-corrected -7%, Foul under-corrected
+    +14% even after holding count mix fixed). The two leagues' RE matrices
+    differ in SHAPE, not just scale, so the correction is per (Description,
+    Count) cell, with fallbacks:
+
+        cell factor   mlb_mean / milb_mean for that (Description, Count)
+        desc factor   same ratio pooled over counts, for thin cells
+        global factor WLS slope through the origin, for anything left
+
+    Aligning cell means also neutralizes the leagues' different base-out
+    MIX within a cell, which is context the pitcher does not control — the
+    same translation framing xwOBAcon / xwOBAsp / Loc+ already use for ROC.
+    Crucially it is a MULTIPLIER, not a substitution, so each pitch keeps its
+    own base-out variation around that cell mean; replacing values with a
+    lookup table would flatten ROC RV to context-neutral while MLB RV stayed
+    context-included, making one column mean two different things by source.
+
+    Estimated from NON-BIP cells only. 'In Play' is excluded from ESTIMATION
+    because its gap is mostly real — ROC hitters genuinely produce more on
+    contact (mean -0.002 vs MLB -0.048) and that must survive as signal, not
+    be scaled away — but BIP still RECEIVES the global factor, since
+    delta_run_exp is in league run units either way.
+
+    Guards: a ratio is only used when both means clear `min_mag` and share a
+    sign, so near-zero cells can't produce exploding or sign-flipping factors.
+
+    Measured every run rather than hardcoded: run environments drift.
+    """
+    cells = defaultdict(lambda: [0.0, 0])
+    descs = defaultdict(lambda: [0.0, 0])
+    for p in all_pitches:
+        d = p.get('Description')
+        c = p.get('Count')
+        if not d or not c or d == 'In Play':
+            continue
+        re = safe_float(p.get('RunExp'))
+        if re is None:
+            continue
+        src = p.get('_source') or 'MLB'
+        cells[(src, d, c)][0] += re; cells[(src, d, c)][1] += 1
+        descs[(src, d)][0] += re; descs[(src, d)][1] += 1
+
+    mlb_cell = {(d, c): s / n for (src, d, c), (s, n) in cells.items()
+                if src == 'MLB' and n >= min_cell}
+    mlb_desc = {d: s / n for (src, d), (s, n) in descs.items() if src == 'MLB'}
+
+    def _ratio(mlb_v, milb_v):
+        if (mlb_v is None or abs(mlb_v) < min_mag or abs(milb_v) < min_mag
+                or (mlb_v > 0) != (milb_v > 0)):
+            return None
+        return milb_v / mlb_v          # divide RunExp by this to reach MLB
+
+    out = {}
+    acc = defaultdict(lambda: [0.0, 0.0])
+    for (src, d, c), (s, n) in cells.items():
+        if src == 'MLB' or n < min_cell:
+            continue
+        m = mlb_cell.get((d, c))
+        if m is None:
+            continue
+        v = s / n
+        acc[src][0] += n * m * v
+        acc[src][1] += n * m * m
+    for src, (num, den) in acc.items():
+        g = num / den if den > 0 else 1.0
+        cell_f, desc_f = {}, {}
+        for (s0, d, c), (s, n) in cells.items():
+            if s0 != src or n < min_cell:
+                continue
+            r = _ratio(mlb_cell.get((d, c)), s / n)
+            if r:
+                cell_f[(d, c)] = r
+        for (s0, d), (s, n) in descs.items():
+            if s0 != src:
+                continue
+            r = _ratio(mlb_desc.get(d), s / n)
+            if r:
+                desc_f[d] = r
+        out[src] = {'cell': cell_f, 'desc': desc_f, 'global': g}
+    return out
+
+
+def runexp_factor(scale_for_source, description, count):
+    """cell -> desc -> global fallback. `scale_for_source` is one entry of
+    compute_runexp_scale()'s output."""
+    if not scale_for_source:
+        return None
+    f = scale_for_source['cell'].get((description, count))
+    if f is None:
+        f = scale_for_source['desc'].get(description)
+    if f is None:
+        f = scale_for_source['global']
+    return f if f and f > 0 else None
+
+
 def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
                         stuff_grades=None, loc_grades=None):
     """Generate micro-aggregate data for client-side date and opponent-hand filtering.
@@ -1288,6 +1391,42 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     # --- Recompute InZone from PlateX/PlateZ/SzTop/SzBot with ball-radius adjustment ---
     for p in all_pitches:
         p['InZone'] = compute_in_zone(p)
+
+    # --- MiLB RunExp currency correction (2026-07-25) ---
+    # Statcast computes delta_run_exp against EACH LEAGUE'S OWN run-expectancy
+    # matrix, so MiLB RunExp is denominated in MiLB runs — measured 1.42x (ROC)
+    # and 1.45x (AAA) the MLB value for the identical event. That silently
+    # corrupted every run-value number for ROC/AAA:
+    #   - RV summed MiLB-denominated runs against MLB-anchored league averages
+    #     (+0.25 runs/100 at ROC, +0.32 at AAA of phantom credit).
+    #   - xRV was WORSE than merely scaled. It values BIP via
+    #     (xwOBA - lgWOBA)/wOBAScale (MLB-anchored) but falls through to
+    #     -RunExp for the other ~83% of pitches, so a single ROC xRV mixed two
+    #     currencies INTERNALLY and could not be interpreted at all. The
+    #     count-anchoring offsets then carefully aligned the BIP branch to a
+    #     currency the rest of the number wasn't in.
+    # Corrected in place, once, before any consumer reads RunExp, so pitcher
+    # RV/xRV, hitter xRV, the SD+/CT+ weight tables and Loc+'s count values all
+    # inherit it consistently rather than each needing its own guard.
+    _re_scale = compute_runexp_scale(all_pitches)
+    if _re_scale:
+        _n_fixed = 0
+        for p in all_pitches:
+            sc = _re_scale.get(p.get('_source'))
+            if not sc:
+                continue
+            v = safe_float(p.get('RunExp'))
+            if v is None:
+                continue
+            f = runexp_factor(sc, p.get('Description'), p.get('Count'))
+            if f:
+                p['RunExp'] = v / f
+                _n_fixed += 1
+        print(f"  [{label}] RunExp -> MLB currency: "
+              + ", ".join(f"{s} (global /{d['global']:.3f}, "
+                          f"{len(d['cell'])} cell factors)"
+                          for s, d in sorted(_re_scale.items()))
+              + f" — {_n_fixed} pitches rescaled")
 
     # --- Map non-MLB BTeams to MLB teams where possible ---
     mlb_hitter_teams = {}
