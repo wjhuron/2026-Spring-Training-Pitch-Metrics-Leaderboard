@@ -1,11 +1,26 @@
-// Trade calculator page. Data: window.TRADE_VALUES (js/tradevalue_data.js).
+// Trade calculator page. Data: data/tradevalue_data.json.gz, fetched and
+// inflated in-browser (same DecompressionStream pattern as js/data.js —
+// the payload used to ship as an 830 KB inline script).
 // Verdict bands come from the market-layer fit residuals: within 1.5x =
 // balanced by market standards; within e^0.9 (~2.4x, the median real-trade
 // miss) = inside historical trade noise; beyond that = lopsided.
 (function () {
   'use strict';
 
-  var DATA = (window.TRADE_VALUES && window.TRADE_VALUES.players) || [];
+  // Same ?v= build tag the pipeline stamps onto this script's own tag.
+  // Captured at parse time — document.currentScript is only valid while
+  // the script executes synchronously.
+  var DATA_VERSION = (function () {
+    try {
+      var src = (document.currentScript && document.currentScript.src) || '';
+      var m = src.match(/[?&]v=([\w-]+)/);
+      return m ? m[1] : '';
+    } catch (e) {
+      return '';
+    }
+  })();
+
+  var DATA = [];
   var BAND_FAIR = Math.log(1.5);
   var BAND_NOISE = 0.9;
   var VALUE_FLOOR_M = 0.5; // avoids log blowups on near-empty sides
@@ -271,12 +286,35 @@
   document.querySelector('.th-sort[data-sort="s"]').classList.add('active');
   teamSel.addEventListener('change', renderValues);
   valuesSearch.addEventListener('input', renderValues);
-  initTeams();
-  renderValues();
 
-  var noteEl = document.getElementById('data-note');
-  if (noteEl && window.TRADE_VALUES) {
-    noteEl.textContent = window.TRADE_VALUES.note +
-      ' Values generated ' + window.TRADE_VALUES.generated + '.';
+  function loadFailed(msg) {
+    valuesNote.textContent = 'Error loading trade values (' + msg +
+      '). Please refresh.';
   }
+
+  valuesNote.textContent = 'Loading trade values…';
+  if (typeof DecompressionStream === 'undefined') {
+    loadFailed('this browser lacks gzip DecompressionStream support');
+    return;
+  }
+  var url = 'data/tradevalue_data.json.gz' +
+            (DATA_VERSION ? ('?v=' + DATA_VERSION) : '');
+  fetch(url).then(function (resp) {
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    if (!resp.body) throw new Error('no body stream');
+    var inflated = resp.body.pipeThrough(new DecompressionStream('gzip'));
+    return new Response(inflated).text();
+  }).then(function (text) {
+    var payload = JSON.parse(text);
+    DATA = payload.players || [];
+    initTeams();
+    renderValues();
+    var noteEl = document.getElementById('data-note');
+    if (noteEl) {
+      noteEl.textContent = payload.note +
+        ' Values generated ' + payload.generated + '.';
+    }
+  }).catch(function (err) {
+    loadFailed(err && err.message ? err.message : 'fetch failed');
+  });
 })();

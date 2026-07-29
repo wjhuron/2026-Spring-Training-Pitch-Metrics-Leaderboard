@@ -39,7 +39,7 @@ import unicodedata
 from datetime import date
 from pathlib import Path
 
-BASE = Path("/Users/wallyhuron/Huronalytics")
+BASE = Path(__file__).resolve().parent.parent
 DATA = BASE / "data"
 OUT_PATH = DATA / "tradevalue_intrinsic.json"
 SEASON = 2026
@@ -581,9 +581,18 @@ def main():
                  "Projections: FanGraphs rest-of-season, annualized."),
         "players": site,
     }
-    (BASE / "js" / "tradevalue_data.js").write_text(
-        "window.TRADE_VALUES = " + json.dumps(site_payload) + ";\n")
-    print(f"Site export: js/tradevalue_data.js ({len(site)} players)")
+    # Gzipped site export (2026-07-29, same pattern as the data embed):
+    # trade.js fetches + inflates it via DecompressionStream. mtime=0 so an
+    # unchanged payload gzips byte-identically (no spurious commits).
+    import gzip
+    gz_path = BASE / "data" / "tradevalue_data.json.gz"
+    payload_bytes = json.dumps(site_payload, separators=(",", ":")).encode()
+    gz_path.write_bytes(gzip.compress(payload_bytes, compresslevel=9, mtime=0))
+    legacy_js = BASE / "js" / "tradevalue_data.js"
+    if legacy_js.exists():
+        legacy_js.unlink()
+    print(f"Site export: data/tradevalue_data.json.gz ({len(site)} players, "
+          f"{gz_path.stat().st_size/1e3:.0f} KB gz)")
 
     n_mlb = sum(1 for r in players if r["engine"] == "mlb")
     n_pro = sum(1 for r in players if r["engine"] == "prospect")
