@@ -205,9 +205,12 @@ def main():
             war = float(r["WAR"]) if r["WAR"] else 0.0
             p = proj.setdefault(mlbam, {
                 "name": r["Name"], "fgId": r["PlayerId"],
-                "warBat": None, "warPit": None,
+                "warBat": None, "warPit": None, "gPit": None, "gsPit": None,
             })
             p["warBat" if kind == "bat" else "warPit"] = war
+            if kind == "pit":
+                p["gPit"] = float(r["G"]) if r.get("G") else None
+                p["gsPit"] = float(r["GS"]) if r.get("GS") else None
 
     # arb projections keyed by mlbam through bbref
     arb_by_mlbam, arb_unmatched = {}, []
@@ -267,6 +270,8 @@ def main():
             "fgId": pr["fgId"] if pr else None,
             "warBat": pr["warBat"] if pr else None,
             "warPit": pr["warPit"] if pr else None,
+            "gPit": pr.get("gPit") if pr else None,
+            "gsPit": pr.get("gsPit") if pr else None,
             "arbProjSalary": arb_by_mlbam[mlbam]["projSalary"] if mlbam in arb_by_mlbam else None,
             "ilStatus": il_status.get(str(mlbam)) if mlbam else None,
             "deferralPVs": dv,

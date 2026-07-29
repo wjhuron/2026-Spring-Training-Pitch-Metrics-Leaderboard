@@ -323,7 +323,7 @@ def market_multiplier(rec, fit, in_deadline):
     is_prospect = rec["engine"] == "prospect"
     rental = rec["engine"] == "mlb" and rec.get("controlYears") == 1
     star = (rec.get("warY1", 0) or 0) >= 4.5 or rec.get("fv") in ("60", "65", "70")
-    reliever = rec["engine"] == "mlb" and role_of(rec["pos"]) == "RP"
+    reliever = rec["engine"] == "mlb" and rec.get("role") == "RP"
     out = 1.0
     if is_prospect:
         out *= m["prospect"]
@@ -357,10 +357,16 @@ def main():
                              / max(frac, CONFIG["minAnnualizeFrac"])
                              if CONFIG["projectionIsRoS"]
                              else (p["warBat"] or 0) + (p["warPit"] or 0), 2)
+        # role from projected usage when available (Cot's pos suffix
+        # mislabels young starters tagged plain 'rhp' as relievers)
+        if p.get("gPit"):
+            role = "SP" if (p.get("gsPit") or 0) / p["gPit"] >= 0.3 else "RP"
+        else:
+            role = role_of(p["pos"])
         rec = {
             "name": p["name"], "team": p["team"], "pos": p["pos"],
             "age": p["age"], "mls": p["mls"], "mlbam": p["mlbam"],
-            "fgId": p["fgId"], "engine": "mlb",
+            "fgId": p["fgId"], "engine": "mlb", "role": role,
             "warY1": war_baseline,
             "ilStatus": p.get("ilStatus"),
             "contract": p["contract"],
