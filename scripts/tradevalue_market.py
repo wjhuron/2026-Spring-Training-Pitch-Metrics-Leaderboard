@@ -39,8 +39,17 @@ from tradevalue_engine import CONFIG
 BASE = Path("/Users/wallyhuron/Huronalytics")
 OUT_PATH = BASE / "data" / "tradevalue_market_fit.json"
 
+# Wide feature vocabulary; evaluation is staged (see main): the incumbent
+# set F0 plus candidate groups A (reliever rental/controlled split),
+# B (defensive-value share), C (catcher share). Pre-registered keep rule:
+# a group stays iff LOSO mean-of-medians improves AND it wins >=6/10
+# held-out seasons vs the set without it.
 FEATURES = ["prospect", "rental", "star", "rentalDeadline", "relieverDl",
-            "gradW"]
+            "gradW", "rlvRentalDl", "rlvCtrlDl", "defFrac", "catcher"]
+F0 = ["prospect", "rental", "star", "rentalDeadline", "relieverDl", "gradW"]
+GROUPS = [("A relieverSplit", ["rlvRentalDl", "rlvCtrlDl"], ["relieverDl"]),
+          ("B defFrac", ["defFrac"], []),
+          ("C catcher", ["catcher"], [])]
 MIN_SIDE = 0.5e6
 Y_CLIP = math.log(10)
 BAND = math.log(1.5)
@@ -83,8 +92,29 @@ def build_fit_trades(ctx):
     return out
 
 
+def def_frac(mlbam, season, ctx):
+    """Defensive share of a position player's trailing run value, [-1, 1].
+
+    Trailing = trade season + prior season pooled; gated at 300 PA so
+    part-timers don't produce wild ratios.
+    """
+    hist = ctx["warhist"].get(mlbam, {})
+    rb = rd = pa = 0.0
+    for s in (season, season - 1):
+        rec = hist.get(s)
+        if rec:
+            rb += rec.get("runsBat", 0.0)
+            rd += rec.get("runsDef", 0.0)
+            pa += rec.get("pa", 0.0)
+    if pa < 300:
+        return 0.0
+    denom = abs(rb) + abs(rd)
+    return rd / denom if denom > 1.0 else 0.0
+
+
 def value_and_featurize(trades, ctx):
     """-> list of (season, y, d) after valuing under the CURRENT config."""
+    people = ctx["people"]
     rows = []
     for tr in trades:
         vals, feats = [], []
@@ -96,20 +126,24 @@ def value_and_featurize(trades, ctx):
                 v = max(val["value"], 0.0)
                 x = np.zeros(len(FEATURES))
                 pros = val["kind"] == "prospect"
-                rental = val["kind"] == "mlb" and val.get("controlLeft") == 1
+                is_mlb = val["kind"] == "mlb"
+                rental = is_mlb and val.get("controlLeft") == 1
                 star = ((val.get("warProj") or 0) >= 4.5
                         or str(val.get("fv", "")) in ("60", "65", "70"))
-                rlv = (val["kind"] == "mlb"
-                       and is_reliever(p["mlbam"], tr["season"], ctx))
+                rlv = is_mlb and is_reliever(p["mlbam"], tr["season"], ctx)
+                person = people.get(str(p["mlbam"]), {})
+                pos = person.get("pos")
                 x[0] = pros
                 x[1] = rental
                 x[2] = star
                 x[3] = rental and tr["deadline"]
                 x[4] = rlv and tr["deadline"]
-                # graduation-blend share: feature value = the FV weight w, so
-                # a fresh grad carries more of the fitted effect than a
-                # nearly-graduated-out one
                 x[5] = val.get("gradBlendW", 0.0)
+                x[6] = rlv and tr["deadline"] and rental
+                x[7] = rlv and tr["deadline"] and not rental
+                x[8] = (def_frac(p["mlbam"], tr["season"], ctx)
+                        if is_mlb and not person.get("pitcher") else 0.0)
+                x[9] = pos == "C"
                 v_tot += v
                 f_tot += v * x
             vals.append(v_tot)
@@ -122,24 +156,30 @@ def value_and_featurize(trades, ctx):
     return rows
 
 
-def ols(rows, hold_out=None):
+def _cols(featset):
+    return [FEATURES.index(f) for f in featset]
+
+
+def ols(rows, hold_out=None, featset=None):
+    idx = _cols(featset or FEATURES)
     use = [(y, d) for s, y, d in rows if s != hold_out]
-    X = np.array([d for _, d in use])
+    X = np.array([d[idx] for _, d in use])
     y = np.array([y for y, _ in use])
     beta, *_ = np.linalg.lstsq(X, y, rcond=None)
     return beta
 
 
-def loso_score(rows):
+def loso_score(rows, featset=None):
     """Mean over seasons of held-out median |residual|; also baseline."""
+    idx = _cols(featset or FEATURES)
     seasons = sorted({s for s, _, _ in rows})
     fit_meds, base_meds, per_season = [], [], {}
     for s in seasons:
-        beta = ols(rows, hold_out=s)
+        beta = ols(rows, hold_out=s, featset=featset)
         held = [(y, d) for s2, y, d in rows if s2 == s]
         if not held:
             continue
-        res = [abs(y - d @ beta) for y, d in held]
+        res = [abs(y - d[idx] @ beta) for y, d in held]
         base = [abs(y) for y, _ in held]
         fit_meds.append(float(np.median(res)))
         base_meds.append(float(np.median(base)))
@@ -342,10 +382,37 @@ def main():
     # the bucket study is recorded in the output for the receipts.
     set_config(best["lambda"], best["delta"], best["ballast"])
     rows = value_and_featurize(trades, ctx)
-    score, base, per_season = loso_score(rows)
-    beta = ols(rows)
+
+    # staged feature-group evaluation (pre-registered keep rule in header)
+    def season_medians(featset):
+        _, _, per = loso_score(rows, featset)
+        return {s: rec["fitMedian"] for s, rec in per.items()}
+
+    current = list(F0)
+    print("\n=== staged feature-group evaluation ===")
+    base_meds = season_medians(current)
+    print(f"incumbent {current}: LOSO mean-of-medians "
+          f"{np.mean(list(base_meds.values())):.4f}")
+    kept_groups = []
+    for gname, adds, drops in GROUPS:
+        cand = [f for f in current if f not in drops] + adds
+        cand_meds = season_medians(cand)
+        wins = sum(cand_meds[s] < base_meds[s] for s in cand_meds)
+        cur_m = float(np.mean(list(base_meds.values())))
+        cand_m = float(np.mean(list(cand_meds.values())))
+        keep = cand_m < cur_m and wins >= 6
+        print(f"  {gname}: {cand_m:.4f} vs {cur_m:.4f}, wins {wins}/10 "
+              f"-> {'KEEP' if keep else 'reject'}")
+        if keep:
+            current, base_meds = cand, cand_meds
+            kept_groups.append(gname)
+
+    featset = current
+    score, base, per_season = loso_score(rows, featset)
+    beta = ols(rows, featset=featset)
     multipliers = {f: round(float(math.exp(b)), 3)
-                   for f, b in zip(FEATURES, beta)}
+                   for f, b in zip(featset, beta)}
+    print(f"final feature set: {featset} (kept: {kept_groups or 'none'})")
 
     print(f"\nBest config: lambda={best['lambda']}, delta={best['delta']}, "
           f"ballast={best['ballast']}")
@@ -361,7 +428,7 @@ def main():
               f'{rec["baseAccept"]:.0%} -> {rec["fitAccept"]:.0%}')
 
     OUT_PATH.write_text(json.dumps({
-        "features": FEATURES,
+        "features": featset,
         "betas": [round(float(b), 4) for b in beta],
         "multipliers": multipliers,
         "bestConfig": best,

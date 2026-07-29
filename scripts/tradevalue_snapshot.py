@@ -72,7 +72,9 @@ def norm_name(s):
 
 def load_people(mlbams):
     cache = json.loads(PEOPLE_CACHE.read_text()) if PEOPLE_CACHE.exists() else {}
-    missing = [m for m in mlbams if str(m) not in cache]
+    # backfill entries cached before the 'pos' field existed
+    missing = [m for m in mlbams
+               if str(m) not in cache or "pos" not in cache[str(m)]]
     for i in range(0, len(missing), 100):
         chunk = missing[i:i + 100]
         d = fetch_json(
@@ -86,6 +88,7 @@ def load_people(mlbams):
                 "debut": p.get("mlbDebutDate"),
                 "pitcher": (p.get("primaryPosition") or {}).get("abbreviation")
                            in ("P", "TWP"),
+                "pos": (p.get("primaryPosition") or {}).get("abbreviation"),
             }
         print(f"people cache: {min(i + 100, len(missing))}/{len(missing)}")
     PEOPLE_CACHE.write_text(json.dumps(cache, indent=1))
@@ -106,6 +109,8 @@ def load_warhist():
             "gsPit": float(r["gsPit"]) if r.get("gsPit") else 0.0,
             "pa": float(r["pa"]) if r.get("pa") else 0.0,
             "ipouts": float(r["ipouts"]) if r.get("ipouts") else 0.0,
+            "runsBat": float(r["runsBat"]) if r.get("runsBat") else 0.0,
+            "runsDef": float(r["runsDef"]) if r.get("runsDef") else 0.0,
         }
     return hist
 
