@@ -225,6 +225,21 @@ def main():
         defer.setdefault((d["team"], last, first), []).append(d)
 
     parents = affiliate_parents()
+    # IL status per mlbam from 40-man rosters (D10/D15/D60 etc)
+    il_status = {}
+    team_ids_all = sorted({p["teamId"] for p in cots["players"]})
+    for tid in team_ids_all:
+        try:
+            roster = fetch_json(
+                f"https://statsapi.mlb.com/api/v1/teams/{tid}/roster"
+                "?rosterType=40Man").get("roster", [])
+        except Exception:
+            continue
+        for x in roster:
+            code = (x.get("status") or {}).get("code", "")
+            if code.startswith("D"):
+                il_status[str(x["person"]["id"])] = code
+    print(f"IL-listed players: {len(il_status)}")
     mlb, unmatched, ambiguous = [], [], []
     for p in cots["players"]:
         manual = MANUAL_IDS.get((p["team"], p["name"]))
@@ -253,6 +268,7 @@ def main():
             "warBat": pr["warBat"] if pr else None,
             "warPit": pr["warPit"] if pr else None,
             "arbProjSalary": arb_by_mlbam[mlbam]["projSalary"] if mlbam in arb_by_mlbam else None,
+            "ilStatus": il_status.get(str(mlbam)) if mlbam else None,
             "deferralPVs": dv,
             "engine": "mlb",
         })

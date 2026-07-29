@@ -18,6 +18,12 @@
     return neg ? '-' + s : s;
   }
 
+  function ilTag(p) {
+    if (!p.il) return '';
+    var days = p.il.replace('D', '');
+    return ' · IL-' + days;
+  }
+
   function meta(p) {
     if (p.e === 'prospect') {
       var m = 'FV ' + p.fv + ' · ' + p.t + ' · ' + p.p;
@@ -30,7 +36,7 @@
       return d;
     }
     return p.t + ' · ' + p.p + ' · ' + p.w + ' WAR · ' +
-           p.c + (p.c === 1 ? ' yr' : ' yrs') + ' control';
+           p.c + (p.c === 1 ? ' yr' : ' yrs') + ' control' + ilTag(p);
   }
 
   function norm(s) {
@@ -64,8 +70,9 @@
         var li = document.createElement('li');
         var val = document.createElement('span');
         val.className = 'pl-val' + (p.m < 0 ? ' neg' : '');
-        val.textContent = fmtM(p.m);
-        val.title = 'Intrinsic ' + fmtM(p.s);
+        val.textContent = fmtM(p.m) + (p.sc ? '\u2020' : '');
+        val.title = 'Intrinsic ' + fmtM(p.s) +
+                    (p.sc ? ' \u2014 star market value is a floor (fitted on traded stars)' : '');
         var rm = document.createElement('button');
         rm.textContent = '×';
         rm.setAttribute('aria-label', 'Remove ' + p.n);
@@ -153,7 +160,7 @@
         mt.className = 'sug-meta';
         mt.textContent = (p.e === 'prospect' ? 'FV ' + p.fv + ' · '
                           : p.e === 'depth' ? p.lvl + ' · ' : '') +
-                         p.t + ' · ' + fmtM(p.m);
+                         p.t + ' · ' + fmtM(p.m) + ilTag(p);
         d.appendChild(nm); d.appendChild(mt);
         d.addEventListener('mousedown', function (ev) { ev.preventDefault(); pick(p); });
         box.appendChild(d);
@@ -223,13 +230,13 @@
       td('', p.n).style.fontWeight = '600';
       td('', p.t);
       td('', p.p);
-      td('td-profile', p.e === 'prospect'
+      td('td-profile', (p.e === 'prospect'
         ? 'FV ' + p.fv + (p.eta ? ' · ETA ' + p.eta : '')
         : p.e === 'depth'
           ? p.lvl + (p.w ? ' · ' + p.w + ' WAR' : ' · unranked')
-          : p.w + ' WAR · ' + p.c + (p.c === 1 ? ' yr' : ' yrs'));
+          : p.w + ' WAR · ' + p.c + (p.c === 1 ? ' yr' : ' yrs')) + ilTag(p));
       td('td-num' + (p.s < 0 ? ' neg' : ''), fmtM(p.s));
-      td('td-num' + (p.m < 0 ? ' neg' : ''), fmtM(p.m));
+      td('td-num' + (p.m < 0 ? ' neg' : ''), fmtM(p.m) + (p.sc ? '\u2020' : ''));
       var actions = document.createElement('td');
       ['a', 'b'].forEach(function (k) {
         var b = document.createElement('button');

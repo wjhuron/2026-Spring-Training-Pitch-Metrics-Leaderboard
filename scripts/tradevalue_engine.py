@@ -362,6 +362,7 @@ def main():
             "age": p["age"], "mls": p["mls"], "mlbam": p["mlbam"],
             "fgId": p["fgId"], "engine": "mlb",
             "warY1": war_baseline,
+            "ilStatus": p.get("ilStatus"),
             "contract": p["contract"],
             "surplus": surplus,
             "controlYears": len(years_out),
@@ -399,6 +400,13 @@ def main():
 
     for r in players:
         r["marketValue"] = r["surplus"] * market_multiplier(r, market_fit, in_deadline)
+        # traded-star selection caveat: the star discount is fitted on stars
+        # that actually moved (distress sales); untradeable stars would fetch
+        # more, so the site marks these market values as lower bounds
+        r["starCaveat"] = bool(
+            r["surplus"] > 0
+            and ((r.get("warY1") or 0) >= 4.5
+                 or r.get("fv") in ("60", "65", "70")))
     # depth layer: everyone in affiliated ball outside the core universe
     depth_path = DATA / "tradevalue_depth.json"
     lvl_short = {"Triple-A": "AAA", "Double-A": "AA", "High-A": "A+",
@@ -442,6 +450,10 @@ def main():
             "s": round(r["surplus"] / 1e6, 1),
             "m": round(r["marketValue"] / 1e6, 1),
         }
+        if r.get("ilStatus"):
+            rec["il"] = r["ilStatus"]
+        if r.get("starCaveat"):
+            rec["sc"] = 1
         if r["engine"] == "prospect":
             rec["fv"] = r["fv"]
             if r.get("eta"):
