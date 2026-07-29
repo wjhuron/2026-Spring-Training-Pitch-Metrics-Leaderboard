@@ -8897,7 +8897,7 @@
    "gPit": 7.0,
    "gsPit": 0.0,
    "arbProjSalary": null,
-   "ilStatus": "D60",
+   "ilStatus": null,
    "deferralPVs": null,
    "engine": "mlb"
   },
@@ -11120,7 +11120,7 @@
    "gPit": 8.0,
    "gsPit": 1.0,
    "arbProjSalary": null,
-   "ilStatus": "D60",
+   "ilStatus": null,
    "deferralPVs": null,
    "engine": "mlb"
   },

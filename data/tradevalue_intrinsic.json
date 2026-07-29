@@ -19401,7 +19401,7 @@
    "engine": "mlb",
    "role": "RP",
    "warY1": 0.04,
-   "ilStatus": "D60",
+   "ilStatus": null,
    "contract": "1 y/$800,000 (26)",
    "surplus": 14985671.219130434,
    "controlYears": 5,
@@ -130438,6 +130438,22 @@
    ]
   },
   {
+   "name": "Juan Castillo",
+   "team": "COL",
+   "pos": "C",
+   "mlbam": "691435",
+   "fgId": null,
+   "engine": "depth",
+   "level": "A",
+   "warY1": null,
+   "controlYears": null,
+   "surplus": 300000,
+   "marketValue": 300000,
+   "flags": [
+    "unranked"
+   ]
+  },
+  {
    "name": "Tyrelle Chadwick",
    "team": "COL",
    "pos": "P",
@@ -142038,6 +142054,22 @@
    ]
   },
   {
+   "name": "Harrison Kreiling",
+   "team": "SEA",
+   "pos": "P",
+   "mlbam": "801653",
+   "fgId": null,
+   "engine": "depth",
+   "level": "A",
+   "warY1": null,
+   "controlYears": null,
+   "surplus": 300000,
+   "marketValue": 300000,
+   "flags": [
+    "unranked"
+   ]
+  },
+  {
    "name": "Aneury Lora",
    "team": "SEA",
    "pos": "P",
@@ -145482,22 +145514,6 @@
    "team": "SEA",
    "pos": "3B",
    "mlbam": "703203",
-   "fgId": null,
-   "engine": "depth",
-   "level": "Rk",
-   "warY1": null,
-   "controlYears": null,
-   "surplus": 300000,
-   "marketValue": 300000,
-   "flags": [
-    "unranked"
-   ]
-  },
-  {
-   "name": "Harrison Kreiling",
-   "team": "SEA",
-   "pos": "P",
-   "mlbam": "801653",
    "fgId": null,
    "engine": "depth",
    "level": "Rk",
@@ -150198,6 +150214,22 @@
    ]
   },
   {
+   "name": "Jackson Dannelley",
+   "team": "WSH",
+   "pos": "P",
+   "mlbam": "800727",
+   "fgId": null,
+   "engine": "depth",
+   "level": "A+",
+   "warY1": null,
+   "controlYears": null,
+   "surplus": 300000,
+   "marketValue": 300000,
+   "flags": [
+    "unranked"
+   ]
+  },
+  {
    "name": "Randal Diaz",
    "team": "WSH",
    "pos": "SS",
@@ -150410,6 +150442,22 @@
    "team": "WSH",
    "pos": "P",
    "mlbam": "807480",
+   "fgId": null,
+   "engine": "depth",
+   "level": "A+",
+   "warY1": null,
+   "controlYears": null,
+   "surplus": 300000,
+   "marketValue": 300000,
+   "flags": [
+    "unranked"
+   ]
+  },
+  {
+   "name": "Travis Sthele",
+   "team": "WSH",
+   "pos": "P",
+   "mlbam": "691017",
    "fgId": null,
    "engine": "depth",
    "level": "A+",
@@ -152294,22 +152342,6 @@
    ]
   },
   {
-   "name": "Jackson Dannelley",
-   "team": "WSH",
-   "pos": "P",
-   "mlbam": "800727",
-   "fgId": null,
-   "engine": "depth",
-   "level": "A",
-   "warY1": null,
-   "controlYears": null,
-   "surplus": 300000,
-   "marketValue": 300000,
-   "flags": [
-    "unranked"
-   ]
-  },
-  {
    "name": "Kevin Davis",
    "team": "WSH",
    "pos": "P",
@@ -152602,22 +152634,6 @@
    "team": "WSH",
    "pos": "LF",
    "mlbam": "808279",
-   "fgId": null,
-   "engine": "depth",
-   "level": "A",
-   "warY1": null,
-   "controlYears": null,
-   "surplus": 300000,
-   "marketValue": 300000,
-   "flags": [
-    "unranked"
-   ]
-  },
-  {
-   "name": "Travis Sthele",
-   "team": "WSH",
-   "pos": "P",
-   "mlbam": "691017",
    "fgId": null,
    "engine": "depth",
    "level": "A",
@@ -165850,22 +165866,6 @@
    "team": "COL",
    "pos": "P",
    "mlbam": "802136",
-   "fgId": null,
-   "engine": "depth",
-   "level": "A+",
-   "warY1": null,
-   "controlYears": null,
-   "surplus": 300000,
-   "marketValue": 300000,
-   "flags": [
-    "unranked"
-   ]
-  },
-  {
-   "name": "Juan Castillo",
-   "team": "COL",
-   "pos": "C",
-   "mlbam": "691435",
    "fgId": null,
    "engine": "depth",
    "level": "A+",
@@ -181974,7 +181974,7 @@
    "engine": "mlb",
    "role": "RP",
    "warY1": 0.21,
-   "ilStatus": "D60",
+   "ilStatus": null,
    "contract": "2 y/$14M (25-26)",
    "surplus": -1794682.7956521742,
    "controlYears": 1,

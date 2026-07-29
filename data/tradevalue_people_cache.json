@@ -47446,5 +47446,4715 @@
   "birthDate": "2004-08-26",
   "debut": null,
   "pitcher": true
+ },
+ "434672": {
+  "name": "Chris Smith",
+  "birthDate": "1981-04-09",
+  "debut": "2008-06-21",
+  "pitcher": true
+ },
+ "446868": {
+  "name": "Wilkin Castillo",
+  "birthDate": "1984-06-01",
+  "debut": "2008-09-02",
+  "pitcher": false
+ },
+ "448167": {
+  "name": "Brandon Mann",
+  "birthDate": "1984-05-16",
+  "debut": "2018-05-13",
+  "pitcher": true
+ },
+ "451705": {
+  "name": "Alberto Rosario",
+  "birthDate": "1987-01-10",
+  "debut": "2016-07-09",
+  "pitcher": false
+ },
+ "451783": {
+  "name": "Dustin Molleken",
+  "birthDate": "1984-08-21",
+  "debut": "2016-07-04",
+  "pitcher": true
+ },
+ "453527": {
+  "name": "Sean Kazmar Jr.",
+  "birthDate": "1984-08-05",
+  "debut": "2008-08-13",
+  "pitcher": false
+ },
+ "454975": {
+  "name": "Hernan Iribarren",
+  "birthDate": "1984-06-29",
+  "debut": "2008-04-12",
+  "pitcher": false
+ },
+ "455376": {
+  "name": "Arcenio Leon",
+  "birthDate": "1986-09-22",
+  "debut": "2017-05-28",
+  "pitcher": true
+ },
+ "458537": {
+  "name": "Cory Luebke",
+  "birthDate": "1985-03-04",
+  "debut": "2010-09-03",
+  "pitcher": true
+ },
+ "487675": {
+  "name": "Edward Paredes",
+  "birthDate": "1986-09-30",
+  "debut": "2017-07-24",
+  "pitcher": true
+ },
+ "491624": {
+  "name": "C\u00e9sar Valdez",
+  "birthDate": "1985-03-17",
+  "debut": "2010-05-03",
+  "pitcher": true
+ },
+ "493193": {
+  "name": "Dae-Ho Lee",
+  "birthDate": "1982-06-21",
+  "debut": "2016-04-04",
+  "pitcher": false
+ },
+ "497807": {
+  "name": "Frank Herrmann",
+  "birthDate": "1984-05-30",
+  "debut": "2010-06-04",
+  "pitcher": true
+ },
+ "500135": {
+  "name": "Ronny Rodr\u00edguez",
+  "birthDate": "1992-04-17",
+  "debut": "2018-05-31",
+  "pitcher": false
+ },
+ "500765": {
+  "name": "Dayan D\u00edaz",
+  "birthDate": "1989-02-10",
+  "debut": "2016-05-22",
+  "pitcher": true
+ },
+ "500872": {
+  "name": "Gregory Infante",
+  "birthDate": "1987-07-10",
+  "debut": "2010-09-07",
+  "pitcher": true
+ },
+ "501697": {
+  "name": "Jhan Mari\u00f1ez",
+  "birthDate": "1988-08-12",
+  "debut": "2010-07-16",
+  "pitcher": true
+ },
+ "501817": {
+  "name": "Tony Barnette",
+  "birthDate": "1983-11-09",
+  "debut": "2016-04-05",
+  "pitcher": true
+ },
+ "501936": {
+  "name": "Matt Buschmann",
+  "birthDate": "1984-02-13",
+  "debut": "2016-04-10",
+  "pitcher": true
+ },
+ "501986": {
+  "name": "Cedric Hunter",
+  "birthDate": "1988-03-10",
+  "debut": "2011-03-31",
+  "pitcher": false
+ },
+ "502130": {
+  "name": "Dan Runzler",
+  "birthDate": "1985-03-30",
+  "debut": "2009-09-04",
+  "pitcher": true
+ },
+ "502151": {
+  "name": "Chad Huffman",
+  "birthDate": "1985-04-29",
+  "debut": "2010-06-13",
+  "pitcher": false
+ },
+ "502212": {
+  "name": "Austin Bibens-Dirkx",
+  "birthDate": "1985-04-29",
+  "debut": "2017-05-17",
+  "pitcher": true
+ },
+ "502457": {
+  "name": "Drew Hayes",
+  "birthDate": "1987-09-03",
+  "debut": "2016-04-21",
+  "pitcher": true
+ },
+ "503437": {
+  "name": "James Beresford",
+  "birthDate": "1989-01-19",
+  "debut": "2016-09-10",
+  "pitcher": false
+ },
+ "503444": {
+  "name": "Joel De La Cruz",
+  "birthDate": "1989-06-09",
+  "debut": "2016-06-29",
+  "pitcher": true
+ },
+ "503566": {
+  "name": "Fabio Castillo",
+  "birthDate": "1989-02-19",
+  "debut": "2017-09-02",
+  "pitcher": true
+ },
+ "505447": {
+  "name": "Brandon Dickson",
+  "birthDate": "1984-11-03",
+  "debut": "2011-07-02",
+  "pitcher": true
+ },
+ "506703": {
+  "name": "Adri\u00e1n Sanchez",
+  "birthDate": "1990-08-16",
+  "debut": "2017-06-30",
+  "pitcher": false
+ },
+ "506924": {
+  "name": "Stephen Cardullo",
+  "birthDate": "1987-08-31",
+  "debut": "2016-08-26",
+  "pitcher": false
+ },
+ "516472": {
+  "name": "Francisco Arcia",
+  "birthDate": "1989-09-14",
+  "debut": "2018-07-26",
+  "pitcher": false
+ },
+ "517448": {
+  "name": "Wilfredo Boscan",
+  "birthDate": "1989-10-26",
+  "debut": "2016-05-19",
+  "pitcher": true
+ },
+ "517629": {
+  "name": "Kelvin Marte",
+  "birthDate": "1987-11-24",
+  "debut": "2016-09-03",
+  "pitcher": true
+ },
+ "518435": {
+  "name": "Manny Barreda",
+  "birthDate": "1988-10-08",
+  "debut": "2021-09-08",
+  "pitcher": true
+ },
+ "518445": {
+  "name": "Chad Bell",
+  "birthDate": "1989-02-28",
+  "debut": "2017-05-10",
+  "pitcher": true
+ },
+ "518566": {
+  "name": "Taylor Cole",
+  "birthDate": "1989-08-20",
+  "debut": "2017-08-09",
+  "pitcher": true
+ },
+ "518883": {
+  "name": "Dean Kiekhefer",
+  "birthDate": "1989-06-07",
+  "debut": "2016-05-14",
+  "pitcher": true
+ },
+ "519037": {
+  "name": "Carlos Moncrief",
+  "birthDate": "1988-11-03",
+  "debut": "2017-07-29",
+  "pitcher": false
+ },
+ "519303": {
+  "name": "Elliot Soto",
+  "birthDate": "1989-08-21",
+  "debut": "2020-09-25",
+  "pitcher": false
+ },
+ "519346": {
+  "name": "Eric Thames",
+  "birthDate": "1986-11-10",
+  "debut": "2011-05-18",
+  "pitcher": false
+ },
+ "519393": {
+  "name": "Marcus Walden",
+  "birthDate": "1988-09-13",
+  "debut": "2018-04-01",
+  "pitcher": true
+ },
+ "528748": {
+  "name": "Humberto Castellanos",
+  "birthDate": "1998-04-03",
+  "debut": "2020-08-04",
+  "pitcher": true
+ },
+ "534737": {
+  "name": "Pat Dean",
+  "birthDate": "1989-05-25",
+  "debut": "2016-05-11",
+  "pitcher": true
+ },
+ "534947": {
+  "name": "Tim Adleman",
+  "birthDate": "1987-11-13",
+  "debut": "2016-05-01",
+  "pitcher": true
+ },
+ "542364": {
+  "name": "Rafael Ortega",
+  "birthDate": "1991-05-15",
+  "debut": "2012-09-30",
+  "pitcher": false
+ },
+ "542884": {
+  "name": "Dustin Antolin",
+  "birthDate": "1989-08-09",
+  "debut": "2016-05-16",
+  "pitcher": true
+ },
+ "542992": {
+  "name": "Andy Burns",
+  "birthDate": "1990-08-07",
+  "debut": "2016-05-09",
+  "pitcher": false
+ },
+ "543001": {
+  "name": "Ryan Carpenter",
+  "birthDate": "1990-08-22",
+  "debut": "2018-04-01",
+  "pitcher": true
+ },
+ "543017": {
+  "name": "Hunter Cervenka",
+  "birthDate": "1990-01-03",
+  "debut": "2016-04-12",
+  "pitcher": true
+ },
+ "543193": {
+  "name": "Drew Gagnon",
+  "birthDate": "1990-06-26",
+  "debut": "2018-07-10",
+  "pitcher": true
+ },
+ "543194": {
+  "name": "Isaac Galloway",
+  "birthDate": "1989-10-10",
+  "debut": "2018-07-31",
+  "pitcher": false
+ },
+ "543329": {
+  "name": "Destin Hood",
+  "birthDate": "1990-04-03",
+  "debut": "2016-09-02",
+  "pitcher": false
+ },
+ "543343": {
+  "name": "Danny Hultzen",
+  "birthDate": "1989-11-28",
+  "debut": "2019-09-08",
+  "pitcher": true
+ },
+ "543357": {
+  "name": "Jordan Jankowski",
+  "birthDate": "1989-05-17",
+  "debut": "2017-05-24",
+  "pitcher": true
+ },
+ "543362": {
+  "name": "A.J. Jimenez",
+  "birthDate": "1990-05-01",
+  "debut": "2017-09-06",
+  "pitcher": false
+ },
+ "543532": {
+  "name": "Tim Melville",
+  "birthDate": "1989-10-09",
+  "debut": "2016-04-10",
+  "pitcher": true
+ },
+ "543611": {
+  "name": "Danny Ortiz",
+  "birthDate": "1990-01-05",
+  "debut": "2017-04-29",
+  "pitcher": false
+ },
+ "543677": {
+  "name": "Matt Ramsey",
+  "birthDate": "1989-09-24",
+  "debut": "2019-04-25",
+  "pitcher": true
+ },
+ "544930": {
+  "name": "Blake Smith",
+  "birthDate": "1987-12-09",
+  "debut": "2016-09-10",
+  "pitcher": true
+ },
+ "545337": {
+  "name": "Nolan Fontana",
+  "birthDate": "1991-06-06",
+  "debut": "2017-05-22",
+  "pitcher": false
+ },
+ "545348": {
+  "name": "Austin Maddox",
+  "birthDate": "1991-05-13",
+  "debut": "2017-06-17",
+  "pitcher": true
+ },
+ "545357": {
+  "name": "Matt Purke",
+  "birthDate": "1990-07-17",
+  "debut": "2016-05-20",
+  "pitcher": true
+ },
+ "546990": {
+  "name": "Anthony Alford",
+  "birthDate": "1994-07-20",
+  "debut": "2017-05-19",
+  "pitcher": false
+ },
+ "546991": {
+  "name": "Albert Almora Jr.",
+  "birthDate": "1994-04-16",
+  "debut": "2016-06-07",
+  "pitcher": false
+ },
+ "547004": {
+  "name": "Rio Ruiz",
+  "birthDate": "1994-05-22",
+  "debut": "2016-09-18",
+  "pitcher": false
+ },
+ "547007": {
+  "name": "Rob Whalen",
+  "birthDate": "1994-01-31",
+  "debut": "2016-08-03",
+  "pitcher": true
+ },
+ "547170": {
+  "name": "Nicky Delmonico",
+  "birthDate": "1992-07-12",
+  "debut": "2017-08-01",
+  "pitcher": false
+ },
+ "547172": {
+  "name": "Tony Wolters",
+  "birthDate": "1992-06-09",
+  "debut": "2016-04-05",
+  "pitcher": false
+ },
+ "547173": {
+  "name": "Christian Lopes",
+  "birthDate": "1992-10-01",
+  "debut": "2022-04-20",
+  "pitcher": false
+ },
+ "547942": {
+  "name": "Kwang Hyun Kim",
+  "birthDate": "1988-07-22",
+  "debut": "2020-07-24",
+  "pitcher": true
+ },
+ "553883": {
+  "name": "Jose Campos",
+  "birthDate": "1992-07-27",
+  "debut": "2016-08-27",
+  "pitcher": true
+ },
+ "553902": {
+  "name": "Willians Astudillo",
+  "birthDate": "1991-10-14",
+  "debut": "2018-06-30",
+  "pitcher": false
+ },
+ "554054": {
+  "name": "Alfredo Gonz\u00e1lez",
+  "birthDate": "1992-07-13",
+  "debut": "2018-05-26",
+  "pitcher": false
+ },
+ "570488": {
+  "name": "Phillips Valdez",
+  "birthDate": "1991-11-16",
+  "debut": "2019-06-08",
+  "pitcher": true
+ },
+ "570639": {
+  "name": "Yefri P\u00e9rez",
+  "birthDate": "1991-02-24",
+  "debut": "2016-07-17",
+  "pitcher": false
+ },
+ "570702": {
+  "name": "Carlos Ram\u00edrez",
+  "birthDate": "1991-04-24",
+  "debut": "2017-09-01",
+  "pitcher": true
+ },
+ "570714": {
+  "name": "C\u00e9sar Vargas",
+  "birthDate": "1991-12-30",
+  "debut": "2016-04-23",
+  "pitcher": true
+ },
+ "570799": {
+  "name": "Christian Villanueva",
+  "birthDate": "1991-06-19",
+  "debut": "2017-09-18",
+  "pitcher": false
+ },
+ "571035": {
+  "name": "William Cuevas",
+  "birthDate": "1990-10-14",
+  "debut": "2016-04-21",
+  "pitcher": true
+ },
+ "571446": {
+  "name": "Mark Appel",
+  "birthDate": "1991-07-15",
+  "debut": "2022-06-29",
+  "pitcher": true
+ },
+ "571473": {
+  "name": "Buddy Baumann",
+  "birthDate": "1987-12-09",
+  "debut": "2016-07-16",
+  "pitcher": true
+ },
+ "571572": {
+  "name": "Joe Col\u00f3n J",
+  "birthDate": "1990-02-18",
+  "debut": "2016-07-08",
+  "pitcher": true
+ },
+ "571595": {
+  "name": "Noel Cuevas",
+  "birthDate": "1991-10-02",
+  "debut": "2018-04-22",
+  "pitcher": false
+ },
+ "571616": {
+  "name": "Matt Dermody",
+  "birthDate": "1990-07-04",
+  "debut": "2016-09-03",
+  "pitcher": true
+ },
+ "571676": {
+  "name": "Seth Frankoff",
+  "birthDate": "1988-08-27",
+  "debut": "2017-06-09",
+  "pitcher": true
+ },
+ "571812": {
+  "name": "Kyle Jensen",
+  "birthDate": "1988-05-20",
+  "debut": "2016-09-03",
+  "pitcher": false
+ },
+ "571830": {
+  "name": "Tommy Joseph",
+  "birthDate": "1991-07-16",
+  "debut": "2016-05-13",
+  "pitcher": false
+ },
+ "571851": {
+  "name": "Spencer Kieboom",
+  "birthDate": "1991-03-16",
+  "debut": "2016-10-02",
+  "pitcher": false
+ },
+ "571858": {
+  "name": "Branden Kline",
+  "birthDate": "1991-09-29",
+  "debut": "2019-04-20",
+  "pitcher": true
+ },
+ "571863": {
+  "name": "Matt Koch",
+  "birthDate": "1990-11-02",
+  "debut": "2016-09-09",
+  "pitcher": true
+ },
+ "571963": {
+  "name": "A.J. Morris",
+  "birthDate": "1986-12-01",
+  "debut": "2016-05-24",
+  "pitcher": true
+ },
+ "571969": {
+  "name": "Conor Mullee",
+  "birthDate": "1988-02-25",
+  "debut": "2016-05-16",
+  "pitcher": true
+ },
+ "572073": {
+  "name": "Joey Rickard",
+  "birthDate": "1991-05-21",
+  "debut": "2016-04-04",
+  "pitcher": false
+ },
+ "572086": {
+  "name": "Brady Rodgers",
+  "birthDate": "1990-09-17",
+  "debut": "2016-09-03",
+  "pitcher": true
+ },
+ "572119": {
+  "name": "Patrick Schuster",
+  "birthDate": "1990-10-30",
+  "debut": "2016-07-05",
+  "pitcher": true
+ },
+ "572208": {
+  "name": "Ashur Tolliver",
+  "birthDate": "1988-01-24",
+  "debut": "2016-05-26",
+  "pitcher": true
+ },
+ "572227": {
+  "name": "Zach Vincej",
+  "birthDate": "1991-05-01",
+  "debut": "2017-09-01",
+  "pitcher": false
+ },
+ "572241": {
+  "name": "David Washington",
+  "birthDate": "1990-11-20",
+  "debut": "2017-06-14",
+  "pitcher": false
+ },
+ "572283": {
+  "name": "Madison Younginer IV",
+  "birthDate": "1990-11-03",
+  "debut": "2016-08-07",
+  "pitcher": true
+ },
+ "572383": {
+  "name": "Brian Moran",
+  "birthDate": "1988-09-30",
+  "debut": "2019-09-05",
+  "pitcher": true
+ },
+ "572703": {
+  "name": "Luke Bard",
+  "birthDate": "1990-11-13",
+  "debut": "2018-03-31",
+  "pitcher": true
+ },
+ "572728": {
+  "name": "Michael Brady",
+  "birthDate": "1987-03-21",
+  "debut": "2017-06-20",
+  "pitcher": true
+ },
+ "573016": {
+  "name": "Kyle Martin",
+  "birthDate": "1991-01-18",
+  "debut": "2017-07-20",
+  "pitcher": true
+ },
+ "573062": {
+  "name": "Aaron Northcraft",
+  "birthDate": "1990-05-28",
+  "debut": "2021-04-24",
+  "pitcher": true
+ },
+ "573088": {
+  "name": "Cameron Perkins",
+  "birthDate": "1990-09-27",
+  "debut": "2017-06-20",
+  "pitcher": false
+ },
+ "573113": {
+  "name": "Tony Renda",
+  "birthDate": "1991-01-24",
+  "debut": "2016-08-02",
+  "pitcher": false
+ },
+ "573166": {
+  "name": "Murphy Smith",
+  "birthDate": "1987-08-25",
+  "debut": "2018-08-27",
+  "pitcher": true
+ },
+ "573188": {
+  "name": "Tyler Sturdevant",
+  "birthDate": "1985-12-20",
+  "debut": "2016-05-24",
+  "pitcher": true
+ },
+ "573589": {
+  "name": "Michael Ynoa",
+  "birthDate": "1991-09-24",
+  "debut": "2016-06-14",
+  "pitcher": true
+ },
+ "573668": {
+  "name": "Juan Minaya",
+  "birthDate": "1990-09-18",
+  "debut": "2016-09-01",
+  "pitcher": true
+ },
+ "574847": {
+  "name": "Rob Segedin",
+  "birthDate": "1988-11-10",
+  "debut": "2016-08-07",
+  "pitcher": false
+ },
+ "575070": {
+  "name": "Enderson Franco",
+  "birthDate": "1992-12-29",
+  "debut": "2019-09-18",
+  "pitcher": true
+ },
+ "578570": {
+  "name": "Juniel Querecuto",
+  "birthDate": "1992-09-19",
+  "debut": "2016-09-22",
+  "pitcher": false
+ },
+ "582473": {
+  "name": "Sherman Johnson",
+  "birthDate": "1990-07-15",
+  "debut": "2018-09-19",
+  "pitcher": false
+ },
+ "591672": {
+  "name": "Osmer Morales",
+  "birthDate": "1992-10-30",
+  "debut": "2018-08-16",
+  "pitcher": true
+ },
+ "591693": {
+  "name": "Edubray Ramos",
+  "birthDate": "1992-12-19",
+  "debut": "2016-06-24",
+  "pitcher": true
+ },
+ "591701": {
+  "name": "Alejandro Chacin",
+  "birthDate": "1993-06-24",
+  "debut": "2017-08-23",
+  "pitcher": true
+ },
+ "591741": {
+  "name": "Jos\u00e9 Osuna",
+  "birthDate": "1992-12-12",
+  "debut": "2017-04-18",
+  "pitcher": false
+ },
+ "591994": {
+  "name": "Willy Garc\u00eda",
+  "birthDate": "1992-09-04",
+  "debut": "2017-04-14",
+  "pitcher": false
+ },
+ "592120": {
+  "name": "Barrett Astin",
+  "birthDate": "1991-10-22",
+  "debut": "2017-04-03",
+  "pitcher": true
+ },
+ "592130": {
+  "name": "Danny Barnes",
+  "birthDate": "1989-10-21",
+  "debut": "2016-08-02",
+  "pitcher": true
+ },
+ "592144": {
+  "name": "Wynton Bernard",
+  "birthDate": "1990-09-24",
+  "debut": "2022-08-12",
+  "pitcher": false
+ },
+ "592165": {
+  "name": "Brandon Brennan",
+  "birthDate": "1991-07-26",
+  "debut": "2019-03-21",
+  "pitcher": true
+ },
+ "592279": {
+  "name": "Jesen Therrien",
+  "birthDate": "1993-03-18",
+  "debut": "2017-07-29",
+  "pitcher": true
+ },
+ "592280": {
+  "name": "Ryan Eades",
+  "birthDate": "1991-12-15",
+  "debut": "2019-06-08",
+  "pitcher": true
+ },
+ "592288": {
+  "name": "Kent Emanuel",
+  "birthDate": "1992-06-04",
+  "debut": "2021-04-24",
+  "pitcher": true
+ },
+ "592330": {
+  "name": "Perci Garner",
+  "birthDate": "1988-12-13",
+  "debut": "2016-08-31",
+  "pitcher": true
+ },
+ "592419": {
+  "name": "Jared Hoying",
+  "birthDate": "1989-05-18",
+  "debut": "2016-05-23",
+  "pitcher": false
+ },
+ "592422": {
+  "name": "Jason Hursh",
+  "birthDate": "1991-10-02",
+  "debut": "2016-08-13",
+  "pitcher": true
+ },
+ "592433": {
+  "name": "Tyrell Jenkins",
+  "birthDate": "1992-07-20",
+  "debut": "2016-06-22",
+  "pitcher": true
+ },
+ "592444": {
+  "name": "JaCoby Jones",
+  "birthDate": "1992-05-10",
+  "debut": "2016-08-30",
+  "pitcher": false
+ },
+ "592450": {
+  "name": "Aaron Judge",
+  "birthDate": "1992-04-26",
+  "debut": "2016-08-13",
+  "pitcher": false
+ },
+ "592499": {
+  "name": "Artie Lewicki",
+  "birthDate": "1992-04-08",
+  "debut": "2017-09-04",
+  "pitcher": true
+ },
+ "592530": {
+  "name": "Jos\u00e9 Marmolejos",
+  "birthDate": "1993-01-02",
+  "debut": "2020-07-24",
+  "pitcher": false
+ },
+ "592656": {
+  "name": "Henry Ramos",
+  "birthDate": "1992-04-15",
+  "debut": "2021-09-05",
+  "pitcher": false
+ },
+ "592660": {
+  "name": "Rangel Ravelo",
+  "birthDate": "1992-04-24",
+  "debut": "2019-06-17",
+  "pitcher": false
+ },
+ "592731": {
+  "name": "Steve Selsky",
+  "birthDate": "1989-07-20",
+  "debut": "2016-05-20",
+  "pitcher": false
+ },
+ "592753": {
+  "name": "Dan Slania",
+  "birthDate": "1992-05-24",
+  "debut": "2017-06-30",
+  "pitcher": true
+ },
+ "592769": {
+  "name": "D.J. Snelten",
+  "birthDate": "1992-05-29",
+  "debut": "2018-04-28",
+  "pitcher": true
+ },
+ "592808": {
+  "name": "Andrew Toles",
+  "birthDate": "1992-05-24",
+  "debut": "2016-07-08",
+  "pitcher": false
+ },
+ "592811": {
+  "name": "Andrew Triggs",
+  "birthDate": "1989-03-16",
+  "debut": "2016-04-25",
+  "pitcher": true
+ },
+ "592831": {
+  "name": "Konner Wade",
+  "birthDate": "1991-12-03",
+  "debut": "2021-06-26",
+  "pitcher": true
+ },
+ "592848": {
+  "name": "Zack Weiss",
+  "birthDate": "1992-06-16",
+  "debut": "2018-04-12",
+  "pitcher": true
+ },
+ "592859": {
+  "name": "Stevie Wilkerson",
+  "birthDate": "1992-01-11",
+  "debut": "2018-06-20",
+  "pitcher": false
+ },
+ "592872": {
+  "name": "Alex Wimmers",
+  "birthDate": "1988-11-01",
+  "debut": "2016-08-26",
+  "pitcher": true
+ },
+ "593334": {
+  "name": "Domingo Germ\u00e1n",
+  "birthDate": "1992-08-04",
+  "debut": "2017-06-11",
+  "pitcher": true
+ },
+ "593417": {
+  "name": "Ra\u00fal Alc\u00e1ntara",
+  "birthDate": "1992-12-04",
+  "debut": "2016-09-05",
+  "pitcher": true
+ },
+ "593523": {
+  "name": "Marco Hern\u00e1ndez",
+  "birthDate": "1992-09-06",
+  "debut": "2016-04-17",
+  "pitcher": false
+ },
+ "593527": {
+  "name": "Ram\u00f3n Torres",
+  "birthDate": "1993-01-22",
+  "debut": "2017-06-07",
+  "pitcher": false
+ },
+ "593528": {
+  "name": "Jorge Bonifacio",
+  "birthDate": "1993-06-04",
+  "debut": "2017-04-21",
+  "pitcher": false
+ },
+ "593590": {
+  "name": "Webster Rivas",
+  "birthDate": "1990-08-08",
+  "debut": "2021-05-28",
+  "pitcher": false
+ },
+ "593604": {
+  "name": "Alberto Baldonado",
+  "birthDate": "1993-02-01",
+  "debut": "2021-09-02",
+  "pitcher": true
+ },
+ "593969": {
+  "name": "Jayson Aquino",
+  "birthDate": "1992-11-22",
+  "debut": "2016-07-04",
+  "pitcher": true
+ },
+ "593993": {
+  "name": "Jos\u00e9 Brice\u00f1o",
+  "birthDate": "1992-09-19",
+  "debut": "2018-05-26",
+  "pitcher": false
+ },
+ "594011": {
+  "name": "Rosell Herrera",
+  "birthDate": "1992-10-16",
+  "debut": "2018-04-26",
+  "pitcher": false
+ },
+ "594027": {
+  "name": "Tyron Guerrero",
+  "birthDate": "1991-01-09",
+  "debut": "2016-05-17",
+  "pitcher": true
+ },
+ "594056": {
+  "name": "Reymin Guduan",
+  "birthDate": "1992-03-16",
+  "debut": "2017-05-31",
+  "pitcher": true
+ },
+ "594576": {
+  "name": "Jacob May",
+  "birthDate": "1992-01-23",
+  "debut": "2017-04-04",
+  "pitcher": false
+ },
+ "594760": {
+  "name": "Aaron Blair",
+  "birthDate": "1992-05-26",
+  "debut": "2016-04-24",
+  "pitcher": true
+ },
+ "594795": {
+  "name": "Grant Dayton",
+  "birthDate": "1987-11-25",
+  "debut": "2016-07-22",
+  "pitcher": true
+ },
+ "594953": {
+  "name": "Daniel Palka",
+  "birthDate": "1991-10-28",
+  "debut": "2018-04-25",
+  "pitcher": false
+ },
+ "594965": {
+  "name": "Daniel Ponce de Leon",
+  "birthDate": "1992-01-16",
+  "debut": "2018-07-23",
+  "pitcher": true
+ },
+ "594992": {
+  "name": "Kevin Shackelford",
+  "birthDate": "1989-04-07",
+  "debut": "2017-06-29",
+  "pitcher": true
+ },
+ "595023": {
+  "name": "Colin Walsh",
+  "birthDate": "1989-09-26",
+  "debut": "2016-04-04",
+  "pitcher": false
+ },
+ "595222": {
+  "name": "Mike Gerber",
+  "birthDate": "1992-07-08",
+  "debut": "2018-04-20",
+  "pitcher": false
+ },
+ "595234": {
+  "name": "Justin Haley",
+  "birthDate": "1991-06-16",
+  "debut": "2017-04-05",
+  "pitcher": true
+ },
+ "595238": {
+  "name": "Jacob Hannemann",
+  "birthDate": "1991-04-29",
+  "debut": "2017-09-09",
+  "pitcher": false
+ },
+ "595263": {
+  "name": "Mickey Jannis",
+  "birthDate": "1987-12-16",
+  "debut": "2021-06-23",
+  "pitcher": true
+ },
+ "595284": {
+  "name": "Andrew Knapp",
+  "birthDate": "1991-11-09",
+  "debut": "2017-04-06",
+  "pitcher": false
+ },
+ "595373": {
+  "name": "Jack Reinheimer",
+  "birthDate": "1992-07-19",
+  "debut": "2017-08-01",
+  "pitcher": false
+ },
+ "595411": {
+  "name": "Ryan Sherriff",
+  "birthDate": "1990-05-25",
+  "debut": "2017-08-25",
+  "pitcher": true
+ },
+ "595426": {
+  "name": "Brock Stassi",
+  "birthDate": "1989-08-07",
+  "debut": "2017-04-03",
+  "pitcher": false
+ },
+ "595798": {
+  "name": "R.J. Alaniz",
+  "birthDate": "1991-06-14",
+  "debut": "2019-04-12",
+  "pitcher": true
+ },
+ "595943": {
+  "name": "Phillip Evans",
+  "birthDate": "1992-09-10",
+  "debut": "2017-09-08",
+  "pitcher": false
+ },
+ "595963": {
+  "name": "Tyler Goeddel",
+  "birthDate": "1992-10-20",
+  "debut": "2016-04-06",
+  "pitcher": false
+ },
+ "596027": {
+  "name": "Dillon Maples",
+  "birthDate": "1992-05-09",
+  "debut": "2017-09-03",
+  "pitcher": true
+ },
+ "596035": {
+  "name": "Reggie McClain",
+  "birthDate": "1992-11-16",
+  "debut": "2019-08-02",
+  "pitcher": true
+ },
+ "596043": {
+  "name": "Daniel Mengden",
+  "birthDate": "1993-02-19",
+  "debut": "2016-06-11",
+  "pitcher": true
+ },
+ "596049": {
+  "name": "Shawn Morimando",
+  "birthDate": "1992-11-20",
+  "debut": "2016-07-02",
+  "pitcher": true
+ },
+ "596074": {
+  "name": "Bobby Poyner",
+  "birthDate": "1992-12-01",
+  "debut": "2018-03-31",
+  "pitcher": true
+ },
+ "596082": {
+  "name": "Jake Reed",
+  "birthDate": "1992-09-29",
+  "debut": "2021-07-06",
+  "pitcher": true
+ },
+ "596115": {
+  "name": "Trevor Story",
+  "birthDate": "1992-11-15",
+  "debut": "2016-04-04",
+  "pitcher": false
+ },
+ "596451": {
+  "name": "Roman Quinn",
+  "birthDate": "1993-05-14",
+  "debut": "2016-09-11",
+  "pitcher": false
+ },
+ "596720": {
+  "name": "Dovydas Neverauskas",
+  "birthDate": "1993-01-14",
+  "debut": "2017-04-24",
+  "pitcher": true
+ },
+ "596816": {
+  "name": "Roberto G\u00f3mez",
+  "birthDate": "1989-08-03",
+  "debut": "2017-09-05",
+  "pitcher": true
+ },
+ "596825": {
+  "name": "Robel Garc\u00eda",
+  "birthDate": "1993-03-28",
+  "debut": "2019-07-03",
+  "pitcher": false
+ },
+ "599683": {
+  "name": "Warwick Saupold",
+  "birthDate": "1990-01-16",
+  "debut": "2016-05-14",
+  "pitcher": true
+ },
+ "600301": {
+  "name": "Taylor Motter",
+  "birthDate": "1989-09-18",
+  "debut": "2016-05-16",
+  "pitcher": false
+ },
+ "600466": {
+  "name": "Raudy Read",
+  "birthDate": "1993-10-29",
+  "debut": "2017-09-03",
+  "pitcher": false
+ },
+ "600524": {
+  "name": "Renato N\u00fa\u00f1ez",
+  "birthDate": "1994-04-04",
+  "debut": "2016-09-12",
+  "pitcher": false
+ },
+ "600526": {
+  "name": "Jos\u00e9 Torres",
+  "birthDate": "1993-09-24",
+  "debut": "2016-09-22",
+  "pitcher": true
+ },
+ "600858": {
+  "name": "Humberto Arteaga",
+  "birthDate": "1994-01-23",
+  "debut": "2019-06-20",
+  "pitcher": false
+ },
+ "600921": {
+  "name": "Andr\u00e9s Machado",
+  "birthDate": "1993-04-22",
+  "debut": "2017-09-02",
+  "pitcher": true
+ },
+ "600965": {
+  "name": "Ricardo Rodr\u00edguez",
+  "birthDate": "1992-08-31",
+  "debut": "2017-08-14",
+  "pitcher": true
+ },
+ "600968": {
+  "name": "Randy Rosario",
+  "birthDate": "1994-05-18",
+  "debut": "2017-06-02",
+  "pitcher": true
+ },
+ "602074": {
+  "name": "Yonathan Daza",
+  "birthDate": "1994-02-28",
+  "debut": "2019-04-09",
+  "pitcher": false
+ },
+ "602080": {
+  "name": "Erick Castillo",
+  "birthDate": "1993-02-25",
+  "debut": "2021-09-30",
+  "pitcher": false
+ },
+ "602115": {
+  "name": "Gabriel Guerrero",
+  "birthDate": "1993-12-11",
+  "debut": "2018-09-04",
+  "pitcher": false
+ },
+ "602928": {
+  "name": "Felix Jorge",
+  "birthDate": "1994-01-02",
+  "debut": "2017-07-01",
+  "pitcher": true
+ },
+ "605119": {
+  "name": "Brian Anderson",
+  "birthDate": "1993-05-19",
+  "debut": "2017-09-01",
+  "pitcher": false
+ },
+ "605121": {
+  "name": "Justin Anderson",
+  "birthDate": "1992-09-28",
+  "debut": "2018-04-23",
+  "pitcher": true
+ },
+ "605138": {
+  "name": "Wes Benjamin",
+  "birthDate": "1993-07-26",
+  "debut": "2020-08-16",
+  "pitcher": true
+ },
+ "605152": {
+  "name": "Jed Bradley",
+  "birthDate": "1990-06-12",
+  "debut": "2016-09-03",
+  "pitcher": true
+ },
+ "605183": {
+  "name": "Jason Coats",
+  "birthDate": "1990-02-24",
+  "debut": "2016-06-04",
+  "pitcher": false
+ },
+ "605196": {
+  "name": "Kevin Cron",
+  "birthDate": "1993-02-17",
+  "debut": "2019-05-24",
+  "pitcher": false
+ },
+ "605222": {
+  "name": "Jake Esch",
+  "birthDate": "1990-03-27",
+  "debut": "2016-08-31",
+  "pitcher": true
+ },
+ "605240": {
+  "name": "Jace Fry",
+  "birthDate": "1993-07-09",
+  "debut": "2017-09-05",
+  "pitcher": true
+ },
+ "605254": {
+  "name": "Daniel Gossett",
+  "birthDate": "1992-11-13",
+  "debut": "2017-06-14",
+  "pitcher": true
+ },
+ "605255": {
+  "name": "Brett Graves",
+  "birthDate": "1993-01-30",
+  "debut": "2018-06-17",
+  "pitcher": true
+ },
+ "605260": {
+  "name": "Taylor Guerrieri",
+  "birthDate": "1992-12-01",
+  "debut": "2018-09-01",
+  "pitcher": true
+ },
+ "605346": {
+  "name": "Jack L\u00f3pez",
+  "birthDate": "1992-12-16",
+  "debut": "2021-09-01",
+  "pitcher": false
+ },
+ "605361": {
+  "name": "Nick Martini",
+  "birthDate": "1990-06-27",
+  "debut": "2018-06-06",
+  "pitcher": false
+ },
+ "605428": {
+  "name": "Max Povse",
+  "birthDate": "1993-08-23",
+  "debut": "2017-06-22",
+  "pitcher": true
+ },
+ "605446": {
+  "name": "Dereck Rodr\u00edguez",
+  "birthDate": "1992-06-05",
+  "debut": "2018-05-29",
+  "pitcher": true
+ },
+ "605469": {
+  "name": "Chandler Shepherd",
+  "birthDate": "1992-08-25",
+  "debut": "2019-08-13",
+  "pitcher": true
+ },
+ "605474": {
+  "name": "Matt Skole",
+  "birthDate": "1989-07-30",
+  "debut": "2018-05-28",
+  "pitcher": false
+ },
+ "605479": {
+  "name": "Josh D. Smith",
+  "birthDate": "1989-10-11",
+  "debut": "2019-05-25",
+  "pitcher": true
+ },
+ "605482": {
+  "name": "Cy Sneed",
+  "birthDate": "1992-10-01",
+  "debut": "2019-06-27",
+  "pitcher": true
+ },
+ "605490": {
+  "name": "Bubba Starling",
+  "birthDate": "1992-08-03",
+  "debut": "2019-07-12",
+  "pitcher": false
+ },
+ "605498": {
+  "name": "Andrew Su\u00e1rez",
+  "birthDate": "1992-09-11",
+  "debut": "2018-04-11",
+  "pitcher": true
+ },
+ "605504": {
+  "name": "Dillon Thomas",
+  "birthDate": "1992-12-10",
+  "debut": "2021-06-09",
+  "pitcher": false
+ },
+ "605508": {
+  "name": "Charlie Tilson",
+  "birthDate": "1992-12-02",
+  "debut": "2016-08-02",
+  "pitcher": false
+ },
+ "605513": {
+  "name": "Spencer Turnbull",
+  "birthDate": "1992-09-18",
+  "debut": "2018-09-14",
+  "pitcher": true
+ },
+ "605520": {
+  "name": "Mitch Walding",
+  "birthDate": "1992-09-10",
+  "debut": "2018-05-30",
+  "pitcher": false
+ },
+ "605525": {
+  "name": "J.B. Wendelken",
+  "birthDate": "1993-03-24",
+  "debut": "2016-05-08",
+  "pitcher": true
+ },
+ "605540": {
+  "name": "Brandon Woodruff",
+  "birthDate": "1993-02-10",
+  "debut": "2017-08-04",
+  "pitcher": true
+ },
+ "605612": {
+  "name": "Harold Castro",
+  "birthDate": "1993-11-30",
+  "debut": "2018-09-23",
+  "pitcher": false
+ },
+ "605795": {
+  "name": "Angel S\u00e1nchez",
+  "birthDate": "1989-11-28",
+  "debut": "2017-08-24",
+  "pitcher": true
+ },
+ "606131": {
+  "name": "Luis Perdomo",
+  "birthDate": "1993-05-09",
+  "debut": "2016-04-04",
+  "pitcher": true
+ },
+ "606157": {
+  "name": "Aristides Aquino",
+  "birthDate": "1994-04-22",
+  "debut": "2018-08-19",
+  "pitcher": false
+ },
+ "606167": {
+  "name": "Adalberto Mej\u00eda",
+  "birthDate": "1993-06-20",
+  "debut": "2016-08-20",
+  "pitcher": true
+ },
+ "606213": {
+  "name": "Yerm\u00edn Mercedes",
+  "birthDate": "1993-02-14",
+  "debut": "2020-08-02",
+  "pitcher": false
+ },
+ "606291": {
+  "name": "Mauricio Cabrera",
+  "birthDate": "1993-09-22",
+  "debut": "2016-06-27",
+  "pitcher": true
+ },
+ "606336": {
+  "name": "Luis Mart\u00e9",
+  "birthDate": "1993-12-15",
+  "debut": "2021-06-01",
+  "pitcher": false
+ },
+ "606424": {
+  "name": "Jarl\u00edn Garc\u00eda",
+  "birthDate": "1993-01-18",
+  "debut": "2017-04-14",
+  "pitcher": true
+ },
+ "606478": {
+  "name": "Pedro Ara\u00fajo",
+  "birthDate": "1993-07-02",
+  "debut": "2018-03-31",
+  "pitcher": true
+ },
+ "606625": {
+  "name": "Reyes Moronta",
+  "birthDate": "1993-01-06",
+  "debut": "2017-09-05",
+  "pitcher": true
+ },
+ "606956": {
+  "name": "Ryan Court",
+  "birthDate": "1988-05-28",
+  "debut": "2019-07-26",
+  "pitcher": false
+ },
+ "606959": {
+  "name": "Rookie Davis",
+  "birthDate": "1993-04-29",
+  "debut": "2017-04-06",
+  "pitcher": true
+ },
+ "606965": {
+  "name": "Chris Devenski",
+  "birthDate": "1990-11-13",
+  "debut": "2016-04-08",
+  "pitcher": true
+ },
+ "606983": {
+  "name": "Koda Glover",
+  "birthDate": "1993-04-13",
+  "debut": "2016-07-20",
+  "pitcher": true
+ },
+ "606988": {
+  "name": "Grayson Greiner",
+  "birthDate": "1992-10-11",
+  "debut": "2018-05-06",
+  "pitcher": false
+ },
+ "606993": {
+  "name": "Jake Hager",
+  "birthDate": "1993-03-04",
+  "debut": "2021-05-15",
+  "pitcher": false
+ },
+ "606996": {
+  "name": "Kyle Hart",
+  "birthDate": "1992-11-23",
+  "debut": "2020-08-13",
+  "pitcher": true
+ },
+ "607111": {
+  "name": "Jacob Wilson",
+  "birthDate": "1990-07-29",
+  "debut": "2021-07-10",
+  "pitcher": false
+ },
+ "607215": {
+  "name": "Eric Skoglund",
+  "birthDate": "1992-10-26",
+  "debut": "2017-05-30",
+  "pitcher": true
+ },
+ "607216": {
+  "name": "Joey Krehbiel",
+  "birthDate": "1992-12-20",
+  "debut": "2018-07-02",
+  "pitcher": true
+ },
+ "607219": {
+  "name": "Sal Romano",
+  "birthDate": "1993-10-12",
+  "debut": "2017-04-16",
+  "pitcher": true
+ },
+ "607223": {
+  "name": "AJ Reed",
+  "birthDate": "1993-05-10",
+  "debut": "2016-06-25",
+  "pitcher": false
+ },
+ "607229": {
+  "name": "Robert Gsellman",
+  "birthDate": "1993-07-18",
+  "debut": "2016-08-23",
+  "pitcher": true
+ },
+ "607249": {
+  "name": "Jason Krizan",
+  "birthDate": "1989-06-28",
+  "debut": "2022-04-29",
+  "pitcher": false
+ },
+ "607297": {
+  "name": "O'Koyea Dickson",
+  "birthDate": "1990-02-09",
+  "debut": "2017-09-02",
+  "pitcher": false
+ },
+ "607320": {
+  "name": "Ryan Merritt",
+  "birthDate": "1992-02-21",
+  "debut": "2016-05-30",
+  "pitcher": true
+ },
+ "607333": {
+  "name": "Beau Taylor",
+  "birthDate": "1990-02-13",
+  "debut": "2018-09-01",
+  "pitcher": false
+ },
+ "607369": {
+  "name": "Travis Taijeron",
+  "birthDate": "1989-01-20",
+  "debut": "2017-08-26",
+  "pitcher": false
+ },
+ "607473": {
+  "name": "Chasen Bradford",
+  "birthDate": "1989-08-05",
+  "debut": "2017-06-25",
+  "pitcher": true
+ },
+ "607536": {
+  "name": "Kyle Freeland",
+  "birthDate": "1993-05-14",
+  "debut": "2017-04-07",
+  "pitcher": true
+ },
+ "607572": {
+  "name": "Sam Howard",
+  "birthDate": "1993-03-05",
+  "debut": "2018-06-10",
+  "pitcher": true
+ },
+ "607609": {
+  "name": "A.J. Ladwig",
+  "birthDate": "1992-12-24",
+  "debut": "2022-08-13",
+  "pitcher": true
+ },
+ "607625": {
+  "name": "Seth Lugo",
+  "birthDate": "1989-11-17",
+  "debut": "2016-07-01",
+  "pitcher": true
+ },
+ "607644": {
+  "name": "John Means",
+  "birthDate": "1993-04-24",
+  "debut": "2018-09-26",
+  "pitcher": true
+ },
+ "607727": {
+  "name": "Jake Smith",
+  "birthDate": "1990-06-02",
+  "debut": "2016-09-07",
+  "pitcher": true
+ },
+ "607951": {
+  "name": "Jairo Labourt",
+  "birthDate": "1994-03-07",
+  "debut": "2017-09-01",
+  "pitcher": true
+ },
+ "608324": {
+  "name": "Alex Bregman",
+  "birthDate": "1994-03-30",
+  "debut": "2016-07-25",
+  "pitcher": false
+ },
+ "608325": {
+  "name": "Gavin Cecchini",
+  "birthDate": "1993-12-22",
+  "debut": "2016-09-11",
+  "pitcher": false
+ },
+ "608331": {
+  "name": "Max Fried",
+  "birthDate": "1994-01-18",
+  "debut": "2017-08-08",
+  "pitcher": true
+ },
+ "608339": {
+  "name": "Zach Green",
+  "birthDate": "1994-03-07",
+  "debut": "2019-07-21",
+  "pitcher": false
+ },
+ "608360": {
+  "name": "Chris Okey",
+  "birthDate": "1994-12-29",
+  "debut": "2022-06-10",
+  "pitcher": false
+ },
+ "608384": {
+  "name": "Nick Williams",
+  "birthDate": "1993-09-08",
+  "debut": "2017-06-30",
+  "pitcher": false
+ },
+ "608566": {
+  "name": "Germ\u00e1n M\u00e1rquez",
+  "birthDate": "1995-02-22",
+  "debut": "2016-09-08",
+  "pitcher": true
+ },
+ "608597": {
+  "name": "Ronald Guzm\u00e1n",
+  "birthDate": "1994-10-20",
+  "debut": "2018-04-13",
+  "pitcher": true
+ },
+ "608601": {
+  "name": "Luis Santos",
+  "birthDate": "1991-02-11",
+  "debut": "2017-09-02",
+  "pitcher": true
+ },
+ "608654": {
+  "name": "Johnny Field",
+  "birthDate": "1992-02-20",
+  "debut": "2018-04-14",
+  "pitcher": false
+ },
+ "608715": {
+  "name": "Eric Stamets",
+  "birthDate": "1991-09-25",
+  "debut": "2019-03-28",
+  "pitcher": false
+ },
+ "608716": {
+  "name": "Drew Steckenrider",
+  "birthDate": "1991-01-10",
+  "debut": "2017-05-24",
+  "pitcher": true
+ },
+ "608718": {
+  "name": "Brent Suter",
+  "birthDate": "1989-08-29",
+  "debut": "2016-08-19",
+  "pitcher": true
+ },
+ "609274": {
+  "name": "Elier Hernandez",
+  "birthDate": "1994-11-21",
+  "debut": "2022-07-14",
+  "pitcher": false
+ },
+ "615699": {
+  "name": "Jacob Robson",
+  "birthDate": "1994-11-20",
+  "debut": "2021-08-12",
+  "pitcher": false
+ },
+ "615868": {
+  "name": "Gerardo Concepci\u00f3n",
+  "birthDate": "1992-02-29",
+  "debut": "2016-06-21",
+  "pitcher": true
+ },
+ "617228": {
+  "name": "Hirokazu Sawamura",
+  "birthDate": "1988-04-03",
+  "debut": "2021-04-02",
+  "pitcher": true
+ },
+ "620396": {
+  "name": "Miguel Aguilar",
+  "birthDate": "1991-09-26",
+  "debut": "2021-07-30",
+  "pitcher": true
+ },
+ "620445": {
+  "name": "Jos\u00e9 Mujica",
+  "birthDate": "1996-06-29",
+  "debut": "2020-09-08",
+  "pitcher": true
+ },
+ "620446": {
+  "name": "Richard Urena",
+  "birthDate": "1996-02-26",
+  "debut": "2017-09-01",
+  "pitcher": false
+ },
+ "621005": {
+  "name": "Tim Lopes",
+  "birthDate": "1994-06-24",
+  "debut": "2019-07-24",
+  "pitcher": false
+ },
+ "621020": {
+  "name": "Dansby Swanson",
+  "birthDate": "1994-02-11",
+  "debut": "2016-08-17",
+  "pitcher": false
+ },
+ "621044": {
+  "name": "Jesmuel Valent\u00edn",
+  "birthDate": "1994-05-12",
+  "debut": "2018-04-29",
+  "pitcher": false
+ },
+ "621052": {
+  "name": "Alex Reyes",
+  "birthDate": "1994-08-29",
+  "debut": "2016-08-09",
+  "pitcher": true
+ },
+ "621078": {
+  "name": "Brady Lail",
+  "birthDate": "1993-08-09",
+  "debut": "2019-08-12",
+  "pitcher": true
+ },
+ "621079": {
+  "name": "Collin Wiles",
+  "birthDate": "1994-05-30",
+  "debut": "2022-09-14",
+  "pitcher": true
+ },
+ "621082": {
+  "name": "Jake Lemoine",
+  "birthDate": "1993-11-28",
+  "debut": "2022-04-08",
+  "pitcher": true
+ },
+ "621086": {
+  "name": "James Marvel",
+  "birthDate": "1993-09-17",
+  "debut": "2019-09-08",
+  "pitcher": true
+ },
+ "621111": {
+  "name": "Walker Buehler",
+  "birthDate": "1994-07-28",
+  "debut": "2017-09-07",
+  "pitcher": true
+ },
+ "621129": {
+  "name": "Kyle Cody",
+  "birthDate": "1994-08-09",
+  "debut": "2020-08-21",
+  "pitcher": true
+ },
+ "621139": {
+  "name": "Brooks Kriske",
+  "birthDate": "1994-02-03",
+  "debut": "2020-07-29",
+  "pitcher": true
+ },
+ "621248": {
+  "name": "Ralph Garza Jr.",
+  "birthDate": "1994-04-06",
+  "debut": "2021-05-29",
+  "pitcher": true
+ },
+ "621259": {
+  "name": "Brody Koerner",
+  "birthDate": "1993-10-17",
+  "debut": "2021-08-03",
+  "pitcher": true
+ },
+ "621290": {
+  "name": "Dakota Bacus",
+  "birthDate": "1991-04-02",
+  "debut": "2020-08-09",
+  "pitcher": true
+ },
+ "621311": {
+  "name": "David Dahl",
+  "birthDate": "1994-04-01",
+  "debut": "2016-07-25",
+  "pitcher": false
+ },
+ "621345": {
+  "name": "A.J. Minter",
+  "birthDate": "1993-09-02",
+  "debut": "2017-08-23",
+  "pitcher": true
+ },
+ "621348": {
+  "name": "Sam Clay",
+  "birthDate": "1993-06-21",
+  "debut": "2021-04-07",
+  "pitcher": true
+ },
+ "621385": {
+  "name": "Daniel Stumpf",
+  "birthDate": "1991-01-04",
+  "debut": "2016-04-07",
+  "pitcher": true
+ },
+ "621453": {
+  "name": "Steven Duggar",
+  "birthDate": "1993-11-04",
+  "debut": "2018-07-08",
+  "pitcher": false
+ },
+ "621458": {
+  "name": "Edwin Rios",
+  "birthDate": "1994-04-21",
+  "debut": "2019-06-27",
+  "pitcher": false
+ },
+ "621466": {
+  "name": "DJ Stewart",
+  "birthDate": "1993-11-30",
+  "debut": "2018-09-12",
+  "pitcher": false
+ },
+ "621514": {
+  "name": "Christin Stewart",
+  "birthDate": "1993-12-10",
+  "debut": "2018-09-09",
+  "pitcher": false
+ },
+ "621592": {
+  "name": "Eduardo Jim\u00e9nez",
+  "birthDate": "1995-04-04",
+  "debut": "2019-05-07",
+  "pitcher": true
+ },
+ "622046": {
+  "name": "Chris Shaw",
+  "birthDate": "1993-10-20",
+  "debut": "2018-08-31",
+  "pitcher": false
+ },
+ "622088": {
+  "name": "Tejay Antone",
+  "birthDate": "1993-12-05",
+  "debut": "2020-07-27",
+  "pitcher": true
+ },
+ "622092": {
+  "name": "Kyle Zimmer",
+  "birthDate": "1991-09-13",
+  "debut": "2019-03-31",
+  "pitcher": true
+ },
+ "622097": {
+  "name": "Jake Thompson",
+  "birthDate": "1994-01-31",
+  "debut": "2016-08-06",
+  "pitcher": true
+ },
+ "622100": {
+  "name": "Taylor Jones",
+  "birthDate": "1993-12-06",
+  "debut": "2020-07-26",
+  "pitcher": false
+ },
+ "622161": {
+  "name": "Eduardo Paredes",
+  "birthDate": "1995-03-06",
+  "debut": "2017-06-23",
+  "pitcher": true
+ },
+ "622210": {
+  "name": "Ian Parmley",
+  "birthDate": "1989-12-19",
+  "debut": "2017-06-23",
+  "pitcher": false
+ },
+ "622217": {
+  "name": "Chris O'Grady",
+  "birthDate": "1990-04-17",
+  "debut": "2017-07-08",
+  "pitcher": true
+ },
+ "622226": {
+  "name": "Dylan Cozens",
+  "birthDate": "1994-05-31",
+  "debut": "2018-06-01",
+  "pitcher": false
+ },
+ "622270": {
+  "name": "Alex D. Mejia",
+  "birthDate": "1991-01-18",
+  "debut": "2017-06-29",
+  "pitcher": false
+ },
+ "622441": {
+  "name": "Rafael Bautista",
+  "birthDate": "1993-03-08",
+  "debut": "2017-04-30",
+  "pitcher": false
+ },
+ "622492": {
+  "name": "Keury Mella",
+  "birthDate": "1993-08-02",
+  "debut": "2017-09-20",
+  "pitcher": true
+ },
+ "622497": {
+  "name": "Miguel G\u00f3mez",
+  "birthDate": "1992-12-17",
+  "debut": "2017-07-07",
+  "pitcher": false
+ },
+ "622503": {
+  "name": "Nabil Crismatt",
+  "birthDate": "1994-12-25",
+  "debut": "2020-08-17",
+  "pitcher": true
+ },
+ "622505": {
+  "name": "Victor Alc\u00e1ntara",
+  "birthDate": "1993-04-03",
+  "debut": "2017-09-05",
+  "pitcher": true
+ },
+ "622608": {
+  "name": "Antonio Senzatela",
+  "birthDate": "1995-01-21",
+  "debut": "2017-04-06",
+  "pitcher": true
+ },
+ "622666": {
+  "name": "Johan Camargo",
+  "birthDate": "1993-12-13",
+  "debut": "2017-04-11",
+  "pitcher": false
+ },
+ "622668": {
+  "name": "Ivan Castillo",
+  "birthDate": "1995-05-30",
+  "debut": "2021-05-14",
+  "pitcher": false
+ },
+ "622682": {
+  "name": "Victor Reyes",
+  "birthDate": "1994-10-05",
+  "debut": "2018-04-01",
+  "pitcher": false
+ },
+ "622766": {
+  "name": "Miguel D\u00edaz",
+  "birthDate": "1994-11-28",
+  "debut": "2017-04-03",
+  "pitcher": true
+ },
+ "622772": {
+  "name": "Jimmy Cordero",
+  "birthDate": "1991-10-19",
+  "debut": "2018-08-02",
+  "pitcher": true
+ },
+ "622774": {
+  "name": "Jos\u00e9 Manuel Fern\u00e1ndez",
+  "birthDate": "1993-02-13",
+  "debut": "2018-09-01",
+  "pitcher": true
+ },
+ "622783": {
+  "name": "Sandy B\u00e1ez",
+  "birthDate": "1993-11-25",
+  "debut": "2018-06-04",
+  "pitcher": true
+ },
+ "622795": {
+  "name": "Yohander M\u00e9ndez",
+  "birthDate": "1995-01-17",
+  "debut": "2016-09-05",
+  "pitcher": true
+ },
+ "622797": {
+  "name": "Pedro Payano",
+  "birthDate": "1994-09-27",
+  "debut": "2019-07-06",
+  "pitcher": true
+ },
+ "622864": {
+  "name": "Fernando Romero",
+  "birthDate": "1994-12-24",
+  "debut": "2018-05-02",
+  "pitcher": true
+ },
+ "623166": {
+  "name": "Mike Miller",
+  "birthDate": "1989-09-27",
+  "debut": "2016-06-27",
+  "pitcher": false
+ },
+ "623180": {
+  "name": "Seth Mejias-Brean",
+  "birthDate": "1991-04-05",
+  "debut": "2019-09-04",
+  "pitcher": false
+ },
+ "623323": {
+  "name": "Braden Bishop",
+  "birthDate": "1993-08-22",
+  "debut": "2019-03-21",
+  "pitcher": false
+ },
+ "623402": {
+  "name": "Tim Peterson",
+  "birthDate": "1991-02-22",
+  "debut": "2018-05-30",
+  "pitcher": true
+ },
+ "623434": {
+  "name": "Mike Hauschild",
+  "birthDate": "1990-01-22",
+  "debut": "2017-04-08",
+  "pitcher": true
+ },
+ "623451": {
+  "name": "Jackson Stephens",
+  "birthDate": "1994-05-11",
+  "debut": "2017-07-01",
+  "pitcher": true
+ },
+ "623454": {
+  "name": "Drew Anderson",
+  "birthDate": "1994-03-22",
+  "debut": "2017-08-01",
+  "pitcher": true
+ },
+ "623470": {
+  "name": "Jake Newberry",
+  "birthDate": "1994-11-20",
+  "debut": "2018-08-20",
+  "pitcher": true
+ },
+ "623507": {
+  "name": "Josh Lester",
+  "birthDate": "1994-07-17",
+  "debut": "2022-09-05",
+  "pitcher": false
+ },
+ "623508": {
+  "name": "Trent Giambrone",
+  "birthDate": "1993-12-20",
+  "debut": "2021-09-29",
+  "pitcher": false
+ },
+ "623520": {
+  "name": "David Bote",
+  "birthDate": "1993-04-07",
+  "debut": "2018-04-21",
+  "pitcher": false
+ },
+ "623993": {
+  "name": "Anthony Santander",
+  "birthDate": "1994-10-19",
+  "debut": "2017-08-18",
+  "pitcher": false
+ },
+ "624133": {
+  "name": "Ranger Suarez",
+  "birthDate": "1995-08-26",
+  "debut": "2018-07-26",
+  "pitcher": true
+ },
+ "624407": {
+  "name": "Tzu-Wei Lin",
+  "birthDate": "1994-02-15",
+  "debut": "2017-06-24",
+  "pitcher": false
+ },
+ "624413": {
+  "name": "Pete Alonso",
+  "birthDate": "1994-12-07",
+  "debut": "2019-03-28",
+  "pitcher": false
+ },
+ "624418": {
+  "name": "Ryan Castellani",
+  "birthDate": "1996-04-01",
+  "debut": "2020-08-08",
+  "pitcher": true
+ },
+ "624419": {
+  "name": "Nick Ciuffo",
+  "birthDate": "1995-03-07",
+  "debut": "2018-09-03",
+  "pitcher": false
+ },
+ "624427": {
+  "name": "Stephen Gonsalves",
+  "birthDate": "1994-07-08",
+  "debut": "2018-08-20",
+  "pitcher": true
+ },
+ "624507": {
+  "name": "Ryder Jones",
+  "birthDate": "1994-06-07",
+  "debut": "2017-06-24",
+  "pitcher": true
+ },
+ "626929": {
+  "name": "Lewis Thorpe",
+  "birthDate": "1995-11-23",
+  "debut": "2019-06-30",
+  "pitcher": true
+ },
+ "627262": {
+  "name": "Chris Smith",
+  "birthDate": "1988-08-19",
+  "debut": "2017-06-27",
+  "pitcher": true
+ },
+ "627500": {
+  "name": "Jen-Ho Tseng",
+  "birthDate": "1994-10-03",
+  "debut": "2017-09-14",
+  "pitcher": true
+ },
+ "628318": {
+  "name": "Kazuhisa Makita",
+  "birthDate": "1984-11-10",
+  "debut": "2018-03-30",
+  "pitcher": true
+ },
+ "628336": {
+  "name": "Jos\u00e9 Miguel Fern\u00e1ndez",
+  "birthDate": "1988-04-27",
+  "debut": "2018-06-08",
+  "pitcher": false
+ },
+ "628345": {
+  "name": "Darien N\u00fa\u00f1ez",
+  "birthDate": "1993-03-19",
+  "debut": "2021-07-09",
+  "pitcher": true
+ },
+ "628450": {
+  "name": "Yadiel Hernandez",
+  "birthDate": "1987-10-09",
+  "debut": "2020-09-10",
+  "pitcher": false
+ },
+ "628711": {
+  "name": "Julio Ur\u00edas",
+  "birthDate": "1996-08-12",
+  "debut": "2016-05-27",
+  "pitcher": true
+ },
+ "630023": {
+  "name": "Yonny Chirinos",
+  "birthDate": "1993-12-26",
+  "debut": "2018-04-01",
+  "pitcher": true
+ },
+ "630263": {
+  "name": "James Bourque",
+  "birthDate": "1993-07-09",
+  "debut": "2019-05-26",
+  "pitcher": true
+ },
+ "635903": {
+  "name": "Chris Rowley",
+  "birthDate": "1990-08-14",
+  "debut": "2017-08-12",
+  "pitcher": true
+ },
+ "640447": {
+  "name": "Phillip Ervin",
+  "birthDate": "1992-07-15",
+  "debut": "2017-04-22",
+  "pitcher": false
+ },
+ "640449": {
+  "name": "Clint Frazier",
+  "birthDate": "1994-09-06",
+  "debut": "2017-07-01",
+  "pitcher": false
+ },
+ "640461": {
+  "name": "Chad Pinder",
+  "birthDate": "1992-03-29",
+  "debut": "2016-08-20",
+  "pitcher": false
+ },
+ "640463": {
+  "name": "Braden Shipley",
+  "birthDate": "1992-02-22",
+  "debut": "2016-07-25",
+  "pitcher": true
+ },
+ "640464": {
+  "name": "Kohl Stewart",
+  "birthDate": "1994-10-07",
+  "debut": "2018-08-12",
+  "pitcher": true
+ },
+ "641302": {
+  "name": "Tyler Alexander",
+  "birthDate": "1994-07-14",
+  "debut": "2019-07-03",
+  "pitcher": true
+ },
+ "641313": {
+  "name": "Tim Anderson",
+  "birthDate": "1993-06-23",
+  "debut": "2016-06-10",
+  "pitcher": false
+ },
+ "641319": {
+  "name": "Carlos Asuaje",
+  "birthDate": "1991-11-02",
+  "debut": "2016-09-21",
+  "pitcher": false
+ },
+ "641384": {
+  "name": "Akeem Bostick",
+  "birthDate": "1995-05-04",
+  "debut": "2021-07-29",
+  "pitcher": true
+ },
+ "641394": {
+  "name": "Jake Brentz",
+  "birthDate": "1994-09-14",
+  "debut": "2021-04-03",
+  "pitcher": true
+ },
+ "641420": {
+  "name": "Zack Burdi",
+  "birthDate": "1995-03-09",
+  "debut": "2020-08-08",
+  "pitcher": true
+ },
+ "641427": {
+  "name": "Alan Busenitz",
+  "birthDate": "1990-08-22",
+  "debut": "2017-06-17",
+  "pitcher": true
+ },
+ "641501": {
+  "name": "Tyler Danish",
+  "birthDate": "1994-09-12",
+  "debut": "2016-06-11",
+  "pitcher": true
+ },
+ "641512": {
+  "name": "Ben DeLuzio",
+  "birthDate": "1994-08-09",
+  "debut": "2022-09-02",
+  "pitcher": false
+ },
+ "641525": {
+  "name": "Brandon Dixon",
+  "birthDate": "1992-01-29",
+  "debut": "2018-05-22",
+  "pitcher": false
+ },
+ "641531": {
+  "name": "Hunter Dozier",
+  "birthDate": "1991-08-22",
+  "debut": "2016-09-12",
+  "pitcher": false
+ },
+ "641541": {
+  "name": "Jon Duplantier",
+  "birthDate": "1994-07-11",
+  "debut": "2019-04-01",
+  "pitcher": true
+ },
+ "641553": {
+  "name": "Adam Engel",
+  "birthDate": "1991-12-09",
+  "debut": "2017-05-27",
+  "pitcher": false
+ },
+ "641561": {
+  "name": "Johneshwy Fargas",
+  "birthDate": "1994-12-15",
+  "debut": "2021-05-17",
+  "pitcher": false
+ },
+ "641576": {
+  "name": "Bernardo Flores Jr.",
+  "birthDate": "1995-08-23",
+  "debut": "2020-09-03",
+  "pitcher": true
+ },
+ "641582": {
+  "name": "Matt Foster",
+  "birthDate": "1995-01-27",
+  "debut": "2020-08-01",
+  "pitcher": true
+ },
+ "641682": {
+  "name": "Ryan Hendrix",
+  "birthDate": "1994-12-16",
+  "debut": "2021-04-23",
+  "pitcher": true
+ },
+ "641684": {
+  "name": "Michael Hermosillo",
+  "birthDate": "1995-01-17",
+  "debut": "2018-05-18",
+  "pitcher": false
+ },
+ "641712": {
+  "name": "Dakota Hudson",
+  "birthDate": "1994-09-15",
+  "debut": "2018-07-28",
+  "pitcher": true
+ },
+ "641741": {
+  "name": "Gosuke Katoh",
+  "birthDate": "1994-10-08",
+  "debut": "2022-04-09",
+  "pitcher": false
+ },
+ "641771": {
+  "name": "Chad Kuhl",
+  "birthDate": "1992-09-10",
+  "debut": "2016-06-26",
+  "pitcher": true
+ },
+ "641779": {
+  "name": "Charles Leblanc",
+  "birthDate": "1996-06-03",
+  "debut": "2022-07-30",
+  "pitcher": false
+ },
+ "641835": {
+  "name": "Tim Mayza",
+  "birthDate": "1992-01-15",
+  "debut": "2017-08-15",
+  "pitcher": true
+ },
+ "641838": {
+  "name": "Kevin McCarthy",
+  "birthDate": "1992-02-22",
+  "debut": "2016-09-09",
+  "pitcher": true
+ },
+ "641850": {
+  "name": "Kevin McGowan",
+  "birthDate": "1991-10-18",
+  "debut": "2017-08-22",
+  "pitcher": true
+ },
+ "641851": {
+  "name": "Kyle McGowin",
+  "birthDate": "1991-11-27",
+  "debut": "2018-09-05",
+  "pitcher": true
+ },
+ "641927": {
+  "name": "Bailey Ober",
+  "birthDate": "1995-07-12",
+  "debut": "2021-05-18",
+  "pitcher": true
+ },
+ "641929": {
+  "name": "Joseph Odom",
+  "birthDate": "1992-01-09",
+  "debut": "2020-07-28",
+  "pitcher": false
+ },
+ "641999": {
+  "name": "Corey Ray",
+  "birthDate": "1994-09-22",
+  "debut": "2021-04-24",
+  "pitcher": false
+ },
+ "642048": {
+  "name": "Tayler Saucedo",
+  "birthDate": "1993-06-18",
+  "debut": "2021-06-17",
+  "pitcher": true
+ },
+ "642067": {
+  "name": "Mike Shawaryn",
+  "birthDate": "1994-09-17",
+  "debut": "2019-06-07",
+  "pitcher": true
+ },
+ "642068": {
+  "name": "Jordan Sheffield",
+  "birthDate": "1995-06-01",
+  "debut": "2021-04-02",
+  "pitcher": true
+ },
+ "642073": {
+  "name": "James Sherfy",
+  "birthDate": "1991-12-27",
+  "debut": "2017-08-20",
+  "pitcher": true
+ },
+ "642082": {
+  "name": "Chance Sisco",
+  "birthDate": "1995-02-24",
+  "debut": "2017-09-02",
+  "pitcher": false
+ },
+ "642086": {
+  "name": "Dominic Smith",
+  "birthDate": "1995-06-15",
+  "debut": "2017-08-11",
+  "pitcher": false
+ },
+ "642092": {
+  "name": "Riley Smith",
+  "birthDate": "1995-01-15",
+  "debut": "2020-08-26",
+  "pitcher": true
+ },
+ "642094": {
+  "name": "Tyler Smith",
+  "birthDate": "1991-07-01",
+  "debut": "2017-06-02",
+  "pitcher": false
+ },
+ "642098": {
+  "name": "Glenn Sparkman",
+  "birthDate": "1992-05-11",
+  "debut": "2017-06-30",
+  "pitcher": true
+ },
+ "642156": {
+  "name": "Stuart Turner",
+  "birthDate": "1991-12-27",
+  "debut": "2017-04-06",
+  "pitcher": false
+ },
+ "642229": {
+  "name": "Daniel Wright",
+  "birthDate": "1991-04-03",
+  "debut": "2016-05-24",
+  "pitcher": true
+ },
+ "642233": {
+  "name": "Eric Yardley",
+  "birthDate": "1990-08-18",
+  "debut": "2019-08-21",
+  "pitcher": true
+ },
+ "642451": {
+  "name": "Luis Liberato",
+  "birthDate": "1995-12-18",
+  "debut": "2022-09-10",
+  "pitcher": false
+ },
+ "642456": {
+  "name": "Luis Barrera",
+  "birthDate": "1995-11-15",
+  "debut": "2021-05-19",
+  "pitcher": false
+ },
+ "642528": {
+  "name": "Jonathan Lo\u00e1isiga",
+  "birthDate": "1994-11-02",
+  "debut": "2018-06-15",
+  "pitcher": true
+ },
+ "642545": {
+  "name": "Jaime Barria",
+  "birthDate": "1996-07-18",
+  "debut": "2018-04-11",
+  "pitcher": true
+ },
+ "642564": {
+  "name": "Francis Martes",
+  "birthDate": "1995-11-24",
+  "debut": "2017-06-09",
+  "pitcher": true
+ },
+ "642578": {
+  "name": "Jos\u00e9 Rodr\u00edguez",
+  "birthDate": "1995-08-29",
+  "debut": "2019-07-27",
+  "pitcher": true
+ },
+ "642585": {
+  "name": "F\u00e9lix Bautista",
+  "birthDate": "1995-06-20",
+  "debut": "2022-04-10",
+  "pitcher": true
+ },
+ "642657": {
+  "name": "Cristofer Ogando",
+  "birthDate": "1993-10-23",
+  "debut": "2022-07-03",
+  "pitcher": true
+ },
+ "642707": {
+  "name": "Allen C\u00f3rdoba",
+  "birthDate": "1995-12-06",
+  "debut": "2017-04-03",
+  "pitcher": false
+ },
+ "642736": {
+  "name": "Domingo Leyba",
+  "birthDate": "1995-09-11",
+  "debut": "2019-06-22",
+  "pitcher": false
+ },
+ "643230": {
+  "name": "Steven Brault",
+  "birthDate": "1992-04-29",
+  "debut": "2016-07-05",
+  "pitcher": true
+ },
+ "643269": {
+  "name": "Will Craig",
+  "birthDate": "1994-11-16",
+  "debut": "2020-08-27",
+  "pitcher": false
+ },
+ "643271": {
+  "name": "Narciso Crook",
+  "birthDate": "1995-07-12",
+  "debut": "2022-06-30",
+  "pitcher": false
+ },
+ "643275": {
+  "name": "Johnny Davis",
+  "birthDate": "1990-04-26",
+  "debut": "2019-09-11",
+  "pitcher": false
+ },
+ "643297": {
+  "name": "Cody Ege",
+  "birthDate": "1991-05-08",
+  "debut": "2016-04-23",
+  "pitcher": true
+ },
+ "643320": {
+  "name": "Nick Gardewine",
+  "birthDate": "1993-08-15",
+  "debut": "2017-08-22",
+  "pitcher": true
+ },
+ "643325": {
+  "name": "Chad Girodo",
+  "birthDate": "1991-02-06",
+  "debut": "2016-04-22",
+  "pitcher": true
+ },
+ "643338": {
+  "name": "Chad Green",
+  "birthDate": "1991-05-24",
+  "debut": "2016-05-16",
+  "pitcher": true
+ },
+ "643348": {
+  "name": "Caleb Hamilton",
+  "birthDate": "1995-02-05",
+  "debut": "2022-07-17",
+  "pitcher": false
+ },
+ "643354": {
+  "name": "Donnie Hart",
+  "birthDate": "1990-09-06",
+  "debut": "2016-07-17",
+  "pitcher": true
+ },
+ "643355": {
+  "name": "Steve Hathaway",
+  "birthDate": "1990-09-13",
+  "debut": "2016-07-31",
+  "pitcher": true
+ },
+ "643400": {
+  "name": "Dusten Knight",
+  "birthDate": "1990-09-02",
+  "debut": "2021-08-04",
+  "pitcher": true
+ },
+ "643414": {
+  "name": "Kyle Lloyd",
+  "birthDate": "1990-10-16",
+  "debut": "2017-07-25",
+  "pitcher": true
+ },
+ "643466": {
+  "name": "Harrison Musgrave",
+  "birthDate": "1992-03-03",
+  "debut": "2018-04-23",
+  "pitcher": true
+ },
+ "643478": {
+  "name": "Joe Palumbo",
+  "birthDate": "1994-10-26",
+  "debut": "2019-06-08",
+  "pitcher": true
+ },
+ "643524": {
+  "name": "Frank Schwindel",
+  "birthDate": "1992-06-29",
+  "debut": "2019-03-28",
+  "pitcher": false
+ },
+ "643532": {
+  "name": "Sterling Sharp",
+  "birthDate": "1995-05-30",
+  "debut": "2020-08-05",
+  "pitcher": true
+ },
+ "643550": {
+  "name": "Layne Somsen",
+  "birthDate": "1989-06-05",
+  "debut": "2016-05-14",
+  "pitcher": true
+ },
+ "643617": {
+  "name": "Zac Reininger",
+  "birthDate": "1993-01-28",
+  "debut": "2017-08-27",
+  "pitcher": true
+ },
+ "644337": {
+  "name": "Nate Orf",
+  "birthDate": "1990-02-01",
+  "debut": "2018-07-02",
+  "pitcher": false
+ },
+ "644364": {
+  "name": "V\u00edctor Arano",
+  "birthDate": "1995-02-07",
+  "debut": "2017-09-12",
+  "pitcher": true
+ },
+ "644428": {
+  "name": "Troy Scribner",
+  "birthDate": "1991-07-02",
+  "debut": "2017-07-29",
+  "pitcher": true
+ },
+ "644433": {
+  "name": "Chadwick Tromp",
+  "birthDate": "1995-03-21",
+  "debut": "2020-07-29",
+  "pitcher": false
+ },
+ "645277": {
+  "name": "Ozzie Albies",
+  "birthDate": "1997-01-07",
+  "debut": "2017-08-01",
+  "pitcher": false
+ },
+ "645302": {
+  "name": "Victor Robles",
+  "birthDate": "1997-05-19",
+  "debut": "2017-09-07",
+  "pitcher": false
+ },
+ "649144": {
+  "name": "Alex Wells",
+  "birthDate": "1997-02-27",
+  "debut": "2021-06-26",
+  "pitcher": true
+ },
+ "650204": {
+  "name": "Norge Ruiz",
+  "birthDate": "1994-03-15",
+  "debut": "2022-08-19",
+  "pitcher": true
+ },
+ "650402": {
+  "name": "Gleyber Torres",
+  "birthDate": "1996-12-13",
+  "debut": "2018-04-22",
+  "pitcher": false
+ },
+ "650530": {
+  "name": "Bryan Garcia",
+  "birthDate": "1995-04-19",
+  "debut": "2019-09-02",
+  "pitcher": true
+ },
+ "650556": {
+  "name": "Bryan Abreu",
+  "birthDate": "1997-04-22",
+  "debut": "2019-07-31",
+  "pitcher": true
+ },
+ "650619": {
+  "name": "Meibrys Viloria",
+  "birthDate": "1997-02-15",
+  "debut": "2018-09-02",
+  "pitcher": false
+ },
+ "650671": {
+  "name": "Jos\u00e9 Quijada",
+  "birthDate": "1995-11-09",
+  "debut": "2019-04-24",
+  "pitcher": true
+ },
+ "650738": {
+  "name": "Adonis Rosa",
+  "birthDate": "1994-11-17",
+  "debut": "2019-08-13",
+  "pitcher": true
+ },
+ "650813": {
+  "name": "Luis Escobar",
+  "birthDate": "1996-05-30",
+  "debut": "2019-07-13",
+  "pitcher": true
+ },
+ "650968": {
+  "name": "Yohel Pozo",
+  "birthDate": "1997-06-14",
+  "debut": "2021-08-13",
+  "pitcher": false
+ },
+ "656004": {
+  "name": "Carlos Sanabria",
+  "birthDate": "1997-01-24",
+  "debut": "2020-08-05",
+  "pitcher": true
+ },
+ "656024": {
+  "name": "Carlos P\u00e9rez",
+  "birthDate": "1996-09-10",
+  "debut": "2022-08-26",
+  "pitcher": false
+ },
+ "656212": {
+  "name": "Charlie Barnes",
+  "birthDate": "1995-10-01",
+  "debut": "2021-07-17",
+  "pitcher": true
+ },
+ "656248": {
+  "name": "Sean Bouchard",
+  "birthDate": "1996-05-16",
+  "debut": "2022-06-19",
+  "pitcher": false
+ },
+ "656252": {
+  "name": "Bobby Bradley",
+  "birthDate": "1996-05-29",
+  "debut": "2019-06-23",
+  "pitcher": false
+ },
+ "656290": {
+  "name": "Drew Carlton",
+  "birthDate": "1995-09-08",
+  "debut": "2021-09-04",
+  "pitcher": true
+ },
+ "656382": {
+  "name": "Tommy Doyle",
+  "birthDate": "1996-05-01",
+  "debut": "2020-09-23",
+  "pitcher": true
+ },
+ "656388": {
+  "name": "Joe Dunand",
+  "birthDate": "1995-09-20",
+  "debut": "2022-05-07",
+  "pitcher": false
+ },
+ "656403": {
+  "name": "Drew Ellis",
+  "birthDate": "1995-12-01",
+  "debut": "2021-07-30",
+  "pitcher": false
+ },
+ "656448": {
+  "name": "Stone Garrett",
+  "birthDate": "1995-11-22",
+  "debut": "2022-08-17",
+  "pitcher": false
+ },
+ "656458": {
+  "name": "Lucas Gilbreath",
+  "birthDate": "1996-03-05",
+  "debut": "2021-05-01",
+  "pitcher": true
+ },
+ "656464": {
+  "name": "Kevin Ginkel",
+  "birthDate": "1994-03-24",
+  "debut": "2019-08-05",
+  "pitcher": true
+ },
+ "656467": {
+  "name": "Chris Gittens",
+  "birthDate": "1994-02-04",
+  "debut": "2021-06-05",
+  "pitcher": false
+ },
+ "656494": {
+  "name": "Taylor Gushue",
+  "birthDate": "1993-12-19",
+  "debut": "2021-06-30",
+  "pitcher": false
+ },
+ "656495": {
+  "name": "Dalton Guthrie",
+  "birthDate": "1995-12-23",
+  "debut": "2022-09-06",
+  "pitcher": false
+ },
+ "656529": {
+  "name": "Sam Hentges",
+  "birthDate": "1996-07-18",
+  "debut": "2021-04-20",
+  "pitcher": true
+ },
+ "656547": {
+  "name": "Jonathan Holder",
+  "birthDate": "1993-06-09",
+  "debut": "2016-09-02",
+  "pitcher": true
+ },
+ "656548": {
+  "name": "Jordan Holloway",
+  "birthDate": "1996-06-13",
+  "debut": "2020-07-26",
+  "pitcher": true
+ },
+ "656555": {
+  "name": "Rhys Hoskins",
+  "birthDate": "1993-03-17",
+  "debut": "2017-08-10",
+  "pitcher": false
+ },
+ "656557": {
+  "name": "Tanner Houck",
+  "birthDate": "1996-06-29",
+  "debut": "2020-09-15",
+  "pitcher": true
+ },
+ "656568": {
+  "name": "Scott Hurst",
+  "birthDate": "1996-03-25",
+  "debut": "2021-04-16",
+  "pitcher": false
+ },
+ "656605": {
+  "name": "Mitch Keller",
+  "birthDate": "1996-04-04",
+  "debut": "2019-05-27",
+  "pitcher": true
+ },
+ "656641": {
+  "name": "Jacob Latz",
+  "birthDate": "1996-04-08",
+  "debut": "2021-08-25",
+  "pitcher": true
+ },
+ "656685": {
+  "name": "Brett Martin",
+  "birthDate": "1995-04-28",
+  "debut": "2019-04-19",
+  "pitcher": true
+ },
+ "656695": {
+  "name": "J.J. Matijevic",
+  "birthDate": "1995-11-14",
+  "debut": "2022-04-22",
+  "pitcher": false
+ },
+ "656713": {
+  "name": "Brendan McKay",
+  "birthDate": "1995-12-18",
+  "debut": "2019-06-29",
+  "pitcher": true
+ },
+ "656725": {
+  "name": "Alex McRae",
+  "birthDate": "1993-04-06",
+  "debut": "2018-08-01",
+  "pitcher": true
+ },
+ "656731": {
+  "name": "Tylor Megill",
+  "birthDate": "1995-07-28",
+  "debut": "2021-06-23",
+  "pitcher": true
+ },
+ "656738": {
+  "name": "Ben Meyer",
+  "birthDate": "1993-01-30",
+  "debut": "2018-06-07",
+  "pitcher": true
+ },
+ "656798": {
+  "name": "Jacob Nix",
+  "birthDate": "1996-01-09",
+  "debut": "2018-08-10",
+  "pitcher": true
+ },
+ "656818": {
+  "name": "Connor Overton",
+  "birthDate": "1993-07-24",
+  "debut": "2021-08-12",
+  "pitcher": true
+ },
+ "656820": {
+  "name": "Nicholas Padilla",
+  "birthDate": "1996-12-24",
+  "debut": "2022-08-23",
+  "pitcher": true
+ },
+ "656847": {
+  "name": "DJ Peters",
+  "birthDate": "1995-12-12",
+  "debut": "2021-04-23",
+  "pitcher": true
+ },
+ "656913": {
+  "name": "Seth Romero",
+  "birthDate": "1996-04-19",
+  "debut": "2020-08-13",
+  "pitcher": true
+ },
+ "656981": {
+  "name": "Peter Solomon",
+  "birthDate": "1996-08-16",
+  "debut": "2021-04-18",
+  "pitcher": true
+ },
+ "657006": {
+  "name": "Justin Steele",
+  "birthDate": "1995-07-11",
+  "debut": "2021-04-12",
+  "pitcher": true
+ },
+ "657044": {
+  "name": "Ryan Thompson",
+  "birthDate": "1992-06-26",
+  "debut": "2020-07-24",
+  "pitcher": true
+ },
+ "657061": {
+  "name": "Cole Tucker",
+  "birthDate": "1996-07-03",
+  "debut": "2019-04-20",
+  "pitcher": false
+ },
+ "657117": {
+  "name": "Austen Williams",
+  "birthDate": "1992-12-19",
+  "debut": "2018-09-02",
+  "pitcher": true
+ },
+ "657145": {
+  "name": "Mark Zagunis",
+  "birthDate": "1993-02-05",
+  "debut": "2017-06-22",
+  "pitcher": false
+ },
+ "657205": {
+  "name": "Zac Curtis",
+  "birthDate": "1992-07-04",
+  "debut": "2016-04-30",
+  "pitcher": true
+ },
+ "657209": {
+  "name": "Dean Deetz",
+  "birthDate": "1993-11-29",
+  "debut": "2018-09-05",
+  "pitcher": true
+ },
+ "657228": {
+  "name": "Jake Jewell",
+  "birthDate": "1993-05-16",
+  "debut": "2018-06-16",
+  "pitcher": true
+ },
+ "657277": {
+  "name": "Logan Webb",
+  "birthDate": "1996-11-18",
+  "debut": "2019-08-17",
+  "pitcher": true
+ },
+ "657376": {
+  "name": "Clarke Schmidt",
+  "birthDate": "1996-02-20",
+  "debut": "2020-09-04",
+  "pitcher": true
+ },
+ "657524": {
+  "name": "John Bormann",
+  "birthDate": "1993-04-04",
+  "debut": "2017-04-30",
+  "pitcher": false
+ },
+ "657566": {
+  "name": "Montana DuRapau",
+  "birthDate": "1992-03-27",
+  "debut": "2019-05-09",
+  "pitcher": true
+ },
+ "657585": {
+  "name": "Reed Garrett",
+  "birthDate": "1993-01-02",
+  "debut": "2019-03-29",
+  "pitcher": true
+ },
+ "657610": {
+  "name": "Trevor Hildenberger",
+  "birthDate": "1990-12-15",
+  "debut": "2017-06-23",
+  "pitcher": true
+ },
+ "657624": {
+  "name": "Josh James",
+  "birthDate": "1993-03-08",
+  "debut": "2018-09-01",
+  "pitcher": true
+ },
+ "657649": {
+  "name": "Jared Koenig",
+  "birthDate": "1994-01-24",
+  "debut": "2022-06-08",
+  "pitcher": true
+ },
+ "657670": {
+  "name": "Greg Mahle",
+  "birthDate": "1993-04-17",
+  "debut": "2016-04-13",
+  "pitcher": true
+ },
+ "657681": {
+  "name": "Kyle McGrath",
+  "birthDate": "1992-07-31",
+  "debut": "2017-07-30",
+  "pitcher": true
+ },
+ "657745": {
+  "name": "Bubby Rossman",
+  "birthDate": "1992-06-29",
+  "debut": "2022-07-13",
+  "pitcher": true
+ },
+ "657757": {
+  "name": "Gavin Sheets",
+  "birthDate": "1996-04-23",
+  "debut": "2021-06-29",
+  "pitcher": false
+ },
+ "657766": {
+  "name": "Locke St. John",
+  "birthDate": "1993-01-31",
+  "debut": "2019-06-25",
+  "pitcher": true
+ },
+ "658069": {
+  "name": "Joshua Fuentes",
+  "birthDate": "1993-02-19",
+  "debut": "2019-04-06",
+  "pitcher": false
+ },
+ "658792": {
+  "name": "Aaron Wilkerson",
+  "birthDate": "1989-05-24",
+  "debut": "2017-09-15",
+  "pitcher": true
+ },
+ "660162": {
+  "name": "Yo\u00e1n Moncada",
+  "birthDate": "1995-05-27",
+  "debut": "2016-09-02",
+  "pitcher": false
+ },
+ "660271": {
+  "name": "Shohei Ohtani",
+  "birthDate": "1994-07-05",
+  "debut": "2018-03-29",
+  "pitcher": true
+ },
+ "660365": {
+  "name": "Hyeon-Jong Yang",
+  "birthDate": "1988-03-01",
+  "debut": "2021-04-26",
+  "pitcher": true
+ },
+ "660494": {
+  "name": "Rogelio Armenteros",
+  "birthDate": "1994-06-30",
+  "debut": "2019-06-14",
+  "pitcher": true
+ },
+ "660593": {
+  "name": "Denyi Reyes",
+  "birthDate": "1996-11-02",
+  "debut": "2022-05-13",
+  "pitcher": true
+ },
+ "660620": {
+  "name": "Jonathan Ara\u00faz",
+  "birthDate": "1998-08-03",
+  "debut": "2020-07-24",
+  "pitcher": false
+ },
+ "660650": {
+  "name": "D\u00e9rmis Garcia",
+  "birthDate": "1998-01-07",
+  "debut": "2022-07-12",
+  "pitcher": false
+ },
+ "660670": {
+  "name": "Ronald Acu\u00f1a Jr.",
+  "birthDate": "1997-12-18",
+  "debut": "2018-04-25",
+  "pitcher": false
+ },
+ "660731": {
+  "name": "Anderson Tejeda",
+  "birthDate": "1998-05-01",
+  "debut": "2020-08-06",
+  "pitcher": false
+ },
+ "660757": {
+  "name": "Oscar Gonzalez",
+  "birthDate": "1998-01-10",
+  "debut": "2022-05-26",
+  "pitcher": false
+ },
+ "660787": {
+  "name": "Yerry De los Santos",
+  "birthDate": "1997-12-12",
+  "debut": "2022-05-25",
+  "pitcher": true
+ },
+ "660875": {
+  "name": "Jes\u00fas Reyes",
+  "birthDate": "1993-02-21",
+  "debut": "2018-08-04",
+  "pitcher": true
+ },
+ "660906": {
+  "name": "Francisco P\u00e9rez",
+  "birthDate": "1997-07-20",
+  "debut": "2021-08-12",
+  "pitcher": true
+ },
+ "661383": {
+  "name": "Oliver Ortega",
+  "birthDate": "1996-10-02",
+  "debut": "2021-09-08",
+  "pitcher": true
+ },
+ "661531": {
+  "name": "Brian Serven",
+  "birthDate": "1995-05-05",
+  "debut": "2022-05-18",
+  "pitcher": false
+ },
+ "663158": {
+  "name": "Robert Suarez",
+  "birthDate": "1991-03-01",
+  "debut": "2022-04-07",
+  "pitcher": true
+ },
+ "663372": {
+  "name": "Ryan Feltner",
+  "birthDate": "1996-09-02",
+  "debut": "2021-09-05",
+  "pitcher": true
+ },
+ "663436": {
+  "name": "Davis Martin",
+  "birthDate": "1997-01-04",
+  "debut": "2022-05-17",
+  "pitcher": true
+ },
+ "663457": {
+  "name": "Lars Nootbaar",
+  "birthDate": "1997-09-08",
+  "debut": "2021-06-22",
+  "pitcher": false
+ },
+ "663460": {
+  "name": "Kris Bubic",
+  "birthDate": "1997-08-19",
+  "debut": "2020-07-31",
+  "pitcher": true
+ },
+ "663485": {
+  "name": "Cole Sands",
+  "birthDate": "1997-07-17",
+  "debut": "2022-05-01",
+  "pitcher": true
+ },
+ "663538": {
+  "name": "Nico Hoerner",
+  "birthDate": "1997-05-13",
+  "debut": "2019-09-09",
+  "pitcher": false
+ },
+ "663546": {
+  "name": "Sean Hjelle",
+  "birthDate": "1997-05-07",
+  "debut": "2022-05-06",
+  "pitcher": true
+ },
+ "663554": {
+  "name": "Casey Mize",
+  "birthDate": "1997-05-01",
+  "debut": "2020-08-19",
+  "pitcher": true
+ },
+ "663556": {
+  "name": "Shane McClanahan",
+  "birthDate": "1997-04-28",
+  "debut": "2020-10-05",
+  "pitcher": true
+ },
+ "663567": {
+  "name": "Peter Lambert",
+  "birthDate": "1997-04-18",
+  "debut": "2019-06-06",
+  "pitcher": true
+ },
+ "663574": {
+  "name": "Tony Santillan",
+  "birthDate": "1997-04-15",
+  "debut": "2021-06-13",
+  "pitcher": true
+ },
+ "663586": {
+  "name": "Austin Riley",
+  "birthDate": "1997-04-02",
+  "debut": "2019-05-15",
+  "pitcher": false
+ },
+ "663616": {
+  "name": "Trevor Larnach",
+  "birthDate": "1997-02-26",
+  "debut": "2021-05-08",
+  "pitcher": false
+ },
+ "663624": {
+  "name": "Ryan Mountcastle",
+  "birthDate": "1997-02-18",
+  "debut": "2020-08-21",
+  "pitcher": false
+ },
+ "663630": {
+  "name": "Ryan McKenna",
+  "birthDate": "1997-02-14",
+  "debut": "2021-04-05",
+  "pitcher": false
+ },
+ "663728": {
+  "name": "Cal Raleigh",
+  "birthDate": "1996-11-26",
+  "debut": "2021-07-11",
+  "pitcher": false
+ },
+ "663738": {
+  "name": "Daniel Lynch IV",
+  "birthDate": "1996-11-17",
+  "debut": "2021-05-03",
+  "pitcher": true
+ },
+ "663770": {
+  "name": "Demarcus Evans",
+  "birthDate": "1996-10-22",
+  "debut": "2020-09-18",
+  "pitcher": true
+ },
+ "663799": {
+  "name": "Curtis Terry",
+  "birthDate": "1996-10-06",
+  "debut": "2021-07-23",
+  "pitcher": false
+ },
+ "663853": {
+  "name": "Romy Gonzalez",
+  "birthDate": "1996-09-06",
+  "debut": "2021-09-03",
+  "pitcher": false
+ },
+ "663886": {
+  "name": "Tyler Stephenson",
+  "birthDate": "1996-08-16",
+  "debut": "2020-07-27",
+  "pitcher": false
+ },
+ "663898": {
+  "name": "Brendan Rodgers",
+  "birthDate": "1996-08-09",
+  "debut": "2019-05-17",
+  "pitcher": false
+ },
+ "663905": {
+  "name": "Travis Blankenhorn",
+  "birthDate": "1996-08-03",
+  "debut": "2020-09-15",
+  "pitcher": false
+ },
+ "663911": {
+  "name": "Nick Plummer",
+  "birthDate": "1996-07-31",
+  "debut": "2022-04-15",
+  "pitcher": false
+ },
+ "663947": {
+  "name": "Tyler Holton",
+  "birthDate": "1996-06-13",
+  "debut": "2022-04-28",
+  "pitcher": true
+ },
+ "663959": {
+  "name": "Tyler Ivey",
+  "birthDate": "1996-05-12",
+  "debut": "2021-05-21",
+  "pitcher": true
+ },
+ "663989": {
+  "name": "Nick Vespi",
+  "birthDate": "1995-10-10",
+  "debut": "2022-05-20",
+  "pitcher": true
+ },
+ "664023": {
+  "name": "Ian Happ",
+  "birthDate": "1994-08-12",
+  "debut": "2017-05-13",
+  "pitcher": false
+ },
+ "664028": {
+  "name": "Brett Kennedy",
+  "birthDate": "1994-08-04",
+  "debut": "2018-08-08",
+  "pitcher": true
+ },
+ "664054": {
+  "name": "Cody Stashak",
+  "birthDate": "1994-06-04",
+  "debut": "2019-07-23",
+  "pitcher": true
+ },
+ "664057": {
+  "name": "Andrew Stevenson",
+  "birthDate": "1994-06-01",
+  "debut": "2017-07-23",
+  "pitcher": false
+ },
+ "664062": {
+  "name": "Tony Gonsolin",
+  "birthDate": "1994-05-14",
+  "debut": "2019-06-26",
+  "pitcher": true
+ },
+ "664069": {
+  "name": "Ben Braymer",
+  "birthDate": "1994-04-28",
+  "debut": "2020-08-28",
+  "pitcher": true
+ },
+ "664161": {
+  "name": "Matt Swarmer",
+  "birthDate": "1993-09-25",
+  "debut": "2022-05-30",
+  "pitcher": true
+ },
+ "664167": {
+  "name": "Blake Trahan",
+  "birthDate": "1993-09-05",
+  "debut": "2018-09-03",
+  "pitcher": false
+ },
+ "664202": {
+  "name": "Tyler Cyr",
+  "birthDate": "1993-05-05",
+  "debut": "2022-08-21",
+  "pitcher": true
+ },
+ "664285": {
+  "name": "Framber Valdez",
+  "birthDate": "1993-11-19",
+  "debut": "2018-08-21",
+  "pitcher": true
+ },
+ "664299": {
+  "name": "Cristian Javier",
+  "birthDate": "1997-03-26",
+  "debut": "2020-07-25",
+  "pitcher": true
+ },
+ "664334": {
+  "name": "Aaron Whitefield",
+  "birthDate": "1996-09-02",
+  "debut": "2020-07-25",
+  "pitcher": false
+ },
+ "664641": {
+  "name": "Ar\u00edel Miranda",
+  "birthDate": "1989-01-10",
+  "debut": "2016-07-03",
+  "pitcher": true
+ },
+ "664682": {
+  "name": "Ryan Meisinger",
+  "birthDate": "1994-05-04",
+  "debut": "2018-06-29",
+  "pitcher": true
+ },
+ "664701": {
+  "name": "Ben Taylor",
+  "birthDate": "1992-11-12",
+  "debut": "2017-04-07",
+  "pitcher": true
+ },
+ "664714": {
+  "name": "Ljay Newsome",
+  "birthDate": "1996-11-08",
+  "debut": "2020-08-20",
+  "pitcher": true
+ },
+ "664728": {
+  "name": "Kyle Isbel",
+  "birthDate": "1997-03-03",
+  "debut": "2021-04-01",
+  "pitcher": false
+ },
+ "664761": {
+  "name": "Alec Bohm",
+  "birthDate": "1996-08-03",
+  "debut": "2020-08-13",
+  "pitcher": false
+ },
+ "664789": {
+  "name": "Ka'ai Tom",
+  "birthDate": "1994-05-29",
+  "debut": "2021-04-01",
+  "pitcher": false
+ },
+ "664842": {
+  "name": "Kevin Kaczmarski",
+  "birthDate": "1991-12-31",
+  "debut": "2018-06-24",
+  "pitcher": false
+ },
+ "664849": {
+  "name": "Danny Young",
+  "birthDate": "1994-05-27",
+  "debut": "2022-05-09",
+  "pitcher": true
+ },
+ "664850": {
+  "name": "Patrick Mazeika",
+  "birthDate": "1993-10-14",
+  "debut": "2021-04-11",
+  "pitcher": false
+ },
+ "664852": {
+  "name": "Jay Flaa",
+  "birthDate": "1992-06-10",
+  "debut": "2021-04-27",
+  "pitcher": true
+ },
+ "664869": {
+  "name": "P.J. Conlon",
+  "birthDate": "1993-11-11",
+  "debut": "2018-05-07",
+  "pitcher": true
+ },
+ "664901": {
+  "name": "Danny Mendick",
+  "birthDate": "1993-09-28",
+  "debut": "2019-09-03",
+  "pitcher": false
+ },
+ "664926": {
+  "name": "Nick Dini",
+  "birthDate": "1993-07-27",
+  "debut": "2019-08-07",
+  "pitcher": false
+ },
+ "664942": {
+  "name": "James Naile",
+  "birthDate": "1993-02-08",
+  "debut": "2022-06-27",
+  "pitcher": true
+ },
+ "664944": {
+  "name": "Cam Vieaux",
+  "birthDate": "1993-12-05",
+  "debut": "2022-06-17",
+  "pitcher": true
+ },
+ "665001": {
+  "name": "Trevor Kelley",
+  "birthDate": "1992-10-20",
+  "debut": "2019-07-02",
+  "pitcher": true
+ },
+ "665066": {
+  "name": "Tyler Payne",
+  "birthDate": "1992-10-25",
+  "debut": "2021-10-03",
+  "pitcher": false
+ },
+ "665093": {
+  "name": "Zac Grotz",
+  "birthDate": "1993-02-17",
+  "debut": "2019-08-02",
+  "pitcher": true
+ },
+ "665120": {
+  "name": "Jared Walsh",
+  "birthDate": "1993-07-30",
+  "debut": "2019-05-15",
+  "pitcher": false
+ },
+ "665161": {
+  "name": "Jeremy Pe\u00f1a",
+  "birthDate": "1997-09-22",
+  "debut": "2022-04-07",
+  "pitcher": false
+ },
+ "665487": {
+  "name": "Fernando Tatis Jr.",
+  "birthDate": "1999-01-02",
+  "debut": "2019-03-28",
+  "pitcher": false
+ },
+ "665489": {
+  "name": "Vladimir Guerrero Jr.",
+  "birthDate": "1999-03-16",
+  "debut": "2019-04-26",
+  "pitcher": false
+ },
+ "665561": {
+  "name": "Rafael March\u00e1n",
+  "birthDate": "1999-02-25",
+  "debut": "2020-09-14",
+  "pitcher": false
+ },
+ "665620": {
+  "name": "Deivi Garc\u00eda",
+  "birthDate": "1999-05-19",
+  "debut": "2020-08-30",
+  "pitcher": true
+ },
+ "665621": {
+  "name": "Rony Garc\u00eda",
+  "birthDate": "1997-12-19",
+  "debut": "2020-07-28",
+  "pitcher": true
+ },
+ "665645": {
+  "name": "Kervin Castro",
+  "birthDate": "1999-02-07",
+  "debut": "2021-09-07",
+  "pitcher": true
+ },
+ "665661": {
+  "name": "Shea Spitzbarth",
+  "birthDate": "1994-10-04",
+  "debut": "2021-08-02",
+  "pitcher": true
+ },
+ "665733": {
+  "name": "Antonio Santos",
+  "birthDate": "1996-10-06",
+  "debut": "2020-09-01",
+  "pitcher": true
+ },
+ "665750": {
+  "name": "Leody Taveras",
+  "birthDate": "1998-09-08",
+  "debut": "2020-07-24",
+  "pitcher": false
+ },
+ "665759": {
+  "name": "Ram\u00f3n Rosso",
+  "birthDate": "1996-06-09",
+  "debut": "2020-07-24",
+  "pitcher": true
+ },
+ "665828": {
+  "name": "Oswaldo Cabrera",
+  "birthDate": "1999-03-01",
+  "debut": "2022-08-17",
+  "pitcher": false
+ },
+ "665861": {
+  "name": "Sebasti\u00e1n Rivero",
+  "birthDate": "1998-11-16",
+  "debut": "2021-05-08",
+  "pitcher": false
+ },
+ "665871": {
+  "name": "Javier Assad",
+  "birthDate": "1997-07-30",
+  "debut": "2022-08-23",
+  "pitcher": true
+ },
+ "665922": {
+  "name": "S\u00edmon Muzziotti",
+  "birthDate": "1998-12-27",
+  "debut": "2022-04-11",
+  "pitcher": false
+ },
+ "666018": {
+  "name": "Jonathan Aranda",
+  "birthDate": "1998-05-23",
+  "debut": "2022-06-24",
+  "pitcher": false
+ },
+ "666128": {
+  "name": "Mario Feliciano",
+  "birthDate": "1998-11-20",
+  "debut": "2021-05-01",
+  "pitcher": false
+ },
+ "666129": {
+  "name": "Braxton Garrett",
+  "birthDate": "1997-08-05",
+  "debut": "2020-09-13",
+  "pitcher": true
+ },
+ "666135": {
+  "name": "Alex Kirilloff",
+  "birthDate": "1997-11-09",
+  "debut": "2020-09-30",
+  "pitcher": false
+ },
+ "666142": {
+  "name": "Cole Ragans",
+  "birthDate": "1997-12-12",
+  "debut": "2022-08-04",
+  "pitcher": true
+ },
+ "666157": {
+  "name": "Nick Lodolo",
+  "birthDate": "1998-02-05",
+  "debut": "2022-04-13",
+  "pitcher": true
+ },
+ "666176": {
+  "name": "Jo Adell",
+  "birthDate": "1999-04-08",
+  "debut": "2020-08-04",
+  "pitcher": false
+ },
+ "666182": {
+  "name": "Bo Bichette",
+  "birthDate": "1998-03-05",
+  "debut": "2019-07-29",
+  "pitcher": false
+ },
+ "666204": {
+  "name": "Dany Jim\u00e9nez",
+  "birthDate": "1993-12-23",
+  "debut": "2020-07-23",
+  "pitcher": true
+ },
+ "666213": {
+  "name": "Colton Welker",
+  "birthDate": "1997-10-09",
+  "debut": "2021-09-08",
+  "pitcher": false
+ },
+ "666310": {
+  "name": "Bo Naylor",
+  "birthDate": "2000-02-21",
+  "debut": "2022-10-01",
+  "pitcher": false
+ },
+ "666464": {
+  "name": "Jerar Encarnacion",
+  "birthDate": "1997-10-22",
+  "debut": "2022-06-19",
+  "pitcher": false
+ },
+ "666560": {
+  "name": "ByungHo Park",
+  "birthDate": "1986-07-10",
+  "debut": "2016-04-04",
+  "pitcher": false
+ },
+ "666561": {
+  "name": "Jae-Gyun Hwang",
+  "birthDate": "1987-07-28",
+  "debut": "2017-06-28",
+  "pitcher": false
+ },
+ "666622": {
+  "name": "Brailyn Marquez",
+  "birthDate": "1999-01-30",
+  "debut": "2020-09-27",
+  "pitcher": true
+ },
+ "666674": {
+  "name": "Edwar Colina",
+  "birthDate": "1997-05-03",
+  "debut": "2020-09-25",
+  "pitcher": true
+ },
+ "666703": {
+  "name": "Eguy Rosario",
+  "birthDate": "1999-08-25",
+  "debut": "2022-08-26",
+  "pitcher": false
+ },
+ "666818": {
+  "name": "Luis Fr\u00edas",
+  "birthDate": "1998-05-23",
+  "debut": "2021-09-19",
+  "pitcher": true
+ },
+ "666915": {
+  "name": "Bobby Dalbec",
+  "birthDate": "1995-06-29",
+  "debut": "2020-08-30",
+  "pitcher": false
+ },
+ "666922": {
+  "name": "Ryan Aguilar",
+  "birthDate": "1994-09-11",
+  "debut": "2022-08-26",
+  "pitcher": false
+ },
+ "667373": {
+  "name": "Angel Rond\u00f3n",
+  "birthDate": "1997-12-01",
+  "debut": "2021-06-06",
+  "pitcher": true
+ },
+ "667376": {
+  "name": "Miguel S\u00e1nchez",
+  "birthDate": "1993-12-31",
+  "debut": "2021-06-22",
+  "pitcher": true
+ },
+ "667427": {
+  "name": "Zach Jackson",
+  "birthDate": "1994-12-25",
+  "debut": "2022-04-09",
+  "pitcher": true
+ },
+ "667674": {
+  "name": "Jack Kruger",
+  "birthDate": "1994-10-26",
+  "debut": "2021-05-06",
+  "pitcher": false
+ },
+ "667725": {
+  "name": "Kyle Tyler",
+  "birthDate": "1996-12-27",
+  "debut": "2021-09-05",
+  "pitcher": true
+ },
+ "668676": {
+  "name": "Zach Plesac",
+  "birthDate": "1995-01-21",
+  "debut": "2019-05-28",
+  "pitcher": true
+ },
+ "668684": {
+  "name": "Tanner Tully",
+  "birthDate": "1994-11-30",
+  "debut": "2022-04-22",
+  "pitcher": true
+ },
+ "668731": {
+  "name": "Akil Baddoo",
+  "birthDate": "1998-08-16",
+  "debut": "2021-04-04",
+  "pitcher": false
+ },
+ "668751": {
+  "name": "Cal Mitchell",
+  "birthDate": "1999-03-08",
+  "debut": "2022-05-24",
+  "pitcher": false
+ },
+ "668820": {
+  "name": "Max Kranick",
+  "birthDate": "1997-07-21",
+  "debut": "2021-06-27",
+  "pitcher": true
+ },
+ "668868": {
+  "name": "Zack Thompson",
+  "birthDate": "1997-10-28",
+  "debut": "2022-06-03",
+  "pitcher": true
+ },
+ "668881": {
+  "name": "Hunter Greene",
+  "birthDate": "1999-08-06",
+  "debut": "2022-04-10",
+  "pitcher": true
+ },
+ "668901": {
+  "name": "Mark Vientos",
+  "birthDate": "1999-12-11",
+  "debut": "2022-09-11",
+  "pitcher": false
+ },
+ "668904": {
+  "name": "Royce Lewis",
+  "birthDate": "1999-06-05",
+  "debut": "2022-05-06",
+  "pitcher": false
+ },
+ "668933": {
+  "name": "Graham Ashcraft",
+  "birthDate": "1998-02-11",
+  "debut": "2022-05-22",
+  "pitcher": true
+ },
+ "668939": {
+  "name": "Adley Rutschman",
+  "birthDate": "1998-02-06",
+  "debut": "2022-05-21",
+  "pitcher": false
+ },
+ "668948": {
+  "name": "Kirk McCarty",
+  "birthDate": "1995-10-12",
+  "debut": "2022-04-24",
+  "pitcher": true
+ },
+ "668952": {
+  "name": "Ryan Kreidler",
+  "birthDate": "1997-11-12",
+  "debut": "2022-09-02",
+  "pitcher": false
+ },
+ "668970": {
+  "name": "Gavin Hollowell",
+  "birthDate": "1997-11-04",
+  "debut": "2022-09-19",
+  "pitcher": true
+ },
+ "669003": {
+  "name": "Garrett Mitchell",
+  "birthDate": "1998-09-04",
+  "debut": "2022-08-27",
+  "pitcher": false
+ },
+ "669004": {
+  "name": "MJ Melendez",
+  "birthDate": "1998-11-29",
+  "debut": "2022-05-03",
+  "pitcher": false
+ },
+ "669008": {
+  "name": "Ronnie Dawson",
+  "birthDate": "1995-05-19",
+  "debut": "2021-04-14",
+  "pitcher": false
+ },
+ "669093": {
+  "name": "Jeremiah Estrada",
+  "birthDate": "1998-11-01",
+  "debut": "2022-08-30",
+  "pitcher": true
+ },
+ "669134": {
+  "name": "Luis Campusano",
+  "birthDate": "1998-09-29",
+  "debut": "2020-09-04",
+  "pitcher": false
+ },
+ "669135": {
+  "name": "Mac Sceroler",
+  "birthDate": "1995-04-09",
+  "debut": "2021-04-05",
+  "pitcher": true
+ },
+ "669194": {
+  "name": "Ryne Nelson",
+  "birthDate": "1998-02-01",
+  "debut": "2022-09-05",
+  "pitcher": true
+ },
+ "669211": {
+  "name": "Keegan Akin",
+  "birthDate": "1995-04-01",
+  "debut": "2020-08-14",
+  "pitcher": true
+ },
+ "669214": {
+  "name": "Conner Menez",
+  "birthDate": "1995-05-29",
+  "debut": "2019-07-21",
+  "pitcher": true
+ },
+ "669257": {
+  "name": "Will Smith",
+  "birthDate": "1995-03-28",
+  "debut": "2019-05-28",
+  "pitcher": false
+ },
+ "669276": {
+  "name": "Dylan Lee",
+  "birthDate": "1994-08-01",
+  "debut": "2021-10-01",
+  "pitcher": true
+ },
+ "669302": {
+  "name": "Logan Gilbert",
+  "birthDate": "1997-05-05",
+  "debut": "2021-05-13",
+  "pitcher": true
+ },
+ "669309": {
+  "name": "Joe Perez",
+  "birthDate": "1999-08-12",
+  "debut": "2022-04-08",
+  "pitcher": false
+ },
+ "669330": {
+  "name": "Tyler Wells",
+  "birthDate": "1994-08-26",
+  "debut": "2021-04-04",
+  "pitcher": true
+ },
+ "669352": {
+  "name": "Bubba Thompson",
+  "birthDate": "1998-06-09",
+  "debut": "2022-08-04",
+  "pitcher": false
+ },
+ "669357": {
+  "name": "Nolan Gorman",
+  "birthDate": "2000-05-10",
+  "debut": "2022-05-20",
+  "pitcher": false
+ },
+ "669373": {
+  "name": "Tarik Skubal",
+  "birthDate": "1996-11-20",
+  "debut": "2020-08-18",
+  "pitcher": true
+ },
+ "669374": {
+  "name": "Keston Hiura",
+  "birthDate": "1996-08-02",
+  "debut": "2019-05-14",
+  "pitcher": false
+ },
+ "669424": {
+  "name": "Jimmy Lambert",
+  "birthDate": "1994-11-18",
+  "debut": "2020-07-25",
+  "pitcher": true
+ },
+ "669459": {
+  "name": "Kyle Nelson",
+  "birthDate": "1996-07-08",
+  "debut": "2020-09-10",
+  "pitcher": true
+ },
+ "669467": {
+  "name": "Andre Pallante",
+  "birthDate": "1998-09-18",
+  "debut": "2022-04-10",
+  "pitcher": true
+ },
+ "669618": {
+  "name": "Joe Barlow",
+  "birthDate": "1995-09-28",
+  "debut": "2021-06-24",
+  "pitcher": true
+ },
+ "669622": {
+  "name": "Anthony Bender",
+  "birthDate": "1995-02-03",
+  "debut": "2021-05-05",
+  "pitcher": true
+ },
+ "669735": {
+  "name": "Chris Rodriguez",
+  "birthDate": "1998-07-20",
+  "debut": "2021-04-02",
+  "pitcher": true
+ },
+ "669738": {
+  "name": "Jake Noll",
+  "birthDate": "1994-03-08",
+  "debut": "2019-03-30",
+  "pitcher": false
+ },
+ "669742": {
+  "name": "Darick Hall",
+  "birthDate": "1995-07-25",
+  "debut": "2022-06-29",
+  "pitcher": false
+ },
+ "669804": {
+  "name": "Angel De Jesus",
+  "birthDate": "1997-02-13",
+  "debut": "2022-04-23",
+  "pitcher": true
+ },
+ "669854": {
+  "name": "Ronel Blanco",
+  "birthDate": "1993-08-31",
+  "debut": "2022-04-08",
+  "pitcher": true
+ },
+ "669920": {
+  "name": "Jason Alexander",
+  "birthDate": "1993-03-01",
+  "debut": "2022-06-01",
+  "pitcher": true
+ },
+ "669923": {
+  "name": "George Kirby",
+  "birthDate": "1998-02-04",
+  "debut": "2022-05-08",
+  "pitcher": true
+ },
+ "670046": {
+  "name": "Kenny Rosenberg",
+  "birthDate": "1995-07-09",
+  "debut": "2022-04-18",
+  "pitcher": true
+ },
+ "670056": {
+  "name": "Caleb Baragar",
+  "birthDate": "1994-04-09",
+  "debut": "2020-07-25",
+  "pitcher": true
+ },
+ "670057": {
+  "name": "Ryan Hartman",
+  "birthDate": "1994-04-21",
+  "debut": "2021-06-30",
+  "pitcher": true
+ },
+ "670087": {
+  "name": "Brandyn Sittinger",
+  "birthDate": "1994-06-06",
+  "debut": "2021-09-08",
+  "pitcher": true
+ },
+ "670242": {
+  "name": "Matt Wallner",
+  "birthDate": "1997-12-12",
+  "debut": "2022-09-17",
+  "pitcher": false
+ },
+ "670288": {
+  "name": "Jake Fishman",
+  "birthDate": "1995-02-08",
+  "debut": "2022-07-31",
+  "pitcher": true
+ },
+ "670298": {
+  "name": "Kramer Robertson",
+  "birthDate": "1994-09-20",
+  "debut": "2022-05-10",
+  "pitcher": false
+ },
+ "670329": {
+  "name": "Rico Garcia",
+  "birthDate": "1994-01-10",
+  "debut": "2019-08-27",
+  "pitcher": true
+ },
+ "670462": {
+  "name": "Hunter Owen",
+  "birthDate": "1993-09-22",
+  "debut": "2021-05-05",
+  "pitcher": false
+ },
+ "670541": {
+  "name": "Yordan Alvarez",
+  "birthDate": "1997-06-27",
+  "debut": "2019-06-09",
+  "pitcher": false
+ },
+ "670550": {
+  "name": "Nivaldo Rodriguez",
+  "birthDate": "1997-04-16",
+  "debut": "2020-07-28",
+  "pitcher": true
+ },
+ "670764": {
+  "name": "Taylor Walls",
+  "birthDate": "1996-07-10",
+  "debut": "2021-05-22",
+  "pitcher": false
+ },
+ "670768": {
+  "name": "Luis Gonz\u00e1lez",
+  "birthDate": "1995-09-10",
+  "debut": "2020-08-18",
+  "pitcher": false
+ },
+ "670770": {
+  "name": "TJ Friedl",
+  "birthDate": "1995-08-14",
+  "debut": "2021-09-18",
+  "pitcher": false
+ },
+ "670955": {
+  "name": "Edwin Uceta",
+  "birthDate": "1998-01-09",
+  "debut": "2021-04-30",
+  "pitcher": true
+ },
+ "670970": {
+  "name": "Adrian Morejon",
+  "birthDate": "1999-02-27",
+  "debut": "2019-07-21",
+  "pitcher": true
+ },
+ "671056": {
+  "name": "Iv\u00e1n Herrera",
+  "birthDate": "2000-06-01",
+  "debut": "2022-05-24",
+  "pitcher": false
+ },
+ "671213": {
+  "name": "Triston Casas",
+  "birthDate": "2000-01-15",
+  "debut": "2022-09-04",
+  "pitcher": false
+ },
+ "671218": {
+  "name": "Heliot Ramos",
+  "birthDate": "1999-09-07",
+  "debut": "2022-04-10",
+  "pitcher": false
+ },
+ "671250": {
+  "name": "Jorge Ona",
+  "birthDate": "1996-12-31",
+  "debut": "2020-09-07",
+  "pitcher": false
+ },
+ "671277": {
+  "name": "Luis Garc\u00eda Jr.",
+  "birthDate": "2000-05-16",
+  "debut": "2020-08-14",
+  "pitcher": false
+ },
+ "671345": {
+  "name": "Jason Foley",
+  "birthDate": "1995-11-01",
+  "debut": "2021-06-06",
+  "pitcher": true
+ },
+ "671739": {
+  "name": "Michael Harris II",
+  "birthDate": "2001-03-07",
+  "debut": "2022-05-28",
+  "pitcher": false
+ },
+ "672282": {
+  "name": "Reid Detmers",
+  "birthDate": "1999-07-08",
+  "debut": "2021-08-01",
+  "pitcher": true
+ },
+ "672386": {
+  "name": "Alejandro Kirk",
+  "birthDate": "1998-11-06",
+  "debut": "2020-09-12",
+  "pitcher": false
+ },
+ "672478": {
+  "name": "Jordan Diaz",
+  "birthDate": "2000-08-13",
+  "debut": "2022-09-18",
+  "pitcher": false
+ },
+ "672580": {
+  "name": "Maikel Garcia",
+  "birthDate": "2000-03-03",
+  "debut": "2022-07-15",
+  "pitcher": false
+ },
+ "672695": {
+  "name": "Geraldo Perdomo",
+  "birthDate": "1999-10-22",
+  "debut": "2021-04-03",
+  "pitcher": false
+ },
+ "672832": {
+  "name": "Israel Pineda",
+  "birthDate": "2000-04-03",
+  "debut": "2022-09-11",
+  "pitcher": false
+ },
+ "672839": {
+  "name": "Francisco Morales",
+  "birthDate": "1999-10-27",
+  "debut": "2022-05-09",
+  "pitcher": true
+ },
+ "672851": {
+  "name": "Joan Adon",
+  "birthDate": "1998-08-12",
+  "debut": "2021-10-03",
+  "pitcher": true
+ },
+ "672911": {
+  "name": "Jesus Cruz",
+  "birthDate": "1995-04-15",
+  "debut": "2020-08-18",
+  "pitcher": true
+ },
+ "673258": {
+  "name": "Michel Baez",
+  "birthDate": "1996-01-21",
+  "debut": "2019-07-23",
+  "pitcher": true
+ },
+ "673316": {
+  "name": "Luke Barker",
+  "birthDate": "1992-03-11",
+  "debut": "2022-06-03",
+  "pitcher": true
+ },
+ "673451": {
+  "name": "Shogo Akiyama",
+  "birthDate": "1988-04-16",
+  "debut": "2020-07-24",
+  "pitcher": false
+ },
+ "673490": {
+  "name": "Ha-Seong Kim",
+  "birthDate": "1995-10-17",
+  "debut": "2021-04-01",
+  "pitcher": false
+ },
+ "673548": {
+  "name": "Seiya Suzuki",
+  "birthDate": "1994-08-18",
+  "debut": "2022-04-07",
+  "pitcher": false
+ },
+ "673633": {
+  "name": "Yoshihisa Hirano",
+  "birthDate": "1984-03-08",
+  "debut": "2018-03-29",
+  "pitcher": true
+ },
+ "673904": {
+  "name": "Jake Walsh",
+  "birthDate": "1995-07-20",
+  "debut": "2022-05-11",
+  "pitcher": true
+ },
+ "673962": {
+  "name": "Josh Jung",
+  "birthDate": "1998-02-12",
+  "debut": "2022-09-09",
+  "pitcher": false
+ },
+ "675540": {
+  "name": "Xzavion Curry",
+  "birthDate": "1998-07-27",
+  "debut": "2022-08-15",
+  "pitcher": true
+ },
+ "675627": {
+  "name": "Michael Grove",
+  "birthDate": "1996-12-18",
+  "debut": "2022-05-15",
+  "pitcher": true
+ },
+ "675649": {
+  "name": "Brian Miller",
+  "birthDate": "1995-08-20",
+  "debut": "2021-07-30",
+  "pitcher": false
+ },
+ "675911": {
+  "name": "Spencer Strider",
+  "birthDate": "1998-10-28",
+  "debut": "2021-10-01",
+  "pitcher": true
+ },
+ "675912": {
+  "name": "Zac Lowther",
+  "birthDate": "1996-04-30",
+  "debut": "2021-04-25",
+  "pitcher": true
+ },
+ "675916": {
+  "name": "James Karinchak",
+  "birthDate": "1995-09-22",
+  "debut": "2019-09-14",
+  "pitcher": true
+ },
+ "675971": {
+  "name": "Kyle Dohy",
+  "birthDate": "1996-09-17",
+  "debut": "2021-10-02",
+  "pitcher": true
+ },
+ "676103": {
+  "name": "Damon Jones",
+  "birthDate": "1994-09-30",
+  "debut": "2021-08-10",
+  "pitcher": true
+ },
+ "676194": {
+  "name": "Jackson Tetreault",
+  "birthDate": "1996-06-03",
+  "debut": "2022-06-14",
+  "pitcher": true
+ },
+ "676391": {
+  "name": "Ernie Clement",
+  "birthDate": "1996-03-22",
+  "debut": "2021-06-13",
+  "pitcher": false
+ },
+ "676424": {
+  "name": "Alec Bettinger",
+  "birthDate": "1995-07-13",
+  "debut": "2021-05-02",
+  "pitcher": true
+ },
+ "676475": {
+  "name": "Alec Burleson",
+  "birthDate": "1998-11-25",
+  "debut": "2022-09-08",
+  "pitcher": false
+ },
+ "676477": {
+  "name": "Garrett Whitlock",
+  "birthDate": "1996-06-11",
+  "debut": "2021-04-04",
+  "pitcher": true
+ },
+ "676628": {
+  "name": "Mark Contreras",
+  "birthDate": "1995-01-24",
+  "debut": "2022-05-11",
+  "pitcher": false
+ },
+ "676637": {
+  "name": "Phoenix Sanders",
+  "birthDate": "1995-06-05",
+  "debut": "2022-04-14",
+  "pitcher": true
+ },
+ "676641": {
+  "name": "Beau Sulser",
+  "birthDate": "1994-05-05",
+  "debut": "2022-04-26",
+  "pitcher": true
+ },
+ "676660": {
+  "name": "Jared Solomon",
+  "birthDate": "1997-06-10",
+  "debut": "2022-05-07",
+  "pitcher": true
+ },
+ "676684": {
+  "name": "Will Vest",
+  "birthDate": "1995-06-06",
+  "debut": "2021-04-01",
+  "pitcher": true
+ },
+ "676694": {
+  "name": "Jake Meyers",
+  "birthDate": "1996-06-18",
+  "debut": "2021-08-01",
+  "pitcher": false
+ },
+ "676710": {
+  "name": "Kutter Crawford",
+  "birthDate": "1996-04-01",
+  "debut": "2021-09-05",
+  "pitcher": true
+ },
+ "676714": {
+  "name": "Brandon Hughes",
+  "birthDate": "1995-12-01",
+  "debut": "2022-05-17",
+  "pitcher": true
+ },
+ "676724": {
+  "name": "Jared Young",
+  "birthDate": "1995-07-09",
+  "debut": "2022-09-16",
+  "pitcher": false
+ },
+ "676766": {
+  "name": "Nick Snyder",
+  "birthDate": "1995-10-10",
+  "debut": "2021-08-21",
+  "pitcher": true
+ },
+ "676782": {
+  "name": "Mickey McDonald",
+  "birthDate": "1995-06-02",
+  "debut": "2022-04-20",
+  "pitcher": false
+ },
+ "676879": {
+  "name": "Aaron Ashby",
+  "birthDate": "1998-05-24",
+  "debut": "2021-06-30",
+  "pitcher": true
+ },
+ "676900": {
+  "name": "Ryan Dorow",
+  "birthDate": "1995-08-21",
+  "debut": "2021-08-26",
+  "pitcher": false
+ },
+ "676917": {
+  "name": "Cade Cavalli",
+  "birthDate": "1998-08-14",
+  "debut": "2022-08-26",
+  "pitcher": true
+ },
+ "676946": {
+  "name": "Matthew Batten",
+  "birthDate": "1995-06-22",
+  "debut": "2022-06-30",
+  "pitcher": false
+ },
+ "676950": {
+  "name": "David MacKinnon",
+  "birthDate": "1994-12-15",
+  "debut": "2022-06-18",
+  "pitcher": false
+ },
+ "676974": {
+  "name": "Max Meyer",
+  "birthDate": "1999-03-12",
+  "debut": "2022-07-16",
+  "pitcher": true
+ },
+ "677053": {
+  "name": "Andrew Nardi",
+  "birthDate": "1998-08-18",
+  "debut": "2022-08-16",
+  "pitcher": true
+ },
+ "677161": {
+  "name": "Zack Kelly",
+  "birthDate": "1995-03-03",
+  "debut": "2022-08-29",
+  "pitcher": true
+ },
+ "677551": {
+  "name": "Wander Franco",
+  "birthDate": "2001-03-01",
+  "debut": "2021-06-22",
+  "pitcher": false
+ },
+ "677594": {
+  "name": "Julio Rodr\u00edguez",
+  "birthDate": "2000-12-29",
+  "debut": "2022-04-08",
+  "pitcher": false
+ },
+ "677651": {
+  "name": "Luis Garcia",
+  "birthDate": "1996-12-13",
+  "debut": "2020-09-04",
+  "pitcher": true
+ },
+ "677951": {
+  "name": "Bobby Witt Jr.",
+  "birthDate": "2000-06-14",
+  "debut": "2022-04-07",
+  "pitcher": false
+ },
+ "678394": {
+  "name": "Brayan Bello",
+  "birthDate": "1999-05-17",
+  "debut": "2022-07-06",
+  "pitcher": true
+ },
+ "678662": {
+  "name": "Ezequiel Tovar",
+  "birthDate": "2001-08-01",
+  "debut": "2022-09-23",
+  "pitcher": false
+ },
+ "679529": {
+  "name": "Spencer Torkelson",
+  "birthDate": "1999-08-26",
+  "debut": "2022-04-08",
+  "pitcher": false
+ },
+ "680552": {
+  "name": "Travis Swaggerty",
+  "birthDate": "1997-08-19",
+  "debut": "2022-06-07",
+  "pitcher": false
+ },
+ "680692": {
+  "name": "Jonathan Stiever",
+  "birthDate": "1997-05-12",
+  "debut": "2020-09-13",
+  "pitcher": true
+ },
+ "680739": {
+  "name": "Josh Winder",
+  "birthDate": "1996-10-11",
+  "debut": "2022-04-12",
+  "pitcher": true
+ },
+ "680757": {
+  "name": "Steven Kwan",
+  "birthDate": "1997-09-05",
+  "debut": "2022-04-07",
+  "pitcher": false
+ },
+ "680776": {
+  "name": "Jarren Duran",
+  "birthDate": "1996-09-05",
+  "debut": "2021-07-17",
+  "pitcher": false
+ },
+ "680777": {
+  "name": "Ryan Jeffers",
+  "birthDate": "1997-06-03",
+  "debut": "2020-08-20",
+  "pitcher": false
+ },
+ "680963": {
+  "name": "Cody Wilson",
+  "birthDate": "1996-07-04",
+  "debut": "2021-04-07",
+  "pitcher": false
+ },
+ "681082": {
+  "name": "Bryson Stott",
+  "birthDate": "1997-10-06",
+  "debut": "2022-04-08",
+  "pitcher": false
+ },
+ "681217": {
+  "name": "Chase Silseth",
+  "birthDate": "2000-05-18",
+  "debut": "2022-05-13",
+  "pitcher": true
+ },
+ "681481": {
+  "name": "Kerry Carpenter",
+  "birthDate": "1997-09-02",
+  "debut": "2022-08-10",
+  "pitcher": false
+ },
+ "681584": {
+  "name": "David Villar",
+  "birthDate": "1997-01-27",
+  "debut": "2022-07-04",
+  "pitcher": false
+ },
+ "681799": {
+  "name": "Ethan Roberts",
+  "birthDate": "1997-07-04",
+  "debut": "2022-04-09",
+  "pitcher": true
+ },
+ "681806": {
+  "name": "Andrew Wantz",
+  "birthDate": "1995-10-13",
+  "debut": "2021-07-04",
+  "pitcher": true
+ },
+ "681810": {
+  "name": "Austin Warren",
+  "birthDate": "1996-02-05",
+  "debut": "2021-07-29",
+  "pitcher": true
+ },
+ "681885": {
+  "name": "Evan Lee",
+  "birthDate": "1997-06-18",
+  "debut": "2022-06-01",
+  "pitcher": true
+ },
+ "681987": {
+  "name": "Nate Eaton",
+  "birthDate": "1996-12-22",
+  "debut": "2022-07-14",
+  "pitcher": false
+ },
+ "682016": {
+  "name": "William Woods",
+  "birthDate": "1998-12-29",
+  "debut": "2022-04-27",
+  "pitcher": true
+ },
+ "682027": {
+  "name": "Cam Alldred",
+  "birthDate": "1996-07-25",
+  "debut": "2022-05-12",
+  "pitcher": true
+ },
+ "682051": {
+  "name": "Garrett Hill",
+  "birthDate": "1996-01-16",
+  "debut": "2022-07-04",
+  "pitcher": true
+ },
+ "682073": {
+  "name": "David Hensley",
+  "birthDate": "1996-03-28",
+  "debut": "2022-08-27",
+  "pitcher": false
+ },
+ "682171": {
+  "name": "Penn Murfee",
+  "birthDate": "1994-05-02",
+  "debut": "2022-04-29",
+  "pitcher": true
+ },
+ "682626": {
+  "name": "Francisco Alvarez",
+  "birthDate": "2001-11-19",
+  "debut": "2022-09-30",
+  "pitcher": false
+ },
+ "682985": {
+  "name": "Riley Greene",
+  "birthDate": "2000-09-28",
+  "debut": "2022-06-18",
+  "pitcher": false
+ },
+ "682998": {
+  "name": "Corbin Carroll",
+  "birthDate": "2000-08-21",
+  "debut": "2022-08-29",
+  "pitcher": false
+ },
+ "683002": {
+  "name": "Gunnar Henderson",
+  "birthDate": "2001-06-29",
+  "debut": "2022-08-31",
+  "pitcher": false
+ },
+ "683146": {
+  "name": "Brett Baty",
+  "birthDate": "1999-11-13",
+  "debut": "2022-08-17",
+  "pitcher": false
+ },
+ "683769": {
+  "name": "Hunter Gaddis",
+  "birthDate": "1998-04-09",
+  "debut": "2022-08-05",
+  "pitcher": true
+ },
+ "685493": {
+  "name": "Shun Yamaguchi",
+  "birthDate": "1987-07-11",
+  "debut": "2020-07-26",
+  "pitcher": true
+ },
+ "685503": {
+  "name": "Kohei Arihara",
+  "birthDate": "1992-08-11",
+  "debut": "2021-04-03",
+  "pitcher": true
+ },
+ "686469": {
+  "name": "Vinnie Pasquantino",
+  "birthDate": "1997-10-10",
+  "debut": "2022-06-28",
+  "pitcher": false
+ },
+ "686613": {
+  "name": "Hunter Brown",
+  "birthDate": "1998-08-29",
+  "debut": "2022-09-05",
+  "pitcher": true
+ },
+ "686681": {
+  "name": "Michael Massey",
+  "birthDate": "1998-03-22",
+  "debut": "2022-07-15",
+  "pitcher": false
+ },
+ "686753": {
+  "name": "Drey Jameson",
+  "birthDate": "1997-08-17",
+  "debut": "2022-09-15",
+  "pitcher": true
+ },
+ "688010": {
+  "name": "Nate Fisher",
+  "birthDate": "1996-05-28",
+  "debut": "2022-08-21",
+  "pitcher": true
+ },
+ "689225": {
+  "name": "Beau Brieske",
+  "birthDate": "1998-04-04",
+  "debut": "2022-04-23",
+  "pitcher": true
+ },
+ "693821": {
+  "name": "Bryce Elder",
+  "birthDate": "1999-05-19",
+  "debut": "2022-04-12",
+  "pitcher": true
  }
 }

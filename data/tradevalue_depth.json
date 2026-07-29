@@ -29924,6 +29924,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 691435,
+   "name": "Juan Castillo",
+   "team": "COL",
+   "level": "Single-A",
+   "pos": "C",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 692165,
    "name": "Tyrelle Chadwick",
    "team": "COL",
@@ -36599,6 +36608,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 801653,
+   "name": "Harrison Kreiling",
+   "team": "SEA",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 699699,
    "name": "Aneury Lora",
    "team": "SEA",
@@ -38545,15 +38563,6 @@
    "team": "SEA",
    "level": "Rookie",
    "pos": "3B",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 801653,
-   "name": "Harrison Kreiling",
-   "team": "SEA",
-   "level": "Rookie",
-   "pos": "P",
    "value": 300000,
    "path": "unranked"
   },
@@ -41247,6 +41256,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 800727,
+   "name": "Jackson Dannelley",
+   "team": "WSH",
+   "level": "High-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 695538,
    "name": "Randal Diaz",
    "team": "WSH",
@@ -41366,6 +41384,15 @@
   {
    "mlbam": 807480,
    "name": "Jacob Roberts",
+   "team": "WSH",
+   "level": "High-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 691017,
+   "name": "Travis Sthele",
    "team": "WSH",
    "level": "High-A",
    "pos": "P",
@@ -42458,15 +42485,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 800727,
-   "name": "Jackson Dannelley",
-   "team": "WSH",
-   "level": "Single-A",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 806112,
    "name": "Kevin Davis",
    "team": "WSH",
@@ -42634,15 +42652,6 @@
    "team": "WSH",
    "level": "Single-A",
    "pos": "LF",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 691017,
-   "name": "Travis Sthele",
-   "team": "WSH",
-   "level": "Single-A",
-   "pos": "P",
    "value": 300000,
    "path": "unranked"
   },
@@ -50140,15 +50149,6 @@
    "team": "COL",
    "level": "High-A",
    "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 691435,
-   "name": "Juan Castillo",
-   "team": "COL",
-   "level": "High-A",
-   "pos": "C",
    "value": 300000,
    "path": "unranked"
   },
