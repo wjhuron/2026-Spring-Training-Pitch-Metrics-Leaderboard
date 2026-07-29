@@ -1249,7 +1249,7 @@ body.compact #table-pinned-body td { padding: 4px 8px; font-size: 12px; }
 }
 .player-page-content {
   display: grid;
-  grid-template-columns: 260px 1fr 1fr;
+  grid-template-columns: 260px minmax(0, 1fr) minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -1506,6 +1506,14 @@ body.compact #table-pinned-body td { padding: 4px 8px; font-size: 12px; }
   height: 100% !important;
 }
 
+/* Wide tables scroll inside their wrapper instead of stretching the column */
+.player-pitch-table,
+#player-count-table,
+#player-game-grades-table {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .player-pitch-stats-table {
   width: 100%;
   border-collapse: collapse;
@@ -1759,7 +1767,7 @@ body.compact #table-pinned-body td { padding: 4px 8px; font-size: 12px; }
 
 @media (max-width: 1100px) {
   .player-page-content {
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 240px minmax(0, 1fr);
   }
   .player-col-movement {
     grid-column: 1 / -1;
@@ -1768,10 +1776,20 @@ body.compact #table-pinned-body td { padding: 4px 8px; font-size: 12px; }
 
 @media (max-width: 768px) {
   .player-page-content {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .player-col {
+    min-width: 0;
+    padding: 14px;
   }
   .player-page {
     padding: 12px;
+  }
+  .player-page-inner {
+    padding: 12px 0;
+  }
+  .player-position {
+    white-space: normal;
   }
   .pctl-row {
     grid-template-columns: 90px 1fr 36px 70px;
