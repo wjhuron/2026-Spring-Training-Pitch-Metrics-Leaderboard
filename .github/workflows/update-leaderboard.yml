@@ -43,7 +43,7 @@ jobs:
       # Stuff+ is an offline-trained model (needs xgboost), so it runs here
       # rather than inside process_data.py. It trains on the fresh pickle that
       # process_data.py just built, injects scores into the leaderboard JSONs,
-      # then rebuild_embed.py swaps those into data_embedded.json.gz (which
+      # then rebuild_embed.py swaps those into data_core.json.gz (which
       # process_data.py built with the previous run's preserved scores).
       - name: Fetch prior-season training data (encrypted release asset)
         # The 2025 retagged training set travels as AES-256 ciphertext on the
@@ -127,65 +127,11 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
         run: python3 scripts/sheets_write_grades.py
 
+      # Gate the publish on real output integrity — same script Wally can
+      # run locally after a pipeline run (checks leaderboard JSONs and both
+      # embed chunks of the 2026-07-29 core/heavy split).
       - name: Validate output integrity
-        run: |
-          python3 -c "
-          import json, sys, os
-
-          errors = []
-
-          # Row count and field-level checks
-          REQUIRED_FIELDS = {
-              'data/pitch_leaderboard_rs.json': ['pitcher', 'team', 'pitchType', 'count'],
-              'data/pitcher_leaderboard_rs.json': ['pitcher', 'team', 'era'],
-              'data/hitter_leaderboard_rs.json': ['hitter', 'team', 'pa'],
-          }
-          for f, fields in REQUIRED_FIELDS.items():
-              d = json.load(open(f))
-              if len(d) < 50:
-                  errors.append(f'FAIL: {f} has only {len(d)} rows (expected 50+)')
-              else:
-                  print(f'OK: {f} has {len(d)} rows')
-              # Spot-check first row has required fields
-              if d:
-                  missing = [k for k in fields if k not in d[0]]
-                  if missing:
-                      errors.append(f'FAIL: {f} missing fields: {missing}')
-
-          # Check the gzipped payload: non-trivial size AND actually
-          # inflates to JSON with the keys the frontend reads. A truncated
-          # or corrupt .gz would break the live site for every visitor, so
-          # validate it for real (cheap — ~1-2s for ~17 MB).
-          import gzip
-          gz = 'data/data_embedded.json.gz'
-          if os.path.exists('data/data_embedded.js'):
-              errors.append('FAIL: legacy data/data_embedded.js still present (should be replaced by the .gz)')
-          if not os.path.exists(gz):
-              errors.append(f'FAIL: {gz} is missing')
-          else:
-              size = os.path.getsize(gz)
-              if size < 1_000_000:
-                  errors.append(f'FAIL: {gz} is only {size} bytes (expected >1 MB)')
-              else:
-                  try:
-                      obj = json.loads(gzip.decompress(open(gz, 'rb').read()))
-                      need = ['pitcherData', 'pitchData', 'hitterData', 'metadata', 'microData']
-                      miss = [k for k in need if k not in obj]
-                      npitch = len(obj.get('pitcherData', []))
-                      if miss:
-                          errors.append(f'FAIL: {gz} inflated but missing keys: {miss}')
-                      elif npitch < 50:
-                          errors.append(f'FAIL: {gz} pitcherData has only {npitch} rows')
-                      else:
-                          print(f'OK: {gz} is {size:,} bytes, inflates to JSON ({npitch} pitchers)')
-                  except Exception as e:
-                      errors.append(f'FAIL: {gz} did not decompress/parse: {e}')
-
-          if errors:
-              for e in errors:
-                  print(e)
-              sys.exit(1)
-          "
+        run: python3 scripts/validate_output.py
 
       - name: Commit and push if changed
         run: |

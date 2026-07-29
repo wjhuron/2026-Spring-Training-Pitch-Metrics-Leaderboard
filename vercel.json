@@ -22,7 +22,14 @@
       ]
     },
     {
-      "source": "/data/data_embedded.json.gz",
+      "source": "/data/data_core.json.gz",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
+        { "key": "Content-Type", "value": "application/gzip" }
+      ]
+    },
+    {
+      "source": "/data/data_heavy.json.gz",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
         { "key": "Content-Type", "value": "application/gzip" }
