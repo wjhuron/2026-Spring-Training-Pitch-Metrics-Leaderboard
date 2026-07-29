@@ -104,6 +104,8 @@ def load_warhist():
             "salary": int(r["salary"]) if r["salary"] else None,
             "gPit": float(r["gPit"]) if r.get("gPit") else 0.0,
             "gsPit": float(r["gsPit"]) if r.get("gsPit") else 0.0,
+            "pa": float(r["pa"]) if r.get("pa") else 0.0,
+            "ipouts": float(r["ipouts"]) if r.get("ipouts") else 0.0,
         }
     return hist
 
