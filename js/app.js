@@ -129,6 +129,8 @@
       setupSidePanel();
       setupCompareModal();
       setupPercentileTooltips();
+      setupPctlTapTooltips();
+      setupScrollHints();
       setupKeyboardNav();
       setupColumnSettings();
       setupRangeFilters();
@@ -1396,6 +1398,60 @@
       if (!e.target.closest('td[data-pctl]')) {
         tooltip.classList.remove('visible');
       }
+    });
+  }
+
+  function setupScrollHints() {
+    const bars = document.querySelectorAll('.nav-sections, .nav-subtabs');
+    bars.forEach(function (el) {
+      el.classList.add('scroll-hint');
+      function update() {
+        el.classList.toggle('sh-left', el.scrollLeft > 2);
+        el.classList.toggle('sh-right', el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+      }
+      el.addEventListener('scroll', update, { passive: true });
+      // ResizeObserver also fires when a hidden subtab bar is shown on a
+      // section switch (size goes 0 -> real), so hints stay correct there.
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(update).observe(el);
+      } else {
+        window.addEventListener('resize', update);
+      }
+      update();
+    });
+  }
+
+  // Touch has no hover: tapping a percentile row (player page / side panel)
+  // shows the circle's title text in the shared fixed tooltip. Desktop clicks
+  // do the same, which just duplicates the native title — harmless.
+  function setupPctlTapTooltips() {
+    const tooltip = document.getElementById('pctl-tooltip');
+    let hideTimer = null;
+    document.addEventListener('click', function (e) {
+      const row = e.target.closest('.pctl-row');
+      if (!row) {
+        // Leaderboard cells keep their own hover handlers; don't fight them.
+        if (!e.target.closest('td[data-pctl]')) tooltip.classList.remove('visible');
+        return;
+      }
+      const circle = row.querySelector('.pctl-circle');
+      if (!circle) return;
+      // Some render paths (per-pitch xRV rows) set no title on qualified
+      // circles — fall back to the percentile the circle displays.
+      let text = circle.title;
+      if (!text) {
+        const pct = parseInt(circle.textContent, 10);
+        if (isNaN(pct)) return;
+        text = Utils.ordinal(pct) + ' percentile';
+      }
+      tooltip.textContent = text;
+      tooltip.classList.add('visible');
+      const x = Math.max(8, Math.min(e.clientX + 12, window.innerWidth - tooltip.offsetWidth - 8));
+      const y = Math.max(8, e.clientY - 34);
+      tooltip.style.left = x + 'px';
+      tooltip.style.top = y + 'px';
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(function () { tooltip.classList.remove('visible'); }, 2600);
     });
   }
 

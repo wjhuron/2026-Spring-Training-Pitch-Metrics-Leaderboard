@@ -1097,6 +1097,22 @@ tbody td.col-compare input[type="checkbox"] {
 
 .pctl-tooltip.visible { opacity: 1; }
 
+/* Scroll-hint fades on swipeable tab bars: their scrollbars are hidden on
+   mobile, so a faded edge is the only cue that more tabs sit off-screen.
+   sh-left/sh-right are toggled by setupScrollHints() from scroll position. */
+.scroll-hint.sh-right {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+}
+.scroll-hint.sh-left {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 36px);
+  mask-image: linear-gradient(to right, transparent, #000 36px);
+}
+.scroll-hint.sh-left.sh-right {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent);
+}
+
 /* === Footer === */
 footer {
   padding: 16px 32px 32px;
