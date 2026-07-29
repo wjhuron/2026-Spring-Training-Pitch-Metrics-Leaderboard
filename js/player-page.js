@@ -21,14 +21,14 @@ var PlayerPage = {
     { key: 'kPct',              label: 'K%',               format: function(v) { return Utils.formatPct(v); } },
     { key: 'bbPct',             label: 'BB%',              format: function(v) { return Utils.formatPct(v); } },
     { key: 'kbbPct',            label: 'K-BB%',            format: function(v) { return Utils.formatPct(v, true); } },
-    { key: 'siera',             label: 'SIERA',            format: function(v) { return v != null ? v.toFixed(2) : '—'; }, rocHide: true },
+    { key: 'siera',             label: 'SIERA',            format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
     // Bat-missing process. (Zone% and Z-Whiff% live in the tables below —
     // battery 2026-07-20: Zone% pred ~0, Z-Whiff% r=.83 with Whiff%.)
     { key: 'swStrPct',          label: 'Whiff%',           format: function(v) { return Utils.formatPct(v); } },
     { key: 'chasePct',          label: 'Chase%',           format: function(v) { return Utils.formatPct(v); } },
     // Contact allowed. (xwOBAcon stays in the batted-ball table — pitcher-side
     // split-half reliability .26; a percentile bubble overstates it.)
-    { key: 'xwOBA',             label: 'xwOBA',            format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, rocHide: true },
+    { key: 'xwOBA',             label: 'xwOBA',            format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'hardHitPct',        label: 'Hard-Hit%',        format: function(v) { return Utils.formatPct(v); } },
     { key: 'barrelPctAgainst',  label: 'Barrel%',          format: function(v) { return Utils.formatPct(v); } },
     { key: 'gbPct',             label: 'GB%',              format: function(v) { return Utils.formatPct(v); } },
@@ -37,15 +37,15 @@ var PlayerPage = {
   HITTING_STATS: [
     // Quality summary — headlines first
     { key: 'hitterPlus',   label: 'Hitter+',     format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    { key: 'xWRCplus',     label: 'xWRC+',       format: function(v) { return v != null ? Math.round(v) : '—'; }, rocHide: true },
+    { key: 'xWRCplus',     label: 'xWRC+',       format: function(v) { return v != null ? Math.round(v) : '—'; } },
     // Hitter+ components (weights: BB+ 65%, CT+ 28%, SD+ 7%)
     { key: 'bbPlus',       label: 'BB+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'ctPlus',       label: 'CT+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'sdPlus',       label: 'SD+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
     // Expected outcomes (wOBA family)
-    { key: 'xwOBA',        label: 'xwOBA',       format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, rocHide: true },
-    { key: 'xwOBAcon',     label: 'xwOBAcon',    format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, rocHide: true },
-    { key: 'xwOBAsp',      label: 'xwOBAsp',     format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, rocHide: true },
+    { key: 'xwOBA',        label: 'xwOBA',       format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    { key: 'xwOBAcon',     label: 'xwOBAcon',    format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    { key: 'xwOBAsp',      label: 'xwOBAsp',     format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     // Contact quality (EV). EV50 over Avg EV (battery 2026-07-20: rel .93
     // vs .87, same predictive power — mirrors the leaderboard call).
     { key: 'ev50',         label: 'EV50',        format: function(v) { return v != null ? v.toFixed(1) + ' mph' : '—'; } },
@@ -83,7 +83,7 @@ var PlayerPage = {
     { key: 'babip', label: 'BABIP', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'wOBA', label: 'wOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'wRCplus', label: 'wRC+', format: function(v) { return v != null ? v : '—'; } },
-    { key: 'xWRCplus', label: 'xWRC+', format: function(v) { return v != null ? v : '—'; }, rocHide: true },
+    { key: 'xWRCplus', label: 'xWRC+', format: function(v) { return v != null ? v : '—'; } },
     { key: 'hitterPlus', label: 'Hitter+', format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'bbPct', label: 'BB%', format: function(v) { return Utils.formatPct(v); } },
     { key: 'kPct', label: 'K%', format: function(v) { return Utils.formatPct(v); } },
@@ -155,7 +155,7 @@ var PlayerPage = {
     { key: 'indVertBrk', label: 'IVB',  format: function(v) { return v != null ? v.toFixed(1) + '"' : '—'; } },
     { key: 'horzBrk',    label: 'HB',   format: function(v) { return v != null ? v.toFixed(1) + '"' : '—'; } },
     { key: 'extension', label: 'Ext',   format: function(v) { return v != null ? Utils.formatFeetInches(v) : '—'; } },
-    { key: 'armAngle',  label: 'Arm\u00B0', format: function(v) { return v != null ? v.toFixed(1) + '\u00B0' : '—'; }, rocHide: true },
+    { key: 'armAngle',  label: 'Arm\u00B0', format: function(v) { return v != null ? v.toFixed(1) + '\u00B0' : '—'; } },
   ],
 
   EXPANDED_PITCH_COLS: [
