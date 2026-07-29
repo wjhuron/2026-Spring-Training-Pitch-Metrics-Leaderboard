@@ -335,6 +335,39 @@ def main():
         "players": players,
     }
     OUT_PATH.write_text(json.dumps(out, indent=1))
+
+    # site export: trimmed records for the trade-builder page
+    site = []
+    for r in players:
+        nm = r["name"]
+        if "," in nm:
+            last, first = nm.split(",", 1)
+            nm = f"{first.strip()} {last.strip()}"
+        rec = {
+            "n": nm, "t": r["team"], "p": r["pos"], "e": r["engine"],
+            "s": round(r["surplus"] / 1e6, 1),
+            "m": round(r["marketValue"] / 1e6, 1),
+        }
+        if r["engine"] == "prospect":
+            rec["fv"] = r["fv"]
+            if r.get("eta"):
+                rec["eta"] = r["eta"]
+        else:
+            rec["w"] = r["warY1"]
+            rec["c"] = r["controlYears"]
+            if r.get("contract"):
+                rec["k"] = r["contract"][:40]
+        site.append(rec)
+    site_payload = {
+        "generated": out["generated"],
+        "note": ("Intrinsic surplus + market-adjusted value, 2026 dollars. "
+                 "Projections: ATC opening-day 2026."),
+        "players": site,
+    }
+    (BASE / "js" / "tradevalue_data.js").write_text(
+        "window.TRADE_VALUES = " + json.dumps(site_payload) + ";\n")
+    print(f"Site export: js/tradevalue_data.js ({len(site)} players)")
+
     n_mlb = sum(1 for r in players if r["engine"] == "mlb")
     n_pro = len(players) - n_mlb
     print(f"Wrote {len(players)} players ({n_mlb} mlb + {n_pro} prospect) -> {OUT_PATH}")
