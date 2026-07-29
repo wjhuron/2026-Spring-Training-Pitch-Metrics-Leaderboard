@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Write per-pitch Stuff+ / Loc+ grades into the Sheets grade columns.
+"""Write per-pitch Stuff+ / Loc+ / Pitching+ grades into the Sheets grade columns.
 
 Reads the two grade dumps keyed by sheet position ("tab\trow" -> float grade):
   - data/pitch_stuff_grades.json      (train_stuff_v11.py --dump-pitch-grades)
   - data/pitch_loc_grades_rs.json     (process_data.py -> pipeline_locplus)
 
-and overwrites the Stuff+ / Loc+ columns (X:Y, positions 24-25 after HAA) in
+and overwrites the Stuff+ / Loc+ / Pitching+ columns (X:Z, positions 24-26 after HAA) in
 every migrated tab of the six division workbooks — full-column overwrite each
 run, so retags, late-arriving arm angles, and model retrains all self-heal.
 

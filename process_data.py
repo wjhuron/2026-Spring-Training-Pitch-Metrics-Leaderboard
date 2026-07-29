@@ -3699,6 +3699,12 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
                 row['sb'] = None
                 row['cs'] = None
                 row['sbPct'] = None
+                # Box-derived rate stats must exist (as None) on every row —
+                # same contract as the pitcher merge above, so a lookup miss
+                # renders as '-' instead of shipping rows with absent keys.
+                for k in ('avg', 'obp', 'slg', 'ops', 'iso',
+                          'kPct', 'bbPct', 'bbToK', 'babip'):
+                    row.setdefault(k, None)
 
     # Compute wRC and wRC+ for each hitter (after boxscore merge so wOBA is from official stats)
     # wRC  = (((wOBA - lgWOBA) / wOBAScale) + lgRPA) * PA
@@ -4446,9 +4452,9 @@ def bump_asset_version(index_path=None):
     timestamp (YYYYMMDDHHMMSS). Forces browsers to bypass cached CSS/JS/data
     whenever the pipeline regenerates output. Second-resolution so two runs
     that land in the same minute still produce distinct ?v= tags — required
-    because data_embedded.json.gz is served immutable with a static filename,
-    so an identical ?v= on differing content would serve stale data for up to
-    a year."""
+    because data_core.json.gz / data_heavy.json.gz are served immutable with
+    static filenames, so an identical ?v= on differing content would serve
+    stale data for up to a year."""
     if index_path is None:
         index_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                   'index.html')

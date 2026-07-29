@@ -115,6 +115,9 @@ TEAM_ABBREV_TO_ID = {
     'MIL': 158, 'MIN': 142, 'NYM': 121, 'NYY': 147, 'ATH': 133,
     'PHI': 143, 'PIT': 134, 'SDP': 135, 'SFG': 137, 'SEA': 136,
     'STL': 138, 'TBR': 139, 'TEX': 140, 'TOR': 141, 'WSH': 120,
+    # Rochester (WSH AAA) — club id, not parent org: the MLB ID lookup
+    # matches ROC hitters/pitchers on currentTeam.id == 534.
+    'ROC': 534,
 }
 
 

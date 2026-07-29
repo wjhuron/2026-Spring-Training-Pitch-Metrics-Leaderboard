@@ -4,6 +4,7 @@
 import gspread
 import json
 import os
+import re
 import time as time_module
 import urllib.request
 import urllib.parse
@@ -604,6 +605,10 @@ def lookup_mlb_id(player_name, team_abbrev, mlb_id_cache):
 
         if people:
             last_name = parts[0] if len(parts) == 2 else player_name.split()[-1]
+            # Sheet names can carry a generational suffix ("Romero Jr.")
+            # that the API's lastName field ("Romero") never does.
+            last_name = re.sub(r'\s+(jr\.?|sr\.?|ii|iii|iv|v)$', '', last_name,
+                               flags=re.IGNORECASE)
             for person in people:
                 if person.get('lastName', '').lower() == last_name.lower():
                     mlb_id = person['id']

@@ -2,13 +2,14 @@
 
 Runs, in order (each step consumes the previous step's output):
   1. abs_challenges.py     - append newly-final games to the dataset (~1 min)
-  2. abs_value_engine.py   - rebuild RE24 / count values / WP tables (~4 min)
-  3. abs_option_model.py   - perception fits + C(k,T,score) DP (~2 min)
-  4. abs_player_grades.py  - decision grades + CSVs to ~/Downloads (~2 min)
-  5. abs_backtest.py       - only with --backtest (weekly is plenty)
+  2. abs_hitter_zones.py   - modal ABS zone per hitter from the dataset (~10 s)
+  3. abs_value_engine.py   - rebuild RE24 / count values / WP tables (~4 min)
+  4. abs_option_model.py   - perception fits + C(k,T,score) DP (~2 min)
+  5. abs_player_grades.py  - decision grades + CSVs to ~/Downloads (~2 min)
+  6. abs_backtest.py       - only with --backtest (weekly is plenty)
 
-Scheduled via cron (installed 2026-07-20):
-  30 7 * * * cd ~/Huronalytics && python3 scripts/abs_daily.py >> ~/Library/Logs/abs_daily.log 2>&1
+Scheduled via LaunchAgent (com.huronalytics.absdaily, daily 07:30, logs to
+~/Library/Logs/abs_daily.log).
 
 Usage:
     python3 scripts/abs_daily.py [--backtest] [--skip-tables]
@@ -24,6 +25,10 @@ from datetime import datetime
 
 STEPS = [
     ("dataset", ["abs_challenges.py"]),
+    # hitter zones: modal ABS zone per hitter from the fresh dataset.
+    # Generator reconstructed 2026-07-29 (the original was never committed;
+    # verified to reproduce the shipped file exactly before wiring in).
+    ("hitter zones", ["abs_hitter_zones.py", "--apply"]),
     ("value tables", ["abs_value_engine.py"]),
     ("option model", ["abs_option_model.py"]),
     ("player grades", ["abs_player_grades.py"]),
@@ -55,7 +60,8 @@ def main():
     # publish the regenerated data so the live ABS section stays current
     data = ["data/abs_player_grades_2026.json", "data/abs_challenge_events_2026.json",
             "data/abs_hitter_zones_2026.json", "data/abs_backtest_2026.json",
-            "data/abs_value_tables_2026.json", "data/abs_option_model_2026.json"]
+            "data/abs_value_tables_2026.json", "data/abs_option_model_2026.json",
+            "data/abs_zone_misses_2026.json"]
     subprocess.run(["git", "add"] + data)
     diff = subprocess.run(["git", "diff", "--cached", "--quiet"])
     if diff.returncode != 0:
