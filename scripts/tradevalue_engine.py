@@ -35,6 +35,7 @@ CALIBRATION (phase 5, 2026-07-28, tradevalue_market.py):
 
 import json
 import re
+import unicodedata
 from datetime import date
 from pathlib import Path
 
@@ -235,6 +236,10 @@ def value_mlb(p, frac_y1):
     war1 = (p["warBat"] or 0.0) + (p["warPit"] or 0.0)
     if cfg["projectionIsRoS"]:
         war1 = war1 / max(frac_y1, cfg["minAnnualizeFrac"])
+    # validated Stuff+ projection adjustment (stuffedge_build.py):
+    # season-blocked pooled coefficient x stuff-vs-results residual,
+    # scaled to this pitcher's annualized workload
+    war1 += p.get("stuffWarAdj", 0.0)
     age = p["age"] if isinstance(p["age"], int) and 15 <= p["age"] <= 55 else None
     if age is None:
         age = cfg["defaultAge"]
@@ -350,13 +355,51 @@ def main():
     board_mlbam = {p["mlbam"] for p in u["prospects"] if p["mlbam"]}
     players = []
 
+    def _nrm(s):
+        s = unicodedata.normalize("NFKD", s)
+        s = "".join(c for c in s if not unicodedata.combining(c))
+        return s.lower().replace(".", "").strip()
+
+    def _keys(name):
+        """exact-normalized plus lastname|first-3 (Matt/Matthew tolerant)."""
+        full = _nrm(name)
+        parts = full.split(",", 1)
+        loose = (parts[0].strip() + "|" + parts[1].strip()[:3]
+                 if len(parts) == 2 and parts[1].strip() else None)
+        return full, loose
+
+    stuff_adj, stuff_loose = {}, {}
+    adj_path = DATA / "tradevalue_stuffadj.json"
+    if adj_path.exists():
+        elapsed = max(1.0 - frac, 0.2)
+        for rec in json.loads(adj_path.read_text())["players"]:
+            annual_pitches = rec["n"] / elapsed
+            war_adj = rec["adjRunsPerPitchPitcherPositive"] * annual_pitches / 10.0
+            full, loose = _keys(rec["name"])
+            stuff_adj[full] = war_adj
+            if loose:
+                # loose key kept only while unambiguous
+                stuff_loose[loose] = (None if loose in stuff_loose else war_adj)
+        print(f"stuff adjustments loaded for {len(stuff_adj)} pitchers")
+
     mlb_by_mlbam = {}
+    n_adj = 0
     for p in u["mlb"]:
+        full, loose = _keys(p["name"])
+        adj_val = stuff_adj.get(full)
+        if adj_val is None and loose:
+            adj_val = stuff_loose.get(loose) or 0.0
+        p["stuffWarAdj"] = adj_val or 0.0
+        if p["stuffWarAdj"]:
+            n_adj += 1
         surplus, years_out, flags = value_mlb(p, frac)
-        war_baseline = round(((p["warBat"] or 0) + (p["warPit"] or 0))
-                             / max(frac, CONFIG["minAnnualizeFrac"])
-                             if CONFIG["projectionIsRoS"]
-                             else (p["warBat"] or 0) + (p["warPit"] or 0), 2)
+        if p["stuffWarAdj"]:
+            flags.append("stuffAdjusted")
+        war_baseline = round((((p["warBat"] or 0) + (p["warPit"] or 0))
+                              / max(frac, CONFIG["minAnnualizeFrac"])
+                              if CONFIG["projectionIsRoS"]
+                              else (p["warBat"] or 0) + (p["warPit"] or 0))
+                             + p.get("stuffWarAdj", 0.0), 2)
         # role from projected usage when available (Cot's pos suffix
         # mislabels young starters tagged plain 'rhp' as relievers)
         if p.get("gPit"):
@@ -379,6 +422,9 @@ def main():
             mlb_by_mlbam[p["mlbam"]] = rec
         if not rec["alsoProspect"]:
             players.append(rec)
+
+    if stuff_adj:
+        print(f"stuff adjustments applied to {n_adj} universe pitchers")
 
     skipped_fv = 0
     for p in u["prospects"]:
