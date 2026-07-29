@@ -1,19 +1,22 @@
 #!/bin/sh
-# Auto-bump the ?v= cache-bust stamp in index.html whenever a js/ or css/ file
-# is part of the commit, so a code edit always reaches browsers instead of
-# serving a stale cached file. Keeps all asset versions on one shared stamp
-# (matching the leaderboard pipeline's convention).
+# Auto-bump the ?v= cache-bust stamp in index.html/trade.html whenever a js/
+# or css/ file is part of the commit, so a code edit always reaches browsers
+# instead of serving a stale cached file. Keeps all asset versions on one
+# shared stamp (matching the leaderboard pipeline's convention — same
+# [\w-]+ pattern bump_asset_version and js/data.js use).
 #
 # Installed via:  git config core.hooksPath .githooks
 # Skip once with: git commit --no-verify
 
 changed=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(js|css)/')
 [ -z "$changed" ] && exit 0
-[ -f index.html ] || exit 0
-grep -qE '\?v=[0-9]+' index.html || exit 0
 
 stamp=$(date +%Y%m%d%H%M%S)
-perl -pi -e "s/\?v=[0-9]+/?v=$stamp/g" index.html
-git add index.html
-echo "pre-commit: js/css changed -> bumped index.html cache-bust to $stamp"
+for page in index.html trade.html; do
+  [ -f "$page" ] || continue
+  grep -qE '\?v=[A-Za-z0-9_-]+' "$page" || continue
+  perl -pi -e "s/\?v=[\w-]+/?v=$stamp/g" "$page"
+  git add "$page"
+  echo "pre-commit: js/css changed -> bumped $page cache-bust to $stamp"
+done
 exit 0

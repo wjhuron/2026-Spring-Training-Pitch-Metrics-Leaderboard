@@ -19,7 +19,7 @@ class BaseballSavantHitterDownloader:
     (Intercept_X, Intercept_Y) that Pitcher2026 does not include.
     """
 
-    def __init__(self, download_dir="/Users/wallyhuron/Downloads"):
+    def __init__(self, download_dir=os.path.expanduser("~/Downloads")):
         self.download_dir = download_dir
         self.session = requests.Session()
         self.session.headers.update({

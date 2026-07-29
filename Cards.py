@@ -152,8 +152,8 @@ GRID_COLOR     = '#c5b89f'  # subtle grid on cream
 PHOTO_BORDER   = '#6a5f55'  # photo edge
 
 MLB_ID_CACHE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mlb_id_cache.json')
-OUTPUT_DIR = '/Users/wallyhuron/Downloads/'
-METADATA_PATH = '/Users/wallyhuron/Huronalytics/data/metadata_rs.json'
+OUTPUT_DIR = os.path.join(os.path.expanduser('~'), 'Downloads', '')
+METADATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'metadata_rs.json')
 
 # Guts constants for xRV computation. Read live from metadata_rs.json so the
 # values match whatever process_data.py used on its last run; otherwise a

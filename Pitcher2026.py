@@ -84,7 +84,7 @@ def compute_weather_adj_factor(rho_game):
 
 
 class BaseballSavantFocusedDownloader:
-    def __init__(self, download_dir="/Users/wallyhuron/Downloads"):
+    def __init__(self, download_dir=os.path.expanduser("~/Downloads")):
         """
         Initialize the Baseball Savant downloader with a focus on individual game data
         """

@@ -3,7 +3,7 @@ import base64
 import json
 import os
 
-REPO = "/Users/wallyhuron/Huronalytics"
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, "artifacts", "abs_matrix.html")
 
 with open(os.path.join(REPO, "data", "abs_value_tables_2026.json")) as f:

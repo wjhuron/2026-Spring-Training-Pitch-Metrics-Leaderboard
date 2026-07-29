@@ -4,7 +4,7 @@ import csv
 import json
 import os
 
-REPO = "/Users/wallyhuron/Huronalytics"
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, "artifacts", "abs_tables.html")
 
 with open(os.path.join(REPO, "data", "abs_player_grades_2026.json")) as f:

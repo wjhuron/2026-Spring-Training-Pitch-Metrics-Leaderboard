@@ -1,4 +1,5 @@
 import argparse
+import os
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -367,7 +368,7 @@ def main():
     if args.start is not None: start_date = args.start
     if args.end is not None: end_date = args.end
 
-    master_file = "/Users/wallyhuron/Downloads/mlb_transactions_master.csv"
+    master_file = os.path.expanduser("~/Downloads/mlb_transactions_master.csv")
 
     print(f"Starting scrape from {start_date} to {end_date}")
     print("-" * 50)
@@ -410,7 +411,7 @@ def main():
             df_combined.to_csv(master_file, index=False)
             print(f"\nAdded {len(df_new_only)} new transactions to master file")
 
-            new_only_file = f"/Users/wallyhuron/Downloads/mlb_transactions_new_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+            new_only_file = os.path.expanduser(f"~/Downloads/mlb_transactions_new_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
             df_new_only.to_csv(new_only_file, index=False)
             print(f"New transactions also saved to: {new_only_file}")
         else:

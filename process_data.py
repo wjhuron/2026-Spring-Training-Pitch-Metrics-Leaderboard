@@ -4448,31 +4448,33 @@ def write_embedded_js(rs_result):
 
 
 def bump_asset_version(index_path=None):
-    """Rewrite every `?v=...` query in index.html to the current build
-    timestamp (YYYYMMDDHHMMSS). Forces browsers to bypass cached CSS/JS/data
-    whenever the pipeline regenerates output. Second-resolution so two runs
-    that land in the same minute still produce distinct ?v= tags — required
-    because data_core.json.gz / data_heavy.json.gz are served immutable with
-    static filenames, so an identical ?v= on differing content would serve
-    stale data for up to a year."""
-    if index_path is None:
-        index_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                  'index.html')
-    if not os.path.exists(index_path):
-        print(f"  WARN: {index_path} not found; skipping version bump")
-        return
+    """Rewrite every `?v=...` query in index.html + trade.html to the current
+    build timestamp (YYYYMMDDHHMMSS). Forces browsers to bypass cached
+    CSS/JS/data whenever the pipeline regenerates output. Second-resolution so
+    two runs that land in the same minute still produce distinct ?v= tags —
+    required because data_core.json.gz / data_heavy.json.gz are served
+    immutable with static filenames, so an identical ?v= on differing content
+    would serve stale data for up to a year."""
+    repo = os.path.dirname(os.path.abspath(__file__))
+    paths = ([index_path] if index_path is not None else
+             [os.path.join(repo, 'index.html'), os.path.join(repo, 'trade.html')])
     build_tag = datetime.now().strftime('%Y%m%d%H%M%S')
-    with open(index_path, 'r') as f:
-        html = f.read()
-    new_html, n = re.subn(r'\?v=[\w-]+', f'?v={build_tag}', html)
-    if n > 0 and new_html != html:
-        with open(index_path, 'w') as f:
-            f.write(new_html)
-        print(f"  Bumped {n} ?v= query params in index.html to {build_tag}")
-    elif n > 0:
-        print(f"  index.html already at ?v={build_tag} (no change)")
-    else:
-        print("  No ?v= query params found in index.html")
+    for path in paths:
+        name = os.path.basename(path)
+        if not os.path.exists(path):
+            print(f"  WARN: {path} not found; skipping version bump")
+            continue
+        with open(path, 'r') as f:
+            html = f.read()
+        new_html, n = re.subn(r'\?v=[\w-]+', f'?v={build_tag}', html)
+        if n > 0 and new_html != html:
+            with open(path, 'w') as f:
+                f.write(new_html)
+            print(f"  Bumped {n} ?v= query params in {name} to {build_tag}")
+        elif n > 0:
+            print(f"  {name} already at ?v={build_tag} (no change)")
+        else:
+            print(f"  No ?v= query params found in {name}")
 
 
 def main():

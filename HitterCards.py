@@ -34,6 +34,10 @@ import sys
 from collections import defaultdict
 from math import atan2, pi
 
+_REPO = os.path.dirname(os.path.abspath(__file__))
+_PICKLE_PATH = os.path.join(_REPO, 'data', 'all_pitches_rs_cache.pkl')
+_HITTER_LB_PATH = os.path.join(_REPO, 'data', 'hitter_leaderboard_rs.json')
+
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle, FancyBboxPatch
 from matplotlib.colors import LinearSegmentedColormap
@@ -346,7 +350,7 @@ def fetch_pickle_from_release(out_path, verbose=True):
         return False
 
 
-def load_pitch_data(path='/Users/wallyhuron/Huronalytics/data/all_pitches_rs_cache.pkl',
+def load_pitch_data(path=_PICKLE_PATH,
                      auto_refresh=True):
     """Load the pitch-level pickle. When auto_refresh is True (default),
     the pickle is automatically refreshed from the latest GitHub Release
@@ -381,13 +385,13 @@ def load_pitch_data(path='/Users/wallyhuron/Huronalytics/data/all_pitches_rs_cac
         return pickle.load(f)
 
 
-def load_hitter_leaderboard(path='/Users/wallyhuron/Huronalytics/data/hitter_leaderboard_rs.json'):
+def load_hitter_leaderboard(path=_HITTER_LB_PATH):
     with open(path) as f:
         return json.load(f)
 
 
-def check_pickle_freshness(pickle_path='/Users/wallyhuron/Huronalytics/data/all_pitches_rs_cache.pkl',
-                            leaderboard_path='/Users/wallyhuron/Huronalytics/data/hitter_leaderboard_rs.json'):
+def check_pickle_freshness(pickle_path=_PICKLE_PATH,
+                            leaderboard_path=_HITTER_LB_PATH):
     """Compare pickle mtime against the leaderboard JSON's most-recent
     lastGameDate. Returns (is_stale, pickle_latest_date_str, json_latest_date_str).
 

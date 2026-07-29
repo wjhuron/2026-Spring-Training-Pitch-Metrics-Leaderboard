@@ -705,7 +705,7 @@ def update_cells_with_retry(ws, cells, max_retries=5, **kwargs):
     )
 
 
-def write_report(report_data, output_dir='/Users/wallyhuron/Downloads/'):
+def write_report(report_data, output_dir=os.path.join(os.path.expanduser('~'), 'Downloads', '')):
     """Write an Excel report with one tab per team showing all changed rows.
     Changed cells are bold; column header row shows which columns had changes."""
     from openpyxl import Workbook
