@@ -81,6 +81,14 @@ CONFIG = {
     },
     # prospect adjustment multipliers: 1.0 until fitted (phase 5)
     "prospectMultipliers": {"eta": 1.0, "position": 1.0, "role": 1.0, "roster": 1.0},
+    # graduation-cliff blend (gradcliff_fit.py): value = w x FV$ + (1-w) x
+    # engine$, w by years since the player's last Board FV. Fit on realized
+    # 4-yr WAR of 758 graduates 2017-2021, LOSO 5/5 vs projection-only,
+    # confirmed on the untouched 2022 cohort; single weight (tier and
+    # position splits tested, not earned). MSE-fit; MAE would say ~0.35-0.40
+    # (right-skew: values are expectations, so the mean-targeting loss is
+    # the principled one).
+    "gradBlendRamp": {0: 0.60, 1: 0.45, 2: 0.30, 3: 0.10},
 }
 
 PROSPECT_PITCHER_POS = {"SP", "SIRP", "MIRP", "RP"}
@@ -425,6 +433,48 @@ def main():
 
     if stuff_adj:
         print(f"stuff adjustments applied to {n_adj} universe pitchers")
+
+    # graduation blend: last Board FV within the ramp window pulls a
+    # graduated player's value toward his FV-table value
+    hist_path = DATA / "tradevalue_board_hist.json"
+    last_fv = {}   # key (fgId or normName) -> (fv, listSeason), newest wins
+    if hist_path.exists():
+        raw = json.loads(hist_path.read_text())
+        for season_key in sorted(raw, reverse=True):
+            season = int(season_key[:4])
+            if SEASON - season > max(CONFIG["gradBlendRamp"]):
+                continue
+            for r in raw[season_key]:
+                fv = str(r.get("fv") or "").strip()
+                if fv not in CONFIG["fvTable"]:
+                    continue
+                for key in (str(r.get("fgId") or ""),
+                            _nrm(r.get("name") or "")):
+                    if key and key not in last_fv:
+                        last_fv[key] = (fv, season)
+    n_blend = 0
+    for r in players:
+        if r["engine"] != "mlb":
+            continue
+        parts = r["name"].split(",", 1)
+        flipped = (parts[1].strip() + " " + parts[0].strip()
+                   if len(parts) == 2 else r["name"])
+        hit = (last_fv.get(str(r.get("fgId") or "x"))
+               or last_fv.get(_nrm(flipped)))
+        if not hit:
+            continue
+        fv, season = hit
+        t = SEASON - season
+        w = CONFIG["gradBlendRamp"].get(t)
+        if w is None:
+            continue
+        is_pitcher = r.get("role") in ("SP", "RP")
+        fv_dollars = CONFIG["fvTable"][fv][1 if is_pitcher else 0]
+        r["surplus"] = w * fv_dollars + (1 - w) * r["surplus"]
+        r["gradBlend"] = {"fv": fv, "listSeason": season, "w": w}
+        r["flags"].append("gradBlend")
+        n_blend += 1
+    print(f"graduation blend applied to {n_blend} recent graduates")
 
     skipped_fv = 0
     for p in u["prospects"]:

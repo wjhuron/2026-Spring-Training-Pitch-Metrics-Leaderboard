@@ -322,11 +322,18 @@ def load_context():
             "people": people, "contractHist": hist}
 
 
-def board_chain(trade_date, season):
+# graduation blend ramp (gradcliff_fit.py): weight on the FV value by
+# years since graduation (debut); beyond the ramp the projection stands alone
+GRAD_RAMP = {0: 0.60, 1: 0.45, 2: 0.30, 3: 0.10}
+
+
+def board_chain(trade_date, season, depth=1):
     variant = "prospect" if trade_date[5:7] < "06" else "updated"
-    return [f"{season}{variant}",
-            f"{season}{'updated' if variant == 'prospect' else 'prospect'}",
-            f"{season - 1}updated"]
+    chain = [f"{season}{variant}",
+             f"{season}{'updated' if variant == 'prospect' else 'prospect'}"]
+    for back in range(1, depth + 1):
+        chain += [f"{season - back}updated", f"{season - back}prospect"]
+    return chain
 
 
 def value_traded_player(mlbam, name, trade_date, season, ctx):
@@ -334,22 +341,24 @@ def value_traded_player(mlbam, name, trade_date, season, ctx):
     person = people.get(str(mlbam), {})
     debut = person.get("debut")
     debut_year = int(debut[:4]) if debut else None
-    board_eligible = debut_year is None or season - debut_year <= 1
-    if board_eligible:
-        for bkey in board_chain(trade_date, season):
-            board = boards.get(bkey)
-            if not board:
-                continue
-            row = board["byMlbam"].get(mlbam)
-            if row is None:
-                nm = norm_name(person.get("name") or name)
-                row = (board["byName"].get(
-                           (nm, (person.get("birthDate") or "")[:4]))
-                       or board["byNameOnly"].get(nm))
-            if row is not None:
-                val = value_prospect_at(row)
-                if val is not None:
-                    return val
+    # find the last Board FV within the ramp window (deep chain)
+    fv_val = None
+    for bkey in board_chain(trade_date, season, depth=4):
+        board = boards.get(bkey)
+        if not board:
+            continue
+        row = board["byMlbam"].get(mlbam)
+        if row is None:
+            nm = norm_name(person.get("name") or name)
+            row = (board["byName"].get(
+                       (nm, (person.get("birthDate") or "")[:4]))
+                   or board["byNameOnly"].get(nm))
+        if row is not None:
+            fv_val = value_prospect_at(row)
+            if fv_val is not None:
+                break
+    if fv_val is not None and debut_year is None:
+        return fv_val  # still a prospect: pure FV, as before
     hist_rec = None
     vintage = ctx.get("contractHist", {}).get(season)
     if vintage is not None:
@@ -357,7 +366,17 @@ def value_traded_player(mlbam, name, trade_date, season, ctx):
         hist_rec = vintage.get(nm)
     val = value_mlb_at(mlbam, trade_date, season, people, warhist, hist_rec)
     if val is None:
-        val = {"kind": "filler", "value": FILLER_VALUE}
+        val = fv_val if fv_val is not None else {"kind": "filler",
+                                                 "value": FILLER_VALUE}
+        return val
+    # graduation ramp: blend the FV value with the MLB path for recent grads
+    if fv_val is not None and debut_year is not None:
+        t = max(0, season - debut_year - 1)
+        w = GRAD_RAMP.get(t)
+        if w is not None:
+            val = dict(val)
+            val["value"] = w * fv_val["value"] + (1 - w) * val["value"]
+            val["gradBlendW"] = w
     return val
 
 
