@@ -809,6 +809,10 @@ const Aggregator = {
                      // the composite from half-filtered parts would be less
                      // honest than carrying the season value through.
                      'pitcherPlus', 'pitcherPlus_pctl', 'pitcherRuns100',
+                     // Command+ is season-level like Pitcher+: targets are
+                     // fit on the full season, so filtered views preserve
+                     // rather than recompute it.
+                     'commandPlus', 'commandPlus_pctl', 'commandPlusRaw', 'commandPlusN',
                      'pitcherPlusProj', 'pitcherPlusProj_pctl',
                      'armAngle'];
     const preAgg = window.PITCHER_DATA || [];

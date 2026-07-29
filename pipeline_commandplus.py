@@ -63,11 +63,13 @@ EM_MAX_ITER = 200
 MIN_POOL = 300                         # pitches to enter the (mu, sigma) pool
 CMD_SCALE_K = 10                       # display points per pool SD
 
-# STABILIZE_TODO: the render-time coloring gate must come from a measured
-# split-half r=0.5 crossing at the RENDERED unit (pitcher overall; per-type
-# if an Arsenal column ships) — measured on the production scorer, not the
-# research engine. Do NOT ship coloring on a guessed value.
-STABILIZE_N = None
+# MEASURED 2026-07-28 (scripts/commandplus_gate_measure.py): split-half
+# r=0.5 crossing at the rendered unit (pitcher-season), random within-pitcher
+# splits, targets fit per half on THIS scorer. Median of 5 seeds = 328
+# (range 286-362). Below the reliever IP-qualification's ~450+ pitches, so
+# Command+ rides the ordinary IP qual gate exactly as Loc+ does — no special
+# render gate needed. Re-measure at season end alongside the Loc+ gates.
+STABILIZE_N = 328
 
 EXCLUDE_DESC = {'Hit By Pitch', 'Foul Bunt', 'Missed Bunt', 'Bunt Foul Tip',
                 'Pitchout', 'Swinging Pitchout', 'Foul Pitchout', 'Intent Ball'}

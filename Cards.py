@@ -728,6 +728,7 @@ BUBBLE_COLUMNS = [
         ('Velocity',   'fbVelo',    'fbVelo_pctl',    'mph'),
         ('Stuff+',     'stuffScore', 'stuffScore_pctl', 'int'),
         ('Loc+',       'locPlus',   'locPlus_pctl',   'int'),
+        ('Command+',   'commandPlus', 'commandPlus_pctl', 'int'),
         ('Pitching+',  'pitchingScore', 'pitchingScore_pctl', 'int'),
     ]),
 ]

@@ -2449,6 +2449,43 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     pitcher_league_avgs['locPlus'] = 100.0
     print(f"  Loc+ computed for {len(loc_results)} pitchers.")
 
+    # Command+ — execution repeatability: mean miss distance (inches) from the
+    # pitcher's GMM-inferred intended targets, per (pitch type × batter hand ×
+    # count group) cell, normalized 100 + 10·(lg − miss)/σ over the qualified
+    # MLB pool. Command is SELF-REFERENTIAL (a pitcher's misses vs his own
+    # targets), so ROC needs no MLB baseline — ROC pitchers are scored from
+    # their own pitches and excluded from the pool. Validated 2021-2026 before
+    # shipping (commit 5518ec4: reliability .795, persistence .79, +0.85 vs
+    # release-angle repeatability); pure-Python port accepted (97f01d3).
+    # HONEST FRAMING (battery-established): forecasts future walk rate beyond
+    # current BB%; does NOT predict run prevention beyond Loc+ — its run
+    # impact lives inside Loc+. Displayed copy must not claim otherwise.
+    from pipeline_commandplus import score_misses as _cmd_score, normalize as _cmd_norm
+    from pipeline_locplus import _is_combined_team as _cmd_is2tm
+    cmd_results = _cmd_score(pitcher_groups)
+    _cmd_combined = {k[:1] + k[2:] for k in cmd_results if _cmd_is2tm(k[1])}
+
+    def _cmd_pool(k):
+        # MLB only; a combined 2TM row stands in for its per-team stints
+        if k[1] in AAA_TEAMS:
+            return False
+        return _cmd_is2tm(k[1]) or (k[:1] + k[2:]) not in _cmd_combined
+    cmd_results, (_cmd_mu, _cmd_sd) = _cmd_norm(cmd_results, _cmd_pool)
+    for row in pitcher_leaderboard:
+        key = (row['pitcher'], row['team'], row.get('throws'))
+        r = cmd_results.get(key)
+        if r is not None:
+            row['commandPlus'] = r['commandPlus']
+            row['commandPlusRaw'] = round(r['raw_miss'], 3)
+            row['commandPlusN'] = r['n_pitches']
+        else:
+            row['commandPlus'] = None
+            row['commandPlusRaw'] = None
+            row['commandPlusN'] = 0
+    pitcher_league_avgs['commandPlus'] = 100.0
+    print(f"  Command+ computed for {len(cmd_results)} pitchers "
+          f"(pool mu {_cmd_mu if _cmd_mu is None else round(_cmd_mu, 2)}in).")
+
     # ======================================================================
     #  HITTER LEADERBOARD
     # ======================================================================
@@ -4105,7 +4142,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     # FanGraphs/Savant — they percentile-rank against the broader pool and
     # only display percentile chips for players who clear sample minimums.
     PITCHER_ALL_PCTL = (STAT_KEYS + PITCHER_METRIC_PCTL_KEYS + PITCHER_BB_KEYS
-                        + EXPECTED_KEYS + ['fbVelo', 'runValue', 'rv100', 'xRunValue', 'xRv100', 'era', 'hr9', 'fip', 'xFIP', 'siera', 'locPlus'])
+                        + EXPECTED_KEYS + ['fbVelo', 'runValue', 'rv100', 'xRunValue', 'xRv100', 'era', 'hr9', 'fip', 'xFIP', 'siera', 'locPlus', 'commandPlus'])
     for stat in PITCHER_ALL_PCTL:
         compute_percentile_ranks_with_aaa(pitcher_leaderboard, stat, min_count=0)
 
