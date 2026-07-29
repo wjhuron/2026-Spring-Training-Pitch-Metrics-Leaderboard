@@ -7,18 +7,18 @@
   "relieverDl"
  ],
  "betas": [
-  -0.7402,
-  -0.1472,
-  -0.8619,
-  0.8235,
-  0.1426
+  -0.6466,
+  -0.1618,
+  -0.68,
+  0.6338,
+  0.4133
  ],
  "multipliers": {
-  "prospect": 0.477,
-  "rental": 0.863,
-  "star": 0.422,
-  "rentalDeadline": 2.278,
-  "relieverDl": 1.153
+  "prospect": 0.524,
+  "rental": 0.851,
+  "star": 0.507,
+  "rentalDeadline": 1.885,
+  "relieverDl": 1.512
  },
  "bestConfig": {
   "lambda": 0.21,
@@ -1678,76 +1678,76 @@
   "2017": {
    "n": 17,
    "baselineMedian": 1.4524,
-   "fitMedian": 1.4363,
-   "fitAccept": 0.235,
+   "fitMedian": 1.2725,
+   "fitAccept": 0.118,
    "baseAccept": 0.0
   },
   "2018": {
    "n": 29,
    "baselineMedian": 0.6019,
-   "fitMedian": 0.5199,
-   "fitAccept": 0.345,
+   "fitMedian": 0.5233,
+   "fitAccept": 0.448,
    "baseAccept": 0.345
   },
   "2019": {
    "n": 13,
    "baselineMedian": 1.2733,
-   "fitMedian": 1.0546,
-   "fitAccept": 0.308,
+   "fitMedian": 0.9914,
+   "fitAccept": 0.154,
    "baseAccept": 0.154
   },
   "2020": {
    "n": 9,
    "baselineMedian": 1.3869,
-   "fitMedian": 0.9197,
+   "fitMedian": 1.0186,
    "fitAccept": 0.333,
    "baseAccept": 0.333
   },
   "2021": {
    "n": 23,
    "baselineMedian": 1.4668,
-   "fitMedian": 1.1425,
-   "fitAccept": 0.174,
+   "fitMedian": 1.1628,
+   "fitAccept": 0.13,
    "baseAccept": 0.087
   },
   "2022": {
    "n": 28,
    "baselineMedian": 0.8849,
-   "fitMedian": 0.9494,
+   "fitMedian": 1.0222,
    "fitAccept": 0.214,
    "baseAccept": 0.214
   },
   "2023": {
    "n": 17,
    "baselineMedian": 0.3588,
-   "fitMedian": 0.8634,
-   "fitAccept": 0.235,
+   "fitMedian": 0.8154,
+   "fitAccept": 0.294,
    "baseAccept": 0.588
   },
   "2024": {
-   "n": 32,
-   "baselineMedian": 1.226,
-   "fitMedian": 0.7316,
-   "fitAccept": 0.312,
-   "baseAccept": 0.188
+   "n": 38,
+   "baselineMedian": 0.7653,
+   "fitMedian": 0.6069,
+   "fitAccept": 0.368,
+   "baseAccept": 0.237
   },
   "2025": {
-   "n": 30,
-   "baselineMedian": 1.2004,
-   "fitMedian": 0.6453,
-   "fitAccept": 0.433,
-   "baseAccept": 0.167
+   "n": 35,
+   "baselineMedian": 0.9318,
+   "fitMedian": 0.6883,
+   "fitAccept": 0.371,
+   "baseAccept": 0.257
   },
   "2026": {
-   "n": 12,
-   "baselineMedian": 1.0391,
-   "fitMedian": 0.8399,
-   "fitAccept": 0.167,
-   "baseAccept": 0.167
+   "n": 13,
+   "baselineMedian": 0.6931,
+   "fitMedian": 0.7014,
+   "fitAccept": 0.154,
+   "baseAccept": 0.231
   }
  },
- "losoFitted": 0.9103,
- "losoBaseline": 1.089,
+ "losoFitted": 0.8803,
+ "losoBaseline": 0.9815,
  "acceptBand": "abs(log ratio) <= log(1.5)",
- "nTrades": 210
+ "nTrades": 222
 }

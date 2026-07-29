@@ -131,7 +131,7 @@ def classify_cell(cell):
     return {"type": "unknown", "raw": s}
 
 
-def parse_sheet(sheet_id, team_id, abbrev, pub=False):
+def parse_sheet(sheet_id, team_id, abbrev, pub=False, expected_season=SEASON):
     if pub:
         url = f"https://docs.google.com/spreadsheets/d/e/{sheet_id}/pub?output=csv"
     else:
@@ -171,8 +171,11 @@ def parse_sheet(sheet_id, team_id, abbrev, pub=False):
             started = True
         elif started:
             break
-    if not year_cols or year_cols[0][1] != SEASON:
+    if not year_cols:
+        raise ValueError(f"{abbrev}: no year labels {label_row}")
+    if expected_season is not None and year_cols[0][1] != expected_season:
         raise ValueError(f"{abbrev}: bad year labels {label_row}")
+    sheet_season = year_cols[0][1]
 
     players, skipped = [], 0
     for r in rows[header_i + 2:]:
@@ -259,7 +262,7 @@ def parse_sheet(sheet_id, team_id, abbrev, pub=False):
             "cbtPV": parse_money("$" + cbt.group(1)) if cbt else None,
             "cbtRate": (float(cbt.group(2)) if cbt and cbt.group(2) else None),
         })
-    return players, skipped, deferrals
+    return players, skipped, deferrals, sheet_season
 
 
 def main():
@@ -270,7 +273,7 @@ def main():
     all_players, all_deferrals, failures = [], [], []
     for team_id, abbrev, sheet_id, pub in sheets:
         try:
-            players, skipped, deferrals = parse_sheet(sheet_id, team_id, abbrev, pub)
+            players, skipped, deferrals, _ = parse_sheet(sheet_id, team_id, abbrev, pub)
             all_players.extend(players)
             all_deferrals.extend(deferrals)
             print(f"{abbrev}: {len(players)} players, {len(deferrals)} deferral PVs "

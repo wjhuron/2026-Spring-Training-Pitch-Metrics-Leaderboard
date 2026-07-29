@@ -32,7 +32,8 @@ from pathlib import Path
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
-from tradevalue_engine import CONFIG, rate_for  # single source for constants
+from tradevalue_engine import (CONFIG, rate_for, parse_option_years,
+                               parse_contract_span)  # single source
 
 BASE = Path("/Users/wallyhuron/Huronalytics")
 DATA = BASE / "data"
@@ -153,7 +154,76 @@ def season_fraction(trade_date, season):
     return (end - d).days / (end - start).days
 
 
-def value_mlb_at(mlbam, trade_date, season, people, warhist):
+def value_mlb_contract(rec, war1, age, trade_date, season, pitcher):
+    """Value off a real Cot's vintage row: actual salaries, arb codes, and
+    option types; every signed year is guaranteed (negative-capable), which
+    is what makes salary dumps price correctly."""
+    cfg = CONFIG
+    option_years = parse_option_years(rec["contract"])
+    span, _ = parse_contract_span(rec["contract"])
+    mls = int(rec["mls"].split(".")[0]) if rec["mls"] and rec["mls"][0].isdigit() else 0
+    frac = season_fraction(trade_date, season)
+    lam = cfg["riskDecay"]["SP" if pitcher else "POS"]
+    ladder = []
+    last_salary = None
+    for i in range(cfg["horizonYears"]):
+        yr = season + i
+        opt_type = option_years.get(yr)
+        if opt_type in ("mutual", "vesting"):
+            break
+        cell = rec["years"].get(str(yr))
+        if cell:
+            t = cell["type"]
+            if t == "fa":
+                break
+            if t == "signed":
+                last_salary = cell["salary"]
+                ladder.append(("playerOption" if opt_type == "player"
+                               else "option" if opt_type == "club"
+                               else "signed", cell["salary"], None))
+            elif t == "arb":
+                ladder.append(("arb", None, cell["arbYear"]))
+            elif t == "option":
+                ladder.append(("playerOption" if opt_type == "player"
+                               else "option", last_salary, None))
+            else:
+                ladder.append(("prearb", None, None))
+            continue
+        if span and span[1] >= yr and last_salary is not None:
+            ladder.append(("signed", last_salary, None))
+            continue
+        service = mls + i
+        if service >= 6:
+            break
+        if service >= 3:
+            ladder.append(("arb", None, min(4, service - 2)))
+        else:
+            ladder.append(("prearb", None, None))
+    if not ladder:
+        ladder = [("signed", last_salary or cfg["leagueMin"], None)]
+
+    surplus = 0.0
+    for t, (status, salary, arb_year) in enumerate(ladder, start=1):
+        war_t = max(0.0, war1) * (1 - lam) ** (t - 1)
+        market = rate_for(war_t) * war_t * (1 + cfg["winInflation"]) ** (t - 1)
+        if status in ("signed", "option", "playerOption"):
+            cost = salary if salary is not None else market
+        elif status == "arb":
+            cost = max(cfg["leagueMin"], cfg["arbLadder"][arb_year] * market)
+        else:
+            cost = cfg["leagueMin"]
+        net = (market - cost) * (frac if t == 1 else 1.0)
+        if status in ("option", "arb", "prearb"):
+            net = max(0.0, net)
+        elif status == "playerOption":
+            net = min(0.0, net)
+        surplus += net / (1 + cfg["discountRate"]) ** (t - 1)
+    return {"kind": "mlb", "warProj": round(war1, 2),
+            "controlLeft": len(ladder), "value": surplus,
+            "contractSource": "cots"}
+
+
+def value_mlb_at(mlbam, trade_date, season, people, warhist, hist_rec=None):
     person = people.get(str(mlbam), {})
     hist = warhist.get(mlbam, {})
     birth = person.get("birthDate")
@@ -167,6 +237,9 @@ def value_mlb_at(mlbam, trade_date, season, people, warhist):
     # agency comes after debut_year + 6 (Soto: 5/2018 debut -> FA after 2024)
     control_left = max(1, min(7, debut_year + 6 - season + 1))
     war1 = marcel(hist, season, age)
+    if hist_rec is not None:
+        return value_mlb_contract(hist_rec, war1, age, trade_date, season,
+                                  bool(person.get("pitcher")))
     cur_salary = (hist.get(season) or {}).get("salary")
     frac = season_fraction(trade_date, season)
 
@@ -226,8 +299,27 @@ def load_context():
     boards = load_boards(idmap_fg)
     all_ids = sorted({p["mlbam"] for t in trades for p in t["players"]})
     people = load_people(all_ids)
+    # archived Cot's vintages: real contract state at trade time
+    hist = {}
+    hist_path = DATA / "tradevalue_contracts_hist.json"
+    if hist_path.exists():
+        raw = json.loads(hist_path.read_text())["seasons"]
+        for season, rows in raw.items():
+            seen, dupes = {}, set()
+            for r in rows:
+                # Cot's uses "Last, First"; person names are "First Last"
+                parts = r["name"].split(",", 1)
+                flipped = (parts[1].strip() + " " + parts[0].strip()
+                           if len(parts) == 2 else r["name"])
+                key = norm_name(flipped)
+                if key in seen:
+                    dupes.add(key)
+                seen[key] = r
+            for d in dupes:  # same-name players are unresolvable by name
+                del seen[d]
+            hist[int(season)] = seen
     return {"trades": trades, "warhist": warhist, "boards": boards,
-            "people": people}
+            "people": people, "contractHist": hist}
 
 
 def board_chain(trade_date, season):
@@ -258,7 +350,12 @@ def value_traded_player(mlbam, name, trade_date, season, ctx):
                 val = value_prospect_at(row)
                 if val is not None:
                     return val
-    val = value_mlb_at(mlbam, trade_date, season, people, warhist)
+    hist_rec = None
+    vintage = ctx.get("contractHist", {}).get(season)
+    if vintage is not None:
+        nm = norm_name(person.get("name") or name)
+        hist_rec = vintage.get(nm)
+    val = value_mlb_at(mlbam, trade_date, season, people, warhist, hist_rec)
     if val is None:
         val = {"kind": "filler", "value": FILLER_VALUE}
     return val
