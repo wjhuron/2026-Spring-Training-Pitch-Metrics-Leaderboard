@@ -349,6 +349,24 @@ def main():
 
     for r in players:
         r["marketValue"] = r["surplus"] * market_multiplier(r, market_fit, in_deadline)
+    # depth layer: everyone in affiliated ball outside the core universe
+    depth_path = DATA / "tradevalue_depth.json"
+    lvl_short = {"Triple-A": "AAA", "Double-A": "AA", "High-A": "A+",
+                 "Single-A": "A", "Rookie": "Rk"}
+    n_depth = 0
+    if depth_path.exists():
+        for d in json.loads(depth_path.read_text())["players"]:
+            players.append({
+                "name": d["name"], "team": d["team"], "pos": d.get("pos", ""),
+                "mlbam": str(d["mlbam"]), "fgId": None, "engine": "depth",
+                "level": lvl_short.get(d.get("level", ""), d.get("level", "")),
+                "warY1": d.get("warProj"),
+                "controlYears": d.get("controlLeft"),
+                "surplus": d["value"],
+                "marketValue": d["value"],
+                "flags": [d.get("path", "")],
+            })
+            n_depth += 1
     players.sort(key=lambda r: r["surplus"], reverse=True)
     out = {
         "generated": date.today().isoformat(),
@@ -378,6 +396,11 @@ def main():
             rec["fv"] = r["fv"]
             if r.get("eta"):
                 rec["eta"] = r["eta"]
+        elif r["engine"] == "depth":
+            rec["lvl"] = r.get("level", "")
+            if r.get("warY1"):
+                rec["w"] = r["warY1"]
+                rec["c"] = r["controlYears"]
         else:
             rec["w"] = r["warY1"]
             rec["c"] = r["controlYears"]
@@ -395,8 +418,9 @@ def main():
     print(f"Site export: js/tradevalue_data.js ({len(site)} players)")
 
     n_mlb = sum(1 for r in players if r["engine"] == "mlb")
-    n_pro = len(players) - n_mlb
-    print(f"Wrote {len(players)} players ({n_mlb} mlb + {n_pro} prospect) -> {OUT_PATH}")
+    n_pro = sum(1 for r in players if r["engine"] == "prospect")
+    print(f"Wrote {len(players)} players ({n_mlb} mlb + {n_pro} prospect "
+          f"+ {n_depth} depth) -> {OUT_PATH}")
 
     print("\nTop 30 by intrinsic surplus (market value alongside):")
     for r in players[:30]:

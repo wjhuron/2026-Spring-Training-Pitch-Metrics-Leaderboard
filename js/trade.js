@@ -24,6 +24,11 @@
       if (p.eta) m += ' · ETA ' + p.eta;
       return m;
     }
+    if (p.e === 'depth') {
+      var d = p.t + ' · ' + p.p + ' · ' + p.lvl;
+      if (p.w) d += ' · ' + p.w + ' WAR';
+      return d;
+    }
     return p.t + ' · ' + p.p + ' · ' + p.w + ' WAR · ' +
            p.c + (p.c === 1 ? ' yr' : ' yrs') + ' control';
   }
@@ -146,7 +151,8 @@
         nm.textContent = p.n;
         var mt = document.createElement('span');
         mt.className = 'sug-meta';
-        mt.textContent = (p.e === 'prospect' ? 'FV ' + p.fv + ' · ' : '') +
+        mt.textContent = (p.e === 'prospect' ? 'FV ' + p.fv + ' · '
+                          : p.e === 'depth' ? p.lvl + ' · ' : '') +
                          p.t + ' · ' + fmtM(p.m);
         d.appendChild(nm); d.appendChild(mt);
         d.addEventListener('mousedown', function (ev) { ev.preventDefault(); pick(p); });
@@ -219,7 +225,9 @@
       td('', p.p);
       td('td-profile', p.e === 'prospect'
         ? 'FV ' + p.fv + (p.eta ? ' · ETA ' + p.eta : '')
-        : p.w + ' WAR · ' + p.c + (p.c === 1 ? ' yr' : ' yrs'));
+        : p.e === 'depth'
+          ? p.lvl + (p.w ? ' · ' + p.w + ' WAR' : ' · unranked')
+          : p.w + ' WAR · ' + p.c + (p.c === 1 ? ' yr' : ' yrs'));
       td('td-num' + (p.s < 0 ? ' neg' : ''), fmtM(p.s));
       td('td-num' + (p.m < 0 ? ' neg' : ''), fmtM(p.m));
       var actions = document.createElement('td');
