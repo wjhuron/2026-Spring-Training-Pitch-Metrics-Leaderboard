@@ -861,8 +861,19 @@
   // family (no-arm model), and xWRC+ are POPULATED for ROC now and were
   // unhidden; actual-RV (runValue/rv100 + the RVOE family), arm angle,
   // sprint speed, bat tracking, and per-pitch xBA/xSLG remain blank.
-  const ROC_HIDDEN_PITCHER = ['armAngle', 'xIVB', 'ivbOE', 'xHB', 'hbOE', 'runValue', 'rv100', 'rvoe', 'xrvoe', 'rvoe100', 'xrvoe100', 'xBA', 'xSLG'];
-  const ROC_HIDDEN_HITTER = ['batSpeed', 'swingLength', 'attackAngle', 'attackDirection', 'swingPathTilt', 'nCompSwings', 'blastPct', 'idealAAPct', 'squaredUpPct', 'xBA', 'xSLG', 'runValue', 'rv100', 'sprintSpeed'];
+  // Columns with NO data for AAA teams. Audited 2026-07-29 against the live
+  // leaderboards: the old pitcher list was entirely stale — the minors
+  // Statcast backfill filled armAngle/xIVB/ivbOE/xHB/hbOE (128/128 ROC
+  // rows) and supplement xStats filled xBA/xSLG (114/128), while the MiLB
+  // RunExp currency fix made the RV/RVOE family valid (RVOE null below its
+  // 150-pitch floor, which renders as blank, not a hidden column). This
+  // list also silently re-hid columns on every refresh, defeating manual
+  // unhides — keep it strictly for genuinely absent data.
+  const ROC_HIDDEN_PITCHER = [];
+  // Hitters: bat tracking truly absent for AAA (0/18 rows); sprintSpeed
+  // nearly absent (5/18). xBA/xSLG (17/18) and runValue/rv100 (18/18) have
+  // data and are no longer hidden.
+  const ROC_HIDDEN_HITTER = ['batSpeed', 'swingLength', 'attackAngle', 'attackDirection', 'swingPathTilt', 'nCompSwings', 'blastPct', 'idealAAPct', 'squaredUpPct', 'sprintSpeed'];
   const ALL_ROC_HIDDEN = ROC_HIDDEN_PITCHER.concat(ROC_HIDDEN_HITTER);
 
   function refresh() {
