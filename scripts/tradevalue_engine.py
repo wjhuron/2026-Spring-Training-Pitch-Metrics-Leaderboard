@@ -119,6 +119,34 @@ def rate_for(war):
     return CONFIG["dollarsPerWarTiers"][-1][1]
 
 
+OPTION_TYPES = {"m": "mutual", "cl": "club", "v": "vesting",
+                "cond": "vesting", "cdl": "vesting", "p": "player",
+                "player": "player"}
+
+
+def parse_option_years(text):
+    """Contract-string option markers -> {season: type}.
+
+    Handles '+27 m opt', '+30 cl opt', '+28 v opt', '+26, 27 opts',
+    '+28-29 opt', '+28 opt' (bare = club). Cot's grids often put the
+    mutual-option year's salary in a plain cell, so this is the only
+    reliable source of option TYPE.
+    """
+    out = {}
+    for m in re.finditer(
+        r"\+\s*((?:\d{2})(?:\s*[,\-]\s*\d{2})*)\s*"
+        r"(m|cl|v|cond|cdl|player|p)?\.?\s*opts?(?![a-z])",
+        text, re.I,
+    ):
+        years_part, type_key = m.group(1), (m.group(2) or "").lower()
+        opt_type = OPTION_TYPES.get(type_key, "club")
+        for tok in re.split(r"[,\-]", years_part):
+            tok = tok.strip()
+            if tok.isdigit():
+                out[2000 + int(tok)] = opt_type
+    return out
+
+
 def parse_contract_span(text):
     """'11 yr/$288.7M (24-34)' -> (2024, 2034, 288.7e6); None where unknown."""
     m = re.search(r"\((\d{2})-(\d{2})\)", text)
@@ -138,24 +166,42 @@ def build_ladder(p):
     years = p["years"]
     mls_years = int(p["mls"].split(".")[0]) if p["mls"] and p["mls"][0].isdigit() else 0
     span, _ = parse_contract_span(p["contract"])
+    option_years = parse_option_years(p["contract"])
     ladder, last_salary, flags = [], None, []
     ended = False
     for i in range(CONFIG["horizonYears"]):
         season = SEASON + i
         cell = years.get(str(season))
+        opt_type = option_years.get(season)
+        if opt_type in ("mutual", "vesting"):
+            # mutual options are essentially never exercised by both sides;
+            # vesting options are treated conservatively the same way, so
+            # control ends here (Littell '1y+27 m opt' = expiring deal)
+            flags.append(opt_type + "OptionEndsControl")
+            break
         if cell:
             t = cell["type"]
             if t == "fa":
                 break
             if t == "signed":
                 last_salary = cell["salary"]
-                ladder.append({"season": season, "status": "signed",
-                               "salary": cell["salary"]})
+                if opt_type in ("club", "player"):
+                    # grid holds the option salary as a plain number; keep
+                    # the salary but treat the year as the option it is
+                    ladder.append({"season": season,
+                                   "status": "option" if opt_type == "club"
+                                   else "playerOption",
+                                   "salary": cell["salary"]})
+                else:
+                    ladder.append({"season": season, "status": "signed",
+                                   "salary": cell["salary"]})
             elif t == "arb":
                 ladder.append({"season": season, "status": "arb",
                                "arbYear": cell["arbYear"]})
             elif t == "option":
-                ladder.append({"season": season, "status": "option",
+                ladder.append({"season": season,
+                               "status": "playerOption"
+                               if opt_type == "player" else "option",
                                "salary": last_salary})
                 flags.append("optionYearEstimated")
             else:  # prearb
@@ -213,8 +259,8 @@ def value_mlb(p, frac_y1):
                  * (1 - lam) ** (t - 1))
         market = rate_for(war_t) * war_t * (1 + cfg["winInflation"]) ** (t - 1)
         value = market
-        if step["status"] == "signed":
-            cost = step["salary"]
+        if step["status"] in ("signed", "playerOption"):
+            cost = step["salary"] if step["salary"] is not None else market
         elif step["status"] == "arb":
             cost = max(cfg["leagueMin"],
                        cfg["arbLadder"][step["arbYear"]] * market)
@@ -226,9 +272,13 @@ def value_mlb(p, frac_y1):
         net = (value - cost) * frac
         # pre-arb and arb salaries are not guaranteed (non-tender/outright) and
         # club options can be declined, so those years never force a loss on
-        # the club; only signed years can go negative
+        # the club; only signed years can go negative. A player option is the
+        # mirror image: the player stays only when it favors him, so the year
+        # can only subtract value.
         if step["status"] in ("option", "arb", "prearb"):
             net = max(0.0, net)
+        elif step["status"] == "playerOption":
+            net = min(0.0, net)
         disc = net / (1 + cfg["discountRate"]) ** (t - 1)
         surplus += disc
         years_out.append({

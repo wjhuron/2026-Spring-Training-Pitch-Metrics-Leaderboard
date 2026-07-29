@@ -1085,7 +1085,7 @@
     },
     {
      "season": 2030,
-     "status": "signed",
+     "status": "option",
      "war": 1.73,
      "value": 16541898,
      "cost": 3000000,
@@ -2276,7 +2276,9 @@
      "net": -4424231
     }
    ],
-   "flags": [],
+   "flags": [
+    "vestingOptionEndsControl"
+   ],
    "alsoProspect": false,
    "marketValue": 28758119.96766755
   },
@@ -3912,7 +3914,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 4.98,
      "value": 64786523,
      "cost": 18000000,
@@ -4442,7 +4444,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 2.35,
      "value": 31401215,
      "cost": 8000,
@@ -4485,7 +4487,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 3.55,
      "value": 47588756,
      "cost": 10000000,
@@ -4520,7 +4522,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 2.82,
      "value": 37773535,
      "cost": 500000,
@@ -4799,41 +4801,6 @@
    ],
    "alsoProspect": false,
    "marketValue": 52959120.39229858
-  },
-  {
-   "name": "Ryan, Joe",
-   "team": "MIN",
-   "pos": "rhp-s",
-   "age": 30,
-   "mls": "4.033",
-   "mlbam": "657746",
-   "fgId": "21390",
-   "engine": "mlb",
-   "warY1": 3.43,
-   "contract": "1 y/$6.2M (26)+27 m opt",
-   "surplus": 45457437.991156794,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 3.43,
-     "value": 44602029,
-     "cost": 6100000,
-     "net": 12555010
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 2.71,
-     "value": 36292671,
-     "cost": 100000,
-     "net": 32902428
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 45457437.991156794
   },
   {
    "name": "Webb, Logan",
@@ -6992,7 +6959,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 2.88,
      "value": 37460992,
      "cost": 10000000,
@@ -7008,7 +6975,7 @@
     },
     {
      "season": 2028,
-     "status": "signed",
+     "status": "option",
      "war": 1.8,
      "value": 16217484,
      "cost": 3000000,
@@ -7998,41 +7965,6 @@
    "marketValue": 34254819.9934845
   },
   {
-   "name": "May, Dustin",
-   "team": "STL",
-   "pos": "rhp-s",
-   "age": 28,
-   "mls": "6.059",
-   "mlbam": "669160",
-   "fgId": "19716",
-   "engine": "mlb",
-   "warY1": 2.78,
-   "contract": "1 y/$12.5M (26)+27 m opt",
-   "surplus": 34175210.449727006,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 2.78,
-     "value": 36162774,
-     "cost": 12000000,
-     "net": 7879166
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 2.2,
-     "value": 29425649,
-     "cost": 500000,
-     "net": 26296045
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 34175210.449727006
-  },
-  {
    "name": "Jump, Gage",
    "team": "ATH",
    "pos": "lhp",
@@ -8792,7 +8724,9 @@
      "net": -13462683
     }
    ],
-   "flags": [],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
    "alsoProspect": false,
    "marketValue": 33450539.6975075
   },
@@ -9250,41 +9184,6 @@
    "marketValue": 31746643.57377082
   },
   {
-   "name": "Boyd, Matt",
-   "team": "CHC",
-   "pos": "lhp-s",
-   "age": 35,
-   "mls": "9.057",
-   "mlbam": "571510",
-   "fgId": "15440",
-   "engine": "mlb",
-   "warY1": 2.81,
-   "contract": "2 y/$29M (25-26)+27 m opt",
-   "surplus": 31625632.011881955,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 2.81,
-     "value": 36579819,
-     "cost": 17000000,
-     "net": 6384724
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 2.22,
-     "value": 29764999,
-     "cost": 2000000,
-     "net": 25240908
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 31625632.011881955
-  },
-  {
    "name": "Prielipp, Connor",
    "team": "MIN",
    "pos": "lhp",
@@ -9515,7 +9414,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 2.84,
      "value": 38048297,
      "cost": 10000000,
@@ -9542,7 +9441,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 3.28,
      "value": 42621453,
      "cost": 12000000,
@@ -12052,7 +11951,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 1.47,
      "value": 12910544,
      "cost": 15000,
@@ -13790,41 +13689,6 @@
    "marketValue": 18367742.67827128
   },
   {
-   "name": "Martinez, Nick",
-   "team": "TB",
-   "pos": "rhp-s",
-   "age": 35,
-   "mls": "7.002",
-   "mlbam": "607259",
-   "fgId": "12730",
-   "engine": "mlb",
-   "warY1": 2.36,
-   "contract": "1 y/$13M (26)+27 m opt",
-   "surplus": 18308247.462989196,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 2.36,
-     "value": 30724602,
-     "cost": 9000000,
-     "net": 7084109
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 1.87,
-     "value": 16346552,
-     "cost": 4000000,
-     "net": 11224138
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 18308247.462989196
-  },
-  {
    "name": "Keith, Colt",
    "team": "DET",
    "pos": "1b-dh",
@@ -13966,7 +13830,7 @@
     },
     {
      "season": 2028,
-     "status": "signed",
+     "status": "option",
      "war": 1.53,
      "value": 13834283,
      "cost": 1000000,
@@ -15818,41 +15682,6 @@
    ],
    "alsoProspect": false,
    "marketValue": 14996492.804389492
-  },
-  {
-   "name": "Soroka, Michael",
-   "team": "AZ",
-   "pos": "rhp-s",
-   "age": 28,
-   "mls": "7.009",
-   "mlbam": "647336",
-   "fgId": "18383",
-   "engine": "mlb",
-   "warY1": 1.98,
-   "contract": "1 y/$7.5M (26)+27 m opt",
-   "surplus": 14951110.372039,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 1.98,
-     "value": 16869513,
-     "cost": 6500000,
-     "net": 3381363
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 1.57,
-     "value": 13726722,
-     "cost": 1000000,
-     "net": 11569748
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 14951110.372039
   },
   {
    "name": "Jax, Griffin",
@@ -17957,7 +17786,7 @@
     },
     {
      "season": 2030,
-     "status": "signed",
+     "status": "option",
      "war": 0.91,
      "value": 7171178,
      "cost": 3000000,
@@ -17984,7 +17813,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 2.08,
      "value": 27006398,
      "cost": 20000000,
@@ -17992,7 +17821,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 1.64,
      "value": 14368338,
      "cost": 2000000,
@@ -18749,39 +18578,33 @@
    "marketValue": 12601787.301882591
   },
   {
-   "name": "Mullins, Cedric",
-   "team": "TB",
-   "pos": "cf",
-   "age": 31,
-   "mls": "6.078",
-   "mlbam": "656775",
-   "fgId": "17929",
+   "name": "Ryan, Joe",
+   "team": "MIN",
+   "pos": "rhp-s",
+   "age": 30,
+   "mls": "4.033",
+   "mlbam": "657746",
+   "fgId": "21390",
    "engine": "mlb",
-   "warY1": 1.66,
-   "contract": "1 y/$7M (26)+27 m opt",
-   "surplus": 12422595.063002635,
-   "controlYears": 2,
+   "warY1": 3.43,
+   "contract": "1 y/$6.2M (26)+27 m opt",
+   "surplus": 12555009.565217393,
+   "controlYears": 1,
    "years": [
     {
      "season": 2026,
      "status": "signed",
-     "war": 1.66,
-     "value": 14070656,
-     "cost": 6500000,
-     "net": 2468692
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 1.31,
-     "value": 11449293,
-     "cost": 500000,
-     "net": 9953903
+     "war": 3.43,
+     "value": 44602029,
+     "cost": 6100000,
+     "net": 12555010
     }
    ],
-   "flags": [],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
    "alsoProspect": false,
-   "marketValue": 12422595.063002635
+   "marketValue": 24682069.074394785
   },
   {
    "name": "Headrick, Brent",
@@ -19213,57 +19036,6 @@
    "marketValue": 11917638.323687794
   },
   {
-   "name": "Kay, Anthony",
-   "team": "CWS",
-   "pos": "lhp-s",
-   "age": 31,
-   "mls": "2.006",
-   "mlbam": "641743",
-   "fgId": "20387",
-   "engine": "mlb",
-   "warY1": 1.37,
-   "contract": "2 y/$12M (26-27)+28 m opt",
-   "surplus": 11828783.987470333,
-   "controlYears": 4,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 1.37,
-     "value": 11679248,
-     "cost": 5000000,
-     "net": 2178016
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 1.09,
-     "value": 9503404,
-     "cost": 5000000,
-     "net": 4094004
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.86,
-     "value": 6368287,
-     "cost": 2000000,
-     "net": 3610155
-    },
-    {
-     "season": 2029,
-     "status": "arb",
-     "war": 0.68,
-     "value": 5181875,
-     "cost": 2590938,
-     "net": 1946610
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 11828783.987470333
-  },
-  {
    "name": "Chapman, Aroldis",
    "team": "BOS",
    "pos": "lhp-c",
@@ -19287,7 +19059,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 1.42,
      "value": 12428558,
      "cost": 300000,
@@ -20492,7 +20264,7 @@
     },
     {
      "season": 2030,
-     "status": "signed",
+     "status": "option",
      "war": 0.82,
      "value": 6497250,
      "cost": 1000000,
@@ -21057,7 +20829,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 1.61,
      "value": 14067638,
      "cost": 8000000,
@@ -21092,7 +20864,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 1.44,
      "value": 12599345,
      "cost": 2000000,
@@ -22658,7 +22430,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 1.06,
      "value": 9273207,
      "cost": 250000,
@@ -23132,7 +22904,7 @@
     },
     {
      "season": 2028,
-     "status": "signed",
+     "status": "option",
      "war": 0.73,
      "value": 5402341,
      "cost": 1000000,
@@ -23304,7 +23076,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 2.68,
      "value": 34902310,
      "cost": 8000000,
@@ -26714,6 +26486,35 @@
    "marketValue": 9174671.214989664
   },
   {
+   "name": "May, Dustin",
+   "team": "STL",
+   "pos": "rhp-s",
+   "age": 28,
+   "mls": "6.059",
+   "mlbam": "669160",
+   "fgId": "19716",
+   "engine": "mlb",
+   "warY1": 2.78,
+   "contract": "1 y/$12.5M (26)+27 m opt",
+   "surplus": 7879165.52173913,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 2.78,
+     "value": 36162774,
+     "cost": 12000000,
+     "net": 7879166
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 15489761.807504259
+  },
+  {
    "name": "Larnach, Trevor",
    "team": "MIN",
    "pos": "lf",
@@ -27345,7 +27146,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 2.25,
      "value": 29205124,
      "cost": 7000000,
@@ -27534,6 +27335,35 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": 7089224.607357649
+  },
+  {
+   "name": "Martinez, Nick",
+   "team": "TB",
+   "pos": "rhp-s",
+   "age": 35,
+   "mls": "7.002",
+   "mlbam": "607259",
+   "fgId": "12730",
+   "engine": "mlb",
+   "warY1": 2.36,
+   "contract": "1 y/$13M (26)+27 m opt",
+   "surplus": 7084109.391304348,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 2.36,
+     "value": 30724602,
+     "cost": 9000000,
+     "net": 7084109
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 13926749.829896694
   },
   {
    "name": "Grisham, Trent",
@@ -30613,6 +30443,35 @@
    "marketValue": 6403579.57371391
   },
   {
+   "name": "Boyd, Matt",
+   "team": "CHC",
+   "pos": "lhp-s",
+   "age": 35,
+   "mls": "9.057",
+   "mlbam": "571510",
+   "fgId": "15440",
+   "engine": "mlb",
+   "warY1": 2.81,
+   "contract": "2 y/$29M (25-26)+27 m opt",
+   "surplus": 6384723.7391304355,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 2.81,
+     "value": 36579819,
+     "cost": 17000000,
+     "net": 6384724
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 12551817.784888871
+  },
+  {
    "name": "Burrows, Michael",
    "team": "HOU",
    "pos": "rhp-s",
@@ -30680,6 +30539,43 @@
    ],
    "alsoProspect": false,
    "marketValue": 6289391.445627059
+  },
+  {
+   "name": "Kay, Anthony",
+   "team": "CWS",
+   "pos": "lhp-s",
+   "age": 31,
+   "mls": "2.006",
+   "mlbam": "641743",
+   "fgId": "20387",
+   "engine": "mlb",
+   "warY1": 1.37,
+   "contract": "2 y/$12M (26-27)+28 m opt",
+   "surplus": 6272019.590427665,
+   "controlYears": 2,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 1.37,
+     "value": 11679248,
+     "cost": 5000000,
+     "net": 2178016
+    },
+    {
+     "season": 2027,
+     "status": "signed",
+     "war": 1.09,
+     "value": 9503404,
+     "cost": 5000000,
+     "net": 4094004
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 6272019.590427665
   },
   {
    "name": "Triolo, Jared",
@@ -30996,41 +30892,6 @@
    ],
    "alsoProspect": false,
    "marketValue": 6006095.76122208
-  },
-  {
-   "name": "Bell, Josh",
-   "team": "MIN",
-   "pos": "dh-1b",
-   "age": 33,
-   "mls": "9.053",
-   "mlbam": "605137",
-   "fgId": "13145",
-   "engine": "mlb",
-   "warY1": 1.13,
-   "contract": "1 y/$7M (26)+27 m opt",
-   "surplus": 5936514.565757576,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 1.13,
-     "value": 9567118,
-     "cost": 5750000,
-     "net": 1244713
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.89,
-     "value": 6410982,
-     "cost": 1250000,
-     "net": 4691802
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 5936514.565757576
   },
   {
    "name": "Adell, Jo",
@@ -35804,7 +35665,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 2.08,
      "value": 27069945,
      "cost": 11500000,
@@ -35841,41 +35702,6 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": 9888058.505735653
-  },
-  {
-   "name": "Littell, Zack",
-   "team": "WSH",
-   "pos": "rhp-s",
-   "age": 30,
-   "mls": "6.043",
-   "mlbam": "641793",
-   "fgId": "15823",
-   "engine": "mlb",
-   "warY1": 1.21,
-   "contract": "1 y/$7M (26)+27 m opt",
-   "surplus": 4999544.8514650855,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 1.21,
-     "value": 10279520,
-     "cost": 3000000,
-     "net": 2373757
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.96,
-     "value": 6888367,
-     "cost": 4000000,
-     "net": 2625788
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 4999544.8514650855
   },
   {
    "name": "Locklear, Tyler",
@@ -36623,49 +36449,6 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": 4600845.604704672
-  },
-  {
-   "name": "Caratini, Victor",
-   "team": "MIN",
-   "pos": "c-dh",
-   "age": 32,
-   "mls": "8.051",
-   "mlbam": "605170",
-   "fgId": "14968",
-   "engine": "mlb",
-   "warY1": 1.24,
-   "contract": "2 y/$14M (26-27)+28 m opt",
-   "surplus": 4482818.898563279,
-   "controlYears": 3,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 1.24,
-     "value": 10526554,
-     "cost": 4000000,
-     "net": 2128224
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.98,
-     "value": 7053906,
-     "cost": 6500000,
-     "net": 503551
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.77,
-     "value": 5739763,
-     "cost": 3500000,
-     "net": 1851044
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 4482818.898563279
   },
   {
    "name": "Garc\u00eda Jr., Luis",
@@ -41808,41 +41591,6 @@
    "marketValue": 3930225.049960331
   },
   {
-   "name": "Canning, Griffin",
-   "team": "SD",
-   "pos": "rhp-s",
-   "age": 30,
-   "mls": "6.075",
-   "mlbam": "656288",
-   "fgId": "19867",
-   "engine": "mlb",
-   "warY1": 0.75,
-   "contract": "1 y/$2.5M (26)+27 m opt",
-   "surplus": 3919341.061041897,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.75,
-     "value": 5262704,
-     "cost": 1000000,
-     "net": 1390012
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.59,
-     "value": 4282262,
-     "cost": 1500000,
-     "net": 2529329
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 3919341.061041897
-  },
-  {
    "name": "Rea, Colin",
    "team": "CHC",
    "pos": "rhp",
@@ -41866,7 +41614,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 0.7,
      "value": 5028610,
      "cost": 1000000,
@@ -42474,41 +42222,6 @@
    "marketValue": 7107378.713769998
   },
   {
-   "name": "Higashioka, Kyle",
-   "team": "TEX",
-   "pos": "c",
-   "age": 36,
-   "mls": "7.005",
-   "mlbam": "543309",
-   "fgId": "5517",
-   "engine": "mlb",
-   "warY1": 0.89,
-   "contract": "2 y/$13.5M (25-26)+27 m opt",
-   "surplus": 3559075.8036600784,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.89,
-     "value": 6257426,
-     "cost": 6750000,
-     "net": -160622
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.71,
-     "value": 5091668,
-     "cost": 1000000,
-     "net": 3719698
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 3559075.8036600784
-  },
-  {
    "name": "Romo, Drew",
    "team": "CWS",
    "pos": "c",
@@ -43031,6 +42744,35 @@
    "marketValue": 3391837.688388886
   },
   {
+   "name": "Soroka, Michael",
+   "team": "AZ",
+   "pos": "rhp-s",
+   "age": 28,
+   "mls": "7.009",
+   "mlbam": "647336",
+   "fgId": "18383",
+   "engine": "mlb",
+   "warY1": 1.98,
+   "contract": "1 y/$7.5M (26)+27 m opt",
+   "surplus": 3381362.782608695,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 1.98,
+     "value": 16869513,
+     "cost": 6500000,
+     "net": 3381363
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 6647468.433409389
+  },
+  {
    "name": "Bazardo, Eduard",
    "team": "SEA",
    "pos": "rhp",
@@ -43107,41 +42849,6 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": 6554810.846549608
-  },
-  {
-   "name": "Junis, Jakob",
-   "team": "TEX",
-   "pos": "rhp",
-   "age": 33,
-   "mls": "8.002",
-   "mlbam": "596001",
-   "fgId": "13619",
-   "engine": "mlb",
-   "warY1": 0.72,
-   "contract": "1 y/$4M (26)+27 m opt",
-   "surplus": 3319299.6213591564,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.72,
-     "value": 5021891,
-     "cost": 2750000,
-     "net": 740834
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.57,
-     "value": 4086312,
-     "cost": 1250000,
-     "net": 2578466
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 3827152.4634271073
   },
   {
    "name": "Moore, Christian",
@@ -43462,41 +43169,6 @@
    "marketValue": 3670418.7995850453
   },
   {
-   "name": "Ur\u00edas, Ram\u00f3n",
-   "team": "STL",
-   "pos": "3b-2b",
-   "age": 32,
-   "mls": "5.025",
-   "mlbam": "602104",
-   "fgId": "18795",
-   "engine": "mlb",
-   "warY1": 0.55,
-   "contract": "1 y/$2M (26)+27 m opt",
-   "surplus": 3134385.2893022406,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.55,
-     "value": 3826240,
-     "cost": 1500000,
-     "net": 758557
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.43,
-     "value": 3113412,
-     "cost": 500000,
-     "net": 2375829
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 3134385.2893022406
-  },
-  {
    "name": "Faucher, Calvin",
    "team": "MIA",
    "pos": "rhp",
@@ -43743,7 +43415,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 0.75,
      "value": 5413190,
      "cost": 750000,
@@ -44312,6 +43984,43 @@
    "marketValue": 2645034.2423635237
   },
   {
+   "name": "Caratini, Victor",
+   "team": "MIN",
+   "pos": "c-dh",
+   "age": 32,
+   "mls": "8.051",
+   "mlbam": "605170",
+   "fgId": "14968",
+   "engine": "mlb",
+   "warY1": 1.24,
+   "contract": "2 y/$14M (26-27)+28 m opt",
+   "surplus": 2631774.9426888013,
+   "controlYears": 2,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 1.24,
+     "value": 10526554,
+     "cost": 4000000,
+     "net": 2128224
+    },
+    {
+     "season": 2027,
+     "status": "signed",
+     "war": 0.98,
+     "value": 7053906,
+     "cost": 6500000,
+     "net": 503551
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 2631774.9426888013
+  },
+  {
    "name": "Beeter, Clayton",
    "team": "WSH",
    "pos": "rhp",
@@ -44769,6 +44478,35 @@
    "marketValue": 2476431.65374809
   },
   {
+   "name": "Mullins, Cedric",
+   "team": "TB",
+   "pos": "cf",
+   "age": 31,
+   "mls": "6.078",
+   "mlbam": "656775",
+   "fgId": "17929",
+   "engine": "mlb",
+   "warY1": 1.66,
+   "contract": "1 y/$7M (26)+27 m opt",
+   "surplus": 2468692.282608696,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 1.66,
+     "value": 14070656,
+     "cost": 6500000,
+     "net": 2468692
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 4853236.720072391
+  },
+  {
    "name": "Norby, Connor",
    "team": "MIA",
    "pos": "2b",
@@ -44826,6 +44564,35 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": 2466265.830966692
+  },
+  {
+   "name": "Littell, Zack",
+   "team": "WSH",
+   "pos": "rhp-s",
+   "age": 30,
+   "mls": "6.043",
+   "mlbam": "641793",
+   "fgId": "15823",
+   "engine": "mlb",
+   "warY1": 1.21,
+   "contract": "1 y/$7M (26)+27 m opt",
+   "surplus": 2373756.6304347827,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 1.21,
+     "value": 10279520,
+     "cost": 3000000,
+     "net": 2373757
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 4666601.392364565
   },
   {
    "name": "Seigler, Anthony",
@@ -49647,7 +49414,7 @@
     },
     {
      "season": 2030,
-     "status": "signed",
+     "status": "option",
      "war": 1.07,
      "value": 10251845,
      "cost": 2500000,
@@ -56309,7 +56076,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 1.35,
      "value": 11492637,
      "cost": 7000000,
@@ -56354,41 +56121,6 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": 1461708.9409673251
-  },
-  {
-   "name": "M\u00e1rquez, Germ\u00e1n",
-   "team": "SD",
-   "pos": "rhp-s",
-   "age": 31,
-   "mls": "9.027",
-   "mlbam": "608566",
-   "fgId": "15038",
-   "engine": "mlb",
-   "warY1": 0.33,
-   "contract": "1 y/$1.75M (26)+27 m opt",
-   "surplus": 1458960.2645691698,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.33,
-     "value": 2314536,
-     "cost": 1000000,
-     "net": 428653
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.26,
-     "value": 1883338,
-     "cost": 750000,
-     "net": 1030307
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 1458960.2645691698
   },
   {
    "name": "March\u00e1n, Rafael",
@@ -56538,39 +56270,33 @@
    "marketValue": 1618477.5041552729
   },
   {
-   "name": "Thielbar, Caleb",
-   "team": "CHC",
-   "pos": "lhp",
-   "age": 39,
-   "mls": "7.131",
-   "mlbam": "573204",
-   "fgId": "10078",
+   "name": "Canning, Griffin",
+   "team": "SD",
+   "pos": "rhp-s",
+   "age": 30,
+   "mls": "6.075",
+   "mlbam": "656288",
+   "fgId": "19867",
    "engine": "mlb",
-   "warY1": 0.42,
-   "contract": "1 y/$4.5M (26)+27 m opt",
-   "surplus": 1340452.4338888014,
-   "controlYears": 2,
+   "warY1": 0.75,
+   "contract": "1 y/$2.5M (26)+27 m opt",
+   "surplus": 1390012.0434782607,
+   "controlYears": 1,
    "years": [
     {
      "season": 2026,
      "status": "signed",
-     "war": 0.42,
-     "value": 2907961,
-     "cost": 4000000,
-     "net": -356100
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.33,
-     "value": 2366207,
-     "cost": 500000,
-     "net": 1696552
+     "war": 0.75,
+     "value": 5262704,
+     "cost": 1000000,
+     "net": 1390012
     }
    ],
-   "flags": [],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
    "alsoProspect": false,
-   "marketValue": 1545541.656273788
+   "marketValue": 2732644.1364425216
   },
   {
    "name": "Estrada, Jeremiah",
@@ -56691,6 +56417,35 @@
    ],
    "alsoProspect": false,
    "marketValue": 1271547.4685151496
+  },
+  {
+   "name": "Bell, Josh",
+   "team": "MIN",
+   "pos": "dh-1b",
+   "age": 33,
+   "mls": "9.053",
+   "mlbam": "605137",
+   "fgId": "13145",
+   "engine": "mlb",
+   "warY1": 1.13,
+   "contract": "1 y/$7M (26)+27 m opt",
+   "surplus": 1244712.5000000002,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 1.13,
+     "value": 9567118,
+     "cost": 5750000,
+     "net": 1244713
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 2446997.7297250004
   },
   {
    "name": "Silseth, Chase",
@@ -57504,6 +57259,57 @@
    "marketValue": 1167607.058721636
   },
   {
+   "name": "Ashby, Aaron",
+   "team": "MIL",
+   "pos": "lhp",
+   "age": 28,
+   "mls": "3.088",
+   "mlbam": "676879",
+   "fgId": "23550",
+   "engine": "mlb",
+   "warY1": 0.85,
+   "contract": "5 y/$20.5M (23-27)+28-29 opts",
+   "surplus": 992659.7311790544,
+   "controlYears": 4,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.85,
+     "value": 5973443,
+     "cost": 5700000,
+     "net": 89166
+    },
+    {
+     "season": 2027,
+     "status": "signed",
+     "war": 0.67,
+     "value": 4860591,
+     "cost": 5700000,
+     "net": -763099
+    },
+    {
+     "season": 2028,
+     "status": "option",
+     "war": 0.53,
+     "value": 3955063,
+     "cost": 7700000,
+     "net": 0
+    },
+    {
+     "season": 2029,
+     "status": "option",
+     "war": 0.42,
+     "value": 3218235,
+     "cost": 1000000,
+     "net": 1666593
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": 1144536.6700494497
+  },
+  {
    "name": "Bernardino, Brennan",
    "team": "COL",
    "pos": "lhp",
@@ -57570,7 +57376,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 0.92,
      "value": 6473982,
      "cost": 3550000,
@@ -58043,6 +57849,35 @@
    ]
   },
   {
+   "name": "Ur\u00edas, Ram\u00f3n",
+   "team": "STL",
+   "pos": "3b-2b",
+   "age": 32,
+   "mls": "5.025",
+   "mlbam": "602104",
+   "fgId": "18795",
+   "engine": "mlb",
+   "warY1": 0.55,
+   "contract": "1 y/$2M (26)+27 m opt",
+   "surplus": 758556.5652173915,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.55,
+     "value": 3826240,
+     "cost": 1500000,
+     "net": 758557
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 1491256.9713527828
+  },
+  {
    "name": "Chaparro, Andr\u00e9s",
    "team": "WSH",
    "pos": "3b",
@@ -58100,6 +57935,35 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": 758054.4820775851
+  },
+  {
+   "name": "Junis, Jakob",
+   "team": "TEX",
+   "pos": "rhp",
+   "age": 33,
+   "mls": "8.002",
+   "mlbam": "596001",
+   "fgId": "13619",
+   "engine": "mlb",
+   "warY1": 0.72,
+   "contract": "1 y/$4M (26)+27 m opt",
+   "surplus": 740833.8695652174,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.72,
+     "value": 5021891,
+     "cost": 2750000,
+     "net": 740834
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 1679247.2742578571
   },
   {
    "name": "Gordon, Colton",
@@ -58883,7 +58747,9 @@
      "net": 528997
     }
    ],
-   "flags": [],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
    "alsoProspect": false,
    "marketValue": 1039962.4116665998
   },
@@ -59226,6 +59092,35 @@
    "flags": [
     "mlbHistory"
    ]
+  },
+  {
+   "name": "M\u00e1rquez, Germ\u00e1n",
+   "team": "SD",
+   "pos": "rhp-s",
+   "age": 31,
+   "mls": "9.027",
+   "mlbam": "608566",
+   "fgId": "15038",
+   "engine": "mlb",
+   "warY1": 0.33,
+   "contract": "1 y/$1.75M (26)+27 m opt",
+   "surplus": 428653.04347826086,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.33,
+     "value": 2314536,
+     "cost": 1000000,
+     "net": 428653
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": 842695.0193165217
   },
   {
    "name": "Albert Su\u00e1rez",
@@ -149942,41 +149837,6 @@
    "marketValue": 524831.4960329218
   },
   {
-   "name": "Hays, Austin",
-   "team": "CWS",
-   "pos": "lf",
-   "age": 30,
-   "mls": "6.057",
-   "mlbam": "669720",
-   "fgId": "19363",
-   "engine": "mlb",
-   "warY1": 0.37,
-   "contract": "1 y/$6M (26)+27 m opt",
-   "surplus": 249368.37514888006,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.37,
-     "value": 2616679,
-     "cost": 5000000,
-     "net": -777170
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.3,
-     "value": 2129192,
-     "cost": 1000000,
-     "net": 1026538
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": 249368.37514888006
-  },
-  {
    "name": "Vierling, Matt",
    "team": "DET",
    "pos": "rf",
@@ -150344,6 +150204,67 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": 440233.9172444785
+  },
+  {
+   "name": "Hart, Kyle",
+   "team": "SD",
+   "pos": "lhp-s",
+   "age": 33,
+   "mls": "1.022",
+   "mlbam": "606996",
+   "fgId": "19646",
+   "engine": "mlb",
+   "warY1": 0.08,
+   "contract": "1 y/$1.2M (25)+26 opt",
+   "surplus": 220617.0370509091,
+   "controlYears": 5,
+   "years": [
+    {
+     "season": 2026,
+     "status": "option",
+     "war": 0.08,
+     "value": 544032,
+     "cost": 1000000,
+     "net": 0
+    },
+    {
+     "season": 2027,
+     "status": "signed",
+     "war": 0.06,
+     "value": 442679,
+     "cost": 200000,
+     "net": 220617
+    },
+    {
+     "season": 2028,
+     "status": "arb",
+     "war": 0.05,
+     "value": 360208,
+     "cost": 780000,
+     "net": 0
+    },
+    {
+     "season": 2029,
+     "status": "arb",
+     "war": 0.04,
+     "value": 293101,
+     "cost": 780000,
+     "net": 0
+    },
+    {
+     "season": 2030,
+     "status": "arb",
+     "war": 0.03,
+     "value": 238496,
+     "cost": 780000,
+     "net": 0
+    }
+   ],
+   "flags": [
+    "controlDerivedFromMLS"
+   ],
+   "alsoProspect": false,
+   "marketValue": 220617.0370509091
   },
   {
    "name": "Sosa, Edmundo",
@@ -151513,67 +151434,6 @@
    ],
    "alsoProspect": false,
    "marketValue": 83157.02608695648
-  },
-  {
-   "name": "Hart, Kyle",
-   "team": "SD",
-   "pos": "lhp-s",
-   "age": 33,
-   "mls": "1.022",
-   "mlbam": "606996",
-   "fgId": "19646",
-   "engine": "mlb",
-   "warY1": 0.08,
-   "contract": "1 y/$1.2M (25)+26 opt",
-   "surplus": 71931.78052916998,
-   "controlYears": 5,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.08,
-     "value": 544032,
-     "cost": 1000000,
-     "net": -148685
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.06,
-     "value": 442679,
-     "cost": 200000,
-     "net": 220617
-    },
-    {
-     "season": 2028,
-     "status": "arb",
-     "war": 0.05,
-     "value": 360208,
-     "cost": 780000,
-     "net": 0
-    },
-    {
-     "season": 2029,
-     "status": "arb",
-     "war": 0.04,
-     "value": 293101,
-     "cost": 780000,
-     "net": 0
-    },
-    {
-     "season": 2030,
-     "status": "arb",
-     "war": 0.03,
-     "value": 238496,
-     "cost": 780000,
-     "net": 0
-    }
-   ],
-   "flags": [
-    "controlDerivedFromMLS"
-   ],
-   "alsoProspect": false,
-   "marketValue": 71931.78052916998
   },
   {
    "name": "Freeland, Kyle",
@@ -153419,7 +153279,7 @@
    "warY1": 0.38,
    "contract": "1 y/$3M (26)+27 m opt",
    "surplus": 32115.782608695623,
-   "controlYears": 2,
+   "controlYears": 1,
    "years": [
     {
      "season": 2026,
@@ -153428,21 +153288,13 @@
      "value": 2663004,
      "cost": 2564516,
      "net": 32116
-    },
-    {
-     "season": 2027,
-     "status": "option",
-     "war": 0.3,
-     "value": 2166887,
-     "cost": 2564516,
-     "net": 0
     }
    ],
    "flags": [
-    "optionYearEstimated"
+    "mutualOptionEndsControl"
    ],
    "alsoProspect": false,
-   "marketValue": 32115.782608695623
+   "marketValue": 63136.86665139125
   },
   {
    "name": "Millas, Drew",
@@ -154101,7 +153953,7 @@
    "years": [
     {
      "season": 2026,
-     "status": "signed",
+     "status": "option",
      "war": 0.69,
      "value": 4796426,
      "cost": 4750000,
@@ -154770,6 +154622,87 @@
    "marketValue": 754.0173913043501
   },
   {
+   "name": "Hill, Tim",
+   "team": "NYY",
+   "pos": "lhp",
+   "age": 36,
+   "mls": "7.112",
+   "mlbam": "657612",
+   "fgId": "16814",
+   "engine": "mlb",
+   "warY1": -0.15,
+   "contract": "1 y/$2.85M (25)+26 cl opt",
+   "surplus": 0.0,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "option",
+     "war": 0.0,
+     "value": 0,
+     "cost": 3000000,
+     "net": 0
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": 0.0
+  },
+  {
+   "name": "Alvarado, Jos\u00e9",
+   "team": "PHI",
+   "pos": "lhp",
+   "age": 31,
+   "mls": "8.009",
+   "mlbam": "621237",
+   "fgId": "17780",
+   "engine": "mlb",
+   "warY1": 0.95,
+   "contract": "3 yr/$22M (23-25)+26 cl opt",
+   "surplus": 0.0,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "option",
+     "war": 0.95,
+     "value": 6616993,
+     "cost": 9000000,
+     "net": 0
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": 0.0
+  },
+  {
+   "name": "Kittredge, Andrew",
+   "team": "BAL",
+   "pos": "rhp",
+   "age": 36,
+   "mls": "7.070",
+   "mlbam": "552640",
+   "fgId": "12828",
+   "engine": "mlb",
+   "warY1": 0.44,
+   "contract": "1 y/$10M (25)+26 cl opt",
+   "surplus": 0.0,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "option",
+     "war": 0.44,
+     "value": 3104574,
+     "cost": 9000000,
+     "net": 0
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": 0.0
+  },
+  {
    "name": "Ortiz, Luis L.",
    "team": "CLE",
    "pos": "rhp",
@@ -154813,6 +154746,35 @@
      "war": 0.0,
      "value": 0,
      "cost": 780000,
+     "net": 0
+    }
+   ],
+   "flags": [
+    "noProjection"
+   ],
+   "alsoProspect": false,
+   "marketValue": 0.0
+  },
+  {
+   "name": "Laureano, Ram\u00f3n",
+   "team": "SD",
+   "pos": "rf",
+   "age": 31,
+   "mls": "6.159",
+   "mlbam": "657656",
+   "fgId": null,
+   "engine": "mlb",
+   "warY1": 0.0,
+   "contract": "1 y/$4M (25)+26 cl opt",
+   "surplus": 0.0,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "option",
+     "war": 0.0,
+     "value": 0,
+     "cost": 6500000,
      "net": 0
     }
    ],
@@ -161055,7 +161017,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 0.21,
      "value": 1547024,
      "cost": 1250000,
@@ -164690,6 +164652,35 @@
    "marketValue": -160497.71739130435
   },
   {
+   "name": "Higashioka, Kyle",
+   "team": "TEX",
+   "pos": "c",
+   "age": 36,
+   "mls": "7.005",
+   "mlbam": "543309",
+   "fgId": "5517",
+   "engine": "mlb",
+   "warY1": 0.89,
+   "contract": "2 y/$13.5M (25-26)+27 m opt",
+   "surplus": -160621.95652173914,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.89,
+     "value": 6257426,
+     "cost": 6750000,
+     "net": -160622
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": -160621.95652173914
+  },
+  {
    "name": "Hiraldo, Yaramil",
    "team": "BAL",
    "pos": "rhp",
@@ -165912,6 +165903,35 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": -188288.80434782608
+  },
+  {
+   "name": "Andujar, Miguel",
+   "team": "SD",
+   "pos": "lf",
+   "age": 31,
+   "mls": "6.053",
+   "mlbam": "609280",
+   "fgId": "15878",
+   "engine": "mlb",
+   "warY1": 0.13,
+   "contract": "1 y/$4M (26)+27 m opt",
+   "surplus": -190929.7347826087,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.13,
+     "value": 914482,
+     "cost": 1500000,
+     "net": -190930
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": -190929.7347826087
   },
   {
    "name": "Burke, Brock",
@@ -167943,6 +167963,51 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": -252888.46304347826
+  },
+  {
+   "name": "Wick, Rowan",
+   "team": "SF",
+   "pos": "rhp",
+   "age": 33,
+   "mls": "3.114",
+   "mlbam": "592858",
+   "fgId": null,
+   "engine": "mlb",
+   "warY1": 0.0,
+   "contract": "1 y/$880,000 (26)+27 cl opt",
+   "surplus": -254347.8260869565,
+   "controlYears": 3,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.0,
+     "value": 0,
+     "cost": 780000,
+     "net": -254348
+    },
+    {
+     "season": 2027,
+     "status": "option",
+     "war": 0.0,
+     "value": 0,
+     "cost": 100000,
+     "net": 0
+    },
+    {
+     "season": 2028,
+     "status": "arb",
+     "war": 0.0,
+     "value": 0,
+     "cost": 780000,
+     "net": 0
+    }
+   ],
+   "flags": [
+    "noProjection"
+   ],
+   "alsoProspect": false,
+   "marketValue": -254347.8260869565
   },
   {
    "name": "Dollander, Chase",
@@ -170956,7 +171021,7 @@
     },
     {
      "season": 2027,
-     "status": "signed",
+     "status": "option",
      "war": 0.15,
      "value": 1068107,
      "cost": 1000000,
@@ -171038,49 +171103,33 @@
    "marketValue": -342159.93782608694
   },
   {
-   "name": "Wick, Rowan",
-   "team": "SF",
-   "pos": "rhp",
-   "age": 33,
-   "mls": "3.114",
-   "mlbam": "592858",
-   "fgId": null,
+   "name": "Thielbar, Caleb",
+   "team": "CHC",
+   "pos": "lhp",
+   "age": 39,
+   "mls": "7.131",
+   "mlbam": "573204",
+   "fgId": "10078",
    "engine": "mlb",
-   "warY1": 0.0,
-   "contract": "1 y/$880,000 (26)+27 cl opt",
-   "surplus": -345256.9169960474,
-   "controlYears": 3,
+   "warY1": 0.42,
+   "contract": "1 y/$4.5M (26)+27 m opt",
+   "surplus": -356099.8260869564,
+   "controlYears": 1,
    "years": [
     {
      "season": 2026,
      "status": "signed",
-     "war": 0.0,
-     "value": 0,
-     "cost": 780000,
-     "net": -254348
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.0,
-     "value": 0,
-     "cost": 100000,
-     "net": -90909
-    },
-    {
-     "season": 2028,
-     "status": "arb",
-     "war": 0.0,
-     "value": 0,
-     "cost": 780000,
-     "net": 0
+     "war": 0.42,
+     "value": 2907961,
+     "cost": 4000000,
+     "net": -356100
     }
    ],
    "flags": [
-    "noProjection"
+    "mutualOptionEndsControl"
    ],
    "alsoProspect": false,
-   "marketValue": -345256.9169960474
+   "marketValue": -356099.8260869564
   },
   {
    "name": "Cabrera, Oswaldo",
@@ -172298,31 +172347,33 @@
    "marketValue": -773138.8260869564
   },
   {
-   "name": "Alvarado, Jos\u00e9",
-   "team": "PHI",
-   "pos": "lhp",
-   "age": 31,
-   "mls": "8.009",
-   "mlbam": "621237",
-   "fgId": "17780",
+   "name": "Hays, Austin",
+   "team": "CWS",
+   "pos": "lf",
+   "age": 30,
+   "mls": "6.057",
+   "mlbam": "669720",
+   "fgId": "19363",
    "engine": "mlb",
-   "warY1": 0.95,
-   "contract": "3 yr/$22M (23-25)+26 cl opt",
-   "surplus": -777067.6086956521,
+   "warY1": 0.37,
+   "contract": "1 y/$6M (26)+27 m opt",
+   "surplus": -777169.7826086956,
    "controlYears": 1,
    "years": [
     {
      "season": 2026,
      "status": "signed",
-     "war": 0.95,
-     "value": 6616993,
-     "cost": 9000000,
-     "net": -777068
+     "war": 0.37,
+     "value": 2616679,
+     "cost": 5000000,
+     "net": -777170
     }
    ],
-   "flags": [],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
    "alsoProspect": false,
-   "marketValue": -777067.6086956521
+   "marketValue": -777169.7826086956
   },
   {
    "name": "Schmidt, Clarke",
@@ -172608,33 +172659,6 @@
    "marketValue": -970108.695652174
   },
   {
-   "name": "Hill, Tim",
-   "team": "NYY",
-   "pos": "lhp",
-   "age": 36,
-   "mls": "7.112",
-   "mlbam": "657612",
-   "fgId": "16814",
-   "engine": "mlb",
-   "warY1": -0.15,
-   "contract": "1 y/$2.85M (25)+26 cl opt",
-   "surplus": -978260.8695652174,
-   "controlYears": 1,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.0,
-     "value": 0,
-     "cost": 3000000,
-     "net": -978261
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -978260.8695652174
-  },
-  {
    "name": "Quintana, Jos\u00e9",
    "team": "COL",
    "pos": "lhp-s",
@@ -172904,6 +172928,35 @@
    "marketValue": -1213958.6956521743
   },
   {
+   "name": "Armstrong, Shawn",
+   "team": "CLE",
+   "pos": "rhp",
+   "age": 35,
+   "mls": "7.113",
+   "mlbam": "542888",
+   "fgId": "12857",
+   "engine": "mlb",
+   "warY1": 0.03,
+   "contract": "1 y/$5.5M (26)+27 m opt",
+   "surplus": -1240844.2460869565,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.03,
+     "value": 194744,
+     "cost": 4000000,
+     "net": -1240844
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": -1240844.2460869565
+  },
+  {
    "name": "Fairbanks, Pete",
    "team": "MIA",
    "pos": "rhp-c",
@@ -173022,6 +173075,35 @@
    "marketValue": -1353260.8695652175
   },
   {
+   "name": "Harvey, Hunter",
+   "team": "CHC",
+   "pos": "rhp",
+   "age": 31,
+   "mls": "6.047",
+   "mlbam": "640451",
+   "fgId": "15507",
+   "engine": "mlb",
+   "warY1": 0.11,
+   "contract": "1 y/$6M (26)+27 m opt",
+   "surplus": -1371946.4826086957,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.11,
+     "value": 792697,
+     "cost": 5000000,
+     "net": -1371946
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": -1371946.4826086957
+  },
+  {
    "name": "Flaherty, Jack",
    "team": "DET",
    "pos": "rhp-s",
@@ -173084,6 +173166,35 @@
    "marketValue": -1427485.8962877465
   },
   {
+   "name": "Johnson, Pierce",
+   "team": "CIN",
+   "pos": "rhp",
+   "age": 35,
+   "mls": "6.137",
+   "mlbam": "572955",
+   "fgId": "13435",
+   "engine": "mlb",
+   "warY1": 0.16,
+   "contract": "1 y/$6.5M (26)+27 m opt",
+   "surplus": -1435937.1608695653,
+   "controlYears": 1,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.16,
+     "value": 1096459,
+     "cost": 5500000,
+     "net": -1435937
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": -1435937.1608695653
+  },
+  {
    "name": "Mountcastle, Ryan",
    "team": "BAL",
    "pos": "1b",
@@ -173119,41 +173230,6 @@
    ],
    "alsoProspect": false,
    "marketValue": -1473948.391304348
-  },
-  {
-   "name": "Johnson, Pierce",
-   "team": "CIN",
-   "pos": "rhp",
-   "age": 35,
-   "mls": "6.137",
-   "mlbam": "572955",
-   "fgId": "13435",
-   "engine": "mlb",
-   "warY1": 0.16,
-   "contract": "1 y/$6.5M (26)+27 m opt",
-   "surplus": -1533947.1680683533,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.16,
-     "value": 1096459,
-     "cost": 5500000,
-     "net": -1435937
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.12,
-     "value": 892189,
-     "cost": 1000000,
-     "net": -98010
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -1533947.1680683533
   },
   {
    "name": "Iglesias, Raisel",
@@ -173220,41 +173296,6 @@
    "marketValue": -1689723.3201581025
   },
   {
-   "name": "Harvey, Hunter",
-   "team": "CHC",
-   "pos": "rhp",
-   "age": 31,
-   "mls": "6.047",
-   "mlbam": "640451",
-   "fgId": "15507",
-   "engine": "mlb",
-   "warY1": 0.11,
-   "contract": "1 y/$6M (26)+27 m opt",
-   "surplus": -1694657.4664474835,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.11,
-     "value": 792697,
-     "cost": 5000000,
-     "net": -1371946
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.09,
-     "value": 645018,
-     "cost": 1000000,
-     "net": -322711
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -1694657.4664474835
-  },
-  {
    "name": "Langeliers, Shea",
    "team": "ATH",
    "pos": "c",
@@ -173300,41 +173341,6 @@
    "marketValue": -1711956.5217391304
   },
   {
-   "name": "Andujar, Miguel",
-   "team": "SD",
-   "pos": "lf",
-   "age": 31,
-   "mls": "6.053",
-   "mlbam": "609280",
-   "fgId": "15878",
-   "engine": "mlb",
-   "warY1": 0.13,
-   "contract": "1 y/$4M (26)+27 m opt",
-   "surplus": -1787189.623198366,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.13,
-     "value": 914482,
-     "cost": 1500000,
-     "net": -190930
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.1,
-     "value": 744114,
-     "cost": 2500000,
-     "net": -1596260
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -1787189.623198366
-  },
-  {
    "name": "Williams, Trevor",
    "team": "WSH",
    "pos": "rhp-s",
@@ -173362,31 +173368,39 @@
    "marketValue": -1794682.7956521742
   },
   {
-   "name": "Kittredge, Andrew",
-   "team": "BAL",
-   "pos": "rhp",
-   "age": 36,
-   "mls": "7.070",
-   "mlbam": "552640",
-   "fgId": "12828",
+   "name": "Straw, Myles",
+   "team": "TOR",
+   "pos": "cf",
+   "age": 31,
+   "mls": "5.125",
+   "mlbam": "664702",
+   "fgId": "17620",
    "engine": "mlb",
-   "warY1": 0.44,
-   "contract": "1 y/$10M (25)+26 cl opt",
-   "surplus": -1922421.608695652,
-   "controlYears": 1,
+   "warY1": 0.21,
+   "contract": "5 yr/$25M (22-26)+27-28 cl opts",
+   "surplus": -1933753.4782608694,
+   "controlYears": 2,
    "years": [
     {
      "season": 2026,
      "status": "signed",
-     "war": 0.44,
-     "value": 3104574,
-     "cost": 9000000,
-     "net": -1922422
+     "war": 0.21,
+     "value": 1469823,
+     "cost": 7400000,
+     "net": -1933753
+    },
+    {
+     "season": 2027,
+     "status": "option",
+     "war": 0.17,
+     "value": 1195995,
+     "cost": 1750000,
+     "net": 0
     }
    ],
    "flags": [],
    "alsoProspect": false,
-   "marketValue": -1922421.608695652
+   "marketValue": -1933753.4782608694
   },
   {
    "name": "Refsnyder, Rob",
@@ -173478,86 +173492,6 @@
    "marketValue": -2093327.6347826088
   },
   {
-   "name": "Ashby, Aaron",
-   "team": "MIL",
-   "pos": "lhp",
-   "age": 28,
-   "mls": "3.088",
-   "mlbam": "676879",
-   "fgId": "23550",
-   "engine": "mlb",
-   "warY1": 0.85,
-   "contract": "5 y/$20.5M (23-27)+28-29 opts",
-   "surplus": -2102329.644804202,
-   "controlYears": 4,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.85,
-     "value": 5973443,
-     "cost": 5700000,
-     "net": 89166
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.67,
-     "value": 4860591,
-     "cost": 5700000,
-     "net": -763099
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.53,
-     "value": 3955063,
-     "cost": 7700000,
-     "net": -3094989
-    },
-    {
-     "season": 2029,
-     "status": "signed",
-     "war": 0.42,
-     "value": 3218235,
-     "cost": 1000000,
-     "net": 1666593
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -2102329.644804202
-  },
-  {
-   "name": "Laureano, Ram\u00f3n",
-   "team": "SD",
-   "pos": "rf",
-   "age": 31,
-   "mls": "6.159",
-   "mlbam": "657656",
-   "fgId": null,
-   "engine": "mlb",
-   "warY1": 0.0,
-   "contract": "1 y/$4M (25)+26 cl opt",
-   "surplus": -2119565.217391304,
-   "controlYears": 1,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.0,
-     "value": 0,
-     "cost": 6500000,
-     "net": -2119565
-    }
-   ],
-   "flags": [
-    "noProjection"
-   ],
-   "alsoProspect": false,
-   "marketValue": -2119565.217391304
-  },
-  {
    "name": "Strahm, Matt",
    "team": "KC",
    "pos": "lhp",
@@ -173583,6 +173517,41 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": -2137158.6739130435
+  },
+  {
+   "name": "Jansen, Kenley",
+   "team": "DET",
+   "pos": "rhp-c",
+   "age": 38,
+   "mls": "15.073",
+   "mlbam": "445276",
+   "fgId": "3096",
+   "engine": "mlb",
+   "warY1": 0.27,
+   "contract": "1 y/$11M (26)+27 cl opt",
+   "surplus": -2329448.5086956522,
+   "controlYears": 2,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.27,
+     "value": 1856358,
+     "cost": 9000000,
+     "net": -2329449
+    },
+    {
+     "season": 2027,
+     "status": "option",
+     "war": 0.21,
+     "value": 1510518,
+     "cost": 2000000,
+     "net": 0
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": -2329448.5086956522
   },
   {
    "name": "Garc\u00eda, Yimi",
@@ -173671,74 +173640,34 @@
    "marketValue": -2405208.172238786
   },
   {
-   "name": "Straw, Myles",
-   "team": "TOR",
-   "pos": "cf",
-   "age": 31,
-   "mls": "5.125",
-   "mlbam": "664702",
-   "fgId": "17620",
+   "name": "Eflin, Zach",
+   "team": "BAL",
+   "pos": "rhp-s",
+   "age": 32,
+   "mls": "9.018",
+   "mlbam": "621107",
+   "fgId": null,
    "engine": "mlb",
-   "warY1": 0.21,
-   "contract": "5 yr/$25M (22-26)+27-28 cl opts",
-   "surplus": -2437394.6565638995,
-   "controlYears": 2,
+   "warY1": 0.0,
+   "contract": "1 y/$10M (26)+27 m opt",
+   "surplus": -2608695.652173913,
+   "controlYears": 1,
    "years": [
     {
      "season": 2026,
      "status": "signed",
-     "war": 0.21,
-     "value": 1469823,
-     "cost": 7400000,
-     "net": -1933753
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.17,
-     "value": 1195995,
-     "cost": 1750000,
-     "net": -503641
+     "war": 0.0,
+     "value": 0,
+     "cost": 8000000,
+     "net": -2608696
     }
    ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -2437394.6565638995
-  },
-  {
-   "name": "Armstrong, Shawn",
-   "team": "CLE",
-   "pos": "rhp",
-   "age": 35,
-   "mls": "7.113",
-   "mlbam": "542888",
-   "fgId": "12857",
-   "engine": "mlb",
-   "warY1": 0.03,
-   "contract": "1 y/$5.5M (26)+27 m opt",
-   "surplus": -2460422.930928411,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.03,
-     "value": 194744,
-     "cost": 4000000,
-     "net": -1240844
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.02,
-     "value": 158463,
-     "cost": 1500000,
-     "net": -1219579
-    }
+   "flags": [
+    "mutualOptionEndsControl",
+    "noProjection"
    ],
-   "flags": [],
    "alsoProspect": false,
-   "marketValue": -2460422.930928411
+   "marketValue": -2608695.652173913
   },
   {
    "name": "India, Jonathan",
@@ -173808,7 +173737,7 @@
    "warY1": 2.03,
    "contract": "4 y/$80M (24-27)+28 v opt",
    "surplus": -2742586.539641371,
-   "controlYears": 4,
+   "controlYears": 2,
    "years": [
     {
      "season": 2026,
@@ -173825,65 +173754,13 @@
      "value": 14046003,
      "cost": 19000000,
      "net": -4503633
-    },
-    {
-     "season": 2028,
-     "status": "option",
-     "war": 1.27,
-     "value": 11429233,
-     "cost": 19000000,
-     "net": 0
-    },
-    {
-     "season": 2029,
-     "status": "option",
-     "war": 1.0,
-     "value": 9299967,
-     "cost": 19000000,
-     "net": 0
     }
    ],
    "flags": [
-    "optionYearEstimated",
-    "optionYearEstimated"
+    "vestingOptionEndsControl"
    ],
    "alsoProspect": false,
    "marketValue": -2742586.539641371
-  },
-  {
-   "name": "Jansen, Kenley",
-   "team": "DET",
-   "pos": "rhp-c",
-   "age": 38,
-   "mls": "15.073",
-   "mlbam": "445276",
-   "fgId": "3096",
-   "engine": "mlb",
-   "warY1": 0.27,
-   "contract": "1 y/$11M (26)+27 cl opt",
-   "surplus": -2774431.755373228,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.27,
-     "value": 1856358,
-     "cost": 9000000,
-     "net": -2329449
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.21,
-     "value": 1510518,
-     "cost": 2000000,
-     "net": -444983
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -2774431.755373228
   },
   {
    "name": "Ozuna, Marcell",
@@ -173932,7 +173809,7 @@
    "warY1": 0.91,
    "contract": "1 y/$15M (26)+27 m opt",
    "surplus": -2812920.347826087,
-   "controlYears": 2,
+   "controlYears": 1,
    "years": [
     {
      "season": 2026,
@@ -173941,18 +173818,10 @@
      "value": 6373711,
      "cost": 15000000,
      "net": -2812920
-    },
-    {
-     "season": 2027,
-     "status": "option",
-     "war": 0.72,
-     "value": 5186289,
-     "cost": 15000000,
-     "net": 0
     }
    ],
    "flags": [
-    "optionYearEstimated"
+    "mutualOptionEndsControl"
    ],
    "alsoProspect": false,
    "marketValue": -2812920.347826087
@@ -174014,6 +173883,41 @@
    ],
    "alsoProspect": false,
    "marketValue": -3260869.565217391
+  },
+  {
+   "name": "Est\u00e9vez, Carlos",
+   "team": "KC",
+   "pos": "rhp-c",
+   "age": 33,
+   "mls": "9.022",
+   "mlbam": "608032",
+   "fgId": "14542",
+   "engine": "mlb",
+   "warY1": 0.0,
+   "contract": "2 y/$22M (25-26)+27 cl opt",
+   "surplus": -3288805.5438695652,
+   "controlYears": 2,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.0,
+     "value": 14330,
+     "cost": 10100000,
+     "net": -3288806
+    },
+    {
+     "season": 2027,
+     "status": "option",
+     "war": 0.0,
+     "value": 11660,
+     "cost": 2000000,
+     "net": 0
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": -3288805.5438695652
   },
   {
    "name": "Springer, George",
@@ -174091,7 +173995,7 @@
    "warY1": 0.0,
    "contract": "3 yr/$33M (24-26)+27 cond opt",
    "surplus": -3586956.5217391304,
-   "controlYears": 2,
+   "controlYears": 1,
    "years": [
     {
      "season": 2026,
@@ -174100,22 +174004,49 @@
      "value": 0,
      "cost": 11000000,
      "net": -3586957
-    },
-    {
-     "season": 2027,
-     "status": "option",
-     "war": 0.0,
-     "value": 0,
-     "cost": 11000000,
-     "net": 0
     }
    ],
    "flags": [
-    "optionYearEstimated",
+    "vestingOptionEndsControl",
     "noProjection"
    ],
    "alsoProspect": false,
    "marketValue": -3586956.5217391304
+  },
+  {
+   "name": "Gurriel Jr., Lourdes",
+   "team": "AZ",
+   "pos": "dh",
+   "age": 32,
+   "mls": "7.094",
+   "mlbam": "666971",
+   "fgId": "19238",
+   "engine": "mlb",
+   "warY1": 0.25,
+   "contract": "3 y/$42M (24-26)+27 cl opt",
+   "surplus": -3675226.534782609,
+   "controlYears": 2,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.25,
+     "value": 1729305,
+     "cost": 13000000,
+     "net": -3675227
+    },
+    {
+     "season": 2027,
+     "status": "option",
+     "war": 0.2,
+     "value": 1407136,
+     "cost": 5000000,
+     "net": 0
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": -3675226.534782609
   },
   {
    "name": "Gallen, Zac",
@@ -174454,7 +174385,7 @@
     },
     {
      "season": 2028,
-     "status": "signed",
+     "status": "option",
      "war": 1.13,
      "value": 10199671,
      "cost": 3000000,
@@ -174497,7 +174428,7 @@
     },
     {
      "season": 2028,
-     "status": "signed",
+     "status": "option",
      "war": 0.61,
      "value": 4566190,
      "cost": 4000000,
@@ -174540,7 +174471,7 @@
     },
     {
      "season": 2028,
-     "status": "signed",
+     "status": "option",
      "war": 1.0,
      "value": 9019332,
      "cost": 6500000,
@@ -174628,43 +174559,6 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": -4369634.191105797
-  },
-  {
-   "name": "Eflin, Zach",
-   "team": "BAL",
-   "pos": "rhp-s",
-   "age": 32,
-   "mls": "9.018",
-   "mlbam": "621107",
-   "fgId": null,
-   "engine": "mlb",
-   "warY1": 0.0,
-   "contract": "1 y/$10M (26)+27 m opt",
-   "surplus": -4426877.470355731,
-   "controlYears": 2,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.0,
-     "value": 0,
-     "cost": 8000000,
-     "net": -2608696
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.0,
-     "value": 0,
-     "cost": 2000000,
-     "net": -1818182
-    }
-   ],
-   "flags": [
-    "noProjection"
-   ],
-   "alsoProspect": false,
-   "marketValue": -4426877.470355731
   },
   {
    "name": "Keller, Mitch",
@@ -174896,39 +174790,41 @@
    "marketValue": -5019147.130434782
   },
   {
-   "name": "Est\u00e9vez, Carlos",
-   "team": "KC",
-   "pos": "rhp-c",
-   "age": 33,
-   "mls": "9.022",
-   "mlbam": "608032",
-   "fgId": "14542",
+   "name": "Jansen, Danny",
+   "team": "TEX",
+   "pos": "c",
+   "age": 31,
+   "mls": "7.050",
+   "mlbam": "643376",
+   "fgId": "16535",
    "engine": "mlb",
-   "warY1": 0.0,
-   "contract": "2 y/$22M (25-26)+27 cl opt",
-   "surplus": -5096387.317696632,
+   "warY1": 0.46,
+   "contract": "2 y/$14.5M (26-27)+28 m opt",
+   "surplus": -5243674.47250224,
    "controlYears": 2,
    "years": [
     {
      "season": 2026,
      "status": "signed",
-     "war": 0.0,
-     "value": 14330,
-     "cost": 10100000,
-     "net": -3288806
+     "war": 0.46,
+     "value": 3204050,
+     "cost": 4250000,
+     "net": -341071
     },
     {
      "season": 2027,
      "status": "signed",
-     "war": 0.0,
-     "value": 11660,
-     "cost": 2000000,
-     "net": -1807582
+     "war": 0.36,
+     "value": 2607136,
+     "cost": 8000000,
+     "net": -4902604
     }
    ],
-   "flags": [],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
    "alsoProspect": false,
-   "marketValue": -5096387.317696632
+   "marketValue": -5243674.47250224
   },
   {
    "name": "O'Hearn, Ryan",
@@ -174964,49 +174860,6 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": -5293542.911274044
-  },
-  {
-   "name": "Jansen, Danny",
-   "team": "TEX",
-   "pos": "c",
-   "age": 31,
-   "mls": "7.050",
-   "mlbam": "643376",
-   "fgId": "16535",
-   "engine": "mlb",
-   "warY1": 0.46,
-   "contract": "2 y/$14.5M (26-27)+28 m opt",
-   "surplus": -5349933.711587735,
-   "controlYears": 3,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.46,
-     "value": 3204050,
-     "cost": 4250000,
-     "net": -341071
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.36,
-     "value": 2607136,
-     "cost": 8000000,
-     "net": -4902604
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.29,
-     "value": 2121426,
-     "cost": 2250000,
-     "net": -106259
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -5349933.711587735
   },
   {
    "name": "Realmuto, J.T.",
@@ -175122,39 +174975,47 @@
    "marketValue": -6498208.355173649
   },
   {
-   "name": "Gurriel Jr., Lourdes",
-   "team": "AZ",
-   "pos": "dh",
-   "age": 32,
-   "mls": "7.094",
-   "mlbam": "666971",
-   "fgId": "19238",
+   "name": "Maton, Phil",
+   "team": "CHC",
+   "pos": "rhp",
+   "age": 33,
+   "mls": "8.047",
+   "mlbam": "664208",
+   "fgId": "18064",
    "engine": "mlb",
-   "warY1": 0.25,
-   "contract": "3 y/$42M (24-26)+27 cl opt",
-   "surplus": -6941466.791886851,
-   "controlYears": 2,
+   "warY1": 0.01,
+   "contract": "2 y/$14.5M (26-27)+28 cl opt",
+   "surplus": -7177885.071627262,
+   "controlYears": 3,
    "years": [
     {
      "season": 2026,
      "status": "signed",
-     "war": 0.25,
-     "value": 1729305,
-     "cost": 13000000,
-     "net": -3675227
+     "war": 0.01,
+     "value": 65808,
+     "cost": 5500000,
+     "net": -1772019
     },
     {
      "season": 2027,
      "status": "signed",
-     "war": 0.2,
-     "value": 1407136,
-     "cost": 5000000,
-     "net": -3266240
+     "war": 0.01,
+     "value": 53548,
+     "cost": 6000000,
+     "net": -5405866
+    },
+    {
+     "season": 2028,
+     "status": "option",
+     "war": 0.01,
+     "value": 43572,
+     "cost": 3000000,
+     "net": 0
     }
    ],
    "flags": [],
    "alsoProspect": false,
-   "marketValue": -6941466.791886851
+   "marketValue": -7177885.071627262
   },
   {
    "name": "Woodruff, Brandon",
@@ -175289,6 +175150,49 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": -7451337.491944664
+  },
+  {
+   "name": "Houser, Adrian",
+   "team": "SF",
+   "pos": "rhp-s",
+   "age": 33,
+   "mls": "6.095",
+   "mlbam": "605288",
+   "fgId": "12718",
+   "engine": "mlb",
+   "warY1": 0.64,
+   "contract": "2 y/$22M (26-27)+28 cl opt",
+   "surplus": -7498303.765797627,
+   "controlYears": 3,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.64,
+     "value": 4488873,
+     "cost": 7000000,
+     "net": -818846
+    },
+    {
+     "season": 2027,
+     "status": "signed",
+     "war": 0.51,
+     "value": 3652596,
+     "cost": 11000000,
+     "net": -6679458
+    },
+    {
+     "season": 2028,
+     "status": "option",
+     "war": 0.4,
+     "value": 2972117,
+     "cost": 4000000,
+     "net": 0
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": -7498303.765797627
   },
   {
    "name": "Hoffman, Jeff",
@@ -175430,49 +175334,6 @@
    "marketValue": -7922988.351742722
   },
   {
-   "name": "Houser, Adrian",
-   "team": "SF",
-   "pos": "rhp-s",
-   "age": 33,
-   "mls": "6.095",
-   "mlbam": "605288",
-   "fgId": "12718",
-   "engine": "mlb",
-   "warY1": 0.64,
-   "contract": "2 y/$22M (26-27)+28 cl opt",
-   "surplus": -8347793.464016711,
-   "controlYears": 3,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.64,
-     "value": 4488873,
-     "cost": 7000000,
-     "net": -818846
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.51,
-     "value": 3652596,
-     "cost": 11000000,
-     "net": -6679458
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.4,
-     "value": 2972117,
-     "cost": 4000000,
-     "net": -849490
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -8347793.464016711
-  },
-  {
    "name": "Ragans, Cole",
    "team": "KC",
    "pos": "lhp-s",
@@ -175577,6 +175438,43 @@
    "marketValue": -8800398.006787356
   },
   {
+   "name": "Finnegan, Kyle",
+   "team": "DET",
+   "pos": "rhp",
+   "age": 34,
+   "mls": "6.000",
+   "mlbam": "640448",
+   "fgId": "15009",
+   "engine": "mlb",
+   "warY1": 0.13,
+   "contract": "2 y/$19M (26-27)+28 m opt",
+   "surplus": -9158188.477513095,
+   "controlYears": 2,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.13,
+     "value": 908038,
+     "cost": 8750000,
+     "net": -2557162
+    },
+    {
+     "season": 2027,
+     "status": "signed",
+     "war": 0.1,
+     "value": 738870,
+     "cost": 8000000,
+     "net": -6601027
+    }
+   ],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": -9158188.477513095
+  },
+  {
    "name": "Martinez, Justin",
    "team": "AZ",
    "pos": "rhp-c",
@@ -175638,47 +175536,41 @@
    "marketValue": -9534844.488737691
   },
   {
-   "name": "Maton, Phil",
-   "team": "CHC",
+   "name": "Dom\u00ednguez, Seranthony",
+   "team": "CWS",
    "pos": "rhp",
-   "age": 33,
-   "mls": "8.047",
-   "mlbam": "664208",
-   "fgId": "18064",
+   "age": 31,
+   "mls": "7.131",
+   "mlbam": "622554",
+   "fgId": "19249",
    "engine": "mlb",
-   "warY1": 0.01,
-   "contract": "2 y/$14.5M (26-27)+28 cl opt",
-   "surplus": -9621214.247068742,
-   "controlYears": 3,
+   "warY1": 0.31,
+   "contract": "2 y/$20M (26-27)+28 m opt",
+   "surplus": -9671699.557246376,
+   "controlYears": 2,
    "years": [
     {
      "season": 2026,
      "status": "signed",
-     "war": 0.01,
-     "value": 65808,
-     "cost": 5500000,
-     "net": -1772019
+     "war": 0.31,
+     "value": 2176183,
+     "cost": 7500000,
+     "net": -1736027
     },
     {
      "season": 2027,
      "status": "signed",
-     "war": 0.01,
-     "value": 53548,
-     "cost": 6000000,
-     "net": -5405866
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.01,
-     "value": 43572,
-     "cost": 3000000,
-     "net": -2443329
+     "war": 0.25,
+     "value": 1770760,
+     "cost": 10500000,
+     "net": -7935672
     }
    ],
-   "flags": [],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
    "alsoProspect": false,
-   "marketValue": -9621214.247068742
+   "marketValue": -9671699.557246376
   },
   {
    "name": "Williams, Devin",
@@ -175724,49 +175616,6 @@
    "marketValue": -9705242.665085703
   },
   {
-   "name": "Dom\u00ednguez, Seranthony",
-   "team": "CWS",
-   "pos": "rhp",
-   "age": 31,
-   "mls": "7.131",
-   "mlbam": "622554",
-   "fgId": "19249",
-   "engine": "mlb",
-   "warY1": 0.31,
-   "contract": "2 y/$20M (26-27)+28 m opt",
-   "surplus": -10133792.35075891,
-   "controlYears": 3,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.31,
-     "value": 2176183,
-     "cost": 7500000,
-     "net": -1736027
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.25,
-     "value": 1770760,
-     "cost": 10500000,
-     "net": -7935672
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.19,
-     "value": 1440868,
-     "cost": 2000000,
-     "net": -462093
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -10133792.35075891
-  },
-  {
    "name": "O'Neill, Tyler",
    "team": "BAL",
    "pos": "lf",
@@ -175800,49 +175649,6 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": -10381996.08056021
-  },
-  {
-   "name": "Finnegan, Kyle",
-   "team": "DET",
-   "pos": "rhp",
-   "age": 34,
-   "mls": "6.000",
-   "mlbam": "640448",
-   "fgId": "15009",
-   "engine": "mlb",
-   "warY1": 0.13,
-   "contract": "2 y/$19M (26-27)+28 m opt",
-   "surplus": -10520817.530816324,
-   "controlYears": 3,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.13,
-     "value": 908038,
-     "cost": 8750000,
-     "net": -2557162
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.1,
-     "value": 738870,
-     "cost": 8000000,
-     "net": -6601027
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.08,
-     "value": 601219,
-     "cost": 2250000,
-     "net": -1362629
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -10520817.530816324
   },
   {
    "name": "Bader, Harrison",
@@ -175979,7 +175785,7 @@
    "warY1": 1.59,
    "contract": "2 y/$40M (26-27)+28 v opt",
    "surplus": -11435199.48334282,
-   "controlYears": 3,
+   "controlYears": 2,
    "years": [
     {
      "season": 2026,
@@ -175996,18 +175802,10 @@
      "value": 11019972,
      "cost": 22000000,
      "net": -9981843
-    },
-    {
-     "season": 2028,
-     "status": "option",
-     "war": 0.99,
-     "value": 7384548,
-     "cost": 22000000,
-     "net": 0
     }
    ],
    "flags": [
-    "optionYearEstimated"
+    "vestingOptionEndsControl"
    ],
    "alsoProspect": false,
    "marketValue": -11435199.48334282
@@ -176123,6 +175921,65 @@
    ],
    "alsoProspect": false,
    "marketValue": -11652354.083489597
+  },
+  {
+   "name": "Hayes, Ke'Bryan",
+   "team": "CIN",
+   "pos": "3b",
+   "age": 29,
+   "mls": "5.075",
+   "mlbam": "663647",
+   "fgId": "18577",
+   "engine": "mlb",
+   "warY1": 0.62,
+   "contract": "8 y/$70M (22-29)+30 cl opt",
+   "surplus": -11673860.183105147,
+   "controlYears": 5,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.62,
+     "value": 4345369,
+     "cost": 7000000,
+     "net": -865641
+    },
+    {
+     "season": 2027,
+     "status": "signed",
+     "war": 0.49,
+     "value": 3535826,
+     "cost": 7000000,
+     "net": -3149249
+    },
+    {
+     "season": 2028,
+     "status": "signed",
+     "war": 0.39,
+     "value": 2877102,
+     "cost": 7000000,
+     "net": -3407354
+    },
+    {
+     "season": 2029,
+     "status": "signed",
+     "war": 0.31,
+     "value": 2341098,
+     "cost": 8000000,
+     "net": -4251617
+    },
+    {
+     "season": 2030,
+     "status": "option",
+     "war": 0.24,
+     "value": 1904951,
+     "cost": 6000000,
+     "net": 0
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": -11673860.183105147
   },
   {
    "name": "Scott, Tanner",
@@ -176378,7 +176235,7 @@
     },
     {
      "season": 2030,
-     "status": "signed",
+     "status": "option",
      "war": 0.55,
      "value": 4330060,
      "cost": 1000000,
@@ -176708,65 +176565,6 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": -14442152.70825053
-  },
-  {
-   "name": "Hayes, Ke'Bryan",
-   "team": "CIN",
-   "pos": "3b",
-   "age": 29,
-   "mls": "5.075",
-   "mlbam": "663647",
-   "fgId": "18577",
-   "engine": "mlb",
-   "warY1": 0.62,
-   "contract": "8 y/$70M (22-29)+30 cl opt",
-   "surplus": -14470833.540566918,
-   "controlYears": 5,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.62,
-     "value": 4345369,
-     "cost": 7000000,
-     "net": -865641
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.49,
-     "value": 3535826,
-     "cost": 7000000,
-     "net": -3149249
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.39,
-     "value": 2877102,
-     "cost": 7000000,
-     "net": -3407354
-    },
-    {
-     "season": 2029,
-     "status": "signed",
-     "war": 0.31,
-     "value": 2341098,
-     "cost": 8000000,
-     "net": -4251617
-    },
-    {
-     "season": 2030,
-     "status": "signed",
-     "war": 0.24,
-     "value": 1904951,
-     "cost": 6000000,
-     "net": -2796973
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -14470833.540566918
   },
   {
    "name": "Keller, Brad",
@@ -177128,7 +176926,7 @@
    "warY1": 1.45,
    "contract": "5 yr/$108M (23-27)+28 v opt",
    "surplus": -16734810.79124242,
-   "controlYears": 3,
+   "controlYears": 2,
    "years": [
     {
      "season": 2026,
@@ -177145,18 +176943,10 @@
      "value": 9997226,
      "cost": 24150000,
      "net": -12866158
-    },
-    {
-     "season": 2028,
-     "status": "option",
-     "war": 0.9,
-     "value": 6699200,
-     "cost": 24150000,
-     "net": 0
     }
    ],
    "flags": [
-    "optionYearEstimated"
+    "vestingOptionEndsControl"
    ],
    "alsoProspect": false,
    "marketValue": -16734810.79124242
@@ -177343,57 +177133,6 @@
    "marketValue": -17312445.50967771
   },
   {
-   "name": "Rogers, Tyler",
-   "team": "TOR",
-   "pos": "rhp",
-   "age": 35,
-   "mls": "6.034",
-   "mlbam": "643511",
-   "fgId": "15541",
-   "engine": "mlb",
-   "warY1": 0.69,
-   "contract": "3 y/$37M (26-28)+29 v opt",
-   "surplus": -17576504.08908188,
-   "controlYears": 4,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.69,
-     "value": 4817399,
-     "cost": 8666666,
-     "net": -1255196
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.54,
-     "value": 3919918,
-     "cost": 13667000,
-     "net": -8860984
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.43,
-     "value": 3189637,
-     "cost": 13667000,
-     "net": -8658978
-    },
-    {
-     "season": 2029,
-     "status": "signed",
-     "war": 0.34,
-     "value": 2595408,
-     "cost": 1000000,
-     "net": 1198653
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -17576504.08908188
-  },
-  {
    "name": "Cole, Gerrit",
    "team": "NYY",
    "pos": "rhp-s",
@@ -177494,6 +177233,51 @@
    "flags": [],
    "alsoProspect": false,
    "marketValue": -18240297.140545174
+  },
+  {
+   "name": "Rogers, Tyler",
+   "team": "TOR",
+   "pos": "rhp",
+   "age": 35,
+   "mls": "6.034",
+   "mlbam": "643511",
+   "fgId": "15541",
+   "engine": "mlb",
+   "warY1": 0.69,
+   "contract": "3 y/$37M (26-28)+29 v opt",
+   "surplus": -18775157.432981543,
+   "controlYears": 3,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.69,
+     "value": 4817399,
+     "cost": 8666666,
+     "net": -1255196
+    },
+    {
+     "season": 2027,
+     "status": "signed",
+     "war": 0.54,
+     "value": 3919918,
+     "cost": 13667000,
+     "net": -8860984
+    },
+    {
+     "season": 2028,
+     "status": "signed",
+     "war": 0.43,
+     "value": 3189637,
+     "cost": 13667000,
+     "net": -8658978
+    }
+   ],
+   "flags": [
+    "vestingOptionEndsControl"
+   ],
+   "alsoProspect": false,
+   "marketValue": -18775157.432981543
   },
   {
    "name": "Reynolds, Bryan",
@@ -177962,7 +177746,7 @@
    "engine": "mlb",
    "warY1": 0.91,
    "contract": "6 y/$140M (22-27)+28 cl opt",
-   "surplus": -24738397.405490156,
+   "surplus": -24091265.440304082,
    "controlYears": 3,
    "years": [
     {
@@ -177983,16 +177767,16 @@
     },
     {
      "season": 2028,
-     "status": "signed",
+     "status": "option",
      "war": 0.57,
      "value": 4216970,
      "cost": 5000000,
-     "net": -647132
+     "net": 0
     }
    ],
    "flags": [],
    "alsoProspect": false,
-   "marketValue": -24738397.405490156
+   "marketValue": -24091265.440304082
   },
   {
    "name": "Semien, Marcus",
@@ -178901,8 +178685,8 @@
    "engine": "mlb",
    "warY1": 0.99,
    "contract": "9 y/$215M (20-28)+29 m opt*",
-   "surplus": -39463338.25668481,
-   "controlYears": 4,
+   "surplus": -38212343.93203025,
+   "controlYears": 3,
    "years": [
     {
      "season": 2026,
@@ -178927,19 +178711,13 @@
      "value": 4571619,
      "cost": 23890000,
      "net": -15965604
-    },
-    {
-     "season": 2029,
-     "status": "signed",
-     "war": 0.49,
-     "value": 3719927,
-     "cost": 5385000,
-     "net": -1250994
     }
    ],
-   "flags": [],
+   "flags": [
+    "mutualOptionEndsControl"
+   ],
    "alsoProspect": false,
-   "marketValue": -39463338.25668481
+   "marketValue": -38212343.93203025
   },
   {
    "name": "Turner, Trea",
@@ -179086,6 +178864,57 @@
    "marketValue": -41011112.358453356
   },
   {
+   "name": "Strider, Spencer",
+   "team": "ATL",
+   "pos": "rhp-s",
+   "age": 27,
+   "mls": "4.003",
+   "mlbam": "675911",
+   "fgId": "27498",
+   "engine": "mlb",
+   "warY1": 0.32,
+   "contract": "6 y/$75M (23-28)+29 cl opt",
+   "surplus": -41067069.497065306,
+   "controlYears": 4,
+   "years": [
+    {
+     "season": 2026,
+     "status": "signed",
+     "war": 0.32,
+     "value": 2254472,
+     "cost": 20000000,
+     "net": -5786585
+    },
+    {
+     "season": 2027,
+     "status": "signed",
+     "war": 0.25,
+     "value": 1834464,
+     "cost": 22000000,
+     "net": -18332305
+    },
+    {
+     "season": 2028,
+     "status": "signed",
+     "war": 0.2,
+     "value": 1492703,
+     "cost": 22000000,
+     "net": -16948179
+    },
+    {
+     "season": 2029,
+     "status": "option",
+     "war": 0.16,
+     "value": 1214613,
+     "cost": 5000000,
+     "net": 0
+    }
+   ],
+   "flags": [],
+   "alsoProspect": false,
+   "marketValue": -41067069.497065306
+  },
+  {
    "name": "Rooker, Brent",
    "team": "ATH",
    "pos": "dh-lf",
@@ -179146,57 +178975,6 @@
    ],
    "alsoProspect": false,
    "marketValue": -42007643.81145265
-  },
-  {
-   "name": "Strider, Spencer",
-   "team": "ATL",
-   "pos": "rhp-s",
-   "age": 27,
-   "mls": "4.003",
-   "mlbam": "675911",
-   "fgId": "27498",
-   "engine": "mlb",
-   "warY1": 0.32,
-   "contract": "6 y/$75M (23-28)+29 cl opt",
-   "surplus": -43911086.94512007,
-   "controlYears": 4,
-   "years": [
-    {
-     "season": 2026,
-     "status": "signed",
-     "war": 0.32,
-     "value": 2254472,
-     "cost": 20000000,
-     "net": -5786585
-    },
-    {
-     "season": 2027,
-     "status": "signed",
-     "war": 0.25,
-     "value": 1834464,
-     "cost": 22000000,
-     "net": -18332305
-    },
-    {
-     "season": 2028,
-     "status": "signed",
-     "war": 0.2,
-     "value": 1492703,
-     "cost": 22000000,
-     "net": -16948179
-    },
-    {
-     "season": 2029,
-     "status": "signed",
-     "war": 0.16,
-     "value": 1214613,
-     "cost": 5000000,
-     "net": -2844017
-    }
-   ],
-   "flags": [],
-   "alsoProspect": false,
-   "marketValue": -43911086.94512007
   },
   {
    "name": "Riley, Austin",
