@@ -720,6 +720,7 @@ BUBBLE_COLUMNS = [
         ('Chase%',     'chasePct',          'chasePct_pctl',          'pct1'),
     ]),
     ('CONTACT MGMT', [
+        ('xwOBAcon',   'xwOBAcon',         'xwOBAcon_pctl',         '3dec'),
         ('Hard-Hit%',  'hardHitPct',       'hardHitPct_pctl',       'pct1'),
         ('Barrel%',    'barrelPctAgainst', 'barrelPctAgainst_pctl', 'pct1'),
         ('GB%',        'gbPct',            'gbPct_pctl',            'pct1'),
@@ -728,7 +729,6 @@ BUBBLE_COLUMNS = [
         ('Velocity',   'fbVelo',    'fbVelo_pctl',    'mph'),
         ('Stuff+',     'stuffScore', 'stuffScore_pctl', 'int'),
         ('Loc+',       'locPlus',   'locPlus_pctl',   'int'),
-        ('Command+',   'commandPlus', 'commandPlus_pctl', 'int'),
         ('Pitching+',  'pitchingScore', 'pitchingScore_pctl', 'int'),
     ]),
 ]
@@ -1488,7 +1488,11 @@ def render_card(config, pitches, output_file):
     # Single-game zone plots use a lower 6-pitch ellipse minimum (matches the
     # movement scatter rule). Season cards keep 10 to suppress ellipse noise
     # when many pitch types are crammed into the same plot.
-    zone_ellipse_min = 10 if is_season_loc else 6
+    # Season: the >=10%-usage gate (below) decides WHICH pitches get
+    # ellipses; the count floor is only the covariance-fit minimum, so a
+    # >=10% pitch in a thin platoon split still draws (was 10, which
+    # silently hid qualifying pitches vs the rarer hand).
+    zone_ellipse_min = 6
 
     # Fixed zone bounds — same size for every pitcher, every card.
     # Season cards TRANSLATE the window so the plate/zone sits middle-right
@@ -2701,10 +2705,10 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "BOS"
+    team            = "ROC"
     start_date      = None    # Set to None for full season
     end_date        = None              # Set to a date for date range, or None for single day
-    filter_pitchers = "Early, Connelly"                 # Semicolon-separated "Last, First" names, or "" for all
+    filter_pitchers = "Williams, Trevor"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     output_dir      = OUTPUT_DIR
 
