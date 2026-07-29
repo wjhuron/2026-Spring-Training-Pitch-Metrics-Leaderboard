@@ -26,6 +26,32 @@
   "ballast": 2,
   "mse": 1.76138
  },
+ "lambdaByWarBucket": [
+  {
+   "lo": 0.0,
+   "hi": 2.0,
+   "lambda": 0.24,
+   "n": 5930,
+   "status": "interior",
+   "seasonWins": "3/6"
+  },
+  {
+   "lo": 2.0,
+   "hi": 4.0,
+   "lambda": 0.24,
+   "n": 717,
+   "status": "interior",
+   "seasonWins": "3/6"
+  },
+  {
+   "lo": 4.0,
+   "hi": 99.0,
+   "lambda": 0.18,
+   "n": 185,
+   "status": "interior",
+   "seasonWins": "4/6"
+  }
+ ],
  "stage1Grid": [
   {
    "lambda": 0.09,

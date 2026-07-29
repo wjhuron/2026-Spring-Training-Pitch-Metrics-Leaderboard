@@ -4,8 +4,8 @@ Inputs (all already in data/):
   tradevalue_contracts.json  Cot's: 40-man contracts, MLS, control ladders
   tradevalue_arb.json        MLBTR arb projections (bbref ids)
   tradevalue_idmap.csv       Chadwick register mlbam/fangraphs/bbref map
-  tradevalue_fg_bat.csv      FG ATC opening-day projections, hitters (MLBAMID)
-  tradevalue_fg_pit.csv      FG ATC opening-day projections, pitchers (MLBAMID)
+  tradevalue_fg_bat.csv      FG RoS projections, hitters (MLBAMID)
+  tradevalue_fg_pit.csv      FG RoS projections, pitchers (MLBAMID)
   tradevalue_fg_board.csv    THE BOARD (FV, Risk, ETA; FG ids, many 'sa'-prefixed)
 
 Matching: Cot's names carry no ids, so they resolve through Chadwick on
@@ -321,7 +321,7 @@ def main():
     out = {
         "fetched": date.today().isoformat(),
         "season": SEASON,
-        "projectionSource": "FanGraphs ATC opening-day 2026 export",
+        "projectionSource": "FanGraphs RoS 2026 export",
         "mlb": mlb,
         "prospects": prospects,
     }

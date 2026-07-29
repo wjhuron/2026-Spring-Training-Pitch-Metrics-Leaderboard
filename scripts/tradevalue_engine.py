@@ -54,8 +54,16 @@ CONFIG = {
     "arbLadder": {1: 0.15, 2: 0.35, 3: 0.50, 4: 0.75},  # FG 2026, fitted to awards
     # fitted 21%/yr multiplicative decline (pooled roles; role split untested)
     "riskDecay": {"SP": 0.21, "RP": 0.21, "C": 0.21, "POS": 0.21},
+    # per-talent-tier decline overrides the pooled value when present:
+    # [[upper WAR bound, lambda], ...] fitted in tradevalue_market stage 1b
+    "riskDecayByWar": None,
     "horizonYears": 10,
     "defaultAge": 27,              # when Cot's age is junk/missing
+    # projections are FG RoS exports: WAR covers only the REMAINING season,
+    # so the full-season talent baseline = RoS WAR / season fraction remaining
+    # (clamped: annualizing through a tiny remaining sliver is meaningless)
+    "projectionIsRoS": True,
+    "minAnnualizeFrac": 0.15,
     # Clemens July 2026 FV table: fv -> (hitter $, pitcher $, expWAR h, expWAR p,
     # star odds h, star odds p)
     "fvTable": {
@@ -92,6 +100,8 @@ def role_of(pos):
     """Cot's pos string -> risk-decay role bucket."""
     toks = re.split(r"[-/ ]", pos.lower())
     if "rhp" in toks or "lhp" in toks:
+        if "dh" in toks:  # two-way players are not relievers
+            return "POS"
         return "SP" if "s" in toks else "RP"
     if "c" in toks:
         return "C"
@@ -173,11 +183,18 @@ def build_ladder(p):
 def value_mlb(p, frac_y1):
     cfg = CONFIG
     war1 = (p["warBat"] or 0.0) + (p["warPit"] or 0.0)
+    if cfg["projectionIsRoS"]:
+        war1 = war1 / max(frac_y1, cfg["minAnnualizeFrac"])
     age = p["age"] if isinstance(p["age"], int) and 15 <= p["age"] <= 55 else None
     if age is None:
         age = cfg["defaultAge"]
     role = role_of(p["pos"])
     lam = cfg["riskDecay"][role]
+    if cfg.get("riskDecayByWar"):
+        for hi, bucket_lam in cfg["riskDecayByWar"]:
+            if war1 < hi:
+                lam = bucket_lam
+                break
     ladder, flags = build_ladder(p)
     if p["warBat"] is None and p["warPit"] is None:
         flags.append("noProjection")
@@ -282,11 +299,15 @@ def main():
     mlb_by_mlbam = {}
     for p in u["mlb"]:
         surplus, years_out, flags = value_mlb(p, frac)
+        war_baseline = round(((p["warBat"] or 0) + (p["warPit"] or 0))
+                             / max(frac, CONFIG["minAnnualizeFrac"])
+                             if CONFIG["projectionIsRoS"]
+                             else (p["warBat"] or 0) + (p["warPit"] or 0), 2)
         rec = {
             "name": p["name"], "team": p["team"], "pos": p["pos"],
             "age": p["age"], "mls": p["mls"], "mlbam": p["mlbam"],
             "fgId": p["fgId"], "engine": "mlb",
-            "warY1": round((p["warBat"] or 0) + (p["warPit"] or 0), 2),
+            "warY1": war_baseline,
             "contract": p["contract"],
             "surplus": surplus,
             "controlYears": len(years_out),
@@ -361,7 +382,7 @@ def main():
     site_payload = {
         "generated": out["generated"],
         "note": ("Intrinsic surplus + market-adjusted value, 2026 dollars. "
-                 "Projections: ATC opening-day 2026."),
+                 "Projections: FanGraphs rest-of-season, annualized."),
         "players": site,
     }
     (BASE / "js" / "tradevalue_data.js").write_text(

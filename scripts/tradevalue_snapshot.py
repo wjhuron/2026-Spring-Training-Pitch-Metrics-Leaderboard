@@ -177,6 +177,11 @@ def value_mlb_at(mlbam, trade_date, season, people, warhist):
         aging = sum(1 for k in range(2, t + 1)
                     if (age or cfg["defaultAge"]) + (k - 1) >= cfg["agingStartAge"])
         lam = cfg["riskDecay"]["POS" if not person.get("pitcher") else "SP"]
+        if cfg.get("riskDecayByWar"):
+            for hi, bucket_lam in cfg["riskDecayByWar"]:
+                if war1 < hi:
+                    lam = bucket_lam
+                    break
         war_t = (max(0.0, war1 + cfg["agingDelta"] * aging)
                  * (1 - lam) ** (t - 1))
         market = rate_for(war_t) * war_t * (1 + cfg["winInflation"]) ** (t - 1)
