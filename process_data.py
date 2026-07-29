@@ -4369,72 +4369,76 @@ def write_json_outputs(result, suffix):
 
 
 def write_embedded_js(rs_result):
-    """Write data_embedded.js with window.RS_DATA."""
-    def build_data_obj(result):
-        # Strip internal _-prefixed keys from all leaderboard rows
-        def strip_internal(rows):
-            return [{k: v for k, v in row.items() if not k.startswith('_')} for row in rows]
-        # Keep _pctl keys on hitter pitch LB rows — needed by the player-page
-        # Plate Discipline / Batted Ball tables to color category rows and
-        # per-pitch sub-rows (the leaderboard's hitterPitch tab recomputes
-        # percentiles client-side via the aggregator, but the player page
-        # reads these rows directly).
-        hitter_pitch_lb_slim = []
-        for row in result['hitter_pitch_leaderboard']:
-            slim = {k: v for k, v in row.items() if not k.startswith('_')}
-            hitter_pitch_lb_slim.append(slim)
-        return {
-            'pitcherData': strip_internal(result['pitcher_leaderboard']),
-            'pitchData': strip_internal(result['pitch_leaderboard']),
-            'hitterData': strip_internal(result['hitter_leaderboard']),
-            'hitterPitchData': hitter_pitch_lb_slim,
-            'metadata': result['metadata'],
-            'microData': result['micro_data'],
-            'pitchDetails': result['pitch_details'],
-            'hitterPitchDetails': result['hitter_pitch_details'],
-            'hitterSwingLocations': result.get('hitter_swing_locations', {}),
-        }
+    """Write the site data payload as TWO gzip chunks (split 2026-07-29):
 
+      data_core.json.gz   leaderboard tables + metadata — everything the
+                          unfiltered tabs need. Small (~5 MB gz), fetched
+                          first; the site renders its first table from this.
+      data_heavy.json.gz  microData + pitchDetails + hitterPitchDetails +
+                          hitterSwingLocations — powers client-side filters
+                          and player pages. Large (~33 MB gz), prefetched in
+                          the background immediately after core (js/data.js).
+
+    Rationale: the combined embed decompressed to ~254 MB and every visitor
+    paid its JSON.parse on every visit even when cached; 84% of that weight
+    (details + micro) is untouched until a filter or player page. Splitting
+    cuts time-to-first-table from ~4-5 s cold to <1 s and per-visit parse by
+    ~85%. The legacy combined data_embedded.json.gz is deleted; clients with
+    a stale cached index.html get the standard error-and-refresh path once.
+    """
     import gzip
 
-    # Serialize the rounded payload, then gzip it. The browser fetches the
-    # .gz and inflates it with DecompressionStream (see js/data.js). JSON of
-    # this shape compresses ≈6-8x, so a ~97 MB payload lands at ~13-16 MB:
-    # well under GitHub's 100 MB file wall (months of season headroom), a
-    # far smaller git push every run, and a 6-8x smaller download for every
-    # visitor (the page-load speedup).
-    data_obj = round_floats_inplace(build_data_obj(rs_result))
-    payload = json.dumps(data_obj, separators=(',', ':')).encode('utf-8')
-    raw_mb = len(payload) / 1048576
+    def strip_internal(rows):
+        return [{k: v for k, v in row.items() if not k.startswith('_')} for row in rows]
 
-    gz_path = os.path.join(DATA_DIR, 'data_embedded.json.gz')
-    # mtime=0 → byte-identical output when the data is unchanged, so a
-    # same-day re-run with no new games produces no spurious commit.
-    with open(gz_path, 'wb') as f:
-        f.write(gzip.compress(payload, compresslevel=9, mtime=0))
-    gz_mb = os.path.getsize(gz_path) / 1048576
+    def _write_gz(name, obj):
+        payload = json.dumps(round_floats_inplace(obj), separators=(',', ':')).encode('utf-8')
+        path = os.path.join(DATA_DIR, name)
+        # mtime=0 -> byte-identical output when the data is unchanged, so a
+        # same-day re-run with no new games produces no spurious commit.
+        with open(path, 'wb') as f:
+            f.write(gzip.compress(payload, compresslevel=9, mtime=0))
+        gz_mb = os.path.getsize(path) / 1048576
+        raw_mb = len(payload) / 1048576
+        print(f"  Wrote {name} ({gz_mb:.1f} MB gz, {raw_mb:.1f} MB raw)")
+        return gz_mb
 
-    # Remove the legacy uncompressed file so the old 100 MB artifact stops
-    # being committed (the workflow's `git add data/` stages this deletion).
-    legacy_js = os.path.join(DATA_DIR, 'data_embedded.js')
-    if os.path.exists(legacy_js):
-        os.remove(legacy_js)
+    # Keep _pctl keys on hitter pitch LB rows — needed by the player-page
+    # Plate Discipline / Batted Ball tables to color category rows and
+    # per-pitch sub-rows (the leaderboard's hitterPitch tab recomputes
+    # percentiles client-side via the aggregator, but the player page
+    # reads these rows directly).
+    hitter_pitch_lb_slim = [
+        {k: v for k, v in row.items() if not k.startswith('_')}
+        for row in rs_result['hitter_pitch_leaderboard']]
 
-    print(f"  Wrote data_embedded.json.gz "
-          f"({gz_mb:.1f} MB gz, {raw_mb:.1f} MB raw, "
-          f"{raw_mb / gz_mb:.1f}x ratio)")
+    core_mb = _write_gz('data_core.json.gz', {
+        'pitcherData': strip_internal(rs_result['pitcher_leaderboard']),
+        'pitchData': strip_internal(rs_result['pitch_leaderboard']),
+        'hitterData': strip_internal(rs_result['hitter_leaderboard']),
+        'hitterPitchData': hitter_pitch_lb_slim,
+        'metadata': rs_result['metadata'],
+    })
+    heavy_mb = _write_gz('data_heavy.json.gz', {
+        'microData': rs_result['micro_data'],
+        'pitchDetails': rs_result['pitch_details'],
+        'hitterPitchDetails': rs_result['hitter_pitch_details'],
+        'hitterSwingLocations': rs_result.get('hitter_swing_locations', {}),
+    })
 
-    # Guard on the COMPRESSED size (that's what git/GitHub sees). At ~15 MB
-    # this never fires in normal operation; tripping it means the payload
-    # grew ~3x unexpectedly and something is wrong. Fail fast with an
-    # actionable message rather than at the push step.
-    if os.path.getsize(gz_path) > 90 * 1048576:
-        raise SystemExit(
-            f"FATAL: data_embedded.json.gz is {gz_mb:.1f} MB. Even compressed "
-            f"it is near GitHub's 100 MB file wall — the payload needs to be "
-            f"split (move pitchDetails/microData to a Release asset like the "
-            f"pickle). See write_embedded_js."
-        )
+    # Remove legacy artifacts (the workflow's `git add data/` stages deletions).
+    for legacy in ('data_embedded.js', 'data_embedded.json.gz'):
+        lp = os.path.join(DATA_DIR, legacy)
+        if os.path.exists(lp):
+            os.remove(lp)
+
+    # Guard on COMPRESSED sizes (what git/GitHub sees). Tripping means a
+    # payload grew ~3x unexpectedly — fail fast with an actionable message
+    # rather than at the push step.
+    if core_mb > 40 or heavy_mb > 90:
+        raise RuntimeError(
+            f"Embed chunk unexpectedly large (core {core_mb:.1f} MB, heavy "
+            f"{heavy_mb:.1f} MB) — investigate before committing.")
 
 
 def bump_asset_version(index_path=None):

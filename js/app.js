@@ -82,10 +82,40 @@
   const rocMode = (new URLSearchParams(window.location.search)).get('roc') === '1';
   window._rocMode = rocMode;
 
+  // Called once the heavy chunk + Aggregator are ready: undo the degraded
+  // no-micro state that setupFilters applied during the core-only window.
+  function enableMicroFilters() {
+    var dateStartInput = document.getElementById('date-start');
+    var dateEndInput = document.getElementById('date-end');
+    var vsHandSelect = document.getElementById('vs-hand-select');
+    if (Aggregator.loaded && Aggregator.data && Aggregator.data.lookups.dates.length > 0) {
+      var dates = Aggregator.data.lookups.dates;
+      if (dateStartInput) {
+        dateStartInput.min = dates[0]; dateStartInput.max = dates[dates.length - 1];
+        dateStartInput.disabled = false; dateStartInput.title = '';
+      }
+      if (dateEndInput) {
+        dateEndInput.min = dates[0]; dateEndInput.max = dates[dates.length - 1];
+        dateEndInput.disabled = false; dateEndInput.title = '';
+      }
+    }
+    if (vsHandSelect) { vsHandSelect.disabled = false; vsHandSelect.title = ''; }
+    var vmGroup = document.getElementById('view-mode-group');
+    if (vmGroup) vmGroup.style.display = '';
+  }
+
   function init() {
+    // Two-stage data load (embed split 2026-07-29): render the leaderboards
+    // from the core chunk immediately; the heavy chunk (micro + details)
+    // prefetches in the background and enables filters/player pages via
+    // enableMicroFilters() when it lands.
+    DataStore.whenHeavy(function () {
+      Aggregator.load(DataStore.active().microData).then(function () {
+        enableMicroFilters();
+        refresh();
+      }).catch(function (e) { console.error('Aggregator init failed:', e); });
+    });
     DataStore.load().then(function () {
-      return Aggregator.load(DataStore.active().microData);
-    }).then(function () {
       if (!DataStore.metadata) {
         document.getElementById('no-results').textContent = 'Failed to load data.';
         document.getElementById('no-results').style.display = '';
@@ -516,11 +546,11 @@
     // Disable vs-hand and date filters if micro data not available
     if (!Aggregator.loaded) {
       vsHandSelect.disabled = true;
-      vsHandSelect.title = 'Requires micro data (run process_data.py)';
+      vsHandSelect.title = 'Loading full data\u2026';
       dateStartInput.disabled = true;
       dateEndInput.disabled = true;
-      dateStartInput.title = 'Requires micro data';
-      dateEndInput.title = 'Requires micro data';
+      dateStartInput.title = 'Loading full data\u2026';
+      dateEndInput.title = 'Loading full data\u2026';
       // Team aggregation also needs micro data
       const vmGroup = document.getElementById('view-mode-group');
       if (vmGroup) vmGroup.style.display = 'none';

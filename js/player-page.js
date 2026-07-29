@@ -245,6 +245,14 @@ var PlayerPage = {
   },
 
   open: function (mlbId, team) {
+    // Embed split: player pages need the heavy chunk (pitch details,
+    // swing locations). If the background prefetch hasn't landed yet
+    // (only possible in the first seconds after load), queue the open.
+    if (!DataStore.heavyReady) {
+      var _args = [mlbId, team];
+      DataStore.whenHeavy(function () { PlayerPage.open.apply(PlayerPage, _args); });
+      return;
+    }
     var pitcherData = this._findPitcherByMlbId(mlbId, team);
     var hitterData = !pitcherData ? this._findHitterByMlbId(mlbId, team) : null;
 

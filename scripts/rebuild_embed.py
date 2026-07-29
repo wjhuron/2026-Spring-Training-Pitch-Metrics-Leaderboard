@@ -1,5 +1,7 @@
 """rebuild_embed.py — swap the Stuff+-injected leaderboards into the already-
-built data_embedded.json.gz, without re-running the full pipeline.
+built data_core.json.gz, without re-running the full pipeline.
+(Embed split 2026-07-29: the leaderboards live in the CORE chunk; the heavy
+chunk — micro/details — is untouched by Stuff+ injection.)
 
 process_data.py builds data_embedded from its in-memory result (with the OLD,
 preserved Stuff+). The Stuff+ trainer injects fresh scores into the leaderboard
@@ -11,7 +13,7 @@ train_stuff_v11.py --inject.
 import json, gzip, os, sys
 
 DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
-GZ = os.path.join(DATA, 'data_embedded.json.gz')
+GZ = os.path.join(DATA, 'data_core.json.gz')
 
 def main(gz=GZ):
     obj = json.loads(gzip.decompress(open(gz, 'rb').read()))

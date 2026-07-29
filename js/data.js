@@ -30,6 +30,31 @@ const DataStore = {
    * changes; a fetch/inflate failure routes to app.js's existing
    * "Error loading data. Please refresh." handler.
    */
+  // Two-stage load (2026-07-29). data_core.json.gz carries the leaderboard
+  // tables + metadata (~5 MB gz) and renders the first table in well under a
+  // second; data_heavy.json.gz (microData + pitchDetails + swing locations,
+  // ~33 MB gz) prefetches in the background immediately after and powers
+  // client-side filters and player pages. Consumers that need heavy data
+  // gate on DataStore.heavyReady / DataStore.whenHeavy(cb) — with the
+  // prefetch starting at once, those gates only bite in the first seconds.
+  heavyReady: false,
+  _heavyCallbacks: [],
+
+  whenHeavy: function (cb) {
+    if (this.heavyReady) { cb(); return; }
+    this._heavyCallbacks.push(cb);
+  },
+
+  _fetchGz: function (name) {
+    var url = 'data/' + name + (DATA_VERSION ? ('?v=' + DATA_VERSION) : '');
+    return fetch(url).then(function (resp) {
+      if (!resp.ok) throw new Error('Data fetch failed: HTTP ' + resp.status + ' (' + name + ')');
+      if (!resp.body) throw new Error('Data fetch returned no body stream (' + name + ')');
+      var inflated = resp.body.pipeThrough(new DecompressionStream('gzip'));
+      return new Response(inflated).text();
+    }).then(function (text) { return JSON.parse(text); });
+  },
+
   load: function () {
     var self = this;
 
@@ -39,40 +64,38 @@ const DataStore = {
         'Please use a current version of Chrome, Firefox, Safari, or Edge.'));
     }
 
-    var url = 'data/data_embedded.json.gz' +
-              (DATA_VERSION ? ('?v=' + DATA_VERSION) : '');
-
-    return fetch(url).then(function (resp) {
-      if (!resp.ok) {
-        throw new Error('Data fetch failed: HTTP ' + resp.status);
-      }
-      if (!resp.body) {
-        throw new Error('Data fetch returned no body stream.');
-      }
-      var inflated = resp.body.pipeThrough(new DecompressionStream('gzip'));
-      return new Response(inflated).text();
-    }).then(function (text) {
-      var rd = JSON.parse(text);
+    return this._fetchGz('data_core.json.gz').then(function (rd) {
       self.rs = {
         pitcherData: rd.pitcherData || [],
         pitchData: rd.pitchData || [],
         hitterData: rd.hitterData || [],
         hitterPitchData: rd.hitterPitchData || [],
         metadata: rd.metadata || {},
-        microData: rd.microData || null,
-        pitchDetails: rd.pitchDetails || {},
-        hitterPitchDetails: rd.hitterPitchDetails || {},
-        hitterSwingLocations: rd.hitterSwingLocations || {},
+        microData: null,
+        pitchDetails: {},
+        hitterPitchDetails: {},
+        hitterSwingLocations: {},
       };
-
-      // Set flat globals so aggregator.js, player-page.js, scatter.js can access data
       self.updateGlobals();
+      // background prefetch — never blocks the first render
+      self._loadHeavy();
+    });
+  },
 
-      self.metadata = self.rs.metadata;
-      self.pitcherData = self.rs.pitcherData;
-      self.pitchData = self.rs.pitchData;
-      self.hitterData = self.rs.hitterData;
-      self.hitterPitchData = self.rs.hitterPitchData;
+  _loadHeavy: function () {
+    var self = this;
+    this._fetchGz('data_heavy.json.gz').then(function (rd) {
+      self.rs.microData = rd.microData || null;
+      self.rs.pitchDetails = rd.pitchDetails || {};
+      self.rs.hitterPitchDetails = rd.hitterPitchDetails || {};
+      self.rs.hitterSwingLocations = rd.hitterSwingLocations || {};
+      self.updateGlobals();
+      self.heavyReady = true;
+      var cbs = self._heavyCallbacks; self._heavyCallbacks = [];
+      cbs.forEach(function (cb) { try { cb(); } catch (e) { console.error(e); } });
+    }).catch(function (e) {
+      // Filters/player pages stay in their degraded state; leaderboards work.
+      console.error('Heavy data chunk failed to load:', e);
     });
   },
 
