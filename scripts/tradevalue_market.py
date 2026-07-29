@@ -39,7 +39,8 @@ from tradevalue_engine import CONFIG
 BASE = Path("/Users/wallyhuron/Huronalytics")
 OUT_PATH = BASE / "data" / "tradevalue_market_fit.json"
 
-FEATURES = ["prospect", "rental", "star", "rentalDeadline", "relieverDl"]
+FEATURES = ["prospect", "rental", "star", "rentalDeadline", "relieverDl",
+            "gradW"]
 MIN_SIDE = 0.5e6
 Y_CLIP = math.log(10)
 BAND = math.log(1.5)
@@ -105,6 +106,10 @@ def value_and_featurize(trades, ctx):
                 x[2] = star
                 x[3] = rental and tr["deadline"]
                 x[4] = rlv and tr["deadline"]
+                # graduation-blend share: feature value = the FV weight w, so
+                # a fresh grad carries more of the fitted effect than a
+                # nearly-graduated-out one
+                x[5] = val.get("gradBlendW", 0.0)
                 v_tot += v
                 f_tot += v * x
             vals.append(v_tot)

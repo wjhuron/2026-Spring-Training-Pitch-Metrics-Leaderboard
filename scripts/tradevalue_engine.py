@@ -348,6 +348,9 @@ def market_multiplier(rec, fit, in_deadline):
         out *= m["rentalDeadline"]
     if reliever and in_deadline:
         out *= m["relieverDl"]
+    if rec.get("gradBlend") and "gradW" in m:
+        # exponent = the blend weight, matching the corpus featurization
+        out *= m["gradW"] ** rec["gradBlend"]["w"]
     return out
 
 
