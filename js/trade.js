@@ -171,6 +171,94 @@
 
   wireSearch('a');
   wireSearch('b');
+
+  // ---- Player Values browse table ----
+  var MAX_ROWS_ALL = 300;
+  var valuesSort = 's';
+  var teamSel = document.getElementById('values-team');
+  var valuesSearch = document.getElementById('values-search');
+  var valuesBody = document.getElementById('values-body');
+  var valuesNote = document.getElementById('values-note');
+
+  function initTeams() {
+    var teams = {};
+    DATA.forEach(function (p) { teams[p.t] = true; });
+    Object.keys(teams).sort().forEach(function (t) {
+      var o = document.createElement('option');
+      o.value = t; o.textContent = t;
+      teamSel.appendChild(o);
+    });
+  }
+
+  function renderValues() {
+    var team = teamSel.value;
+    var q = norm(valuesSearch.value.trim());
+    var rows = DATA.filter(function (p) {
+      if (team !== 'all' && p.t !== team) return false;
+      if (q && norm(p.n).indexOf(q) === -1) return false;
+      return true;
+    });
+    rows.sort(function (x, y) { return y[valuesSort] - x[valuesSort]; });
+    var capped = team === 'all' && !q && rows.length > MAX_ROWS_ALL;
+    var shown = capped ? rows.slice(0, MAX_ROWS_ALL) : rows;
+
+    valuesBody.innerHTML = '';
+    var frag = document.createDocumentFragment();
+    shown.forEach(function (p, i) {
+      var tr = document.createElement('tr');
+      function td(cls, text) {
+        var c = document.createElement('td');
+        if (cls) c.className = cls;
+        c.textContent = text;
+        tr.appendChild(c);
+        return c;
+      }
+      td('td-rank', String(i + 1));
+      td('', p.n).style.fontWeight = '600';
+      td('', p.t);
+      td('', p.p);
+      td('td-profile', p.e === 'prospect'
+        ? 'FV ' + p.fv + (p.eta ? ' · ETA ' + p.eta : '')
+        : p.w + ' WAR · ' + p.c + (p.c === 1 ? ' yr' : ' yrs'));
+      td('td-num' + (p.s < 0 ? ' neg' : ''), fmtM(p.s));
+      td('td-num' + (p.m < 0 ? ' neg' : ''), fmtM(p.m));
+      var actions = document.createElement('td');
+      ['a', 'b'].forEach(function (k) {
+        var b = document.createElement('button');
+        b.className = 'add-btn';
+        b.textContent = k.toUpperCase();
+        b.title = 'Add to Side ' + k.toUpperCase();
+        b.addEventListener('click', function () {
+          sides[k].push(p);
+          render();
+        });
+        actions.appendChild(b);
+      });
+      tr.appendChild(actions);
+      frag.appendChild(tr);
+    });
+    valuesBody.appendChild(frag);
+    valuesNote.textContent = capped
+      ? 'Showing top ' + MAX_ROWS_ALL + ' of ' + rows.length +
+        ' players. Pick a team or search to see everyone.'
+      : rows.length + ' players.';
+  }
+
+  document.querySelectorAll('.th-sort').forEach(function (th) {
+    th.addEventListener('click', function () {
+      valuesSort = th.getAttribute('data-sort');
+      document.querySelectorAll('.th-sort').forEach(function (o) {
+        o.classList.toggle('active', o === th);
+      });
+      renderValues();
+    });
+  });
+  document.querySelector('.th-sort[data-sort="s"]').classList.add('active');
+  teamSel.addEventListener('change', renderValues);
+  valuesSearch.addEventListener('input', renderValues);
+  initTeams();
+  renderValues();
+
   var noteEl = document.getElementById('data-note');
   if (noteEl && window.TRADE_VALUES) {
     noteEl.textContent = window.TRADE_VALUES.note +
