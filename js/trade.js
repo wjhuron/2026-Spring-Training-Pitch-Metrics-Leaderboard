@@ -152,7 +152,7 @@
         d.addEventListener('mousedown', function (ev) { ev.preventDefault(); pick(p); });
         box.appendChild(d);
       });
-      box.style.display = '';
+      box.style.display = 'block';
     }
 
     input.addEventListener('input', function () {
