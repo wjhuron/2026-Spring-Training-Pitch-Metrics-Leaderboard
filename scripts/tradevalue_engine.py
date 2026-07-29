@@ -93,9 +93,10 @@ CONFIG = {
 
 PROSPECT_PITCHER_POS = {"SP", "SIRP", "MIRP", "RP"}
 
-# Board org abbrevs -> statsapi style, so site team lists unify
-FG_ORG_ALIAS = {"ARI": "AZ", "CHW": "CWS", "KCR": "KC", "SDP": "SD",
-                "SFG": "SF", "TBR": "TB", "WSN": "WSH"}
+# Map every internal abbrev style (statsapi or FG) to the SITE convention
+# (the sheets' PTeam set: ARI/ATH/CWS/KCR/SDP/SFG/TBR/WSH...)
+SITE_TEAM_ALIAS = {"AZ": "ARI", "KC": "KCR", "SD": "SDP", "SF": "SFG",
+                   "TB": "TBR", "CHW": "CWS", "WSN": "WSH"}
 
 
 def season_fraction_remaining(today=None):
@@ -550,7 +551,7 @@ def main():
             last, first = nm.split(",", 1)
             nm = f"{first.strip()} {last.strip()}"
         rec = {
-            "n": nm, "t": FG_ORG_ALIAS.get(r["team"], r["team"]),
+            "n": nm, "t": SITE_TEAM_ALIAS.get(r["team"], r["team"]),
             "p": r["pos"], "e": r["engine"],
             "s": round(r["surplus"] / 1e6, 1),
             "m": round(r["marketValue"] / 1e6, 1),
