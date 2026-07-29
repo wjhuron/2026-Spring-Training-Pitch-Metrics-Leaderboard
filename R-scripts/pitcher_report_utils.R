@@ -33,11 +33,12 @@ pitch_colors <- c(
   "EP" = "gray50"
 )
 
-# Display order for pitch types
+# Display order for pitch types (must cover every pitch_names value —
+# a missing entry becomes factor NA and sorts unpredictably on usage ties)
 pitch_order <- c(
   "Fastball", "Sinker", "Cutter",
   "Slider", "Sweeper", "Curveball", "Slurve",
-  "Changeup", "Splitter", "Knuckleball"
+  "Changeup", "Splitter", "Knuckleball", "Eephus"
 )
 
 # ---- Team / League Lookup ----
@@ -677,8 +678,10 @@ render_pitcher_pages <- function(pitcher_data, pitcher_name, per_date_pages,
       # If there are multiple dates, create a separate page for each date
       message(paste("Found", length(game_dates), "different game dates for", pitcher_name))
 
-      # Sort game dates chronologically (earliest to latest)
-      game_dates <- sort(game_dates)
+      # Sort game dates chronologically (earliest to latest). as.character
+      # matters: `for` over a Date vector strips the class, so log messages
+      # would print the numeric day serial ("on 20658") instead of the date.
+      game_dates <- as.character(sort(game_dates))
 
       for (game_date in game_dates) {
         # Filter data for this specific date
@@ -801,11 +804,13 @@ generate_pitcher_reports_core <- function(input_file, output_dir,
 
       message("Processing ", length(all_pitchers), " pitchers for ", current_team)
 
-      # Loop through each pitcher
+      # Loop through each pitcher. Filter by team AND name (matching
+      # Daily.R): a pitcher traded within the division workbook has rows
+      # under both PTeams, and name-only filtering would merge the other
+      # team's pitches into this team's report.
       for (selected_pitcher in all_pitchers) {
-        # Get all data for this pitcher
         pitcher_data <- pitch_data %>%
-          filter(Pitcher == selected_pitcher)
+          filter(PTeam == current_team, Pitcher == selected_pitcher)
 
         render_pitcher_pages(pitcher_data, selected_pitcher, per_date_pages,
                              plot_fun, tables_fun)
