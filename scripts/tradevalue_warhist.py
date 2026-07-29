@@ -3,7 +3,8 @@
 Downloads war_daily_bat.txt and war_daily_pitch.txt (free, ~30MB combined),
 trims to what the trade-corpus valuation needs, and writes
 data/tradevalue_warhist.csv with:
-  mlbam, season, age, warBat, warPit, salary
+  mlbam, season, age, warBat, warPit, salary, gPit, gsPit
+(gPit/gsPit feed the reliever-vs-starter tag in the market layer)
 
 Seasons kept: 2013+ (three-year lookback for 2017 trades). The current
 season's row is season-to-date. bWAR here vs fWAR in the live engine is an
@@ -55,11 +56,17 @@ def main():
             key = (int(mlbam), int(year))
             rec = table.setdefault(key, {
                 "age": None, "warBat": None, "warPit": None, "salary": None,
+                "gPit": None, "gsPit": None,
             })
             war = to_float(row.get("WAR"))
             if war is not None:  # sum stints
                 field = "warBat" if kind == "bat" else "warPit"
                 rec[field] = (rec[field] or 0.0) + war
+            if kind == "pit":
+                for src, dst in (("G", "gPit"), ("GS", "gsPit")):
+                    v = to_float(row.get(src))
+                    if v is not None:
+                        rec[dst] = (rec[dst] or 0.0) + v
             if rec["age"] is None:
                 rec["age"] = row.get("age") if (row.get("age") or "").isdigit() else None
             sal = to_float(row.get("salary"))
@@ -70,10 +77,12 @@ def main():
 
     with open(OUT_PATH, "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["mlbam", "season", "age", "warBat", "warPit", "salary"])
+        w.writerow(["mlbam", "season", "age", "warBat", "warPit", "salary",
+                    "gPit", "gsPit"])
         for (mlbam, season), rec in sorted(table.items()):
             w.writerow([mlbam, season, rec["age"],
-                        rec["warBat"], rec["warPit"], rec["salary"]])
+                        rec["warBat"], rec["warPit"], rec["salary"],
+                        rec["gPit"], rec["gsPit"]])
     print(f"Wrote {len(table)} player-seasons -> {OUT_PATH}")
 
 

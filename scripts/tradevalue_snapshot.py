@@ -101,6 +101,8 @@ def load_warhist():
         hist.setdefault(key, {})[season] = {
             "war": war * SHORT_SEASON_SCALE.get(season, 1.0),
             "salary": int(r["salary"]) if r["salary"] else None,
+            "gPit": float(r["gPit"]) if r.get("gPit") else 0.0,
+            "gsPit": float(r["gsPit"]) if r.get("gsPit") else 0.0,
         }
     return hist
 
@@ -174,7 +176,9 @@ def value_mlb_at(mlbam, trade_date, season, people, warhist):
         season_age = (age or cfg["defaultAge"]) + (t - 1)
         aging = sum(1 for k in range(2, t + 1)
                     if (age or cfg["defaultAge"]) + (k - 1) >= cfg["agingStartAge"])
-        war_t = max(0.0, war1 + cfg["agingDelta"] * aging)
+        lam = cfg["riskDecay"]["POS" if not person.get("pitcher") else "SP"]
+        war_t = (max(0.0, war1 + cfg["agingDelta"] * aging)
+                 * (1 - lam) ** (t - 1))
         market = rate_for(war_t) * war_t * (1 + cfg["winInflation"]) ** (t - 1)
         service_t = service + (t - 1)
         if t == 1 and cur_salary:
@@ -206,7 +210,8 @@ def value_prospect_at(board_row):
             "value": row[1] if is_p else row[0]}
 
 
-def main():
+def load_context():
+    """Everything value_traded_player needs, loaded once."""
     trades = json.loads((DATA / "tradevalue_trades.json").read_text())
     idmap_fg = {}
     for r in csv.DictReader(open(DATA / "tradevalue_idmap.csv")):
@@ -216,49 +221,59 @@ def main():
     boards = load_boards(idmap_fg)
     all_ids = sorted({p["mlbam"] for t in trades for p in t["players"]})
     people = load_people(all_ids)
+    return {"trades": trades, "warhist": warhist, "boards": boards,
+            "people": people}
+
+
+def board_chain(trade_date, season):
+    variant = "prospect" if trade_date[5:7] < "06" else "updated"
+    return [f"{season}{variant}",
+            f"{season}{'updated' if variant == 'prospect' else 'prospect'}",
+            f"{season - 1}updated"]
+
+
+def value_traded_player(mlbam, name, trade_date, season, ctx):
+    people, warhist, boards = ctx["people"], ctx["warhist"], ctx["boards"]
+    person = people.get(str(mlbam), {})
+    debut = person.get("debut")
+    debut_year = int(debut[:4]) if debut else None
+    board_eligible = debut_year is None or season - debut_year <= 1
+    if board_eligible:
+        for bkey in board_chain(trade_date, season):
+            board = boards.get(bkey)
+            if not board:
+                continue
+            row = board["byMlbam"].get(mlbam)
+            if row is None:
+                nm = norm_name(person.get("name") or name)
+                row = (board["byName"].get(
+                           (nm, (person.get("birthDate") or "")[:4]))
+                       or board["byNameOnly"].get(nm))
+            if row is not None:
+                val = value_prospect_at(row)
+                if val is not None:
+                    return val
+    val = value_mlb_at(mlbam, trade_date, season, people, warhist)
+    if val is None:
+        val = {"kind": "filler", "value": FILLER_VALUE}
+    return val
+
+
+def main():
+    ctx = load_context()
+    trades = ctx["trades"]
 
     out, n_players, n_valued = [], 0, 0
     for tr in trades:
         season = tr["season"]
-        variant = "prospect" if tr["date"][5:7] < "06" else "updated"
-        # fallback chain: mid-season graduates drop off the updated list but
-        # remain on the same season's preseason list (Abrams/Gore in 8/2022)
-        chain = [f"{season}{variant}",
-                 f"{season}{'updated' if variant == 'prospect' else 'prospect'}",
-                 f"{season - 1}updated"]
         sides = {}
         for p in tr["players"]:
             n_players += 1
-            mlbam = p["mlbam"]
-            person = people.get(str(mlbam), {})
-            debut = person.get("debut")
-            debut_year = int(debut[:4]) if debut else None
-            # a stale FV only applies to players still prospect-ish at trade
-            board_eligible = debut_year is None or season - debut_year <= 1
-            val = None
-            if board_eligible:
-                for bkey in chain:
-                    board = boards.get(bkey)
-                    if not board:
-                        continue
-                    row = board["byMlbam"].get(mlbam)
-                    if row is None:
-                        nm = norm_name(person.get("name") or p["name"])
-                        row = (board["byName"].get(
-                                   (nm, (person.get("birthDate") or "")[:4]))
-                               or board["byNameOnly"].get(nm))
-                    if row is not None:
-                        val = value_prospect_at(row)
-                        if val is not None:
-                            break
-            if val is None:
-                val = value_mlb_at(mlbam, tr["date"], season, people, warhist)
-            if val is None:
-                # never ranked, no MLB track: unranked minor leaguer floor
-                val = {"kind": "filler", "value": FILLER_VALUE}
+            val = value_traded_player(p["mlbam"], p["name"], tr["date"],
+                                      season, ctx)
             n_valued += 1
             sides.setdefault(p["toTeamId"], []).append({
-                "mlbam": mlbam, "name": p["name"], **val,
+                "mlbam": p["mlbam"], "name": p["name"], **val,
             })
         out.append({
             "date": tr["date"], "season": season, "deadline": tr["deadline"],

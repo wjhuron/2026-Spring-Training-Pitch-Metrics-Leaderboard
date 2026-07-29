@@ -4,8 +4,10 @@ Reads data/tradevalue_universe.json and produces data/tradevalue_intrinsic.json:
 one intrinsic surplus value (in $) per player, MLB engine and prospect engine.
 
 MLB engine, per remaining control year t:
-  W_t   = (warBat + warPit baseline) + agingDelta per season at/after agingStartAge, floored at 0
-  V_t   = rate(W_t) * W_t * (1 + winInflation)^(t-1) * (1 - riskDecay_role)^(t-1)
+  W_t   = max(0, warBase + agingDelta * agingSeasons) * (1 - riskDecay_role)^(t-1)
+  V_t   = rate(W_t) * W_t * (1 + winInflation)^(t-1)
+(decay applies to WAR itself so declining players also slide down the $/WAR
+tiers; fitted vs realized future bWAR in tradevalue_market.py stage 1)
   C_t   = signed salary | arbLadder_k * market value | league minimum
   S     = sum_t (V_t - C_t) / (1 + discountRate)^(t-1)
 Year 1 is prorated by the fraction of the current season remaining.
@@ -17,12 +19,18 @@ so signed-year salaries need no further deferral adjustment.
 Prospect engine: Clemens July 2026 FV table (hitter/pitcher split), with
 adjustment multipliers left at 1.0 until the market layer fits them.
 
-CALIBRATION STATUS: riskDecay is deliberately 0.0 (NOT an estimate — it must
-be fitted against the trade corpus in phase 5; anything else would be a
-guessed constant). agingDelta, arb ladder, $/WAR tiers, and rates are
-literature anchors, each to be swept in phase 5. Values from this engine are
-pre-calibration and will run hot for long-control players until riskDecay
-is fitted.
+CALIBRATION (phase 5, 2026-07-28, tradevalue_market.py):
+- riskDecay 0.21 and agingDelta 0.0: decline is multiplicative — projected
+  WAR decays 21%/yr. Fit vs realized bWAR 1-4 yrs ahead over 6,832 active
+  player-seasons 2016-2022; lambda interior-bracketed, ballast interior at 2,
+  delta at its natural boundary 0. Beats the literature anchor
+  (lambda 0, delta -0.4, ballast 2) in 6/6 held-out seasons.
+- market multipliers (data/tradevalue_market_fit.json) price deviations on
+  top of intrinsic surplus, fit on 200+ two-sided trades 2017-2026 with
+  engine constants FIXED (trade balance alone rewards value-flattening and
+  cannot identify engine constants). LOSO: beats intrinsic-only in 8/10
+  held-out seasons. Residuals stay wide (median ~0.9 log units): team
+  context dominates single trades; treat marketValue bands as wide.
 """
 
 import json
@@ -41,10 +49,11 @@ CONFIG = {
     "dollarsPerWarTiers": [[1.0, 7_000_000], [2.0, 8_500_000], [None, 13_000_000]],
     "winInflation": 0.03,          # annual growth in the cost of a win
     "discountRate": 0.10,          # nominal; 10% - 3% inflation = FG's 7% net
-    "agingDelta": -0.4,            # WAR per season, literature anchor (sweep in phase 5)
-    "agingStartAge": 27,           # delta applies in seasons at/after this age
+    "agingDelta": 0.0,             # fitted: no linear term needed (see header)
+    "agingStartAge": 27,           # inert while agingDelta is 0
     "arbLadder": {1: 0.15, 2: 0.35, 3: 0.50, 4: 0.75},  # FG 2026, fitted to awards
-    "riskDecay": {"SP": 0.0, "RP": 0.0, "C": 0.0, "POS": 0.0},  # fit in phase 5
+    # fitted 21%/yr multiplicative decline (pooled roles; role split untested)
+    "riskDecay": {"SP": 0.21, "RP": 0.21, "C": 0.21, "POS": 0.21},
     "horizonYears": 10,
     "defaultAge": 27,              # when Cot's age is junk/missing
     # Clemens July 2026 FV table: fv -> (hitter $, pitcher $, expWAR h, expWAR p,
@@ -179,9 +188,10 @@ def value_mlb(p, frac_y1):
         season_age = age + (t - 1)
         if t > 1 and season_age >= cfg["agingStartAge"]:
             aging_seasons += 1
-        war_t = max(0.0, war1 + cfg["agingDelta"] * aging_seasons)
+        war_t = (max(0.0, war1 + cfg["agingDelta"] * aging_seasons)
+                 * (1 - lam) ** (t - 1))
         market = rate_for(war_t) * war_t * (1 + cfg["winInflation"]) ** (t - 1)
-        value = market * (1 - lam) ** (t - 1)
+        value = market
         if step["status"] == "signed":
             cost = step["salary"]
         elif step["status"] == "arb":
@@ -225,8 +235,44 @@ def value_prospect(p):
     return value, exp_war, star
 
 
+def market_multiplier(rec, fit, in_deadline):
+    """Fitted market multipliers applied at player level (positive values).
+
+    Interpretation caveat: multipliers were fit on players who actually
+    traded. The rental/deadline/reliever premia are mechanism-backed; the
+    star (0.42) and prospect (0.48) discounts describe what TRADED stars and
+    prospects returned (distress sales, willing-to-deal orgs) and understate
+    what an untradeable star would fetch. Rank by intrinsic surplus;
+    marketValue answers "what have players like this returned in real
+    trades", with wide bands.
+    """
+    if rec["surplus"] <= 0 or fit is None:
+        return 1.0
+    m = fit["multipliers"]
+    is_prospect = rec["engine"] == "prospect"
+    rental = rec["engine"] == "mlb" and rec.get("controlYears") == 1
+    star = (rec.get("warY1", 0) or 0) >= 4.5 or rec.get("fv") in ("60", "65", "70")
+    reliever = rec["engine"] == "mlb" and role_of(rec["pos"]) == "RP"
+    out = 1.0
+    if is_prospect:
+        out *= m["prospect"]
+    if rental:
+        out *= m["rental"]
+    if star:
+        out *= m["star"]
+    if rental and in_deadline:
+        out *= m["rentalDeadline"]
+    if reliever and in_deadline:
+        out *= m["relieverDl"]
+    return out
+
+
 def main():
     u = json.load(open(DATA / "tradevalue_universe.json"))
+    fit_path = DATA / "tradevalue_market_fit.json"
+    market_fit = json.loads(fit_path.read_text()) if fit_path.exists() else None
+    today = date.today()
+    in_deadline = "06-15" <= today.isoformat()[5:] <= "07-31"
     frac = season_fraction_remaining()
     print(f"Season fraction remaining: {frac:.3f}")
 
@@ -276,6 +322,8 @@ def main():
     if skipped_fv:
         print(f"WARNING: {skipped_fv} prospects with unknown FV skipped")
 
+    for r in players:
+        r["marketValue"] = r["surplus"] * market_multiplier(r, market_fit, in_deadline)
     players.sort(key=lambda r: r["surplus"], reverse=True)
     out = {
         "generated": date.today().isoformat(),
@@ -291,11 +339,12 @@ def main():
     n_pro = len(players) - n_mlb
     print(f"Wrote {len(players)} players ({n_mlb} mlb + {n_pro} prospect) -> {OUT_PATH}")
 
-    print("\nTop 30 by intrinsic surplus:")
+    print("\nTop 30 by intrinsic surplus (market value alongside):")
     for r in players[:30]:
         extra = (f'FV {r["fv"]}' if r["engine"] == "prospect"
                  else f'{r["warY1"]} WAR, {r["controlYears"]}y ctrl')
-        print(f'  {r["surplus"]/1e6:7.1f}M  {r["name"]:24} {r["team"]:4} {extra}')
+        print(f'  {r["surplus"]/1e6:7.1f}M  mkt {r["marketValue"]/1e6:7.1f}M  '
+              f'{r["name"]:24} {r["team"]:4} {extra}')
     print("\nBottom 10 (worst contracts):")
     for r in players[-10:]:
         print(f'  {r["surplus"]/1e6:7.1f}M  {r["name"]:24} {r["team"]:4} '
