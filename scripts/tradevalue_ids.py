@@ -1,9 +1,9 @@
 """Build the cross-source player ID map from the Chadwick Bureau register.
 
 The register (github.com/chadwickbureau/register) splits its people table into
-16 hex-suffixed CSVs. We keep every row holding an MLBAM id plus at least one
-of a FanGraphs or Baseball-Reference id; that covers everyone the trade value
-model can meet (Cot's/statsapi <-> THE BOARD/Depth Charts <-> MLBTR bbref links).
+16 hex-suffixed CSVs. We keep every row holding an MLBAM id plus either a FanGraphs/bbref id or
+recent pro activity (pro_played_last >= 2020) — the latter covers current
+minor leaguers who have MLBAM ids but no FG/bbref keys yet.
 
 Output: data/tradevalue_idmap.csv with
   mlbam, fangraphs, bbref, retro, last, first, birthYear
@@ -22,8 +22,9 @@ REGISTER = (
 )
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
 KEEP = ["key_mlbam", "key_fangraphs", "key_bbref", "key_retro",
-        "name_last", "name_first", "birth_year"]
-OUT_COLS = ["mlbam", "fangraphs", "bbref", "retro", "last", "first", "birthYear"]
+        "name_last", "name_first", "birth_year", "pro_played_last"]
+OUT_COLS = ["mlbam", "fangraphs", "bbref", "retro", "last", "first",
+            "birthYear", "proLast"]
 
 
 def fetch(url):
@@ -41,7 +42,9 @@ def main():
         for row in reader:
             if not row.get("key_mlbam"):
                 continue
-            if not (row.get("key_fangraphs") or row.get("key_bbref")):
+            pro_last = row.get("pro_played_last", "")
+            recent = pro_last.isdigit() and int(pro_last) >= 2020
+            if not (row.get("key_fangraphs") or row.get("key_bbref") or recent):
                 continue
             rows_out.append([row.get(k, "") for k in KEEP])
             kept += 1
