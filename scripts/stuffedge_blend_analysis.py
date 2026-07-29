@@ -83,7 +83,8 @@ def main():
             fh_result=('target_xrv', 'mean'), fh_stuff=('pred', 'mean'),
             fh_n=('target_xrv', 'size'))
         g_sh = df[~fh].groupby('pitcher').agg(
-            sh_result=('target_xrv', 'mean'), sh_n=('target_xrv', 'size'))
+            sh_result=('target_xrv', 'mean'), sh_n=('target_xrv', 'size'),
+            sh_actual=('rv_raw', 'mean'))
         t = g_fh.join(g_sh, how='inner').dropna()
         # projection-like prior: weighted mean of prior-season full rates
         pri, pri_w = [], []
@@ -130,6 +131,29 @@ def main():
               f'baseline wMSE={m_base:.7f}  +stuff={m_full:.7f}  '
               f'improvement={100 * (1 - m_full / m_base):.1f}%  '
               f'stuff coef={coef_full[-1]:.3f}')
+
+    print('\n=== ROBUSTNESS: same test, SH outcome = ACTUAL run value ===')
+    for fit_yr in EVAL_YEARS:
+        eval_yr = EVAL_YEARS[1] if fit_yr == EVAL_YEARS[0] else EVAL_YEARS[0]
+        f = tables[fit_yr].rename(columns={'sh_result': 'sh_xrv',
+                                           'sh_actual': 'sh_result'})
+        e = tables[eval_yr].rename(columns={'sh_result': 'sh_xrv',
+                                            'sh_actual': 'sh_result'})
+        m_base = wmse(BASE, wls(BASE, f), e)
+        coef_full = wls(FULL, f)
+        m_full = wmse(FULL, coef_full, e)
+        print(f'fit {fit_yr} -> eval {eval_yr}: baseline wMSE={m_base:.7f}  '
+              f'+stuff={m_full:.7f}  improvement={100 * (1 - m_full / m_base):.1f}%  '
+              f'stuff coef={coef_full[-1]:.3f}')
+    for year, t in tables.items():
+        def resid_a(a, cols):
+            A = np.column_stack([np.ones(len(t))] +
+                                [t[c].values for c in cols])
+            c, *_ = np.linalg.lstsq(A, a, rcond=None)
+            return a - A @ c
+        r = float(np.corrcoef(resid_a(t['fh_stuff'].values, BASE),
+                              resid_a(t['sh_actual'].values, BASE))[0, 1])
+        print(f'{year}: partial(stuff | baseline) on ACTUAL SH runs = {r:.3f}')
 
     print('\n=== partial correlation of stuff given the full baseline ===')
     for year, t in tables.items():
