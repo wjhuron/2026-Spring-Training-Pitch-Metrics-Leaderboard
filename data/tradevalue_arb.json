@@ -1,0 +1,1750 @@
+{
+ "fetched": "2026-07-28",
+ "season": 2026,
+ "source": "https://www.mlbtraderumors.com/2025/10/projected-arbitration-salaries-for-2026.html",
+ "players": [
+  {
+   "name": "Taylor Ward",
+   "bbrefId": "wardta01",
+   "team": "LAA",
+   "mls": "5.164",
+   "projSalary": 13700000.0
+  },
+  {
+   "name": "Brock Burke",
+   "bbrefId": "burkebr01",
+   "team": "LAA",
+   "mls": "5.045",
+   "projSalary": 2000000.0
+  },
+  {
+   "name": "Connor Brogdon",
+   "bbrefId": "brogdco01",
+   "team": "LAA",
+   "mls": "4.090",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Jo Adell",
+   "bbrefId": "adelljo01",
+   "team": "LAA",
+   "mls": "4.085",
+   "projSalary": 5500000.0
+  },
+  {
+   "name": "Carson Fulmer",
+   "bbrefId": "fulmeca01",
+   "team": "LAA",
+   "mls": "4.018",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Reid Detmers",
+   "bbrefId": "detmere01",
+   "team": "LAA",
+   "mls": "3.159",
+   "projSalary": 2600000.0
+  },
+  {
+   "name": "Jose Soriano",
+   "bbrefId": "soriajo02",
+   "team": "LAA",
+   "mls": "3.121",
+   "projSalary": 3200000.0
+  },
+  {
+   "name": "Carter Kieboom",
+   "bbrefId": "kieboca01",
+   "team": "LAA",
+   "mls": "3.009",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "Logan O&#8217;Hoppe",
+   "bbrefId": "ohopplo01",
+   "team": "LAA",
+   "mls": "3.008",
+   "projSalary": 2900000.0
+  },
+  {
+   "name": "Zach Neto",
+   "bbrefId": "netoza01",
+   "team": "LAA",
+   "mls": "2.170",
+   "projSalary": 4099999.9999999995
+  },
+  {
+   "name": "Mauricio Dubon",
+   "bbrefId": "dubonma01",
+   "team": "HOU",
+   "mls": "5.162",
+   "projSalary": 5800000.0
+  },
+  {
+   "name": "Steven Okert",
+   "bbrefId": "okertst01",
+   "team": "HOU",
+   "mls": "5.089",
+   "projSalary": 2000000.0
+  },
+  {
+   "name": "Ramon Urias",
+   "bbrefId": "uriasra01",
+   "team": "HOU",
+   "mls": "5.025",
+   "projSalary": 4400000.0
+  },
+  {
+   "name": "Bryan Abreu",
+   "bbrefId": "abreubr01",
+   "team": "HOU",
+   "mls": "5.022",
+   "projSalary": 5900000.0
+  },
+  {
+   "name": "Enyel De Los Santos",
+   "bbrefId": "delosen01",
+   "team": "HOU",
+   "mls": "5.015",
+   "projSalary": 2100000.0
+  },
+  {
+   "name": "Chas McCormick",
+   "bbrefId": "mccorch01",
+   "team": "HOU",
+   "mls": "4.161",
+   "projSalary": 3400000.0
+  },
+  {
+   "name": "Isaac Paredes",
+   "bbrefId": "paredis01",
+   "team": "HOU",
+   "mls": "4.160",
+   "projSalary": 9300000.0
+  },
+  {
+   "name": "Yainer Diaz",
+   "bbrefId": "diazya02",
+   "team": "HOU",
+   "mls": "3.035",
+   "projSalary": 4500000.0
+  },
+  {
+   "name": "Hayden Wesneski",
+   "bbrefId": "wesneha01",
+   "team": "HOU",
+   "mls": "2.170",
+   "projSalary": 1500000.0
+  },
+  {
+   "name": "Bennett Sousa",
+   "bbrefId": "sousabe01",
+   "team": "HOU",
+   "mls": "2.156",
+   "projSalary": 1100000.0
+  },
+  {
+   "name": "Taylor Trammell",
+   "bbrefId": "trammta01",
+   "team": "HOU",
+   "mls": "2.144",
+   "projSalary": 900000.0
+  },
+  {
+   "name": "Austin Wynns",
+   "bbrefId": "wynnsau01",
+   "team": "ATH",
+   "mls": "5.017",
+   "projSalary": 1800000.0
+  },
+  {
+   "name": "Shea Langeliers",
+   "bbrefId": "langesh01",
+   "team": "ATH",
+   "mls": "3.051",
+   "projSalary": 5100000.0
+  },
+  {
+   "name": "JJ Bleday",
+   "bbrefId": "bledajj01",
+   "team": "ATH",
+   "mls": "3.029",
+   "projSalary": 2200000.0
+  },
+  {
+   "name": "Ken Waldichuk",
+   "bbrefId": "waldike01",
+   "team": "ATH",
+   "mls": "2.150",
+   "projSalary": 900000.0
+  },
+  {
+   "name": "Daulton Varsho",
+   "bbrefId": "varshda01",
+   "team": "TOR",
+   "mls": "5.128",
+   "projSalary": 9700000.0
+  },
+  {
+   "name": "Eric Lauer",
+   "bbrefId": "lauerer01",
+   "team": "TOR",
+   "mls": "5.091",
+   "projSalary": 4400000.0
+  },
+  {
+   "name": "Dillon Tate",
+   "bbrefId": "tatedi01",
+   "team": "TOR",
+   "mls": "5.018",
+   "projSalary": 1700000.0
+  },
+  {
+   "name": "Nick Sandlin",
+   "bbrefId": "sandlni01",
+   "team": "TOR",
+   "mls": "4.157",
+   "projSalary": 2000000.0
+  },
+  {
+   "name": "Ernie Clement",
+   "bbrefId": "clemeer01",
+   "team": "TOR",
+   "mls": "3.168",
+   "projSalary": 4300000.0
+  },
+  {
+   "name": "Ryan Burr",
+   "bbrefId": "burrry01",
+   "team": "TOR",
+   "mls": "3.109",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "Tyler Heineman",
+   "bbrefId": "heinety01",
+   "team": "TOR",
+   "mls": "3.066",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Jake Fraley",
+   "bbrefId": "fraleja01",
+   "team": "ATL",
+   "mls": "5.097",
+   "projSalary": 3600000.0
+  },
+  {
+   "name": "Jose Suarez",
+   "bbrefId": "suarejo01",
+   "team": "ATL",
+   "mls": "4.064",
+   "projSalary": 1500000.0
+  },
+  {
+   "name": "Alek Manoah",
+   "bbrefId": "manoaal01",
+   "team": "ATL",
+   "mls": "4.063",
+   "projSalary": 2200000.0
+  },
+  {
+   "name": "Eli White",
+   "bbrefId": "whiteel04",
+   "team": "ATL",
+   "mls": "3.140",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Vidal Brujan",
+   "bbrefId": "brujavi01",
+   "team": "ATL",
+   "mls": "3.014",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "Joey Wentz",
+   "bbrefId": "wentzjo01",
+   "team": "ATL",
+   "mls": "2.166",
+   "projSalary": 1100000.0
+  },
+  {
+   "name": "Jake Bauers",
+   "bbrefId": "bauerja01",
+   "team": "MIL",
+   "mls": "5.084",
+   "projSalary": 2000000.0
+  },
+  {
+   "name": "Andrew Vaughn",
+   "bbrefId": "vaughan01",
+   "team": "MIL",
+   "mls": "4.142",
+   "projSalary": 7800000.0
+  },
+  {
+   "name": "William Contreras",
+   "bbrefId": "contrwi02",
+   "team": "MIL",
+   "mls": "4.112",
+   "projSalary": 11100000.0
+  },
+  {
+   "name": "Nick Mears",
+   "bbrefId": "mearsni01",
+   "team": "MIL",
+   "mls": "4.022",
+   "projSalary": 1600000.0
+  },
+  {
+   "name": "Trevor Megill",
+   "bbrefId": "megiltr01",
+   "team": "MIL",
+   "mls": "4.002",
+   "projSalary": 4200000.0
+  },
+  {
+   "name": "Garrett Mitchell",
+   "bbrefId": "mitchga01",
+   "team": "MIL",
+   "mls": "3.040",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Brice Turang",
+   "bbrefId": "turanbr02",
+   "team": "MIL",
+   "mls": "2.165",
+   "projSalary": 4400000.0
+  },
+  {
+   "name": "Jorge Alcala",
+   "bbrefId": "alcaljo01",
+   "team": "STL",
+   "mls": "5.165",
+   "projSalary": 2100000.0
+  },
+  {
+   "name": "JoJo Romero",
+   "bbrefId": "romerjo01",
+   "team": "STL",
+   "mls": "5.045",
+   "projSalary": 4400000.0
+  },
+  {
+   "name": "John King",
+   "bbrefId": "kingjo01",
+   "team": "STL",
+   "mls": "4.148",
+   "projSalary": 2100000.0
+  },
+  {
+   "name": "Lars Nootbaar",
+   "bbrefId": "nootbla01",
+   "team": "STL",
+   "mls": "4.076",
+   "projSalary": 5700000.0
+  },
+  {
+   "name": "Brendan Donovan",
+   "bbrefId": "donovbr01",
+   "team": "STL",
+   "mls": "4.000",
+   "projSalary": 5400000.0
+  },
+  {
+   "name": "Andre Pallante",
+   "bbrefId": "pallaan01",
+   "team": "STL",
+   "mls": "3.145",
+   "projSalary": 3400000.0
+  },
+  {
+   "name": "Nolan Gorman",
+   "bbrefId": "gormano01",
+   "team": "STL",
+   "mls": "3.114",
+   "projSalary": 2900000.0
+  },
+  {
+   "name": "Alec Burleson",
+   "bbrefId": "burleal01",
+   "team": "STL",
+   "mls": "3.029",
+   "projSalary": 3500000.0
+  },
+  {
+   "name": "Matthew Liberatore",
+   "bbrefId": "liberma01",
+   "team": "STL",
+   "mls": "2.144",
+   "projSalary": 2800000.0
+  },
+  {
+   "name": "Reese McGuire",
+   "bbrefId": "mcguire01",
+   "team": "CHC",
+   "mls": "5.110",
+   "projSalary": 1900000.0
+  },
+  {
+   "name": "Justin Steele",
+   "bbrefId": "steelju01",
+   "team": "CHC",
+   "mls": "4.143",
+   "projSalary": 6550000.0
+  },
+  {
+   "name": "Eli Morgan",
+   "bbrefId": "morgael01",
+   "team": "CHC",
+   "mls": "4.091",
+   "projSalary": 1100000.0
+  },
+  {
+   "name": "Javier Assad",
+   "bbrefId": "assadja01",
+   "team": "CHC",
+   "mls": "3.027",
+   "projSalary": 1900000.0
+  },
+  {
+   "name": "Ildemaro Vargas",
+   "bbrefId": "vargail01",
+   "team": "AZ",
+   "mls": "5.129",
+   "projSalary": 1400000.0
+  },
+  {
+   "name": "A.J. Puk",
+   "bbrefId": "pukaj01",
+   "team": "AZ",
+   "mls": "5.124",
+   "projSalary": 3300000.0
+  },
+  {
+   "name": "Ryan Thompson",
+   "bbrefId": "thompry02",
+   "team": "AZ",
+   "mls": "5.095",
+   "projSalary": 3900000.0
+  },
+  {
+   "name": "Kevin Ginkel",
+   "bbrefId": "ginkeke01",
+   "team": "AZ",
+   "mls": "5.033",
+   "projSalary": 3000000.0
+  },
+  {
+   "name": "John Curtiss",
+   "bbrefId": "curtijo02",
+   "team": "AZ",
+   "mls": "4.078",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Pavin Smith",
+   "bbrefId": "smithpa04",
+   "team": "AZ",
+   "mls": "4.015",
+   "projSalary": 2400000.0
+  },
+  {
+   "name": "Alek Thomas",
+   "bbrefId": "thomaal01",
+   "team": "AZ",
+   "mls": "3.103",
+   "projSalary": 2200000.0
+  },
+  {
+   "name": "Kyle Nelson",
+   "bbrefId": "nelsoky01",
+   "team": "AZ",
+   "mls": "3.081",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Jake McCarthy",
+   "bbrefId": "mccarja02",
+   "team": "AZ",
+   "mls": "3.074",
+   "projSalary": 1900000.0
+  },
+  {
+   "name": "Gabriel Moreno",
+   "bbrefId": "morenga01",
+   "team": "AZ",
+   "mls": "3.061",
+   "projSalary": 2400000.0
+  },
+  {
+   "name": "Ryne Nelson",
+   "bbrefId": "nelsory01",
+   "team": "AZ",
+   "mls": "3.020",
+   "projSalary": 3300000.0
+  },
+  {
+   "name": "Brusdar Graterol",
+   "bbrefId": "gratebr01",
+   "team": "LAD",
+   "mls": "5.167",
+   "projSalary": 2800000.0
+  },
+  {
+   "name": "Tony Gonsolin",
+   "bbrefId": "gonsoto01",
+   "team": "LAD",
+   "mls": "5.152",
+   "projSalary": 5400000.0
+  },
+  {
+   "name": "Evan Phillips",
+   "bbrefId": "phillev01",
+   "team": "LAD",
+   "mls": "5.136",
+   "projSalary": 6100000.0
+  },
+  {
+   "name": "Alex Vesia",
+   "bbrefId": "vesiaal01",
+   "team": "LAD",
+   "mls": "5.078",
+   "projSalary": 4099999.9999999995
+  },
+  {
+   "name": "Anthony Banda",
+   "bbrefId": "bandaan01",
+   "team": "LAD",
+   "mls": "4.135",
+   "projSalary": 1700000.0
+  },
+  {
+   "name": "Brock Stewart",
+   "bbrefId": "stewabr01",
+   "team": "LAD",
+   "mls": "4.093",
+   "projSalary": 1400000.0
+  },
+  {
+   "name": "Ben Rortvedt",
+   "bbrefId": "rortvbe01",
+   "team": "LAD",
+   "mls": "3.135",
+   "projSalary": 1300000.0
+  },
+  {
+   "name": "Michael Grove",
+   "bbrefId": "grovemi01",
+   "team": "LAD",
+   "mls": "3.031",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "JT Brubaker",
+   "bbrefId": "brubajt01",
+   "team": "SF",
+   "mls": "5.162",
+   "projSalary": 2100000.0
+  },
+  {
+   "name": "Andrew Knizner",
+   "bbrefId": "kniznan01",
+   "team": "SF",
+   "mls": "5.090",
+   "projSalary": 1300000.0
+  },
+  {
+   "name": "Joey Lucchesi",
+   "bbrefId": "lucchjo01",
+   "team": "SF",
+   "mls": "5.047",
+   "projSalary": 2000000.0
+  },
+  {
+   "name": "Patrick Bailey",
+   "bbrefId": "bailepa01",
+   "team": "SF",
+   "mls": "2.136",
+   "projSalary": 2200000.0
+  },
+  {
+   "name": "Kolby Allard",
+   "bbrefId": "allarko01",
+   "team": "CLE",
+   "mls": "5.004",
+   "projSalary": 1900000.0
+  },
+  {
+   "name": "Steven Kwan",
+   "bbrefId": "kwanst01",
+   "team": "CLE",
+   "mls": "4.000",
+   "projSalary": 8800000.0
+  },
+  {
+   "name": "Ben Lively",
+   "bbrefId": "livelbe01",
+   "team": "CLE",
+   "mls": "3.133",
+   "projSalary": 2700000.0
+  },
+  {
+   "name": "Nolan Jones",
+   "bbrefId": "jonesno01",
+   "team": "CLE",
+   "mls": "3.007",
+   "projSalary": 2000000.0
+  },
+  {
+   "name": "Will Brennan",
+   "bbrefId": "brennwi02",
+   "team": "CLE",
+   "mls": "2.155",
+   "projSalary": 900000.0
+  },
+  {
+   "name": "David Fry",
+   "bbrefId": "fryda01",
+   "team": "CLE",
+   "mls": "2.154",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Matt Festa",
+   "bbrefId": "festama01",
+   "team": "CLE",
+   "mls": "2.153",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Anthony Bender",
+   "bbrefId": "bendean01",
+   "team": "MIA",
+   "mls": "4.153",
+   "projSalary": 2300000.0
+  },
+  {
+   "name": "Braxton Garrett",
+   "bbrefId": "garrebr01",
+   "team": "MIA",
+   "mls": "3.168",
+   "projSalary": 1530000.0
+  },
+  {
+   "name": "Edward Cabrera",
+   "bbrefId": "cabreed02",
+   "team": "MIA",
+   "mls": "3.147",
+   "projSalary": 3700000.0
+  },
+  {
+   "name": "Ryan Weathers",
+   "bbrefId": "weathry01",
+   "team": "MIA",
+   "mls": "3.066",
+   "projSalary": 1500000.0
+  },
+  {
+   "name": "Andrew Nardi",
+   "bbrefId": "nardian01",
+   "team": "MIA",
+   "mls": "3.053",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "Calvin Faucher",
+   "bbrefId": "fauchca01",
+   "team": "MIA",
+   "mls": "2.156",
+   "projSalary": 1900000.0
+  },
+  {
+   "name": "Trent Thornton",
+   "bbrefId": "thorntr01",
+   "team": "SEA",
+   "mls": "5.148",
+   "projSalary": 2500000.0
+  },
+  {
+   "name": "Randy Arozarena",
+   "bbrefId": "arozara01",
+   "team": "SEA",
+   "mls": "5.129",
+   "projSalary": 18200000.0
+  },
+  {
+   "name": "Logan Gilbert",
+   "bbrefId": "gilbelo01",
+   "team": "SEA",
+   "mls": "4.144",
+   "projSalary": 10000000.0
+  },
+  {
+   "name": "Gabe Speier",
+   "bbrefId": "speiega01",
+   "team": "SEA",
+   "mls": "4.000",
+   "projSalary": 1700000.0
+  },
+  {
+   "name": "George Kirby",
+   "bbrefId": "kirbyge01",
+   "team": "SEA",
+   "mls": "3.151",
+   "projSalary": 5400000.0
+  },
+  {
+   "name": "Tayler Saucedo",
+   "bbrefId": "sauceta01",
+   "team": "SEA",
+   "mls": "3.146",
+   "projSalary": 1100000.0
+  },
+  {
+   "name": "Matt Brash",
+   "bbrefId": "brashma01",
+   "team": "SEA",
+   "mls": "3.121",
+   "projSalary": 1800000.0
+  },
+  {
+   "name": "Luke Raley",
+   "bbrefId": "raleylu01",
+   "team": "SEA",
+   "mls": "3.106",
+   "projSalary": 1800000.0
+  },
+  {
+   "name": "Gregory Santos",
+   "bbrefId": "santogr01",
+   "team": "SEA",
+   "mls": "3.055",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "Luis Torrens",
+   "bbrefId": "torrelu01",
+   "team": "NYM",
+   "mls": "5.105",
+   "projSalary": 2200000.0
+  },
+  {
+   "name": "Tyrone Taylor",
+   "bbrefId": "tayloty01",
+   "team": "NYM",
+   "mls": "5.093",
+   "projSalary": 3600000.0
+  },
+  {
+   "name": "David Peterson",
+   "bbrefId": "peterda01",
+   "team": "NYM",
+   "mls": "5.089",
+   "projSalary": 7600000.0
+  },
+  {
+   "name": "Tylor Megill",
+   "bbrefId": "megilty01",
+   "team": "NYM",
+   "mls": "4.031",
+   "projSalary": 2600000.0
+  },
+  {
+   "name": "Max Kranick",
+   "bbrefId": "kranima01",
+   "team": "NYM",
+   "mls": "3.011",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Huascar Brazoban",
+   "bbrefId": "brazohu01",
+   "team": "NYM",
+   "mls": "2.170",
+   "projSalary": 1300000.0
+  },
+  {
+   "name": "Francisco Alvarez",
+   "bbrefId": "alvarfr01",
+   "team": "NYM",
+   "mls": "2.164",
+   "projSalary": 2400000.0
+  },
+  {
+   "name": "Reed Garrett",
+   "bbrefId": "garrere01",
+   "team": "NYM",
+   "mls": "2.143",
+   "projSalary": 1400000.0
+  },
+  {
+   "name": "Jorge Alfaro",
+   "bbrefId": "alfarjo01",
+   "team": "WSH",
+   "mls": "5.160",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Luis Garcia Jr.",
+   "bbrefId": "garcilu04",
+   "team": "WSH",
+   "mls": "4.142",
+   "projSalary": 7000000.0
+  },
+  {
+   "name": "Josiah Gray",
+   "bbrefId": "grayjo03",
+   "team": "WSH",
+   "mls": "4.075",
+   "projSalary": 1350000.0
+  },
+  {
+   "name": "Mason Thompson",
+   "bbrefId": "thompma02",
+   "team": "WSH",
+   "mls": "4.022",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "MacKenzie Gore",
+   "bbrefId": "gorema01",
+   "team": "WSH",
+   "mls": "4.000",
+   "projSalary": 4700000.0
+  },
+  {
+   "name": "Riley Adams",
+   "bbrefId": "adamsri03",
+   "team": "WSH",
+   "mls": "3.171",
+   "projSalary": 1500000.0
+  },
+  {
+   "name": "CJ Abrams",
+   "bbrefId": "abramcj01",
+   "team": "WSH",
+   "mls": "3.130",
+   "projSalary": 5600000.0
+  },
+  {
+   "name": "Jake Irvin",
+   "bbrefId": "irvinja01",
+   "team": "WSH",
+   "mls": "2.152",
+   "projSalary": 3300000.0
+  },
+  {
+   "name": "Cade Cavalli",
+   "bbrefId": "cavalca01",
+   "team": "WSH",
+   "mls": "2.141",
+   "projSalary": 1300000.0
+  },
+  {
+   "name": "Ryan Mountcastle",
+   "bbrefId": "mountry01",
+   "team": "BAL",
+   "mls": "5.105",
+   "projSalary": 7800000.0
+  },
+  {
+   "name": "Keegan Akin",
+   "bbrefId": "akinke01",
+   "team": "BAL",
+   "mls": "5.083",
+   "projSalary": 3000000.0
+  },
+  {
+   "name": "Dylan Carlson",
+   "bbrefId": "carlsdy01",
+   "team": "BAL",
+   "mls": "5.067",
+   "projSalary": 1500000.0
+  },
+  {
+   "name": "Dean Kremer",
+   "bbrefId": "kremede01",
+   "team": "BAL",
+   "mls": "4.112",
+   "projSalary": 5100000.0
+  },
+  {
+   "name": "Adley Rutschman",
+   "bbrefId": "rutscad01",
+   "team": "BAL",
+   "mls": "4.000",
+   "projSalary": 6800000.0
+  },
+  {
+   "name": "Felix Bautista",
+   "bbrefId": "bautife01",
+   "team": "BAL",
+   "mls": "4.000",
+   "projSalary": 2100000.0
+  },
+  {
+   "name": "Kyle Bradish",
+   "bbrefId": "bradiky01",
+   "team": "BAL",
+   "mls": "3.160",
+   "projSalary": 2800000.0
+  },
+  {
+   "name": "Yennier Cano",
+   "bbrefId": "canoye01",
+   "team": "BAL",
+   "mls": "3.065",
+   "projSalary": 1800000.0
+  },
+  {
+   "name": "Gunnar Henderson",
+   "bbrefId": "hendegu01",
+   "team": "BAL",
+   "mls": "3.036",
+   "projSalary": 6600000.0
+  },
+  {
+   "name": "Albert Suarez",
+   "bbrefId": "suareal01",
+   "team": "BAL",
+   "mls": "3.019",
+   "projSalary": 900000.0
+  },
+  {
+   "name": "Adrian Morejon",
+   "bbrefId": "morejad01",
+   "team": "SD",
+   "mls": "5.140",
+   "projSalary": 3600000.0
+  },
+  {
+   "name": "Jason Adam",
+   "bbrefId": "adamja01",
+   "team": "SD",
+   "mls": "5.132",
+   "projSalary": 6800000.0
+  },
+  {
+   "name": "Gavin Sheets",
+   "bbrefId": "sheetga01",
+   "team": "SD",
+   "mls": "4.076",
+   "projSalary": 4300000.0
+  },
+  {
+   "name": "JP Sears",
+   "bbrefId": "searsjp01",
+   "team": "SD",
+   "mls": "3.065",
+   "projSalary": 3500000.0
+  },
+  {
+   "name": "Luis Campusano",
+   "bbrefId": "campulu01",
+   "team": "SD",
+   "mls": "3.003",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Jesus Luzardo",
+   "bbrefId": "luzarje01",
+   "team": "PHI",
+   "mls": "5.165",
+   "projSalary": 10400000.0
+  },
+  {
+   "name": "Edmundo Sosa",
+   "bbrefId": "sosaed01",
+   "team": "PHI",
+   "mls": "5.140",
+   "projSalary": 3900000.0
+  },
+  {
+   "name": "Alec Bohm",
+   "bbrefId": "bohmal01",
+   "team": "PHI",
+   "mls": "5.106",
+   "projSalary": 10300000.0
+  },
+  {
+   "name": "Garrett Stubbs",
+   "bbrefId": "stubbga01",
+   "team": "PHI",
+   "mls": "4.148",
+   "projSalary": 925000.0
+  },
+  {
+   "name": "Brandon Marsh",
+   "bbrefId": "marshbr02",
+   "team": "PHI",
+   "mls": "4.078",
+   "projSalary": 4500000.0
+  },
+  {
+   "name": "Jhoan Duran",
+   "bbrefId": "duranjh01",
+   "team": "PHI",
+   "mls": "4.000",
+   "projSalary": 7600000.0
+  },
+  {
+   "name": "Bryson Stott",
+   "bbrefId": "stottbr01",
+   "team": "PHI",
+   "mls": "4.000",
+   "projSalary": 5800000.0
+  },
+  {
+   "name": "Tanner Banks",
+   "bbrefId": "banksta01",
+   "team": "PHI",
+   "mls": "3.092",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Rafael Marchan",
+   "bbrefId": "marchra01",
+   "team": "PHI",
+   "mls": "3.006",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Dennis Santana",
+   "bbrefId": "santade01",
+   "team": "PIT",
+   "mls": "5.126",
+   "projSalary": 3400000.0
+  },
+  {
+   "name": "Johan Oviedo",
+   "bbrefId": "oviedjo01",
+   "team": "PIT",
+   "mls": "4.078",
+   "projSalary": 2000000.0
+  },
+  {
+   "name": "Joey Bart",
+   "bbrefId": "bartjo01",
+   "team": "PIT",
+   "mls": "4.020",
+   "projSalary": 2700000.0
+  },
+  {
+   "name": "Justin Lawrence",
+   "bbrefId": "lawreju01",
+   "team": "PIT",
+   "mls": "3.167",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Yohan Ramirez",
+   "bbrefId": "ramiryo01",
+   "team": "PIT",
+   "mls": "3.135",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Colin Holderman",
+   "bbrefId": "holdeco01",
+   "team": "PIT",
+   "mls": "3.120",
+   "projSalary": 1700000.0
+  },
+  {
+   "name": "Oneil Cruz",
+   "bbrefId": "cruzon01",
+   "team": "PIT",
+   "mls": "3.110",
+   "projSalary": 3600000.0
+  },
+  {
+   "name": "Dauri Moreta",
+   "bbrefId": "moretda01",
+   "team": "PIT",
+   "mls": "3.056",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "Jack Suwinski",
+   "bbrefId": "suwinja01",
+   "team": "PIT",
+   "mls": "2.170",
+   "projSalary": 1700000.0
+  },
+  {
+   "name": "Jonah Heim",
+   "bbrefId": "heimjo01",
+   "team": "TEX",
+   "mls": "5.097",
+   "projSalary": 6000000.0
+  },
+  {
+   "name": "Adolis Garcia",
+   "bbrefId": "garciad02",
+   "team": "TEX",
+   "mls": "5.095",
+   "projSalary": 12100000.0
+  },
+  {
+   "name": "Josh Sborz",
+   "bbrefId": "sborzjo01",
+   "team": "TEX",
+   "mls": "5.055",
+   "projSalary": 1100000.0
+  },
+  {
+   "name": "Sam Haggerty",
+   "bbrefId": "haggesa01",
+   "team": "TEX",
+   "mls": "5.007",
+   "projSalary": 1400000.0
+  },
+  {
+   "name": "Jake Burger",
+   "bbrefId": "burgeja01",
+   "team": "TEX",
+   "mls": "3.127",
+   "projSalary": 3500000.0
+  },
+  {
+   "name": "Ezequiel Duran",
+   "bbrefId": "duranez01",
+   "team": "TEX",
+   "mls": "3.050",
+   "projSalary": 1400000.0
+  },
+  {
+   "name": "Josh Jung",
+   "bbrefId": "jungjo01",
+   "team": "TEX",
+   "mls": "3.023",
+   "projSalary": 2900000.0
+  },
+  {
+   "name": "Shane McClanahan",
+   "bbrefId": "mcclash01",
+   "team": "TB",
+   "mls": "4.158",
+   "projSalary": 3600000.0
+  },
+  {
+   "name": "Cole Sulser",
+   "bbrefId": "sulseco01",
+   "team": "TB",
+   "mls": "4.096",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Taylor Walls",
+   "bbrefId": "wallsta01",
+   "team": "TB",
+   "mls": "4.092",
+   "projSalary": 2000000.0
+  },
+  {
+   "name": "Griffin Jax",
+   "bbrefId": "jaxgr01",
+   "team": "TB",
+   "mls": "4.091",
+   "projSalary": 3600000.0
+  },
+  {
+   "name": "Garrett Cleavinger",
+   "bbrefId": "cleavga01",
+   "team": "TB",
+   "mls": "4.060",
+   "projSalary": 2100000.0
+  },
+  {
+   "name": "Shane Baz",
+   "bbrefId": "bazsh01",
+   "team": "TB",
+   "mls": "3.158",
+   "projSalary": 3100000.0
+  },
+  {
+   "name": "Nick Fortes",
+   "bbrefId": "forteni01",
+   "team": "TB",
+   "mls": "3.149",
+   "projSalary": 2400000.0
+  },
+  {
+   "name": "Christopher Morel",
+   "bbrefId": "morelch01",
+   "team": "TB",
+   "mls": "3.117",
+   "projSalary": 2600000.0
+  },
+  {
+   "name": "Stuart Fairchild",
+   "bbrefId": "faircst01",
+   "team": "TB",
+   "mls": "3.114",
+   "projSalary": 900000.0
+  },
+  {
+   "name": "Josh Lowe",
+   "bbrefId": "lowejo01",
+   "team": "TB",
+   "mls": "3.093",
+   "projSalary": 2900000.0
+  },
+  {
+   "name": "Bryan Baker",
+   "bbrefId": "bakerbr01",
+   "team": "TB",
+   "mls": "3.049",
+   "projSalary": 1500000.0
+  },
+  {
+   "name": "Ryan Pepiot",
+   "bbrefId": "pepiory01",
+   "team": "TB",
+   "mls": "3.005",
+   "projSalary": 3700000.0
+  },
+  {
+   "name": "Alex Faedo",
+   "bbrefId": "faedoal01",
+   "team": "TB",
+   "mls": "2.169",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "Edwin Uceta",
+   "bbrefId": "ucetaed01",
+   "team": "TB",
+   "mls": "2.150",
+   "projSalary": 1400000.0
+  },
+  {
+   "name": "Tanner Houck",
+   "bbrefId": "houckta01",
+   "team": "BOS",
+   "mls": "4.100",
+   "projSalary": 3950000.0
+  },
+  {
+   "name": "Jarren Duran",
+   "bbrefId": "duranja01",
+   "team": "BOS",
+   "mls": "3.155",
+   "projSalary": 8400000.0
+  },
+  {
+   "name": "Kutter Crawford",
+   "bbrefId": "crawfku01",
+   "team": "BOS",
+   "mls": "3.136",
+   "projSalary": 2750000.0
+  },
+  {
+   "name": "Romy Gonzalez",
+   "bbrefId": "gonzaro01",
+   "team": "BOS",
+   "mls": "3.083",
+   "projSalary": 1800000.0
+  },
+  {
+   "name": "Triston Casas",
+   "bbrefId": "casastr01",
+   "team": "BOS",
+   "mls": "3.032",
+   "projSalary": 1700000.0
+  },
+  {
+   "name": "Brennan Bernardino",
+   "bbrefId": "bernabr01",
+   "team": "BOS",
+   "mls": "2.150",
+   "projSalary": 1100000.0
+  },
+  {
+   "name": "Brady Singer",
+   "bbrefId": "singebr01",
+   "team": "CIN",
+   "mls": "5.156",
+   "projSalary": 11900000.0
+  },
+  {
+   "name": "Santiago Espinal",
+   "bbrefId": "espinsa01",
+   "team": "CIN",
+   "mls": "5.149",
+   "projSalary": 2900000.0
+  },
+  {
+   "name": "Gavin Lux",
+   "bbrefId": "luxga01",
+   "team": "CIN",
+   "mls": "5.114",
+   "projSalary": 5000000.0
+  },
+  {
+   "name": "Tyler Stephenson",
+   "bbrefId": "stephty01",
+   "team": "CIN",
+   "mls": "5.056",
+   "projSalary": 6400000.0
+  },
+  {
+   "name": "Ian Gibaut",
+   "bbrefId": "gibauia01",
+   "team": "CIN",
+   "mls": "4.077",
+   "projSalary": 1500000.0
+  },
+  {
+   "name": "Sam Moll",
+   "bbrefId": "mollsa01",
+   "team": "CIN",
+   "mls": "4.023",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Nick Lodolo",
+   "bbrefId": "lodolni01",
+   "team": "CIN",
+   "mls": "4.000",
+   "projSalary": 4300000.0
+  },
+  {
+   "name": "Graham Ashcraft",
+   "bbrefId": "ashcrgr01",
+   "team": "CIN",
+   "mls": "3.130",
+   "projSalary": 1400000.0
+  },
+  {
+   "name": "TJ Friedl",
+   "bbrefId": "friedtj01",
+   "team": "CIN",
+   "mls": "3.112",
+   "projSalary": 4900000.0
+  },
+  {
+   "name": "Tony Santillan",
+   "bbrefId": "santito01",
+   "team": "CIN",
+   "mls": "3.099",
+   "projSalary": 2400000.0
+  },
+  {
+   "name": "Spencer Steer",
+   "bbrefId": "steersp01",
+   "team": "CIN",
+   "mls": "3.035",
+   "projSalary": 4500000.0
+  },
+  {
+   "name": "Will Benson",
+   "bbrefId": "bensowi01",
+   "team": "CIN",
+   "mls": "3.003",
+   "projSalary": 1700000.0
+  },
+  {
+   "name": "Matt McLain",
+   "bbrefId": "mclaima01",
+   "team": "CIN",
+   "mls": "2.140",
+   "projSalary": 2600000.0
+  },
+  {
+   "name": "Thairo Estrada",
+   "bbrefId": "estrath01",
+   "team": "COL",
+   "mls": "5.153",
+   "projSalary": 3800000.0
+  },
+  {
+   "name": "Mickey Moniak",
+   "bbrefId": "moniami01",
+   "team": "COL",
+   "mls": "4.027",
+   "projSalary": 4200000.0
+  },
+  {
+   "name": "Lucas Gilbreath",
+   "bbrefId": "gilbrlu01",
+   "team": "COL",
+   "mls": "3.150",
+   "projSalary": 900000.0
+  },
+  {
+   "name": "Ryan Feltner",
+   "bbrefId": "feltnry01",
+   "team": "COL",
+   "mls": "3.071",
+   "projSalary": 2300000.0
+  },
+  {
+   "name": "Brenton Doyle",
+   "bbrefId": "doylebr02",
+   "team": "COL",
+   "mls": "2.161",
+   "projSalary": 3200000.0
+  },
+  {
+   "name": "Taylor Clarke",
+   "bbrefId": "clarkta01",
+   "team": "KC",
+   "mls": "5.148",
+   "projSalary": 1900000.0
+  },
+  {
+   "name": "Kris Bubic",
+   "bbrefId": "bubickr01",
+   "team": "KC",
+   "mls": "5.135",
+   "projSalary": 6000000.0
+  },
+  {
+   "name": "John Schreiber",
+   "bbrefId": "schrejo01",
+   "team": "KC",
+   "mls": "5.027",
+   "projSalary": 3800000.0
+  },
+  {
+   "name": "Jonathan India",
+   "bbrefId": "indiajo01",
+   "team": "KC",
+   "mls": "5.000",
+   "projSalary": 7400000.0
+  },
+  {
+   "name": "Kyle Wright",
+   "bbrefId": "wrighky01",
+   "team": "KC",
+   "mls": "4.151",
+   "projSalary": 1800000.0
+  },
+  {
+   "name": "Kyle Isbel",
+   "bbrefId": "isbelky01",
+   "team": "KC",
+   "mls": "4.043",
+   "projSalary": 2700000.0
+  },
+  {
+   "name": "Bailey Falter",
+   "bbrefId": "falteba01",
+   "team": "KC",
+   "mls": "3.138",
+   "projSalary": 3300000.0
+  },
+  {
+   "name": "Daniel Lynch IV",
+   "bbrefId": "lynchda02",
+   "team": "KC",
+   "mls": "3.136",
+   "projSalary": 1300000.0
+  },
+  {
+   "name": "Sam Long",
+   "bbrefId": "longsa01",
+   "team": "KC",
+   "mls": "3.121",
+   "projSalary": 950000.0
+  },
+  {
+   "name": "Vinnie Pasquantino",
+   "bbrefId": "pasquvi01",
+   "team": "KC",
+   "mls": "3.101",
+   "projSalary": 5400000.0
+  },
+  {
+   "name": "Angel Zerpa",
+   "bbrefId": "zerpaan01",
+   "team": "KC",
+   "mls": "3.082",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "MJ Melendez",
+   "bbrefId": "melenmj01",
+   "team": "KC",
+   "mls": "3.016",
+   "projSalary": 2650000.0
+  },
+  {
+   "name": "Maikel Garcia",
+   "bbrefId": "garcima01",
+   "team": "KC",
+   "mls": "2.168",
+   "projSalary": 4800000.0
+  },
+  {
+   "name": "James McArthur",
+   "bbrefId": "mcartja01",
+   "team": "KC",
+   "mls": "2.150",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "Tarik Skubal",
+   "bbrefId": "skubata01",
+   "team": "DET",
+   "mls": "5.114",
+   "projSalary": 17800000.0
+  },
+  {
+   "name": "Casey Mize",
+   "bbrefId": "mizeca01",
+   "team": "DET",
+   "mls": "5.111",
+   "projSalary": 5400000.0
+  },
+  {
+   "name": "Jake Rogers",
+   "bbrefId": "rogerja03",
+   "team": "DET",
+   "mls": "5.040",
+   "projSalary": 2900000.0
+  },
+  {
+   "name": "Will Vest",
+   "bbrefId": "vestwi01",
+   "team": "DET",
+   "mls": "4.100",
+   "projSalary": 3300000.0
+  },
+  {
+   "name": "Zach McKinstry",
+   "bbrefId": "mckinza01",
+   "team": "DET",
+   "mls": "4.099",
+   "projSalary": 3500000.0
+  },
+  {
+   "name": "Matt Vierling",
+   "bbrefId": "vierlma01",
+   "team": "DET",
+   "mls": "4.026",
+   "projSalary": 3100000.0
+  },
+  {
+   "name": "Jason Foley",
+   "bbrefId": "foleyja01",
+   "team": "DET",
+   "mls": "3.150",
+   "projSalary": 3150000.0
+  },
+  {
+   "name": "Alex Lange",
+   "bbrefId": "langeal01",
+   "team": "DET",
+   "mls": "3.145",
+   "projSalary": 900000.0
+  },
+  {
+   "name": "Andy Ibanez",
+   "bbrefId": "ibanean01",
+   "team": "DET",
+   "mls": "3.133",
+   "projSalary": 1800000.0
+  },
+  {
+   "name": "Riley Greene",
+   "bbrefId": "greenri03",
+   "team": "DET",
+   "mls": "3.110",
+   "projSalary": 6600000.0
+  },
+  {
+   "name": "Spencer Torkelson",
+   "bbrefId": "torkesp01",
+   "team": "DET",
+   "mls": "3.076",
+   "projSalary": 5100000.0
+  },
+  {
+   "name": "Kerry Carpenter",
+   "bbrefId": "carpeke01",
+   "team": "DET",
+   "mls": "3.057",
+   "projSalary": 3500000.0
+  },
+  {
+   "name": "Beau Brieske",
+   "bbrefId": "briesbe01",
+   "team": "DET",
+   "mls": "3.056",
+   "projSalary": 1300000.0
+  },
+  {
+   "name": "Genesis Cabrera",
+   "bbrefId": "cabrege01",
+   "team": "MIN",
+   "mls": "5.149",
+   "projSalary": 1400000.0
+  },
+  {
+   "name": "Ryan Jeffers",
+   "bbrefId": "jeffery01",
+   "team": "MIN",
+   "mls": "5.089",
+   "projSalary": 6600000.0
+  },
+  {
+   "name": "Justin Topa",
+   "bbrefId": "topaju01",
+   "team": "MIN",
+   "mls": "5.044",
+   "projSalary": 1700000.0
+  },
+  {
+   "name": "Michael Tonkin",
+   "bbrefId": "tonkimi01",
+   "team": "MIN",
+   "mls": "5.044",
+   "projSalary": 1400000.0
+  },
+  {
+   "name": "Bailey Ober",
+   "bbrefId": "oberba01",
+   "team": "MIN",
+   "mls": "4.093",
+   "projSalary": 4600000.0
+  },
+  {
+   "name": "Joe Ryan",
+   "bbrefId": "ryanjo04",
+   "team": "MIN",
+   "mls": "4.033",
+   "projSalary": 5800000.0
+  },
+  {
+   "name": "Trevor Larnach",
+   "bbrefId": "larnatr01",
+   "team": "MIN",
+   "mls": "4.014",
+   "projSalary": 4700000.0
+  },
+  {
+   "name": "Royce Lewis",
+   "bbrefId": "lewisro02",
+   "team": "MIN",
+   "mls": "3.142",
+   "projSalary": 3000000.0
+  },
+  {
+   "name": "Anthony Misiewicz",
+   "bbrefId": "misiean01",
+   "team": "MIN",
+   "mls": "3.082",
+   "projSalary": 1100000.0
+  },
+  {
+   "name": "Cole Sands",
+   "bbrefId": "sandsco01",
+   "team": "MIN",
+   "mls": "3.017",
+   "projSalary": 1300000.0
+  },
+  {
+   "name": "Mike Tauchman",
+   "bbrefId": "tauchmi01",
+   "team": "CWS",
+   "mls": "5.143",
+   "projSalary": 3400000.0
+  },
+  {
+   "name": "Steven Wilson",
+   "bbrefId": "wilsost02",
+   "team": "CWS",
+   "mls": "3.166",
+   "projSalary": 1500000.0
+  },
+  {
+   "name": "Jazz Chisholm Jr.",
+   "bbrefId": "chishja01",
+   "team": "NYY",
+   "mls": "5.075",
+   "projSalary": 10200000.0
+  },
+  {
+   "name": "David Bednar",
+   "bbrefId": "bednada01",
+   "team": "NYY",
+   "mls": "5.073",
+   "projSalary": 9000000.0
+  },
+  {
+   "name": "Mark Leiter Jr.",
+   "bbrefId": "leitema02",
+   "team": "NYY",
+   "mls": "5.031",
+   "projSalary": 3000000.0
+  },
+  {
+   "name": "Clarke Schmidt",
+   "bbrefId": "schmicl01",
+   "team": "NYY",
+   "mls": "4.148",
+   "projSalary": 4900000.0
+  },
+  {
+   "name": "Camilo Doval",
+   "bbrefId": "dovalca01",
+   "team": "NYY",
+   "mls": "4.071",
+   "projSalary": 6600000.0
+  },
+  {
+   "name": "Jake Cousins",
+   "bbrefId": "cousija01",
+   "team": "NYY",
+   "mls": "3.091",
+   "projSalary": 841000.0
+  },
+  {
+   "name": "Ian Hamilton",
+   "bbrefId": "hamilia01",
+   "team": "NYY",
+   "mls": "3.081",
+   "projSalary": 941000.0
+  },
+  {
+   "name": "Scott Effross",
+   "bbrefId": "effrosc01",
+   "team": "NYY",
+   "mls": "3.063",
+   "projSalary": 800000.0
+  },
+  {
+   "name": "Jake Bird",
+   "bbrefId": "birdja01",
+   "team": "NYY",
+   "mls": "3.051",
+   "projSalary": 1000000.0
+  },
+  {
+   "name": "Oswaldo Cabrera",
+   "bbrefId": "cabreos01",
+   "team": "NYY",
+   "mls": "3.050",
+   "projSalary": 1200000.0
+  },
+  {
+   "name": "Anthony Volpe",
+   "bbrefId": "volpean01",
+   "team": "NYY",
+   "mls": "3.000",
+   "projSalary": 3900000.0
+  },
+  {
+   "name": "Jose Caballero",
+   "bbrefId": "cabaljo01",
+   "team": "NYY",
+   "mls": "2.170",
+   "projSalary": 1900000.0
+  }
+ ]
+}
