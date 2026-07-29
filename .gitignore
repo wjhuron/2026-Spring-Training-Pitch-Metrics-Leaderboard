@@ -20,6 +20,12 @@ data/micro_data*.json
 # per-pitch grade dumps for the Sheets write-back (derived, local-only)
 data/pitch_loc_grades_*.json
 data/pitch_stuff_grades*.json
+# ABS full pitch-level dataset (~65 MB; the site reads the smaller
+# abs_challenge_events file, this one is a local pipeline input only)
+data/abs_challenges_2026.json
+# local lookup caches + experiment outputs (guard against `git add data/`)
+data/hitter_bats_cache.json
+data/_pplus_*.csv
 
 # Python
 .venv/
@@ -48,9 +54,10 @@ biomech/playid_cache.json
 biomech/pose_landmarker_heavy.task
 *.task
 
-# Stuff+ v10 model artifacts (only the training script is in git)
-stuff_plus_v10/pitcher_stuff_v10.csv
-stuff_plus_v10/model_summary_v10.txt
+# Stuff+ v10 model artifacts (only the training script is in git;
+# v10 archived 2026-07-29)
+archive/stuff_plus_v10/pitcher_stuff_v10.csv
+archive/stuff_plus_v10/model_summary_v10.txt
 
 # Logs
 *.log

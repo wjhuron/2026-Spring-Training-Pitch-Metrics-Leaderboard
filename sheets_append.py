@@ -413,7 +413,7 @@ def push_team_data(df, team, gc=None, verbose=True):
             f"[sheets] SCHEMA MISMATCH on tab {team!r} — refusing to append "
             f"({len(sheet_header)} sheet cols vs {len(expected)} df cols). "
             f"First diffs: {'; '.join(diffs)}. If the schema just changed, "
-            f"run the column migration (scripts/migrate_sheets_grade_columns.py) "
+            f"run the column migration (scripts/archive/migrate_sheets_grade_columns.py) "
             f"or update Pitcher2026's final_columns to match.")
 
     # First blank row in column A. Header row 1 stays untouched. Using
