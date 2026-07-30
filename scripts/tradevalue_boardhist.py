@@ -49,6 +49,7 @@ def trim(row):
         "age": row.get("Age"),
         "rank": row.get("Ovr_Rank"),
         "org": row.get("Team"),
+        "level": row.get("mlevel"),
         "birthDate": row.get("BirthDate"),
     }
 
