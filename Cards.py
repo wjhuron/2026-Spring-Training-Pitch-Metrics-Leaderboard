@@ -1339,21 +1339,27 @@ def render_card(config, pitches, output_file):
         ax_main.text(x+col_w/2, stat_y_value+cell_h/2, val_str, fontsize=val_fs, ha='center', va='center', color=TEXT_PRIMARY, fontweight='bold', fontfamily='IBM Plex Sans')
     ax_main.add_patch(Rectangle((photo_left, stat_y_value), len(config['stat_headers'])*col_w, stat_y_header+cell_h-stat_y_value, fill=False, edgecolor=ACCENT, linewidth=2, zorder=5))
 
-    # ── FB velo-by-start sparkline — season cards only, thin strip directly
-    # under the boxscore line. Fastball (FF; SI fallback when no FF) average
-    # velo per game date: muted dots on a thin line, dotted season-average
-    # reference, "last · avg · max" annotation right-aligned above, first/mid/
-    # last date labels below. Skips gracefully with fewer than 3 starts. Lives
+    # ── FB velo-by-outing sparkline — season cards only, thin strip directly
+    # under the boxscore line. Combined fastball pool (FF/FA/SI) average velo
+    # per game date — the same count-weighted definition as the Fastball Velo
+    # bubble, so the strip's avg matches the bubble's mph. Muted dots on a
+    # thin line, dotted season-average reference, "last · avg · max" above,
+    # first/mid/last date labels below. Skips gracefully under 3 games. Lives
     # in the 0.7in of extra card height, so nothing below has to yield.
     if config.get('mvn_models'):
-        _fb_type = 'FF' if any(p.get('Pitch Type') == 'FF' for p in pitches) else 'SI'
+        _FB_POOL = ('FF', 'FA', 'SI')
         _velo_by_start = defaultdict(list)
+        _fb_counts = defaultdict(int)
         for p in pitches:
-            if p.get('Pitch Type') != _fb_type:
+            _pt_ = p.get('Pitch Type')
+            if _pt_ not in _FB_POOL:
                 continue
             _v = sf(p.get('Velocity')); _gd = p.get('Game Date')
             if _v is not None and _gd:
                 _velo_by_start[_gd].append(_v)
+                _fb_counts[_pt_] += 1
+        # dominant type just picks the accent color for the season-high dot
+        _fb_type = max(_fb_counts, key=_fb_counts.get) if _fb_counts else 'FF'
         _sdates = sorted(_velo_by_start)
         if len(_sdates) >= 3:
             _svelos = [float(np.mean(_velo_by_start[d])) for d in _sdates]
@@ -1379,7 +1385,16 @@ def render_card(config, pitches, output_file):
             ax_spark.axis('off')
 
             _label_y = strip_top + 0.07
-            ax_main.text(photo_left, _label_y, 'FB VELO BY START', fontsize=8.5,
+            # Relievers get 'BY OUTING' — a 0-GS arm has no starts to plot by.
+            _gs_val = 0
+            try:
+                _sh = config.get('stat_headers') or []
+                if 'GS' in _sh:
+                    _gs_val = int(float(config.get('stat_values')[_sh.index('GS')]))
+            except (TypeError, ValueError, IndexError):
+                pass
+            _velo_label = 'FB VELO BY START' if _gs_val > 0 else 'FB VELO BY OUTING'
+            ax_main.text(photo_left, _label_y, _velo_label, fontsize=8.5,
                          color=TEXT_SECONDARY, fontweight='bold',
                          fontfamily='IBM Plex Sans', va='bottom')
             ax_main.text(photo_left + strip_w_in, _label_y,
@@ -2023,6 +2038,12 @@ def render_card(config, pitches, output_file):
                 cell.set_facecolor(PITCH_COLORS.get(pc,'#999'))
                 cell.set_text_props(color=badge_text_color(PITCH_COLORS.get(pc,'#999')), fontweight='bold', fontfamily='IBM Plex Sans')
 
+    # Gated cells render FADED (site parity: #8a7f75 = the unqualified-circle
+    # text color) so "full ink, no tint" reads as league-average and "faded"
+    # reads as sample-too-small. Values always render either way.
+    def _fade_cell(r_, c_):
+        table.get_celld()[(r_, c_)].set_text_props(color=TEXT_FAINT)
+
     # Percentile-based coloring for Zone%, Whiff%, Chase%
     league_avgs = config.get('league_avgs', {})
     overall_avgs = config.get('overall_avgs', {})
@@ -2041,6 +2062,7 @@ def render_card(config, pitches, output_file):
                     continue
                 # Flat outcome coloring gate (season/date-range cards).
                 if is_season and pitch_counts.get(pc, 0) < CARD_COLOR_MIN_PITCHES:
+                    _fade_cell(r, c)
                     continue
                 la = league_avgs[pc].get(meta_key)
                 row_bg = DARK_CELL if r % 2 == 1 else ALT_ROW_BG
@@ -2088,6 +2110,7 @@ def render_card(config, pitches, output_file):
                 continue
             # BIP coloring gate (season/date-range): xwOBAcon tints at 25 BIP.
             if is_season and r < len(cell_data) and bip_by_pt.get(pc, 0) < XWC_COLOR_MIN_BIP:
+                _fade_cell(r, xwc_col_idx)
                 continue
             val_str = cell_data[r - 1][xwc_col_idx]
             tinted = _pitcher_stat_cell_color(val_str, la, 0.05, False, row_bg, False)
@@ -2110,7 +2133,10 @@ def render_card(config, pitches, output_file):
                 la = league_avgs.get(pc, {}).get('gbPct') if pc else None
                 row_bg = DARK_CELL if r % 2 == 1 else ALT_ROW_BG
                 qual = bip_by_pt.get(pc, 0) >= GB_COLOR_MIN_BIP
-            if la is None or not qual:
+            if not qual:
+                _fade_cell(r, gb_col_idx)
+                continue
+            if la is None:
                 continue
             val_str = cell_data[r - 1][gb_col_idx]
             tinted = _pitcher_stat_cell_color(val_str, la, 1.0, True, row_bg, True)
@@ -2132,6 +2158,7 @@ def render_card(config, pitches, output_file):
             if is_season and r < len(cell_data):
                 _pc = pt_codes[r - 1]
                 if _pc and not rv_qual_by_pt.get(_pc, True):
+                    _fade_cell(r, c)
                     continue
             row_bg = DARKER if r == len(cell_data) else (DARK_CELL if r % 2 == 1 else ALT_ROW_BG)
             val_str = cell_data[r - 1][c]
@@ -2148,6 +2175,7 @@ def render_card(config, pitches, output_file):
             if is_season and r < len(cell_data):
                 _pc = pt_codes[r - 1]
                 if _pc and pitch_counts.get(_pc, 0) < _locplus_color_min(_pc):
+                    _fade_cell(r, lp_col_idx)
                     continue
             row_bg = DARKER if r == len(cell_data) else (DARK_CELL if r % 2 == 1 else ALT_ROW_BG)
             val_str = cell_data[r - 1][lp_col_idx]
@@ -2164,6 +2192,7 @@ def render_card(config, pitches, output_file):
             if is_season and r < len(cell_data):
                 _pc = pt_codes[r - 1]
                 if _pc and pitch_counts.get(_pc, 0) < STUFF_COLOR_MIN_PITCHES:
+                    _fade_cell(r, sp_col_idx)
                     continue
             row_bg = DARKER if r == len(cell_data) else (DARK_CELL if r % 2 == 1 else ALT_ROW_BG)
             val_str = cell_data[r - 1][sp_col_idx]
@@ -2250,8 +2279,9 @@ def render_card(config, pitches, output_file):
         _sp_cell = table.get_celld()[(0, col_headers.index('Stuff+'))]
         _sp_x = _sp_cell.get_window_extent(renderer).x0 / fig_bbox.width
         _sp_note = ('PitchRV/100 actual · xPitchRV/100 expected (luck-neutral) runs saved per 100 pitches: the gap is fortune\n'
-                    'Per-pitch Stuff+ graded vs same pitch type (100 = average for that type)\n'
-                    'Overall Stuff+ = pitch-weighted average of per-pitch grades')
+                    'Per-pitch Stuff+ and Loc+ graded vs same pitch type (100 = average for that type)\n'
+                    'Overall Stuff+ = pitch-weighted average of per-pitch grades\n'
+                    'Faded values: sample too small to grade; they color in as pitches accumulate')
         if any(stuff_lowsup_by_pt.get(_pt) and stuff_by_pt.get(_pt) is not None
                for _pt, _ in pitch_stats):
             _sp_note += '\n† = low model support (unusual pitch profile, score less certain)'
@@ -2259,7 +2289,7 @@ def render_card(config, pitches, output_file):
                  fontsize=8, color=TEXT_MUTED, va='top', ha='left', fontfamily='IBM Plex Sans', fontweight='bold', linespacing=1.5)
 
     # Watermark — bottom-left of the card, just below the table border.
-    fig.text(l, b - _below_off, 'Huronalytics', fontsize=9, ha='left', va='top', color=TEXT_FAINT, style='italic', fontfamily='IBM Plex Sans')
+    fig.text(l, b - _below_off, 'huronalytics.vercel.app', fontsize=9, ha='left', va='top', color=TEXT_PRIMARY, style='italic', fontfamily='IBM Plex Sans')
     plt.savefig(output_file, dpi=SAVE_DPI, bbox_inches='tight', facecolor=BG, pad_inches=0.1)
     plt.close()
 
