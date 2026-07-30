@@ -342,7 +342,7 @@ def main():
     out = {
         "fetched": date.today().isoformat(),
         "season": SEASON,
-        "projectionSource": "FanGraphs THE BAT X RoS 2026 export",
+        "projectionSource": "FanGraphs 8-system RoS ensemble (tradevalue_ensemble.py)",
         "mlb": mlb,
         "prospects": prospects,
     }

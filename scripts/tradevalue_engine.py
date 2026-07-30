@@ -591,7 +591,7 @@ def main():
     site_payload = {
         "generated": out["generated"],
         "note": ("Intrinsic surplus + market-adjusted value, 2026 dollars. "
-                 "Projections: FanGraphs rest-of-season, annualized."),
+                 "Projections: 8-system FanGraphs rest-of-season consensus, annualized."),
         "players": site,
     }
     # Gzipped site export (2026-07-29, same pattern as the data embed):
