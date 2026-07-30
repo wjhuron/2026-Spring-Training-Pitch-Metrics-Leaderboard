@@ -80,9 +80,9 @@
     var dist = parseFloat(document.getElementById('cp-dist').value);
     var time = parseFloat(document.getElementById('cp-time').value);
     var hang = parseFloat(document.getElementById('cp-hang').value);
-    var velo = parseFloat(document.getElementById('cp-velo').value);
     var plate = parseFloat(document.getElementById('cp-plate').value);
-    var zone = document.getElementById('cp-zone').value.split('|');
+    var zoneRaw = document.getElementById('cp-zone').value;
+    var zone = (zoneRaw || '0|0').split('|');   // blank zone = assume standard
     var wall = zone[1];
     var angle = parseFloat(document.getElementById('cp-angle').value);
     // back if the zone says so ("Standard Back") OR the angle is within
@@ -91,10 +91,9 @@
                 (!isNaN(angle) && Math.abs(angle) >= 150)) ? '1' : '0';
     var res = document.getElementById('cp-result');
 
-    // pitch flight: plate time from the card is exact; 37.6/velo fits
-    // real pitches within ~3ms; 0.39s is the typical-fastball default
-    var flight = !isNaN(plate) && plate > 0 ? plate
-               : (!isNaN(velo) && velo > 0 ? 37.6 / velo : FLIGHT);
+    // pitch flight: plate time from the card is exact, else the
+    // typical-fastball default
+    var flight = !isNaN(plate) && plate > 0 ? plate : FLIGHT;
     // Research-portal cards TRUNCATE to one decimal (card value T means
     // true time in [T, T + 0.1]), so center every card read at +0.05 and,
     // when both clocks are given, intersect the two truncation intervals.
@@ -136,7 +135,7 @@
     }
     res.style.display = 'block';
     document.getElementById('cp-big').textContent =
-      (out.p * 100).toFixed(1) + '%';
+      Math.round(out.p * 100) + '%';
     document.getElementById('cp-stars').textContent =
       starRange(out.p) + ' · Savant display: ' +
       Math.round(bucket(out.p) * 100) + '%';
@@ -150,7 +149,7 @@
       meta.seasons + ', ' + meta.plays.toLocaleString() + ' tracked plays';
   }
 
-  ['cp-dist', 'cp-time', 'cp-hang', 'cp-velo', 'cp-plate', 'cp-zone', 'cp-angle'].forEach(function (id) {
+  ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-zone', 'cp-angle'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', update);
   });
 })();

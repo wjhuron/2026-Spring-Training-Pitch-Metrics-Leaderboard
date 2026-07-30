@@ -177,7 +177,7 @@ def main():
 
     flags = (' BACK' if back else '') + (' WALL' if wall else '')
     print(f'\nInputs: {args.dist:.0f} ft in {args.time:.2f}s{flags or " (standard)"}')
-    print(f'Catch probability: {p * 100:.1f}%  ({stars(p)}-star range)')
+    print(f'Catch probability: {int(p * 100 + 0.5)}%  ({stars(p)}-star range)')
     print(f'  Savant display bucket: {bucket(p) * 100:.0f}%')
     print(f'  from {n} plays within '
           f'±{TIME_STEP * ring:.2f}s / ±{DIST_STEP * ring} ft '
