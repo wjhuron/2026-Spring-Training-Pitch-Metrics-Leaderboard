@@ -6,8 +6,7 @@ from Savant's player-services/range endpoint). No network access needed.
 
 Usage:
   python3 scripts/catch_prob.py --dist 56 --time 3.6
-  python3 scripts/catch_prob.py --dist 56 --time 3.6 --zone "standard"
-  python3 scripts/catch_prob.py --dist 91 --time 5.2 --zone "RF Gap" --angle 105
+  python3 scripts/catch_prob.py --dist 91 --time 5.2 --wall --angle 105
   python3 scripts/catch_prob.py --dist 56 --hang 3.2          # opportunity time from hang + 0.39
   python3 scripts/catch_prob.py                                # interactive prompts
 
@@ -22,11 +21,10 @@ Inputs:
            plate). Flight = --plate if given (exact, from the card), else
            37.6/velo if --velo (mph) given, else --flight (default 0.39s).
   --plate  plate time from the card, seconds (pitch release to plate).
-  --zone   fielding zone string from the card, e.g. "Standard", "RF Gap",
-           "LF Line", "CF". Anything other than Standard is a wall zone
-           (ball landing within 8 ft of the outfield wall) and sets the
-           wall flag. Zone strings do NOT encode direction.
-  --back / --wall  set the flags directly (override zone/angle).
+  --wall   ball projected to land within 8 ft of the outfield wall.
+           The card's Fielding Zone is a positioning label and does not
+           carry wall information; judge from hit distance and park.
+  --back   set the back flag directly (otherwise inferred from --angle).
   --angle  angle to ball landing, degrees. Going back = |angle| >= 150
            (within 30 degrees of straight behind, MLB's definition).
 
@@ -101,7 +99,6 @@ def main():
     ap.add_argument('--flight', type=float, default=0.39)
     ap.add_argument('--velo', type=float, help='pitch velocity mph; refines hang fallback')
     ap.add_argument('--plate', type=float, help='plate time s from the card (exact flight)')
-    ap.add_argument('--zone', type=str, default='')
     ap.add_argument('--back', action='store_true')
     ap.add_argument('--wall', action='store_true')
     ap.add_argument('--angle', type=float)
@@ -114,7 +111,7 @@ def main():
             args.time = float(raw)
         else:
             args.hang = float(input('Hang time (s): '))
-        args.zone = input('Fielding zone [standard]: ').strip() or 'standard'
+        args.wall = input('Near the wall? y/N: ').strip().lower().startswith('y')
 
     if args.time is None and args.hang is None:
         ap.error('need --time or --hang')
@@ -143,14 +140,8 @@ def main():
     else:
         args.time = args.time + 0.05
 
-    zone = args.zone.strip().lower()
-    # Standard variants ("Standard", "Standard Left/Right/Back") = no wall
-    # factor; named wall zones (Line, RF Gap, LF Line, CF, ...) = wall flag
-    wall = 1 if (args.wall or (zone and not zone.startswith('standard'))) else 0
-    # back = --back, or angle within 30 degrees of straight behind, ONLY.
-    # Zone labels like "Standard Back" are descriptive and do not set the
-    # model flag (verified: Trammell 4/19 play, zone "Standard Back",
-    # official back=0, catch_rate 0.99)
+    wall = 1 if args.wall else 0
+    # back = --back, or angle within 30 degrees of straight behind, ONLY
     back = 1 if args.back else 0
     if not back and args.angle is not None and abs(args.angle) >= 150:
         back = 1

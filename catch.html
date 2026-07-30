@@ -75,22 +75,12 @@
           <div class="catch-hint">feet</div>
         </div>
         <div class="catch-field">
-          <label for="cp-zone">Fielding Zone</label>
-          <select id="cp-zone">
-            <option value="" selected></option>
-            <option value="0|0">Standard</option>
-            <option value="0|0">Standard Left</option>
-            <option value="0|0">Standard Right</option>
-            <option value="0|0">Standard Back</option>
-            <option value="0|1">Line</option>
-            <option value="0|1">LF Line</option>
-            <option value="0|1">LF Gap</option>
-            <option value="0|1">CF</option>
-            <option value="0|1">RF Gap</option>
-            <option value="0|1">RF Line</option>
-            <option value="0|1">Other wall zone</option>
+          <label for="cp-wall">Near the Wall</label>
+          <select id="cp-wall">
+            <option value="0" selected>No</option>
+            <option value="1">Yes</option>
           </select>
-          <div class="catch-hint">Standard variants (incl. "Standard Back") = no wall factor; named wall zones = landing within 8 ft of the outfield wall. Zone labels are descriptive and never set going back</div>
+          <div class="catch-hint">yes = ball projected to land within 8 ft of the outfield wall (and under 8 ft high on it). The card's Fielding Zone is a positioning label and does not answer this</div>
         </div>
         <div class="catch-field">
           <label for="cp-angle">Angle to Ball Landing</label>

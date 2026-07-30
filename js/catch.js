@@ -81,13 +81,11 @@
     var time = parseFloat(document.getElementById('cp-time').value);
     var hang = parseFloat(document.getElementById('cp-hang').value);
     var plate = parseFloat(document.getElementById('cp-plate').value);
-    var zoneRaw = document.getElementById('cp-zone').value;
-    var zone = (zoneRaw || '0|0').split('|');   // blank zone = assume standard
-    var wall = zone[1];
+    // wall is an explicit input: the card's Fielding Zone is a positioning
+    // label and carries no wall information
+    var wall = document.getElementById('cp-wall').value;
     var angle = parseFloat(document.getElementById('cp-angle').value);
-    // back = angle within 30 degrees of straight behind, ONLY. Zone labels
-    // like "Standard Back" are descriptive and do not set the model flag
-    // (verified: Trammell 4/19 play, zone "Standard Back", official back=0)
+    // back = angle within 30 degrees of straight behind, ONLY
     var back = (!isNaN(angle) && Math.abs(angle) >= 150) ? '1' : '0';
     var res = document.getElementById('cp-result');
 
@@ -149,7 +147,7 @@
       meta.seasons + ', ' + meta.plays.toLocaleString() + ' tracked plays';
   }
 
-  ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-zone', 'cp-angle'].forEach(function (id) {
+  ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-wall', 'cp-angle'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', update);
   });
 })();
