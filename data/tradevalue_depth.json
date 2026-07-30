@@ -1,5 +1,5 @@
 {
- "generated": "2026-07-29",
+ "generated": "2026-07-30",
  "players": [
   {
    "mlbam": 680573,
@@ -7,7 +7,7 @@
    "team": "TOR",
    "level": "Triple-A",
    "pos": "P",
-   "value": 7711932.919232905,
+   "value": 7672704.56131365,
    "warProj": 1.31,
    "controlLeft": 3,
    "path": "mlbHistory"
@@ -18,7 +18,7 @@
    "team": "COL",
    "level": "Triple-A",
    "pos": "P",
-   "value": 6084771.209063752,
+   "value": 6066460.93238391,
    "warProj": 0.59,
    "controlLeft": 5,
    "path": "mlbHistory"
@@ -29,7 +29,7 @@
    "team": "SF",
    "level": "Triple-A",
    "pos": "2B",
-   "value": 5553717.184377795,
+   "value": 5531244.358290838,
    "warProj": 0.7,
    "controlLeft": 4,
    "path": "mlbHistory"
@@ -40,7 +40,7 @@
    "team": "AZ",
    "level": "Triple-A",
    "pos": "1B",
-   "value": 2943167.701863354,
+   "value": 2894114.906832298,
    "warProj": 1.3,
    "controlLeft": 1,
    "path": "mlbHistory"
@@ -51,7 +51,7 @@
    "team": "NYM",
    "level": "Triple-A",
    "pos": "2B",
-   "value": 1491074.145256917,
+   "value": 1479430.1235177866,
    "warProj": 0.61,
    "controlLeft": 2,
    "path": "mlbHistory"
@@ -62,7 +62,7 @@
    "team": "BOS",
    "level": "Triple-A",
    "pos": "P",
-   "value": 1102173.913043478,
+   "value": 1083804.3478260867,
    "warProj": 0.63,
    "controlLeft": 1,
    "path": "mlbHistory"
@@ -73,7 +73,7 @@
    "team": "TEX",
    "level": "Triple-A",
    "pos": "RF",
-   "value": 1038706.2598814229,
+   "value": 1030594.8468379446,
    "warProj": 0.43,
    "controlLeft": 2,
    "path": "mlbHistory"
@@ -84,7 +84,7 @@
    "team": "MIL",
    "level": "Triple-A",
    "pos": "RF",
-   "value": 887618.3639356996,
+   "value": 883557.0991135653,
    "warProj": 0.22,
    "controlLeft": 5,
    "path": "mlbHistory"
@@ -95,20 +95,9 @@
    "team": "AZ",
    "level": "Triple-A",
    "pos": "LF",
-   "value": 867391.304347826,
+   "value": 852934.7826086956,
    "warProj": 0.49,
    "controlLeft": 1,
-   "path": "mlbHistory"
-  },
-  {
-   "mlbam": 678545,
-   "name": "Osleivis Basabe",
-   "team": "SF",
-   "level": "Triple-A",
-   "pos": "SS",
-   "value": 772054.2110735605,
-   "warProj": 0.21,
-   "controlLeft": 4,
    "path": "mlbHistory"
   },
   {
@@ -117,7 +106,7 @@
    "team": "NYM",
    "level": "Triple-A",
    "pos": "RF",
-   "value": 703823.757763975,
+   "value": 692093.361801242,
    "warProj": 1.02,
    "controlLeft": 1,
    "path": "mlbHistory"
@@ -128,7 +117,7 @@
    "team": "TB",
    "level": "Triple-A",
    "pos": "P",
-   "value": 568031.1931231832,
+   "value": 564938.3077476892,
    "warProj": 0.19,
    "controlLeft": 5,
    "path": "mlbHistory"
@@ -139,7 +128,7 @@
    "team": "ATL",
    "level": "Triple-A",
    "pos": "2B",
-   "value": 521107.24643909413,
+   "value": 518172.46383039845,
    "warProj": 0.19,
    "controlLeft": 4,
    "path": "mlbHistory"
@@ -150,19 +139,8 @@
    "team": "AZ",
    "level": "Rookie",
    "pos": "P",
-   "value": 462228.26086956525,
+   "value": 454524.4565217391,
    "warProj": 0.81,
-   "controlLeft": 1,
-   "path": "mlbHistory"
-  },
-  {
-   "mlbam": 544150,
-   "name": "Albert Su\u00e1rez",
-   "team": "BAL",
-   "level": "Triple-A",
-   "pos": "P",
-   "value": 410350.790513834,
-   "warProj": 0.72,
    "controlLeft": 1,
    "path": "mlbHistory"
   },
@@ -172,9 +150,20 @@
    "team": "ATH",
    "level": "Triple-A",
    "pos": "P",
-   "value": 408196.49973050586,
+   "value": 405642.15190441895,
    "warProj": 0.18,
    "controlLeft": 3,
+   "path": "mlbHistory"
+  },
+  {
+   "mlbam": 544150,
+   "name": "Albert Su\u00e1rez",
+   "team": "BAL",
+   "level": "Triple-A",
+   "pos": "P",
+   "value": 403511.6106719367,
+   "warProj": 0.72,
+   "controlLeft": 1,
    "path": "mlbHistory"
   },
   {
@@ -183,7 +172,7 @@
    "team": "SD",
    "level": "Triple-A",
    "pos": "LF",
-   "value": 321680.4730317186,
+   "value": 319417.6271819162,
    "warProj": 0.17,
    "controlLeft": 5,
    "path": "mlbHistory"
@@ -1287,6 +1276,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 805063,
+   "name": "Julio Valdez",
+   "team": "CHC",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 703726,
    "name": "Edward Vargas",
    "team": "CHC",
@@ -1301,6 +1299,15 @@
    "team": "CHC",
    "level": "Single-A",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 686404,
+   "name": "Wuilfredo Antunez",
+   "team": "PHI",
+   "level": "Double-A",
+   "pos": "RF",
    "value": 300000,
    "path": "unranked"
   },
@@ -1442,6 +1449,15 @@
   {
    "mlbam": 688753,
    "name": "Evan Gates",
+   "team": "PHI",
+   "level": "Double-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 703496,
+   "name": "Mavis Graves",
    "team": "PHI",
    "level": "Double-A",
    "pos": "P",
@@ -2904,17 +2920,6 @@
    "value": 300000,
    "warProj": 0.0,
    "controlLeft": 4,
-   "path": "mlbHistory"
-  },
-  {
-   "mlbam": 657265,
-   "name": "Peter Strzelecki",
-   "team": "NYY",
-   "level": "Triple-A",
-   "pos": "P",
-   "value": 300000,
-   "warProj": 0.0,
-   "controlLeft": 3,
    "path": "mlbHistory"
   },
   {
@@ -4969,6 +4974,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 806212,
+   "name": "Stone Russell",
+   "team": "KC",
+   "level": "Triple-A",
+   "pos": "3B",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 592717,
    "name": "Aaron Sanchez",
    "team": "KC",
@@ -5321,8 +5335,26 @@
    "path": "unranked"
   },
   {
+   "mlbam": 687984,
+   "name": "Brady Hill",
+   "team": "WSH",
+   "level": "Double-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 680770,
    "name": "Chance Huff",
+   "team": "WSH",
+   "level": "Double-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 678883,
+   "name": "Yeuris Jimenez",
    "team": "WSH",
    "level": "Double-A",
    "pos": "P",
@@ -5483,6 +5515,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 692446,
+   "name": "Miguel Villarroel",
+   "team": "WSH",
+   "level": "Double-A",
+   "pos": "2B",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 695604,
    "name": "T.J. White",
    "team": "WSH",
@@ -5560,6 +5601,15 @@
    "team": "BAL",
    "level": "Single-A",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 821763,
+   "name": "Hector Campusano",
+   "team": "BAL",
+   "level": "Single-A",
+   "pos": "IF",
    "value": 300000,
    "path": "unranked"
   },
@@ -5753,6 +5803,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 808262,
+   "name": "Francisco Morao",
+   "team": "BAL",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 834985,
    "name": "Dalton Neuschwander",
    "team": "BAL",
@@ -5866,6 +5925,15 @@
    "team": "BAL",
    "level": "Single-A",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 811083,
+   "name": "Andrew Tess",
+   "team": "BAL",
+   "level": "Single-A",
+   "pos": "C",
    "value": 300000,
    "path": "unranked"
   },
@@ -7339,17 +7407,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 623381,
-   "name": "Thomas Pannone",
-   "team": "MIL",
-   "level": "Triple-A",
-   "pos": "P",
-   "value": 300000,
-   "warProj": 0.0,
-   "controlLeft": 1,
-   "path": "mlbHistory"
-  },
-  {
    "mlbam": 671111,
    "name": "Sammy Peralta",
    "team": "MIL",
@@ -7406,17 +7463,6 @@
    "pos": "P",
    "value": 300000,
    "path": "unranked"
-  },
-  {
-   "mlbam": 663765,
-   "name": "Jake Woodford",
-   "team": "MIL",
-   "level": "Triple-A",
-   "pos": "P",
-   "value": 300000,
-   "warProj": 0.0,
-   "controlLeft": 1,
-   "path": "mlbHistory"
   },
   {
    "mlbam": 668965,
@@ -9420,6 +9466,24 @@
    "path": "unranked"
   },
   {
+   "mlbam": 829751,
+   "name": "Angel De Los Santos",
+   "team": "DET",
+   "level": "Single-A",
+   "pos": "IF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 800503,
+   "name": "Enderson Delgado",
+   "team": "DET",
+   "level": "Single-A",
+   "pos": "C",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 813891,
    "name": "Jatnk Diaz",
    "team": "DET",
@@ -9602,6 +9666,15 @@
   {
    "mlbam": 834393,
    "name": "Caleb Leys",
+   "team": "DET",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 843821,
+   "name": "Maddox Long",
    "team": "DET",
    "level": "Single-A",
    "pos": "P",
@@ -10064,6 +10137,15 @@
    "team": "BAL",
    "level": "Rookie",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 844196,
+   "name": "Yorvis Salazar",
+   "team": "BAL",
+   "level": "Rookie",
+   "pos": "IF",
    "value": 300000,
    "path": "unranked"
   },
@@ -11735,6 +11817,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 821169,
+   "name": "Jonnhan Sanchez",
+   "team": "NYM",
+   "level": "Rookie",
+   "pos": "CF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 829727,
    "name": "Yobanny Sanchez",
    "team": "NYM",
@@ -11745,7 +11836,7 @@
   },
   {
    "mlbam": 834296,
-   "name": "Biguey Santana",
+   "name": "Bigey Santana",
    "team": "NYM",
    "level": "Rookie",
    "pos": "P",
@@ -11848,15 +11939,6 @@
    "team": "DET",
    "level": "High-A",
    "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 800503,
-   "name": "Enderson Delgado",
-   "team": "DET",
-   "level": "High-A",
-   "pos": "C",
    "value": 300000,
    "path": "unranked"
   },
@@ -14088,6 +14170,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 837641,
+   "name": "Yendi Pirela",
+   "team": "MIA",
+   "level": "Rookie",
+   "pos": "C",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 808506,
    "name": "Luis Porfirio",
    "team": "MIA",
@@ -14907,6 +14998,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 821241,
+   "name": "Yohandy Cruz",
+   "team": "DET",
+   "level": "Rookie",
+   "pos": "SS",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 840326,
    "name": "Santiago De Freitas",
    "team": "DET",
@@ -15087,6 +15187,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 821802,
+   "name": "Franyerson Reyes",
+   "team": "DET",
+   "level": "Rookie",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 821623,
    "name": "Angel Rodriguez",
    "team": "DET",
@@ -15119,6 +15228,15 @@
    "team": "DET",
    "level": "Rookie",
    "pos": "OF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 844335,
+   "name": "Raibel Santana",
+   "team": "DET",
+   "level": "Rookie",
+   "pos": "P",
    "value": 300000,
    "path": "unranked"
   },
@@ -15465,15 +15583,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 821763,
-   "name": "Hector Campusano",
-   "team": "BAL",
-   "level": "Rookie",
-   "pos": "IF",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 823883,
    "name": "Salvador Casado",
    "team": "BAL",
@@ -15618,15 +15727,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 808262,
-   "name": "Francisco Morao",
-   "team": "BAL",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 825247,
    "name": "Harlin Naut",
    "team": "BAL",
@@ -15713,15 +15813,6 @@
    "team": "BAL",
    "level": "Rookie",
    "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 811083,
-   "name": "Andrew Tess",
-   "team": "BAL",
-   "level": "Rookie",
-   "pos": "C",
    "value": 300000,
    "path": "unranked"
   },
@@ -17666,6 +17757,15 @@
    "team": "STL",
    "level": "Rookie",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 844318,
+   "name": "Eduardo Mirabal",
+   "team": "STL",
+   "level": "Rookie",
+   "pos": "C",
    "value": 300000,
    "path": "unranked"
   },
@@ -19787,6 +19887,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 814702,
+   "name": "Adler Cecil",
+   "team": "SD",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 683609,
    "name": "Victor Duarte",
    "team": "SD",
@@ -20403,6 +20512,17 @@
    "pos": "1B",
    "value": 300000,
    "path": "unranked"
+  },
+  {
+   "mlbam": 671083,
+   "name": "Buddy Kennedy",
+   "team": "SF",
+   "level": "Triple-A",
+   "pos": "1B",
+   "value": 300000,
+   "warProj": 0.0,
+   "controlLeft": 3,
+   "path": "mlbHistory"
   },
   {
    "mlbam": 675920,
@@ -21055,15 +21175,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 837641,
-   "name": "Yendi Pirela",
-   "team": "MIA",
-   "level": "Rookie",
-   "pos": "C",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 829715,
    "name": "Sandy Presbot",
    "team": "MIA",
@@ -21289,15 +21400,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 821169,
-   "name": "Jonnhan Sanchez",
-   "team": "NYM",
-   "level": "Rookie",
-   "pos": "CF",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 829792,
    "name": "Adrian Silva",
    "team": "NYM",
@@ -21426,6 +21528,15 @@
   {
    "mlbam": 829999,
    "name": "Frandy Guillen",
+   "team": "BAL",
+   "level": "Rookie",
+   "pos": "IF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 844197,
+   "name": "Ruben Hernandez",
    "team": "BAL",
    "level": "Rookie",
    "pos": "IF",
@@ -22252,6 +22363,24 @@
    "path": "unranked"
   },
   {
+   "mlbam": 825411,
+   "name": "Luis Cruz",
+   "team": "PIT",
+   "level": "Rookie",
+   "pos": "OF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 831811,
+   "name": "Mauricio De La Cruz",
+   "team": "PIT",
+   "level": "Rookie",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 829686,
    "name": "Fernando Figuera",
    "team": "PIT",
@@ -22414,6 +22543,24 @@
    "path": "unranked"
   },
   {
+   "mlbam": 823822,
+   "name": "Marlon Quintana",
+   "team": "PIT",
+   "level": "Rookie",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 837658,
+   "name": "Gilbert Ramirez",
+   "team": "PIT",
+   "level": "Rookie",
+   "pos": "C",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 827755,
    "name": "Hanley Ramirez",
    "team": "PIT",
@@ -22450,11 +22597,29 @@
    "path": "unranked"
   },
   {
+   "mlbam": 842568,
+   "name": "Jean Rodriguez",
+   "team": "PIT",
+   "level": "Rookie",
+   "pos": "OF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 833255,
    "name": "Angel Rosado",
    "team": "PIT",
    "level": "Rookie",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 829729,
+   "name": "Yoander Santana",
+   "team": "PIT",
+   "level": "Rookie",
+   "pos": "IF",
    "value": 300000,
    "path": "unranked"
   },
@@ -23800,6 +23965,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 844038,
+   "name": "Manuel Sanchez",
+   "team": "CIN",
+   "level": "Rookie",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 830607,
    "name": "Jonathan Santana",
    "team": "CIN",
@@ -24340,15 +24514,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 821241,
-   "name": "Yohandy Cruz",
-   "team": "DET",
-   "level": "Rookie",
-   "pos": "SS",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 829998,
    "name": "Fabian Dorta",
    "team": "DET",
@@ -24480,15 +24645,6 @@
    "team": "DET",
    "level": "Rookie",
    "pos": "OF",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 821802,
-   "name": "Franyerson Reyes",
-   "team": "DET",
-   "level": "Rookie",
-   "pos": "P",
    "value": 300000,
    "path": "unranked"
   },
@@ -24889,11 +25045,38 @@
    "path": "unranked"
   },
   {
+   "mlbam": 825432,
+   "name": "Adrian Belen",
+   "team": "KC",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 691771,
+   "name": "Michael Braswell III",
+   "team": "KC",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 800492,
    "name": "Roni Cabrera",
    "team": "KC",
    "level": "Single-A",
    "pos": "LF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 823841,
+   "name": "Manuel Colon",
+   "team": "KC",
+   "level": "Single-A",
+   "pos": "P",
    "value": 300000,
    "path": "unranked"
   },
@@ -24961,6 +25144,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 815777,
+   "name": "Jesus Oliveira",
+   "team": "KC",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 805615,
    "name": "Yeri Perez",
    "team": "KC",
@@ -25011,15 +25203,6 @@
    "team": "KC",
    "level": "Single-A",
    "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 806212,
-   "name": "Stone Russell",
-   "team": "KC",
-   "level": "Single-A",
-   "pos": "3B",
    "value": 300000,
    "path": "unranked"
   },
@@ -27572,6 +27755,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 828173,
+   "name": "Slater de Brun",
+   "team": "TB",
+   "level": "Single-A",
+   "pos": "OF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 688682,
    "name": "Cooper Bowman",
    "team": "TB",
@@ -27779,6 +27971,17 @@
    "path": "unranked"
   },
   {
+   "mlbam": 681806,
+   "name": "Andrew Wantz",
+   "team": "TB",
+   "level": "Triple-A",
+   "pos": "P",
+   "value": 300000,
+   "warProj": 0.0,
+   "controlLeft": 2,
+   "path": "mlbHistory"
+  },
+  {
    "mlbam": 676831,
    "name": "Kodi Whitley",
    "team": "TB",
@@ -27945,15 +28148,6 @@
    "team": "STL",
    "level": "Triple-A",
    "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 692446,
-   "name": "Miguel Villarroel",
-   "team": "STL",
-   "level": "Triple-A",
-   "pos": "2B",
    "value": 300000,
    "path": "unranked"
   },
@@ -28258,6 +28452,17 @@
    "value": 300000,
    "warProj": 0.0,
    "controlLeft": 1,
+   "path": "mlbHistory"
+  },
+  {
+   "mlbam": 656212,
+   "name": "Charlie Barnes",
+   "team": "LAD",
+   "level": "Triple-A",
+   "pos": "P",
+   "value": 300000,
+   "warProj": 0.0,
+   "controlLeft": 2,
    "path": "mlbHistory"
   },
   {
@@ -30203,6 +30408,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 800164,
+   "name": "Ronny Ugarte",
+   "team": "COL",
+   "level": "Single-A",
+   "pos": "1B",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 809819,
    "name": "Bryson Van Sickle",
    "team": "COL",
@@ -30725,6 +30939,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 829791,
+   "name": "Miguel Hern\u00e1ndez",
+   "team": "STL",
+   "level": "Single-A",
+   "pos": "SS",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 701509,
    "name": "Brian Holiday",
    "team": "STL",
@@ -31206,6 +31429,17 @@
    "value": 300000,
    "warProj": 0.0,
    "controlLeft": 5,
+   "path": "mlbHistory"
+  },
+  {
+   "mlbam": 663362,
+   "name": "Matt Waldron",
+   "team": "SD",
+   "level": "Triple-A",
+   "pos": "P",
+   "value": 300000,
+   "warProj": 0.0,
+   "controlLeft": 4,
    "path": "mlbHistory"
   },
   {
@@ -31886,24 +32120,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 825411,
-   "name": "Luis Cruz",
-   "team": "PIT",
-   "level": "Rookie",
-   "pos": "OF",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 831811,
-   "name": "Mauricio De La Cruz",
-   "team": "PIT",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 825497,
    "name": "Victor Familia",
    "team": "PIT",
@@ -32030,24 +32246,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 823822,
-   "name": "Marlon Quintana",
-   "team": "PIT",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 837658,
-   "name": "Gilbert Ramirez",
-   "team": "PIT",
-   "level": "Rookie",
-   "pos": "C",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 825466,
    "name": "Maickol Reyes",
    "team": "PIT",
@@ -32071,24 +32269,6 @@
    "team": "PIT",
    "level": "Rookie",
    "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 842568,
-   "name": "Jean Rodriguez",
-   "team": "PIT",
-   "level": "Rookie",
-   "pos": "OF",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 829729,
-   "name": "Yoander Santana",
-   "team": "PIT",
-   "level": "Rookie",
-   "pos": "IF",
    "value": 300000,
    "path": "unranked"
   },
@@ -33135,6 +33315,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 836083,
+   "name": "Braydon Risley",
+   "team": "PIT",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 691922,
    "name": "Javier Rivas",
    "team": "PIT",
@@ -33992,15 +34181,6 @@
    "team": "STL",
    "level": "Rookie",
    "pos": "IF",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 829791,
-   "name": "Miguel Hern\u00e1ndez",
-   "team": "STL",
-   "level": "Rookie",
-   "pos": "SS",
    "value": 300000,
    "path": "unranked"
   },
@@ -36779,6 +36959,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 808511,
+   "name": "Dylan Wilson",
+   "team": "SEA",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 813683,
    "name": "Jose Zerpa",
    "team": "SEA",
@@ -36802,15 +36991,6 @@
    "team": "CLE",
    "level": "Double-A",
    "pos": "2B",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 686404,
-   "name": "Wuilfredo Antunez",
-   "team": "CLE",
-   "level": "Double-A",
-   "pos": "RF",
    "value": 300000,
    "path": "unranked"
   },
@@ -38079,15 +38259,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 805063,
-   "name": "Julio Valdez",
-   "team": "CHC",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 823893,
    "name": "Geovanny Vasquez",
    "team": "CHC",
@@ -38648,15 +38819,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 808511,
-   "name": "Dylan Wilson",
-   "team": "SEA",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 820925,
    "name": "Fabian Alcantara",
    "team": "SD",
@@ -38689,15 +38851,6 @@
    "team": "SD",
    "level": "Rookie",
    "pos": "C",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 814702,
-   "name": "Adler Cecil",
-   "team": "SD",
-   "level": "Rookie",
-   "pos": "P",
    "value": 300000,
    "path": "unranked"
   },
@@ -39163,26 +39316,8 @@
    "path": "unranked"
   },
   {
-   "mlbam": 825432,
-   "name": "Adrian Belen",
-   "team": "KC",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 816095,
    "name": "Grayson Boles",
-   "team": "KC",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 691771,
-   "name": "Michael Braswell III",
    "team": "KC",
    "level": "Rookie",
    "pos": "P",
@@ -39201,15 +39336,6 @@
   {
    "mlbam": 824908,
    "name": "Keisther Castillo",
-   "team": "KC",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 823841,
-   "name": "Manuel Colon",
    "team": "KC",
    "level": "Rookie",
    "pos": "P",
@@ -39330,15 +39456,6 @@
    "team": "KC",
    "level": "Rookie",
    "pos": "3B",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 815777,
-   "name": "Jesus Oliveira",
-   "team": "KC",
-   "level": "Rookie",
-   "pos": "P",
    "value": 300000,
    "path": "unranked"
   },
@@ -39824,6 +39941,15 @@
    "warProj": 0.0,
    "controlLeft": 1,
    "path": "mlbHistory"
+  },
+  {
+   "mlbam": 694650,
+   "name": "Cameron Cotter",
+   "team": "CIN",
+   "level": "Triple-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
   },
   {
    "mlbam": 669721,
@@ -40959,6 +41085,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 821327,
+   "name": "Jake Bennett",
+   "team": "TOR",
+   "level": "Single-A",
+   "pos": "C",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 807721,
    "name": "Ryan Cooney",
    "team": "TOR",
@@ -40973,6 +41108,15 @@
    "team": "TOR",
    "level": "Single-A",
    "pos": "C",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 686590,
+   "name": "Dax Dathe",
+   "team": "TOR",
+   "level": "Single-A",
+   "pos": "P",
    "value": 300000,
    "path": "unranked"
   },
@@ -41000,6 +41144,15 @@
    "team": "TOR",
    "level": "Single-A",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 812469,
+   "name": "Ryan Franden",
+   "team": "TOR",
+   "level": "Single-A",
+   "pos": "3B",
    "value": 300000,
    "path": "unranked"
   },
@@ -41036,6 +41189,15 @@
    "team": "TOR",
    "level": "Single-A",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 842047,
+   "name": "Brayden Martin",
+   "team": "TOR",
+   "level": "Single-A",
+   "pos": "3B",
    "value": 300000,
    "path": "unranked"
   },
@@ -41175,6 +41337,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 703631,
+   "name": "Isaac Williams",
+   "team": "TOR",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 805268,
    "name": "Peyton Williams",
    "team": "TOR",
@@ -41301,15 +41472,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 687984,
-   "name": "Brady Hill",
-   "team": "WSH",
-   "level": "High-A",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 702309,
    "name": "Hunter Hines",
    "team": "WSH",
@@ -41321,15 +41483,6 @@
   {
    "mlbam": 678973,
    "name": "Eiker Huizi",
-   "team": "WSH",
-   "level": "High-A",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 678883,
-   "name": "Yeuris Jimenez",
    "team": "WSH",
    "level": "High-A",
    "pos": "P",
@@ -41378,6 +41531,15 @@
    "team": "WSH",
    "level": "High-A",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 800201,
+   "name": "Rafael Ramirez Jr.",
+   "team": "WSH",
+   "level": "High-A",
+   "pos": "SS",
    "value": 300000,
    "path": "unranked"
   },
@@ -41537,15 +41699,6 @@
   {
    "mlbam": 826939,
    "name": "Luke Gabrysh",
-   "team": "PHI",
-   "level": "High-A",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 703496,
-   "name": "Mavis Graves",
    "team": "PHI",
    "level": "High-A",
    "pos": "P",
@@ -41843,17 +41996,6 @@
    "value": 300000,
    "warProj": 0.0,
    "controlLeft": 4,
-   "path": "mlbHistory"
-  },
-  {
-   "mlbam": 622694,
-   "name": "Elieser Hern\u00e1ndez",
-   "team": "ATL",
-   "level": "Triple-A",
-   "pos": "P",
-   "value": 300000,
-   "warProj": 0.0,
-   "controlLeft": 1,
    "path": "mlbHistory"
   },
   {
@@ -42242,6 +42384,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 820842,
+   "name": "Bryce Chance",
+   "team": "TOR",
+   "level": "High-A",
+   "pos": "OF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 800140,
    "name": "Kendry Chirinos",
    "team": "TOR",
@@ -42301,6 +42452,15 @@
    "team": "TOR",
    "level": "High-A",
    "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 808852,
+   "name": "Gable Mitchell",
+   "team": "TOR",
+   "level": "High-A",
+   "pos": "SS",
    "value": 300000,
    "path": "unranked"
   },
@@ -42557,6 +42717,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 842247,
+   "name": "Noah Millikan",
+   "team": "WSH",
+   "level": "Single-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 828514,
    "name": "Ryan Minckler",
    "team": "WSH",
@@ -42616,15 +42785,6 @@
    "team": "WSH",
    "level": "Single-A",
    "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 800201,
-   "name": "Rafael Ramirez Jr.",
-   "team": "WSH",
-   "level": "Single-A",
-   "pos": "SS",
    "value": 300000,
    "path": "unranked"
   },
@@ -42769,6 +42929,15 @@
    "team": "CLE",
    "level": "High-A",
    "pos": "2B",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 804940,
+   "name": "Nelson Keljo",
+   "team": "CLE",
+   "level": "High-A",
+   "pos": "P",
    "value": 300000,
    "path": "unranked"
   },
@@ -43314,6 +43483,15 @@
   {
    "mlbam": 802397,
    "name": "Angel Arredondo",
+   "team": "TEX",
+   "level": "Single-A",
+   "pos": "SS",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 702705,
+   "name": "Kolby Branch",
    "team": "TEX",
    "level": "Single-A",
    "pos": "SS",
@@ -44998,15 +45176,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 800164,
-   "name": "Ronny Ugarte",
-   "team": "COL",
-   "level": "Rookie",
-   "pos": "1B",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 829958,
    "name": "Kamuel Villar",
    "team": "COL",
@@ -45819,6 +45988,15 @@
    "path": "unranked"
   },
   {
+   "mlbam": 806672,
+   "name": "Alix Hernandez",
+   "team": "SF",
+   "level": "High-A",
+   "pos": "P",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
    "mlbam": 815779,
    "name": "Cole Hillier",
    "team": "SF",
@@ -46613,15 +46791,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 842247,
-   "name": "Noah Millikan",
-   "team": "WSH",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 808312,
    "name": "Juan Obispo",
    "team": "WSH",
@@ -46897,15 +47066,6 @@
    "team": "TB",
    "level": "Rookie",
    "pos": "C",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 828173,
-   "name": "Slater de Brun",
-   "team": "TB",
-   "level": "Rookie",
-   "pos": "OF",
    "value": 300000,
    "path": "unranked"
   },
@@ -47828,15 +47988,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 836083,
-   "name": "Braydon Risley",
-   "team": "PIT",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 808033,
    "name": "Jonathan Rivero",
    "team": "PIT",
@@ -48161,15 +48312,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 829751,
-   "name": "Angel De Los Santos",
-   "team": "DET",
-   "level": "Rookie",
-   "pos": "IF",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 820988,
    "name": "Jose Dickson",
    "team": "DET",
@@ -48190,15 +48332,6 @@
   {
    "mlbam": 808006,
    "name": "Leonardo Leon",
-   "team": "DET",
-   "level": "Rookie",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 843821,
-   "name": "Maddox Long",
    "team": "DET",
    "level": "Rookie",
    "pos": "P",
@@ -48928,15 +49061,6 @@
   {
    "mlbam": 690367,
    "name": "Evan Gray",
-   "team": "SF",
-   "level": "Single-A",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
-   "mlbam": 806672,
-   "name": "Alix Hernandez",
    "team": "SF",
    "level": "Single-A",
    "pos": "P",
@@ -49862,15 +49986,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 804940,
-   "name": "Nelson Keljo",
-   "team": "CLE",
-   "level": "Single-A",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 806997,
    "name": "Yerlin Luis",
    "team": "CLE",
@@ -50771,15 +50886,6 @@
    "path": "unranked"
   },
   {
-   "mlbam": 694650,
-   "name": "Cameron Cotter",
-   "team": "CIN",
-   "level": "Double-A",
-   "pos": "P",
-   "value": 300000,
-   "path": "unranked"
-  },
-  {
    "mlbam": 686671,
    "name": "Thomas Farr",
    "team": "CIN",
@@ -51144,6 +51250,24 @@
    "name": "Wyatt Young",
    "team": "NYM",
    "level": "Double-A",
+   "pos": "SS",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 821920,
+   "name": "Kuhio Aloy",
+   "team": "NYM",
+   "level": "Single-A",
+   "pos": "OF",
+   "value": 300000,
+   "path": "unranked"
+  },
+  {
+   "mlbam": 822406,
+   "name": "Dylan Carey",
+   "team": "NYM",
+   "level": "Single-A",
    "pos": "SS",
    "value": 300000,
    "path": "unranked"

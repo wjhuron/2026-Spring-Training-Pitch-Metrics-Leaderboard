@@ -2811,7 +2811,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 148049.0
+     "salary": 361027.0
     }
    },
    "deferred": false,
@@ -4293,7 +4293,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 106774.0
+     "salary": 319753.0
     }
    },
    "deferred": false,
@@ -4710,7 +4710,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 310024.0
+     "salary": 76332.0
     }
    },
    "deferred": false,
@@ -5759,7 +5759,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 275294.0
+     "salary": 58825.0
     }
    },
    "deferred": false,
@@ -7837,7 +7837,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 345517.0
+     "salary": 549390.0
     }
    },
    "deferred": false,
@@ -9120,6 +9120,37 @@
    "engine": "mlb"
   },
   {
+   "name": "Hern\u00e1ndez, Elieser",
+   "team": "ATL",
+   "teamId": 144,
+   "pos": "rhp",
+   "age": 31,
+   "mls": "5.044",
+   "optsLeft": 1,
+   "optsTotal": 3,
+   "contract": "1 y (26)",
+   "years": {
+    "2026": {
+     "type": "signed",
+     "salary": 561497.0
+    },
+    "2027": {
+     "type": "fa"
+    }
+   },
+   "deferred": false,
+   "mlbam": "622694",
+   "fgId": "16933",
+   "warBat": null,
+   "warPit": -0.01179,
+   "gPit": 13.0,
+   "gsPit": 0.375,
+   "arbProjSalary": null,
+   "ilStatus": null,
+   "deferralPVs": null,
+   "engine": "mlb"
+  },
+  {
    "name": "Hicklen, Brewer",
    "team": "ATL",
    "teamId": 144,
@@ -9468,7 +9499,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 299690.0
+     "salary": 100934.0
     },
     "2027": {
      "type": "prearb"
@@ -11687,7 +11718,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 454515.0
+     "salary": 458035.0
     }
    },
    "deferred": false,
@@ -12085,7 +12116,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 651852.0
+     "salary": 453987.0
     }
    },
    "deferred": false,
@@ -12113,7 +12144,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 605429.0
+     "salary": 388959.0
     }
    },
    "deferred": false,
@@ -14178,7 +14209,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 667062.0
+     "salary": 353958.0
     }
    },
    "deferred": false,
@@ -16431,37 +16462,6 @@
    "gPit": null,
    "gsPit": null,
    "arbProjSalary": 3100000.0,
-   "ilStatus": null,
-   "deferralPVs": null,
-   "engine": "mlb"
-  },
-  {
-   "name": "Rogers, Jake",
-   "team": "DET",
-   "teamId": 116,
-   "pos": "c",
-   "age": 31,
-   "mls": "5.040",
-   "optsLeft": 2,
-   "optsTotal": 3,
-   "contract": "1 y/$3.05M (26)",
-   "years": {
-    "2026": {
-     "type": "signed",
-     "salary": 3050000.0
-    },
-    "2027": {
-     "type": "fa"
-    }
-   },
-   "deferred": false,
-   "mlbam": "668670",
-   "fgId": "19452",
-   "warBat": 0.14669,
-   "warPit": -0.01685,
-   "gPit": 1.0,
-   "gsPit": 0.0,
-   "arbProjSalary": 2900000.0,
    "ilStatus": null,
    "deferralPVs": null,
    "engine": "mlb"
@@ -19211,43 +19211,39 @@
    "engine": "mlb"
   },
   {
-   "name": "Wantz, Andrew",
+   "name": "Woodford, Jake",
    "team": "CHC",
    "teamId": 112,
-   "pos": "rhp",
-   "age": 30,
-   "mls": "2.069",
+   "pos": "rhp-s",
+   "age": 29,
+   "mls": "3.096",
    "optsLeft": 0,
    "optsTotal": 3,
-   "contract": "2 y (25-26)",
+   "contract": "1 y/$1M (26)",
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 269519.0
+     "salary": 300321.0
     },
     "2027": {
      "type": "arb",
-     "arbYear": 1
+     "arbYear": 2
     },
     "2028": {
      "type": "arb",
-     "arbYear": 2
-    },
-    "2029": {
-     "type": "arb",
      "arbYear": 3
     },
-    "2030": {
+    "2029": {
      "type": "fa"
     }
    },
    "deferred": false,
-   "mlbam": "681806",
-   "fgId": "24933",
+   "mlbam": "663765",
+   "fgId": "18674",
    "warBat": null,
-   "warPit": -0.01279,
-   "gPit": 4.0,
-   "gsPit": 0.0,
+   "warPit": 0.04124,
+   "gPit": 5.05555,
+   "gsPit": 0.5,
    "arbProjSalary": null,
    "ilStatus": null,
    "deferralPVs": null,
@@ -20612,7 +20608,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 76484.0
+     "salary": 275183.0
     },
     "2027": {
      "type": "prearb"
@@ -20690,7 +20686,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 269587.0
+     "salary": 453819.0
     }
    },
    "deferred": false,
@@ -22355,6 +22351,49 @@
    "engine": "mlb"
   },
   {
+   "name": "Pannone, Thomas",
+   "team": "MIL",
+   "teamId": 158,
+   "pos": "lhp",
+   "age": 32,
+   "mls": "1.010",
+   "optsLeft": 0,
+   "optsTotal": 3,
+   "contract": "1 y (26)",
+   "years": {
+    "2026": {
+     "type": "signed",
+     "salary": 260963.0
+    },
+    "2027": {
+     "type": "prearb"
+    },
+    "2028": {
+     "type": "arb",
+     "arbYear": 1
+    },
+    "2029": {
+     "type": "arb",
+     "arbYear": 2
+    },
+    "2030": {
+     "type": "arb",
+     "arbYear": 3
+    }
+   },
+   "deferred": false,
+   "mlbam": "623381",
+   "fgId": "17281",
+   "warBat": null,
+   "warPit": 0.01193,
+   "gPit": 5.029528571428571,
+   "gsPit": 0.6485714285714286,
+   "arbProjSalary": null,
+   "ilStatus": null,
+   "deferralPVs": null,
+   "engine": "mlb"
+  },
+  {
    "name": "Pratt, Cooper",
    "team": "MIL",
    "teamId": 158,
@@ -22510,7 +22549,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 315794.0
+     "salary": 80845.0
     }
    },
    "deferred": false,
@@ -23109,7 +23148,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 547002.0
+     "salary": 768159.0
     }
    },
    "deferred": false,
@@ -23492,7 +23531,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 70851.0
+     "salary": 288485.0
     }
    },
    "deferred": false,
@@ -25092,7 +25131,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 194555.0
+     "salary": 198406.0
     }
    },
    "deferred": false,
@@ -27779,7 +27818,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 724288.0
+     "salary": 546596.0
     }
    },
    "deferred": false,
@@ -27906,7 +27945,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 194090.0
+     "salary": 409165.0
     }
    },
    "deferred": false,
@@ -28018,7 +28057,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 558857.0
+     "salary": 344734.0
     }
    },
    "deferred": false,
@@ -28130,7 +28169,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 331291.0
+     "salary": 195275.0
     },
     "2027": {
      "type": "prearb"
@@ -28201,7 +28240,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 193794.0
+     "salary": 407918.0
     }
    },
    "deferred": false,
@@ -28400,7 +28439,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 68614.0
+     "salary": 282737.0
     }
    },
    "deferred": false,
@@ -29873,7 +29912,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 313653.0
+     "salary": 316480.0
     }
    },
    "deferred": false,
@@ -30856,7 +30895,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 543886.0
+     "salary": 324897.0
     }
    },
    "deferred": false,
@@ -31429,6 +31468,49 @@
    "warPit": -0.00026,
    "gPit": 0.1754,
    "gsPit": 0.1754,
+   "arbProjSalary": null,
+   "ilStatus": null,
+   "deferralPVs": null,
+   "engine": "mlb"
+  },
+  {
+   "name": "Strzelecki, Peter",
+   "team": "STL",
+   "teamId": 138,
+   "pos": "rhp",
+   "age": 31,
+   "mls": "1.029",
+   "optsLeft": 0,
+   "optsTotal": 3,
+   "contract": "1 y (26)",
+   "years": {
+    "2026": {
+     "type": "signed",
+     "salary": 261925.0
+    },
+    "2027": {
+     "type": "prearb"
+    },
+    "2028": {
+     "type": "arb",
+     "arbYear": 1
+    },
+    "2029": {
+     "type": "arb",
+     "arbYear": 2
+    },
+    "2030": {
+     "type": "arb",
+     "arbYear": 3
+    }
+   },
+   "deferred": false,
+   "mlbam": "657265",
+   "fgId": "21367",
+   "warBat": null,
+   "warPit": -0.00873,
+   "gPit": 14.0833375,
+   "gsPit": 0.0,
    "arbProjSalary": null,
    "ilStatus": null,
    "deferralPVs": null,
@@ -32848,7 +32930,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 327940.0
+     "salary": 94248.0
     }
    },
    "deferred": false,
@@ -34333,7 +34415,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 726423.0
+     "salary": 509125.0
     }
    },
    "deferred": false,
@@ -34371,34 +34453,6 @@
    "warPit": null,
    "gPit": null,
    "gsPit": null,
-   "arbProjSalary": null,
-   "ilStatus": null,
-   "deferralPVs": null,
-   "engine": "mlb"
-  },
-  {
-   "name": "Barnes, Charlie",
-   "team": "LAD",
-   "teamId": 119,
-   "pos": "lhp",
-   "age": 30,
-   "mls": "0.037",
-   "optsLeft": 2,
-   "optsTotal": 3,
-   "contract": "1 y (26)",
-   "years": {
-    "2026": {
-     "type": "signed",
-     "salary": 385995.0
-    }
-   },
-   "deferred": false,
-   "mlbam": "656212",
-   "fgId": "19865",
-   "warBat": null,
-   "warPit": 0.01249,
-   "gPit": 3.0,
-   "gsPit": 1.0,
    "arbProjSalary": null,
    "ilStatus": null,
    "deferralPVs": null,
@@ -35770,7 +35824,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 739018.0
+     "salary": 739264.0
     }
    },
    "deferred": false,
@@ -35826,7 +35880,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 499033.0
+     "salary": 496364.0
     }
    },
    "deferred": false,
@@ -35854,7 +35908,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 381613.0
+     "salary": 379573.0
     }
    },
    "deferred": false,
@@ -35882,7 +35936,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 337713.0
+     "salary": 335907.0
     }
    },
    "deferred": false,
@@ -35910,7 +35964,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 390367.0
+     "salary": 388959.0
     }
    },
    "deferred": false,
@@ -35938,7 +35992,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 321048.0
+     "salary": 320017.0
     }
    },
    "deferred": false,
@@ -35994,7 +36048,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 1225806.0
+     "salary": 1219251.0
     }
    },
    "deferred": false,
@@ -36022,7 +36076,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 612259.0
+     "salary": 661790.0
     }
    },
    "deferred": false,
@@ -36081,7 +36135,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 662581.0
+     "salary": 659038.0
     }
    },
    "deferred": false,
@@ -36109,7 +36163,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 602108.0
+     "salary": 599721.0
     }
    },
    "deferred": false,
@@ -36165,7 +36219,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 666667.0
+     "salary": 663102.0
     }
    },
    "deferred": false,
@@ -36176,6 +36230,45 @@
    "gPit": null,
    "gsPit": null,
    "arbProjSalary": null,
+   "ilStatus": null,
+   "deferralPVs": null,
+   "engine": "mlb"
+  },
+  {
+   "name": "O'Hoppe, Logan",
+   "team": "TEX",
+   "teamId": 140,
+   "pos": "c",
+   "age": 26,
+   "mls": "3.008",
+   "optsLeft": 3,
+   "optsTotal": 3,
+   "contract": "1 y/$2.625M (26)",
+   "years": {
+    "2026": {
+     "type": "signed",
+     "salary": 842246.0
+    },
+    "2027": {
+     "type": "arb",
+     "arbYear": 2
+    },
+    "2028": {
+     "type": "arb",
+     "arbYear": 3
+    },
+    "2029": {
+     "type": "fa"
+    }
+   },
+   "deferred": false,
+   "mlbam": "681351",
+   "fgId": "24729",
+   "warBat": 0.22523,
+   "warPit": null,
+   "gPit": null,
+   "gsPit": null,
+   "arbProjSalary": 2900000.0,
    "ilStatus": null,
    "deferralPVs": null,
    "engine": "mlb"
@@ -36193,7 +36286,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 668970.0
+     "salary": 666579.0
     }
    },
    "deferred": false,
@@ -36221,7 +36314,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 369033.0
+     "salary": 367059.0
     }
    },
    "deferred": false,
@@ -36249,7 +36342,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 1115592.0
+     "salary": 1109627.0
     },
     "2027": {
      "type": "fa"
@@ -36280,7 +36373,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 94413.0
+     "salary": 94248.0
     }
    },
    "deferred": false,
@@ -36290,6 +36383,49 @@
    "warPit": 0.02831,
    "gPit": 3.4166625,
    "gsPit": 0.5,
+   "arbProjSalary": null,
+   "ilStatus": null,
+   "deferralPVs": null,
+   "engine": "mlb"
+  },
+  {
+   "name": "Silseth, Chase",
+   "team": "TEX",
+   "teamId": 140,
+   "pos": "rhp-s",
+   "age": 26,
+   "mls": "1.105",
+   "optsLeft": 0,
+   "optsTotal": 3,
+   "contract": "1 y/$800,000 (26)",
+   "years": {
+    "2026": {
+     "type": "signed",
+     "salary": 256684.0
+    },
+    "2027": {
+     "type": "prearb"
+    },
+    "2028": {
+     "type": "arb",
+     "arbYear": 1
+    },
+    "2029": {
+     "type": "arb",
+     "arbYear": 2
+    },
+    "2030": {
+     "type": "arb",
+     "arbYear": 3
+    }
+   },
+   "deferred": false,
+   "mlbam": "681217",
+   "fgId": "30074",
+   "warBat": null,
+   "warPit": 0.08879,
+   "gPit": 19.1196,
+   "gsPit": 0.375,
    "arbProjSalary": null,
    "ilStatus": null,
    "deferralPVs": null,
@@ -36308,7 +36444,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 86710.0
+     "salary": 86586.0
     }
    },
    "deferred": false,
@@ -36336,7 +36472,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 289355.0
+     "salary": 287807.0
     },
     "2027": {
      "type": "fa"
@@ -37441,49 +37577,6 @@
    "engine": "mlb"
   },
   {
-   "name": "Waldron, Matt",
-   "team": "SD",
-   "teamId": 135,
-   "pos": "rhp",
-   "age": 29,
-   "mls": "1.107",
-   "optsLeft": 0,
-   "optsTotal": 3,
-   "contract": "1 y/$796,800 (26)",
-   "years": {
-    "2026": {
-     "type": "signed",
-     "salary": 796800.0
-    },
-    "2027": {
-     "type": "prearb"
-    },
-    "2028": {
-     "type": "arb",
-     "arbYear": 1
-    },
-    "2029": {
-     "type": "arb",
-     "arbYear": 2
-    },
-    "2030": {
-     "type": "arb",
-     "arbYear": 3
-    }
-   },
-   "deferred": false,
-   "mlbam": "663362",
-   "fgId": "25550",
-   "warBat": null,
-   "warPit": 0.03735,
-   "gPit": 6.2083375,
-   "gsPit": 0.875,
-   "arbProjSalary": null,
-   "ilStatus": null,
-   "deferralPVs": null,
-   "engine": "mlb"
-  },
-  {
    "name": "Brito, Jhony",
    "team": "SD",
    "teamId": 135,
@@ -38346,45 +38439,6 @@
    "engine": "mlb"
   },
   {
-   "name": "O'Hoppe, Logan",
-   "team": "LAA",
-   "teamId": 108,
-   "pos": "c",
-   "age": 26,
-   "mls": "3.008",
-   "optsLeft": 3,
-   "optsTotal": 3,
-   "contract": "1 y/$2.625M (26)",
-   "years": {
-    "2026": {
-     "type": "signed",
-     "salary": 2625000.0
-    },
-    "2027": {
-     "type": "arb",
-     "arbYear": 2
-    },
-    "2028": {
-     "type": "arb",
-     "arbYear": 3
-    },
-    "2029": {
-     "type": "fa"
-    }
-   },
-   "deferred": false,
-   "mlbam": "681351",
-   "fgId": "24729",
-   "warBat": 0.22523,
-   "warPit": null,
-   "gPit": null,
-   "gsPit": null,
-   "arbProjSalary": 2900000.0,
-   "ilStatus": null,
-   "deferralPVs": null,
-   "engine": "mlb"
-  },
-  {
    "name": "Lowe, Josh",
    "team": "LAA",
    "teamId": 108,
@@ -38780,49 +38834,6 @@
    "gsPit": 3.5877,
    "arbProjSalary": null,
    "ilStatus": "D60",
-   "deferralPVs": null,
-   "engine": "mlb"
-  },
-  {
-   "name": "Silseth, Chase",
-   "team": "LAA",
-   "teamId": 108,
-   "pos": "rhp-s",
-   "age": 26,
-   "mls": "1.105",
-   "optsLeft": 0,
-   "optsTotal": 3,
-   "contract": "1 y/$800,000 (26)",
-   "years": {
-    "2026": {
-     "type": "signed",
-     "salary": 800000.0
-    },
-    "2027": {
-     "type": "prearb"
-    },
-    "2028": {
-     "type": "arb",
-     "arbYear": 1
-    },
-    "2029": {
-     "type": "arb",
-     "arbYear": 2
-    },
-    "2030": {
-     "type": "arb",
-     "arbYear": 3
-    }
-   },
-   "deferred": false,
-   "mlbam": "681217",
-   "fgId": "30074",
-   "warBat": null,
-   "warPit": 0.08879,
-   "gPit": 19.1196,
-   "gsPit": 0.375,
-   "arbProjSalary": null,
-   "ilStatus": null,
    "deferralPVs": null,
    "engine": "mlb"
   },
@@ -40579,6 +40590,34 @@
    "engine": "mlb"
   },
   {
+   "name": "Basabe, Osleivis",
+   "team": "SF",
+   "teamId": 137,
+   "pos": "ss",
+   "age": 25,
+   "mls": "0.050",
+   "optsLeft": 1,
+   "optsTotal": 3,
+   "contract": "1 y (26)",
+   "years": {
+    "2026": {
+     "type": "signed",
+     "salary": 258610.0
+    }
+   },
+   "deferred": false,
+   "mlbam": "678545",
+   "fgId": "23985",
+   "warBat": 0.04016,
+   "warPit": null,
+   "gPit": null,
+   "gsPit": null,
+   "arbProjSalary": null,
+   "ilStatus": null,
+   "deferralPVs": null,
+   "engine": "mlb"
+  },
+  {
    "name": "Beck, Tristan",
    "team": "SF",
    "teamId": 137,
@@ -41978,7 +42017,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 385154.0
+     "salary": 387298.0
     },
     "2027": {
      "type": "prearb"
@@ -42077,7 +42116,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 400499.0
+     "salary": 402545.0
     },
     "2027": {
      "type": "prearb"
@@ -42120,7 +42159,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 483768.0
+     "salary": 481181.0
     }
    },
    "deferred": false,
@@ -42148,7 +42187,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 553549.0
+     "salary": 134083.0
     }
    },
    "deferred": false,
@@ -42176,7 +42215,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 568162.0
+     "salary": 565464.0
     }
    },
    "deferred": false,
@@ -42204,7 +42243,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 488172.0
+     "salary": 464706.0
     },
     "2027": {
      "type": "arb",
@@ -42231,34 +42270,6 @@
    "engine": "mlb"
   },
   {
-   "name": "Kennedy, Buddy",
-   "team": "SEA",
-   "teamId": 136,
-   "pos": "1b",
-   "age": 26,
-   "mls": "0.131",
-   "optsLeft": 0,
-   "optsTotal": 3,
-   "contract": "1 y (26)",
-   "years": {
-    "2026": {
-     "type": "signed",
-     "salary": 377420.0
-    }
-   },
-   "deferred": false,
-   "mlbam": "671083",
-   "fgId": "22505",
-   "warBat": 0.10623,
-   "warPit": -0.0522,
-   "gPit": 1.0,
-   "gsPit": 0.0,
-   "arbProjSalary": null,
-   "ilStatus": null,
-   "deferralPVs": null,
-   "engine": "mlb"
-  },
-  {
    "name": "Ortiz, Robinson",
    "team": "SEA",
    "teamId": 136,
@@ -42271,7 +42282,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 116026.0
+     "salary": 115406.0
     }
    },
    "deferred": false,
@@ -42299,7 +42310,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 263999.0
+     "salary": 263267.0
     }
    },
    "deferred": false,
@@ -42327,7 +42338,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 468818.0
+     "salary": 466311.0
     },
     "2027": {
      "type": "arb",
@@ -42370,7 +42381,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 240922.0
+     "salary": 240683.0
     },
     "2027": {
      "type": "prearb"
@@ -42441,7 +42452,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 576408.0
+     "salary": 574005.0
     }
    },
    "deferred": false,
@@ -42469,7 +42480,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 428979.0
+     "salary": 426685.0
     },
     "2027": {
      "type": "prearb"
@@ -42512,7 +42523,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 675162.0
+     "salary": 671552.0
     }
    },
    "deferred": false,
@@ -42540,7 +42551,7 @@
    "years": {
     "2026": {
      "type": "signed",
-     "salary": 703763.0
+     "salary": 700000.0
     },
     "2027": {
      "type": "arb",

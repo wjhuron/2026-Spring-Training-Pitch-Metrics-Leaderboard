@@ -1,577 +1,571 @@
 {
- "generated": "2026-07-29",
+ "generated": "2026-07-30",
  "cStuff": 0.39587232391755545,
  "threshold": 300,
  "players": [
   {
    "name": "Sasaki, Roki",
-   "resid": -0.013827,
-   "adjRunsPerPitchPitcherPositive": 0.005474,
+   "resid": -0.013833,
+   "adjRunsPerPitchPitcherPositive": 0.005476,
    "n": 1610
   },
   {
-   "name": "Hentges, Sam",
-   "resid": 0.011908,
-   "adjRunsPerPitchPitcherPositive": -0.004714,
-   "n": 394
-  },
-  {
    "name": "Ashcraft, Graham",
-   "resid": -0.011902,
-   "adjRunsPerPitchPitcherPositive": 0.004712,
+   "resid": -0.011908,
+   "adjRunsPerPitchPitcherPositive": 0.004714,
    "n": 450
   },
   {
    "name": "Warren, Austin",
-   "resid": -0.011404,
-   "adjRunsPerPitchPitcherPositive": 0.004515,
+   "resid": -0.011409,
+   "adjRunsPerPitchPitcherPositive": 0.004516,
    "n": 652
   },
   {
-   "name": "Faucher, Calvin",
-   "resid": -0.011247,
-   "adjRunsPerPitchPitcherPositive": 0.004452,
-   "n": 788
+   "name": "Hentges, Sam",
+   "resid": 0.01137,
+   "adjRunsPerPitchPitcherPositive": -0.004501,
+   "n": 418
   },
   {
    "name": "Misiorowski, Jacob",
-   "resid": -0.011152,
-   "adjRunsPerPitchPitcherPositive": 0.004415,
+   "resid": -0.011158,
+   "adjRunsPerPitchPitcherPositive": 0.004417,
    "n": 1808
   },
   {
+   "name": "Faucher, Calvin",
+   "resid": -0.011105,
+   "adjRunsPerPitchPitcherPositive": 0.004396,
+   "n": 797
+  },
+  {
    "name": "Phillips, Connor",
-   "resid": -0.010994,
-   "adjRunsPerPitchPitcherPositive": 0.004352,
+   "resid": -0.010999,
+   "adjRunsPerPitchPitcherPositive": 0.004354,
    "n": 546
   },
   {
-   "name": "Zuber, Tyler",
-   "resid": -0.010313,
-   "adjRunsPerPitchPitcherPositive": 0.004082,
-   "n": 314
-  },
-  {
    "name": "Kelly, Zack",
-   "resid": -0.010265,
-   "adjRunsPerPitchPitcherPositive": 0.004064,
+   "resid": -0.01027,
+   "adjRunsPerPitchPitcherPositive": 0.004066,
    "n": 315
   },
   {
+   "name": "Zuber, Tyler",
+   "resid": -0.010208,
+   "adjRunsPerPitchPitcherPositive": 0.004041,
+   "n": 328
+  },
+  {
    "name": "Fuentes, Didier",
-   "resid": -0.00979,
-   "adjRunsPerPitchPitcherPositive": 0.003876,
-   "n": 760
+   "resid": -0.009901,
+   "adjRunsPerPitchPitcherPositive": 0.00392,
+   "n": 787
+  },
+  {
+   "name": "Morejon, Adrian",
+   "resid": -0.009715,
+   "adjRunsPerPitchPitcherPositive": 0.003846,
+   "n": 879
   },
   {
    "name": "Headrick, Brent",
-   "resid": 0.00971,
-   "adjRunsPerPitchPitcherPositive": -0.003844,
-   "n": 790
+   "resid": 0.009699,
+   "adjRunsPerPitchPitcherPositive": -0.003839,
+   "n": 795
   },
   {
    "name": "Fried, Max",
-   "resid": 0.00961,
-   "adjRunsPerPitchPitcherPositive": -0.003804,
+   "resid": 0.009602,
+   "adjRunsPerPitchPitcherPositive": -0.003801,
    "n": 1040
   },
   {
    "name": "Ober, Bailey",
-   "resid": 0.009533,
-   "adjRunsPerPitchPitcherPositive": -0.003774,
+   "resid": 0.009525,
+   "adjRunsPerPitchPitcherPositive": -0.003771,
    "n": 1283
   },
   {
-   "name": "Morejon, Adrian",
-   "resid": -0.009458,
-   "adjRunsPerPitchPitcherPositive": 0.003744,
-   "n": 847
-  },
-  {
    "name": "Collyer, Gavin",
-   "resid": -0.009382,
-   "adjRunsPerPitchPitcherPositive": 0.003714,
+   "resid": -0.009389,
+   "adjRunsPerPitchPitcherPositive": 0.003717,
    "n": 446
   },
   {
    "name": "Beeks, Jalen",
-   "resid": 0.008813,
-   "adjRunsPerPitchPitcherPositive": -0.003489,
+   "resid": 0.008808,
+   "adjRunsPerPitchPitcherPositive": -0.003487,
    "n": 407
   },
   {
    "name": "Roberts, Ethan",
-   "resid": -0.008787,
-   "adjRunsPerPitchPitcherPositive": 0.003478,
+   "resid": -0.008795,
+   "adjRunsPerPitchPitcherPositive": 0.003482,
    "n": 436
   },
   {
-   "name": "Jax, Griffin",
-   "resid": -0.008738,
-   "adjRunsPerPitchPitcherPositive": 0.003459,
-   "n": 1227
-  },
-  {
    "name": "Davidson, Tucker",
-   "resid": 0.00866,
-   "adjRunsPerPitchPitcherPositive": -0.003428,
+   "resid": 0.008654,
+   "adjRunsPerPitchPitcherPositive": -0.003426,
    "n": 302
   },
   {
    "name": "Pearson, Nate",
-   "resid": -0.008395,
-   "adjRunsPerPitchPitcherPositive": 0.003323,
+   "resid": -0.008402,
+   "adjRunsPerPitchPitcherPositive": 0.003326,
    "n": 362
   },
   {
    "name": "Bidois, Brandan",
-   "resid": -0.008354,
-   "adjRunsPerPitchPitcherPositive": 0.003307,
+   "resid": -0.008358,
+   "adjRunsPerPitchPitcherPositive": 0.003309,
    "n": 325
   },
   {
+   "name": "Jax, Griffin",
+   "resid": -0.008117,
+   "adjRunsPerPitchPitcherPositive": 0.003213,
+   "n": 1320
+  },
+  {
    "name": "Dollander, Chase",
-   "resid": -0.008084,
-   "adjRunsPerPitchPitcherPositive": 0.0032,
+   "resid": -0.008091,
+   "adjRunsPerPitchPitcherPositive": 0.003203,
    "n": 742
   },
   {
    "name": "Ram\u00edrez, Yohan",
-   "resid": -0.008007,
-   "adjRunsPerPitchPitcherPositive": 0.00317,
+   "resid": -0.008026,
+   "adjRunsPerPitchPitcherPositive": 0.003177,
    "n": 932
   },
   {
+   "name": "Eisert, Brandon",
+   "resid": 0.007993,
+   "adjRunsPerPitchPitcherPositive": -0.003164,
+   "n": 640
+  },
+  {
    "name": "Bender, Anthony",
-   "resid": -0.007645,
-   "adjRunsPerPitchPitcherPositive": 0.003026,
+   "resid": -0.007653,
+   "adjRunsPerPitchPitcherPositive": 0.00303,
    "n": 539
   },
   {
-   "name": "Nunez, Anthony",
-   "resid": -0.00764,
-   "adjRunsPerPitchPitcherPositive": 0.003025,
-   "n": 711
-  },
-  {
    "name": "O'Brien, Riley",
-   "resid": -0.00764,
-   "adjRunsPerPitchPitcherPositive": 0.003025,
-   "n": 690
+   "resid": -0.007546,
+   "adjRunsPerPitchPitcherPositive": 0.002987,
+   "n": 708
   },
   {
-   "name": "Eisert, Brandon",
-   "resid": 0.007585,
-   "adjRunsPerPitchPitcherPositive": -0.003003,
-   "n": 599
+   "name": "Nunez, Anthony",
+   "resid": -0.007409,
+   "adjRunsPerPitchPitcherPositive": 0.002933,
+   "n": 724
   },
   {
    "name": "Messick, Parker",
-   "resid": 0.007395,
-   "adjRunsPerPitchPitcherPositive": -0.002928,
+   "resid": 0.007387,
+   "adjRunsPerPitchPitcherPositive": -0.002924,
    "n": 1909
   },
   {
-   "name": "Scott, Christian",
-   "resid": -0.007311,
-   "adjRunsPerPitchPitcherPositive": 0.002894,
-   "n": 1167
-  },
-  {
    "name": "Meyer, Max",
-   "resid": -0.007279,
-   "adjRunsPerPitchPitcherPositive": 0.002881,
+   "resid": -0.007285,
+   "adjRunsPerPitchPitcherPositive": 0.002884,
    "n": 1789
   },
   {
-   "name": "Hughes, Gabriel",
-   "resid": 0.007147,
-   "adjRunsPerPitchPitcherPositive": -0.002829,
-   "n": 317
-  },
-  {
    "name": "Granillo, Andre",
-   "resid": 0.007105,
-   "adjRunsPerPitchPitcherPositive": -0.002813,
+   "resid": 0.007095,
+   "adjRunsPerPitchPitcherPositive": -0.002809,
    "n": 733
   },
   {
-   "name": "Lawrence, Justin",
-   "resid": -0.007053,
-   "adjRunsPerPitchPitcherPositive": 0.002792,
-   "n": 697
-  },
-  {
    "name": "Baker, Bryan",
-   "resid": -0.007032,
-   "adjRunsPerPitchPitcherPositive": 0.002784,
-   "n": 625
+   "resid": -0.007082,
+   "adjRunsPerPitchPitcherPositive": 0.002804,
+   "n": 645
   },
   {
    "name": "Megill, Trevor",
-   "resid": -0.007014,
-   "adjRunsPerPitchPitcherPositive": 0.002777,
+   "resid": -0.007022,
+   "adjRunsPerPitchPitcherPositive": 0.00278,
    "n": 597
   },
   {
-   "name": "Cruz, Steven",
-   "resid": -0.00685,
-   "adjRunsPerPitchPitcherPositive": 0.002712,
-   "n": 599
+   "name": "Scott, Christian",
+   "resid": -0.006896,
+   "adjRunsPerPitchPitcherPositive": 0.00273,
+   "n": 1265
   },
   {
    "name": "Bird, Jake",
-   "resid": -0.006837,
-   "adjRunsPerPitchPitcherPositive": 0.002707,
+   "resid": -0.006843,
+   "adjRunsPerPitchPitcherPositive": 0.002709,
    "n": 555
   },
   {
    "name": "Imai, Tatsuya",
-   "resid": 0.006685,
-   "adjRunsPerPitchPitcherPositive": -0.002646,
+   "resid": 0.006663,
+   "adjRunsPerPitchPitcherPositive": -0.002638,
    "n": 1151
   },
   {
+   "name": "Cruz, Steven",
+   "resid": -0.00663,
+   "adjRunsPerPitchPitcherPositive": 0.002624,
+   "n": 620
+  },
+  {
+   "name": "Lawrence, Justin",
+   "resid": -0.006584,
+   "adjRunsPerPitchPitcherPositive": 0.002606,
+   "n": 716
+  },
+  {
    "name": "Mears, Nick",
-   "resid": -0.006559,
-   "adjRunsPerPitchPitcherPositive": 0.002596,
+   "resid": -0.006563,
+   "adjRunsPerPitchPitcherPositive": 0.002598,
    "n": 341
   },
   {
    "name": "Bachar, Lake",
-   "resid": -0.006537,
-   "adjRunsPerPitchPitcherPositive": 0.002588,
+   "resid": -0.006544,
+   "adjRunsPerPitchPitcherPositive": 0.00259,
    "n": 916
   },
   {
    "name": "McLean, Nolan",
-   "resid": -0.006532,
-   "adjRunsPerPitchPitcherPositive": 0.002586,
+   "resid": -0.006538,
+   "adjRunsPerPitchPitcherPositive": 0.002588,
    "n": 1978
   },
   {
-   "name": "Mor\u00e1n, Jovani",
-   "resid": 0.006496,
-   "adjRunsPerPitchPitcherPositive": -0.002571,
-   "n": 655
+   "name": "Hughes, Gabriel",
+   "resid": 0.006497,
+   "adjRunsPerPitchPitcherPositive": -0.002572,
+   "n": 393
   },
   {
    "name": "Woodruff, Brandon",
-   "resid": 0.00648,
-   "adjRunsPerPitchPitcherPositive": -0.002565,
+   "resid": 0.006471,
+   "adjRunsPerPitchPitcherPositive": -0.002562,
    "n": 639
   },
   {
    "name": "Richards, Trevor",
-   "resid": 0.006472,
-   "adjRunsPerPitchPitcherPositive": -0.002562,
-   "n": 750
+   "resid": 0.006458,
+   "adjRunsPerPitchPitcherPositive": -0.002557,
+   "n": 764
   },
   {
    "name": "Bolton, Cody",
-   "resid": -0.00645,
-   "adjRunsPerPitchPitcherPositive": 0.002554,
+   "resid": -0.006454,
+   "adjRunsPerPitchPitcherPositive": 0.002555,
    "n": 391
   },
   {
-   "name": "Petty, Chase",
-   "resid": -0.006341,
-   "adjRunsPerPitchPitcherPositive": 0.00251,
-   "n": 397
+   "name": "Chapman, Aroldis",
+   "resid": -0.006426,
+   "adjRunsPerPitchPitcherPositive": 0.002544,
+   "n": 585
+  },
+  {
+   "name": "Mor\u00e1n, Jovani",
+   "resid": 0.006395,
+   "adjRunsPerPitchPitcherPositive": -0.002532,
+   "n": 668
   },
   {
    "name": "Severino, Luis",
-   "resid": -0.006318,
-   "adjRunsPerPitchPitcherPositive": 0.002501,
+   "resid": -0.006325,
+   "adjRunsPerPitchPitcherPositive": 0.002504,
    "n": 1086
   },
   {
    "name": "Madden, Ty",
-   "resid": 0.006298,
-   "adjRunsPerPitchPitcherPositive": -0.002493,
-   "n": 469
-  },
-  {
-   "name": "Chapman, Aroldis",
-   "resid": -0.006263,
-   "adjRunsPerPitchPitcherPositive": 0.002479,
-   "n": 571
-  },
-  {
-   "name": "Rivera, Eduardo",
-   "resid": 0.006177,
-   "adjRunsPerPitchPitcherPositive": -0.002445,
-   "n": 401
-  },
-  {
-   "name": "G\u00f3mez, Yoendrys",
-   "resid": -0.00617,
-   "adjRunsPerPitchPitcherPositive": 0.002442,
-   "n": 779
-  },
-  {
-   "name": "Halvorsen, Seth",
-   "resid": -0.006163,
-   "adjRunsPerPitchPitcherPositive": 0.00244,
-   "n": 375
-  },
-  {
-   "name": "Sullivan, Sean",
-   "resid": 0.006137,
-   "adjRunsPerPitchPitcherPositive": -0.002429,
-   "n": 412
-  },
-  {
-   "name": "Woodford, Jake",
-   "resid": -0.006125,
-   "adjRunsPerPitchPitcherPositive": 0.002425,
-   "n": 443
-  },
-  {
-   "name": "V\u00e1squez, Randy",
-   "resid": -0.006089,
-   "adjRunsPerPitchPitcherPositive": 0.002411,
-   "n": 1519
-  },
-  {
-   "name": "Bernardino, Brennan",
-   "resid": 0.006047,
-   "adjRunsPerPitchPitcherPositive": -0.002394,
-   "n": 665
-  },
-  {
-   "name": "Senzatela, Antonio",
-   "resid": -0.006007,
-   "adjRunsPerPitchPitcherPositive": 0.002378,
-   "n": 781
+   "resid": 0.006306,
+   "adjRunsPerPitchPitcherPositive": -0.002497,
+   "n": 496
   },
   {
    "name": "Lauer, Eric",
-   "resid": 0.006004,
-   "adjRunsPerPitchPitcherPositive": -0.002377,
-   "n": 1319
+   "resid": 0.006305,
+   "adjRunsPerPitchPitcherPositive": -0.002496,
+   "n": 1406
   },
   {
-   "name": "Littell, Zack",
-   "resid": 0.00593,
-   "adjRunsPerPitchPitcherPositive": -0.002348,
-   "n": 1589
+   "name": "G\u00f3mez, Yoendrys",
+   "resid": -0.006176,
+   "adjRunsPerPitchPitcherPositive": 0.002445,
+   "n": 779
   },
   {
-   "name": "Sabrowski, Erik",
-   "resid": 0.00575,
-   "adjRunsPerPitchPitcherPositive": -0.002276,
-   "n": 546
+   "name": "Rivera, Eduardo",
+   "resid": 0.006172,
+   "adjRunsPerPitchPitcherPositive": -0.002443,
+   "n": 401
   },
   {
-   "name": "Abel, Mick",
-   "resid": -0.005745,
-   "adjRunsPerPitchPitcherPositive": 0.002274,
-   "n": 357
+   "name": "Halvorsen, Seth",
+   "resid": -0.006167,
+   "adjRunsPerPitchPitcherPositive": 0.002441,
+   "n": 375
+  },
+  {
+   "name": "Senzatela, Antonio",
+   "resid": -0.006131,
+   "adjRunsPerPitchPitcherPositive": 0.002427,
+   "n": 796
+  },
+  {
+   "name": "Woodford, Jake",
+   "resid": -0.00613,
+   "adjRunsPerPitchPitcherPositive": 0.002427,
+   "n": 443
+  },
+  {
+   "name": "Sullivan, Sean",
+   "resid": 0.006127,
+   "adjRunsPerPitchPitcherPositive": -0.002426,
+   "n": 412
+  },
+  {
+   "name": "V\u00e1squez, Randy",
+   "resid": -0.006094,
+   "adjRunsPerPitchPitcherPositive": 0.002413,
+   "n": 1519
   },
   {
    "name": "Rodriguez, Grayson",
-   "resid": -0.005694,
-   "adjRunsPerPitchPitcherPositive": 0.002254,
-   "n": 740
-  },
-  {
-   "name": "Suarez, Ranger",
-   "resid": 0.00562,
-   "adjRunsPerPitchPitcherPositive": -0.002225,
-   "n": 1510
+   "resid": -0.00609,
+   "adjRunsPerPitchPitcherPositive": 0.002411,
+   "n": 838
   },
   {
    "name": "Sewald, Paul",
-   "resid": -0.005605,
-   "adjRunsPerPitchPitcherPositive": 0.002219,
-   "n": 578
+   "resid": -0.006076,
+   "adjRunsPerPitchPitcherPositive": 0.002405,
+   "n": 591
   },
   {
-   "name": "Thompson, Ryan",
-   "resid": -0.005561,
-   "adjRunsPerPitchPitcherPositive": 0.002202,
-   "n": 585
+   "name": "Petty, Chase",
+   "resid": -0.006016,
+   "adjRunsPerPitchPitcherPositive": 0.002382,
+   "n": 439
   },
   {
-   "name": "Bennett, Jake",
-   "resid": 0.005522,
-   "adjRunsPerPitchPitcherPositive": -0.002186,
-   "n": 876
+   "name": "Littell, Zack",
+   "resid": 0.006007,
+   "adjRunsPerPitchPitcherPositive": -0.002378,
+   "n": 1670
+  },
+  {
+   "name": "Bernardino, Brennan",
+   "resid": 0.005974,
+   "adjRunsPerPitchPitcherPositive": -0.002365,
+   "n": 693
+  },
+  {
+   "name": "Sabrowski, Erik",
+   "resid": 0.005891,
+   "adjRunsPerPitchPitcherPositive": -0.002332,
+   "n": 554
   },
   {
    "name": "Varland, Louis",
-   "resid": -0.005522,
-   "adjRunsPerPitchPitcherPositive": 0.002186,
-   "n": 834
+   "resid": -0.00581,
+   "adjRunsPerPitchPitcherPositive": 0.0023,
+   "n": 854
   },
   {
-   "name": "Sears, JP",
-   "resid": 0.005512,
-   "adjRunsPerPitchPitcherPositive": -0.002182,
-   "n": 432
-  },
-  {
-   "name": "Burke, Brock",
-   "resid": 0.005452,
-   "adjRunsPerPitchPitcherPositive": -0.002158,
-   "n": 797
-  },
-  {
-   "name": "Hern\u00e1ndez, Jonathan",
-   "resid": -0.005446,
-   "adjRunsPerPitchPitcherPositive": 0.002156,
-   "n": 400
+   "name": "Abel, Mick",
+   "resid": -0.005749,
+   "adjRunsPerPitchPitcherPositive": 0.002276,
+   "n": 357
   },
   {
    "name": "Iglesias, Raisel",
+   "resid": 0.005711,
+   "adjRunsPerPitchPitcherPositive": -0.002261,
+   "n": 561
+  },
+  {
+   "name": "Thompson, Ryan",
+   "resid": -0.005633,
+   "adjRunsPerPitchPitcherPositive": 0.00223,
+   "n": 613
+  },
+  {
+   "name": "Suarez, Ranger",
+   "resid": 0.005613,
+   "adjRunsPerPitchPitcherPositive": -0.002222,
+   "n": 1510
+  },
+  {
+   "name": "Sears, JP",
+   "resid": 0.005504,
+   "adjRunsPerPitchPitcherPositive": -0.002179,
+   "n": 432
+  },
+  {
+   "name": "Hern\u00e1ndez, Jonathan",
+   "resid": -0.005451,
+   "adjRunsPerPitchPitcherPositive": 0.002158,
+   "n": 400
+  },
+  {
+   "name": "Burke, Brock",
    "resid": 0.005425,
-   "adjRunsPerPitchPitcherPositive": -0.002147,
-   "n": 553
+   "adjRunsPerPitchPitcherPositive": -0.002148,
+   "n": 805
   },
   {
    "name": "King, John",
-   "resid": 0.005414,
-   "adjRunsPerPitchPitcherPositive": -0.002143,
+   "resid": 0.005376,
+   "adjRunsPerPitchPitcherPositive": -0.002128,
    "n": 580
   },
   {
-   "name": "Chandler, Bubba",
-   "resid": -0.005411,
-   "adjRunsPerPitchPitcherPositive": 0.002142,
-   "n": 1715
-  },
-  {
-   "name": "Alvarado, Elvis",
-   "resid": -0.005372,
-   "adjRunsPerPitchPitcherPositive": 0.002127,
-   "n": 533
-  },
-  {
    "name": "Anderson, Grant",
-   "resid": -0.005354,
-   "adjRunsPerPitchPitcherPositive": 0.002119,
-   "n": 695
+   "resid": -0.005364,
+   "adjRunsPerPitchPitcherPositive": 0.002123,
+   "n": 713
+  },
+  {
+   "name": "Bennett, Jake",
+   "resid": 0.005349,
+   "adjRunsPerPitchPitcherPositive": -0.002117,
+   "n": 964
   },
   {
    "name": "Roycroft, Chris",
-   "resid": -0.005332,
-   "adjRunsPerPitchPitcherPositive": 0.002111,
+   "resid": -0.005338,
+   "adjRunsPerPitchPitcherPositive": 0.002113,
    "n": 333
   },
   {
-   "name": "Giolito, Lucas",
-   "resid": 0.005288,
-   "adjRunsPerPitchPitcherPositive": -0.002093,
-   "n": 551
+   "name": "Chandler, Bubba",
+   "resid": -0.005336,
+   "adjRunsPerPitchPitcherPositive": 0.002112,
+   "n": 1806
   },
   {
    "name": "P\u00e9rez, Eury",
-   "resid": -0.005276,
-   "adjRunsPerPitchPitcherPositive": 0.002089,
+   "resid": -0.005283,
+   "adjRunsPerPitchPitcherPositive": 0.002091,
    "n": 1605
   },
   {
+   "name": "Giolito, Lucas",
+   "resid": 0.005279,
+   "adjRunsPerPitchPitcherPositive": -0.00209,
+   "n": 551
+  },
+  {
+   "name": "Alvarado, Elvis",
+   "resid": -0.005206,
+   "adjRunsPerPitchPitcherPositive": 0.002061,
+   "n": 557
+  },
+  {
    "name": "Backhus, Kyle",
-   "resid": 0.005233,
-   "adjRunsPerPitchPitcherPositive": -0.002072,
+   "resid": 0.005204,
+   "adjRunsPerPitchPitcherPositive": -0.00206,
    "n": 350
   },
   {
-   "name": "Soriano, George",
-   "resid": -0.005219,
-   "adjRunsPerPitchPitcherPositive": 0.002066,
-   "n": 712
-  },
-  {
-   "name": "Fluharty, Mason",
-   "resid": 0.005216,
-   "adjRunsPerPitchPitcherPositive": -0.002065,
-   "n": 733
-  },
-  {
-   "name": "Nance, Tommy",
-   "resid": -0.00516,
-   "adjRunsPerPitchPitcherPositive": 0.002043,
-   "n": 625
-  },
-  {
    "name": "Klein, Will",
-   "resid": -0.005157,
-   "adjRunsPerPitchPitcherPositive": 0.002042,
+   "resid": -0.005165,
+   "adjRunsPerPitchPitcherPositive": 0.002045,
    "n": 723
   },
   {
-   "name": "Gage, Matt",
-   "resid": 0.005112,
-   "adjRunsPerPitchPitcherPositive": -0.002024,
-   "n": 526
+   "name": "Nance, Tommy",
+   "resid": -0.005167,
+   "adjRunsPerPitchPitcherPositive": 0.002045,
+   "n": 625
+  },
+  {
+   "name": "Fluharty, Mason",
+   "resid": 0.005151,
+   "adjRunsPerPitchPitcherPositive": -0.002039,
+   "n": 752
   },
   {
    "name": "Bachman, Sam",
-   "resid": -0.005109,
-   "adjRunsPerPitchPitcherPositive": 0.002022,
+   "resid": -0.005117,
+   "adjRunsPerPitchPitcherPositive": 0.002026,
    "n": 729
   },
   {
    "name": "Nelson, Ryne",
-   "resid": -0.005102,
-   "adjRunsPerPitchPitcherPositive": 0.00202,
+   "resid": -0.005109,
+   "adjRunsPerPitchPitcherPositive": 0.002023,
    "n": 1199
   },
   {
+   "name": "Gage, Matt",
+   "resid": 0.005106,
+   "adjRunsPerPitchPitcherPositive": -0.002021,
+   "n": 526
+  },
+  {
    "name": "Macko, Adam",
-   "resid": 0.005077,
-   "adjRunsPerPitchPitcherPositive": -0.00201,
+   "resid": 0.005069,
+   "adjRunsPerPitchPitcherPositive": -0.002007,
    "n": 458
   },
   {
    "name": "Cease, Dylan",
-   "resid": -0.005059,
-   "adjRunsPerPitchPitcherPositive": 0.002003,
+   "resid": -0.005064,
+   "adjRunsPerPitchPitcherPositive": 0.002005,
    "n": 1937
   },
   {
    "name": "Aldegheri, Sam",
-   "resid": 0.005053,
-   "adjRunsPerPitchPitcherPositive": -0.002,
+   "resid": 0.005046,
+   "adjRunsPerPitchPitcherPositive": -0.001998,
    "n": 610
   },
   {
-   "name": "Antone, Tejay",
-   "resid": -0.005,
-   "adjRunsPerPitchPitcherPositive": 0.00198,
-   "n": 504
+   "name": "Natera Jr., Samy",
+   "resid": 0.004983,
+   "adjRunsPerPitchPitcherPositive": -0.001973,
+   "n": 370
   },
   {
-   "name": "Yesavage, Trey",
-   "resid": 0.004975,
-   "adjRunsPerPitchPitcherPositive": -0.00197,
-   "n": 1496
-  },
-  {
-   "name": "Morris, Andrew",
-   "resid": 0.004953,
-   "adjRunsPerPitchPitcherPositive": -0.001961,
-   "n": 876
+   "name": "Williams, Devin",
+   "resid": -0.004966,
+   "adjRunsPerPitchPitcherPositive": 0.001966,
+   "n": 676
   },
   {
    "name": "May, Dustin",
-   "resid": -0.004945,
+   "resid": -0.004947,
    "adjRunsPerPitchPitcherPositive": 0.001958,
-   "n": 1681
+   "n": 1751
+  },
+  {
+   "name": "Morris, Andrew",
+   "resid": 0.004944,
+   "adjRunsPerPitchPitcherPositive": -0.001957,
+   "n": 876
+  },
+  {
+   "name": "Soriano, George",
+   "resid": -0.004933,
+   "adjRunsPerPitchPitcherPositive": 0.001953,
+   "n": 734
   },
   {
    "name": "Penrod, Zach",
-   "resid": 0.004892,
-   "adjRunsPerPitchPitcherPositive": -0.001936,
+   "resid": 0.004886,
+   "adjRunsPerPitchPitcherPositive": -0.001934,
    "n": 704
-  },
-  {
-   "name": "Burns, Chase",
-   "resid": -0.004886,
-   "adjRunsPerPitchPitcherPositive": 0.001934,
-   "n": 1768
   },
   {
    "name": "Woods Richardson, Simeon",
@@ -580,2379 +574,2403 @@
    "n": 1134
   },
   {
-   "name": "Schultz, Paxton",
-   "resid": 0.004873,
-   "adjRunsPerPitchPitcherPositive": -0.001929,
-   "n": 849
-  },
-  {
    "name": "deGrom, Jacob",
-   "resid": -0.004859,
-   "adjRunsPerPitchPitcherPositive": 0.001923,
+   "resid": -0.004864,
+   "adjRunsPerPitchPitcherPositive": 0.001926,
    "n": 1792
   },
   {
-   "name": "Natera Jr., Samy",
-   "resid": 0.004851,
-   "adjRunsPerPitchPitcherPositive": -0.00192,
-   "n": 349
-  },
-  {
-   "name": "Williams, Devin",
-   "resid": -0.004839,
-   "adjRunsPerPitchPitcherPositive": 0.001915,
-   "n": 658
-  },
-  {
-   "name": "Duran, Jhoan",
-   "resid": 0.004829,
-   "adjRunsPerPitchPitcherPositive": -0.001912,
-   "n": 573
-  },
-  {
    "name": "Alvarez, Andrew",
-   "resid": 0.004811,
-   "adjRunsPerPitchPitcherPositive": -0.001905,
+   "resid": 0.004842,
+   "adjRunsPerPitchPitcherPositive": -0.001917,
    "n": 1586
   },
   {
+   "name": "Duran, Jhoan",
+   "resid": 0.004836,
+   "adjRunsPerPitchPitcherPositive": -0.001914,
+   "n": 573
+  },
+  {
+   "name": "Yesavage, Trey",
+   "resid": 0.004835,
+   "adjRunsPerPitchPitcherPositive": -0.001914,
+   "n": 1593
+  },
+  {
    "name": "Greene, Hunter",
-   "resid": -0.00481,
-   "adjRunsPerPitchPitcherPositive": 0.001904,
+   "resid": -0.004814,
+   "adjRunsPerPitchPitcherPositive": 0.001906,
    "n": 365
   },
   {
-   "name": "Kelly, Kevin",
-   "resid": -0.004794,
-   "adjRunsPerPitchPitcherPositive": 0.001898,
-   "n": 628
-  },
-  {
-   "name": "Mikolas, Miles",
-   "resid": 0.004736,
-   "adjRunsPerPitchPitcherPositive": -0.001875,
-   "n": 1601
-  },
-  {
-   "name": "Suarez, Robert",
-   "resid": -0.004728,
-   "adjRunsPerPitchPitcherPositive": 0.001872,
-   "n": 466
+   "name": "Schultz, Paxton",
+   "resid": 0.004805,
+   "adjRunsPerPitchPitcherPositive": -0.001902,
+   "n": 881
   },
   {
    "name": "Ashby, Aaron",
-   "resid": -0.004714,
-   "adjRunsPerPitchPitcherPositive": 0.001866,
-   "n": 1051
+   "resid": -0.00479,
+   "adjRunsPerPitchPitcherPositive": 0.001896,
+   "n": 1084
+  },
+  {
+   "name": "Suarez, Robert",
+   "resid": -0.004736,
+   "adjRunsPerPitchPitcherPositive": 0.001875,
+   "n": 466
+  },
+  {
+   "name": "Mikolas, Miles",
+   "resid": 0.004728,
+   "adjRunsPerPitchPitcherPositive": -0.001872,
+   "n": 1601
   },
   {
    "name": "Rasmussen, Drew",
-   "resid": -0.004713,
-   "adjRunsPerPitchPitcherPositive": 0.001866,
+   "resid": -0.00472,
+   "adjRunsPerPitchPitcherPositive": 0.001869,
    "n": 1648
   },
   {
    "name": "Leiter, Jack",
-   "resid": -0.004704,
-   "adjRunsPerPitchPitcherPositive": 0.001862,
+   "resid": -0.00471,
+   "adjRunsPerPitchPitcherPositive": 0.001865,
    "n": 1396
   },
   {
-   "name": "Jones, Jared",
-   "resid": -0.004701,
-   "adjRunsPerPitchPitcherPositive": 0.001861,
-   "n": 734
+   "name": "Burns, Chase",
+   "resid": -0.004687,
+   "adjRunsPerPitchPitcherPositive": 0.001855,
+   "n": 1857
   },
   {
    "name": "Ray, Robbie",
-   "resid": 0.004689,
-   "adjRunsPerPitchPitcherPositive": -0.001856,
+   "resid": 0.004683,
+   "adjRunsPerPitchPitcherPositive": -0.001854,
    "n": 1975
   },
   {
+   "name": "Smith, Cade",
+   "resid": -0.004635,
+   "adjRunsPerPitchPitcherPositive": 0.001835,
+   "n": 854
+  },
+  {
+   "name": "Su\u00e1rez, Albert",
+   "resid": 0.004636,
+   "adjRunsPerPitchPitcherPositive": -0.001835,
+   "n": 674
+  },
+  {
+   "name": "Antone, Tejay",
+   "resid": -0.004632,
+   "adjRunsPerPitchPitcherPositive": 0.001834,
+   "n": 529
+  },
+  {
+   "name": "Seymour, Ian",
+   "resid": 0.004596,
+   "adjRunsPerPitchPitcherPositive": -0.001819,
+   "n": 1264
+  },
+  {
+   "name": "Kerkering, Orion",
+   "resid": -0.004575,
+   "adjRunsPerPitchPitcherPositive": 0.001811,
+   "n": 740
+  },
+  {
    "name": "Warren, Will",
-   "resid": -0.004524,
-   "adjRunsPerPitchPitcherPositive": 0.001791,
+   "resid": -0.00453,
+   "adjRunsPerPitchPitcherPositive": 0.001793,
    "n": 1745
   },
   {
    "name": "Imanaga, Shota",
-   "resid": 0.004514,
-   "adjRunsPerPitchPitcherPositive": -0.001787,
+   "resid": 0.004507,
+   "adjRunsPerPitchPitcherPositive": -0.001784,
    "n": 1869
   },
   {
    "name": "Banks, Tanner",
-   "resid": 0.004505,
-   "adjRunsPerPitchPitcherPositive": -0.001783,
+   "resid": 0.004498,
+   "adjRunsPerPitchPitcherPositive": -0.001781,
    "n": 563
   },
   {
-   "name": "Sinclair, Jack",
-   "resid": -0.004489,
-   "adjRunsPerPitchPitcherPositive": 0.001777,
-   "n": 790
-  },
-  {
-   "name": "Kent, Jackson",
-   "resid": 0.004476,
-   "adjRunsPerPitchPitcherPositive": -0.001772,
-   "n": 837
-  },
-  {
-   "name": "Kerkering, Orion",
-   "resid": -0.004467,
-   "adjRunsPerPitchPitcherPositive": 0.001768,
-   "n": 720
-  },
-  {
-   "name": "Kay, Anthony",
-   "resid": -0.004462,
-   "adjRunsPerPitchPitcherPositive": 0.001766,
-   "n": 1797
-  },
-  {
    "name": "Weiss, Ryan",
-   "resid": -0.004451,
-   "adjRunsPerPitchPitcherPositive": 0.001762,
+   "resid": -0.004454,
+   "adjRunsPerPitchPitcherPositive": 0.001763,
    "n": 530
   },
   {
+   "name": "Kay, Anthony",
+   "resid": -0.004441,
+   "adjRunsPerPitchPitcherPositive": 0.001758,
+   "n": 1894
+  },
+  {
+   "name": "Kelly, Kevin",
+   "resid": -0.004384,
+   "adjRunsPerPitchPitcherPositive": 0.001736,
+   "n": 651
+  },
+  {
    "name": "Champlain, Chandler",
-   "resid": 0.004366,
-   "adjRunsPerPitchPitcherPositive": -0.001728,
+   "resid": 0.004358,
+   "adjRunsPerPitchPitcherPositive": -0.001725,
    "n": 1290
   },
   {
-   "name": "Lee, Dylan",
-   "resid": 0.00436,
-   "adjRunsPerPitchPitcherPositive": -0.001726,
-   "n": 723
-  },
-  {
-   "name": "Su\u00e1rez, Albert",
-   "resid": 0.004356,
-   "adjRunsPerPitchPitcherPositive": -0.001725,
-   "n": 634
-  },
-  {
    "name": "Petersen, Michael",
-   "resid": -0.004349,
-   "adjRunsPerPitchPitcherPositive": 0.001722,
+   "resid": -0.004355,
+   "adjRunsPerPitchPitcherPositive": 0.001724,
    "n": 728
   },
   {
-   "name": "Dreyer, Jack",
-   "resid": 0.004336,
-   "adjRunsPerPitchPitcherPositive": -0.001717,
-   "n": 665
+   "name": "Jones, Jared",
+   "resid": -0.004344,
+   "adjRunsPerPitchPitcherPositive": 0.00172,
+   "n": 811
   },
   {
    "name": "Vest, Will",
-   "resid": -0.004334,
-   "adjRunsPerPitchPitcherPositive": 0.001716,
+   "resid": -0.004341,
+   "adjRunsPerPitchPitcherPositive": 0.001718,
    "n": 483
   },
   {
-   "name": "Yarbrough, Ryan",
-   "resid": 0.004321,
-   "adjRunsPerPitchPitcherPositive": -0.001711,
-   "n": 670
+   "name": "Suter, Brent",
+   "resid": 0.004333,
+   "adjRunsPerPitchPitcherPositive": -0.001715,
+   "n": 1059
   },
   {
    "name": "Barnett, Mason",
-   "resid": -0.004318,
-   "adjRunsPerPitchPitcherPositive": 0.001709,
+   "resid": -0.004323,
+   "adjRunsPerPitchPitcherPositive": 0.001711,
    "n": 437
   },
   {
    "name": "Minter, A.J.",
-   "resid": 0.004287,
-   "adjRunsPerPitchPitcherPositive": -0.001697,
-   "n": 319
+   "resid": 0.004318,
+   "adjRunsPerPitchPitcherPositive": -0.001709,
+   "n": 340
   },
   {
-   "name": "Montgomery, Mason",
-   "resid": -0.00428,
-   "adjRunsPerPitchPitcherPositive": 0.001694,
-   "n": 772
+   "name": "Kent, Jackson",
+   "resid": 0.004309,
+   "adjRunsPerPitchPitcherPositive": -0.001706,
+   "n": 917
   },
   {
-   "name": "Fairbanks, Pete",
-   "resid": -0.004274,
-   "adjRunsPerPitchPitcherPositive": 0.001692,
-   "n": 593
+   "name": "Sinclair, Jack",
+   "resid": -0.004277,
+   "adjRunsPerPitchPitcherPositive": 0.001693,
+   "n": 809
   },
   {
    "name": "Lo\u00e1isiga, Jonathan",
-   "resid": -0.004262,
-   "adjRunsPerPitchPitcherPositive": 0.001687,
+   "resid": -0.004271,
+   "adjRunsPerPitchPitcherPositive": 0.001691,
    "n": 594
   },
   {
-   "name": "Cantillo, Joey",
-   "resid": 0.004251,
-   "adjRunsPerPitchPitcherPositive": -0.001683,
-   "n": 1885
-  },
-  {
-   "name": "Blackburn, Paul",
-   "resid": 0.004236,
-   "adjRunsPerPitchPitcherPositive": -0.001677,
-   "n": 763
+   "name": "Montgomery, Mason",
+   "resid": -0.00426,
+   "adjRunsPerPitchPitcherPositive": 0.001686,
+   "n": 772
   },
   {
    "name": "Zeferjahn, Ryan",
-   "resid": -0.004226,
-   "adjRunsPerPitchPitcherPositive": 0.001673,
+   "resid": -0.004237,
+   "adjRunsPerPitchPitcherPositive": 0.001677,
    "n": 893
   },
   {
+   "name": "Yarbrough, Ryan",
+   "resid": 0.004207,
+   "adjRunsPerPitchPitcherPositive": -0.001666,
+   "n": 672
+  },
+  {
    "name": "Poulin, PJ",
-   "resid": 0.00421,
-   "adjRunsPerPitchPitcherPositive": -0.001667,
+   "resid": 0.004204,
+   "adjRunsPerPitchPitcherPositive": -0.001664,
    "n": 720
   },
   {
    "name": "Corbin, Patrick",
-   "resid": 0.004205,
-   "adjRunsPerPitchPitcherPositive": -0.001665,
+   "resid": 0.004199,
+   "adjRunsPerPitchPitcherPositive": -0.001662,
    "n": 1397
   },
   {
    "name": "Junk, Janson",
-   "resid": -0.004158,
-   "adjRunsPerPitchPitcherPositive": 0.001646,
+   "resid": -0.004167,
+   "adjRunsPerPitchPitcherPositive": 0.00165,
    "n": 1189
   },
   {
-   "name": "Stanek, Ryne",
-   "resid": -0.004139,
-   "adjRunsPerPitchPitcherPositive": 0.001639,
-   "n": 730
+   "name": "Wells, Tyler",
+   "resid": 0.004158,
+   "adjRunsPerPitchPitcherPositive": -0.001646,
+   "n": 790
   },
   {
-   "name": "Seymour, Ian",
-   "resid": 0.004116,
-   "adjRunsPerPitchPitcherPositive": -0.001629,
-   "n": 1193
-  },
-  {
-   "name": "Brown, Ben",
-   "resid": 0.004089,
-   "adjRunsPerPitchPitcherPositive": -0.001619,
-   "n": 1004
-  },
-  {
-   "name": "Kimbrel, Craig",
-   "resid": -0.004089,
-   "adjRunsPerPitchPitcherPositive": 0.001619,
-   "n": 522
+   "name": "Scott, Tanner",
+   "resid": -0.004127,
+   "adjRunsPerPitchPitcherPositive": 0.001634,
+   "n": 620
   },
   {
    "name": "Brazob\u00e1n, Huascar",
-   "resid": 0.004073,
-   "adjRunsPerPitchPitcherPositive": -0.001612,
-   "n": 780
+   "resid": 0.004115,
+   "adjRunsPerPitchPitcherPositive": -0.001629,
+   "n": 791
   },
   {
-   "name": "Estrada, Jeremiah",
-   "resid": 0.004054,
-   "adjRunsPerPitchPitcherPositive": -0.001605,
-   "n": 322
+   "name": "Taylor, Grant",
+   "resid": -0.004102,
+   "adjRunsPerPitchPitcherPositive": 0.001624,
+   "n": 883
   },
   {
-   "name": "Singer, Brady",
-   "resid": 0.004032,
-   "adjRunsPerPitchPitcherPositive": -0.001596,
-   "n": 1772
+   "name": "Stanek, Ryne",
+   "resid": -0.004087,
+   "adjRunsPerPitchPitcherPositive": 0.001618,
+   "n": 758
   },
   {
-   "name": "Suter, Brent",
-   "resid": 0.004029,
-   "adjRunsPerPitchPitcherPositive": -0.001595,
-   "n": 1022
+   "name": "Brown, Ben",
+   "resid": 0.00408,
+   "adjRunsPerPitchPitcherPositive": -0.001615,
+   "n": 1004
+  },
+  {
+   "name": "Blackburn, Paul",
+   "resid": 0.004068,
+   "adjRunsPerPitchPitcherPositive": -0.00161,
+   "n": 787
+  },
+  {
+   "name": "Lee, Dylan",
+   "resid": 0.004044,
+   "adjRunsPerPitchPitcherPositive": -0.001601,
+   "n": 731
   },
   {
    "name": "Keller, Brad",
-   "resid": -0.004016,
-   "adjRunsPerPitchPitcherPositive": 0.00159,
+   "resid": -0.004025,
+   "adjRunsPerPitchPitcherPositive": 0.001593,
    "n": 539
   },
   {
-   "name": "Strahm, Matt",
-   "resid": 0.003968,
-   "adjRunsPerPitchPitcherPositive": -0.001571,
-   "n": 619
+   "name": "Wolfram, Grant",
+   "resid": 0.004025,
+   "adjRunsPerPitchPitcherPositive": -0.001593,
+   "n": 544
   },
   {
-   "name": "Lara, Andry",
-   "resid": 0.003963,
-   "adjRunsPerPitchPitcherPositive": -0.001569,
-   "n": 1417
+   "name": "Holderman, Colin",
+   "resid": -0.003981,
+   "adjRunsPerPitchPitcherPositive": 0.001576,
+   "n": 626
+  },
+  {
+   "name": "Cantillo, Joey",
+   "resid": 0.003976,
+   "adjRunsPerPitchPitcherPositive": -0.001574,
+   "n": 1974
   },
   {
    "name": "P\u00e9rez, Mart\u00edn",
-   "resid": 0.003956,
-   "adjRunsPerPitchPitcherPositive": -0.001566,
+   "resid": 0.003964,
+   "adjRunsPerPitchPitcherPositive": -0.001569,
    "n": 1444
   },
   {
-   "name": "Boyd, Matthew",
-   "resid": 0.003945,
-   "adjRunsPerPitchPitcherPositive": -0.001562,
-   "n": 955
+   "name": "Strahm, Matt",
+   "resid": 0.003959,
+   "adjRunsPerPitchPitcherPositive": -0.001567,
+   "n": 619
   },
   {
-   "name": "King, Bryan",
-   "resid": 0.00393,
-   "adjRunsPerPitchPitcherPositive": -0.001556,
-   "n": 750
+   "name": "Rogers, Tyler",
+   "resid": -0.003956,
+   "adjRunsPerPitchPitcherPositive": 0.001566,
+   "n": 674
+  },
+  {
+   "name": "Singer, Brady",
+   "resid": 0.00395,
+   "adjRunsPerPitchPitcherPositive": -0.001564,
+   "n": 1872
+  },
+  {
+   "name": "Rojas, Kendry",
+   "resid": 0.003949,
+   "adjRunsPerPitchPitcherPositive": -0.001563,
+   "n": 497
+  },
+  {
+   "name": "Lara, Andry",
+   "resid": 0.003941,
+   "adjRunsPerPitchPitcherPositive": -0.00156,
+   "n": 1417
+  },
+  {
+   "name": "Kimbrel, Craig",
+   "resid": -0.003929,
+   "adjRunsPerPitchPitcherPositive": 0.001555,
+   "n": 552
   },
   {
    "name": "Nicolas, Kyle",
-   "resid": -0.003928,
+   "resid": -0.003927,
    "adjRunsPerPitchPitcherPositive": 0.001555,
    "n": 346
   },
   {
-   "name": "P\u00e9rez, Cionel",
-   "resid": -0.003888,
-   "adjRunsPerPitchPitcherPositive": 0.001539,
-   "n": 706
-  },
-  {
-   "name": "Rojas, Kendry",
-   "resid": 0.00387,
-   "adjRunsPerPitchPitcherPositive": -0.001532,
-   "n": 445
-  },
-  {
-   "name": "Leahy, Kyle",
-   "resid": -0.003862,
-   "adjRunsPerPitchPitcherPositive": 0.001529,
-   "n": 1672
-  },
-  {
-   "name": "Cleavinger, Garrett",
-   "resid": -0.003856,
-   "adjRunsPerPitchPitcherPositive": 0.001527,
-   "n": 528
-  },
-  {
-   "name": "Wolfram, Grant",
-   "resid": 0.003856,
-   "adjRunsPerPitchPitcherPositive": -0.001526,
-   "n": 528
+   "name": "King, Bryan",
+   "resid": 0.003921,
+   "adjRunsPerPitchPitcherPositive": -0.001552,
+   "n": 750
   },
   {
    "name": "Gaddis, Hunter",
-   "resid": 0.00385,
-   "adjRunsPerPitchPitcherPositive": -0.001524,
-   "n": 571
+   "resid": 0.003904,
+   "adjRunsPerPitchPitcherPositive": -0.001545,
+   "n": 606
+  },
+  {
+   "name": "Fairbanks, Pete",
+   "resid": -0.003888,
+   "adjRunsPerPitchPitcherPositive": 0.001539,
+   "n": 615
+  },
+  {
+   "name": "Leahy, Kyle",
+   "resid": -0.003868,
+   "adjRunsPerPitchPitcherPositive": 0.001531,
+   "n": 1672
+  },
+  {
+   "name": "Finnegan, Kyle",
+   "resid": -0.003822,
+   "adjRunsPerPitchPitcherPositive": 0.001513,
+   "n": 737
+  },
+  {
+   "name": "Boyd, Matthew",
+   "resid": 0.003817,
+   "adjRunsPerPitchPitcherPositive": -0.001511,
+   "n": 1044
+  },
+  {
+   "name": "Estrada, Jeremiah",
+   "resid": 0.003817,
+   "adjRunsPerPitchPitcherPositive": -0.001511,
+   "n": 344
   },
   {
    "name": "Quintana, Jose",
-   "resid": 0.00382,
-   "adjRunsPerPitchPitcherPositive": -0.001512,
+   "resid": 0.003811,
+   "adjRunsPerPitchPitcherPositive": -0.001509,
    "n": 687
   },
   {
    "name": "Gibson, Trey",
-   "resid": -0.003802,
-   "adjRunsPerPitchPitcherPositive": 0.001505,
+   "resid": -0.003807,
+   "adjRunsPerPitchPitcherPositive": 0.001507,
    "n": 619
   },
   {
-   "name": "Taylor, Grant",
-   "resid": -0.003798,
-   "adjRunsPerPitchPitcherPositive": 0.001504,
-   "n": 857
-  },
-  {
-   "name": "Smith, Cade",
-   "resid": -0.003794,
-   "adjRunsPerPitchPitcherPositive": 0.001502,
-   "n": 811
-  },
-  {
-   "name": "Holderman, Colin",
-   "resid": -0.003791,
-   "adjRunsPerPitchPitcherPositive": 0.001501,
-   "n": 599
-  },
-  {
-   "name": "Wells, Tyler",
-   "resid": 0.003774,
-   "adjRunsPerPitchPitcherPositive": -0.001494,
-   "n": 778
-  },
-  {
-   "name": "Finnegan, Kyle",
-   "resid": -0.003727,
-   "adjRunsPerPitchPitcherPositive": 0.001475,
-   "n": 717
-  },
-  {
-   "name": "Marinaccio, Ron",
-   "resid": -0.003709,
-   "adjRunsPerPitchPitcherPositive": 0.001468,
-   "n": 839
-  },
-  {
-   "name": "Vodnik, Victor",
-   "resid": -0.003694,
-   "adjRunsPerPitchPitcherPositive": 0.001463,
-   "n": 584
-  },
-  {
-   "name": "Johnson, Pierce",
-   "resid": -0.003685,
-   "adjRunsPerPitchPitcherPositive": 0.001459,
-   "n": 521
-  },
-  {
    "name": "Jansen, Kenley",
-   "resid": -0.00363,
-   "adjRunsPerPitchPitcherPositive": 0.001437,
-   "n": 459
+   "resid": -0.003803,
+   "adjRunsPerPitchPitcherPositive": 0.001505,
+   "n": 477
   },
   {
-   "name": "Scott, Tanner",
-   "resid": -0.003591,
-   "adjRunsPerPitchPitcherPositive": 0.001421,
-   "n": 606
-  },
-  {
-   "name": "Rogers, Tyler",
-   "resid": -0.003563,
-   "adjRunsPerPitchPitcherPositive": 0.00141,
-   "n": 659
+   "name": "Beeter, Clayton",
+   "resid": 0.003798,
+   "adjRunsPerPitchPitcherPositive": -0.001503,
+   "n": 535
   },
   {
    "name": "Dobnak, Randy",
-   "resid": 0.00356,
-   "adjRunsPerPitchPitcherPositive": -0.001409,
-   "n": 331
+   "resid": 0.00379,
+   "adjRunsPerPitchPitcherPositive": -0.001501,
+   "n": 432
+  },
+  {
+   "name": "Yates, Kirby",
+   "resid": 0.003755,
+   "adjRunsPerPitchPitcherPositive": -0.001486,
+   "n": 450
+  },
+  {
+   "name": "Dreyer, Jack",
+   "resid": 0.003728,
+   "adjRunsPerPitchPitcherPositive": -0.001476,
+   "n": 683
+  },
+  {
+   "name": "Rucker, Michael",
+   "resid": -0.003725,
+   "adjRunsPerPitchPitcherPositive": 0.001475,
+   "n": 327
+  },
+  {
+   "name": "Vodnik, Victor",
+   "resid": -0.00372,
+   "adjRunsPerPitchPitcherPositive": 0.001473,
+   "n": 610
+  },
+  {
+   "name": "P\u00e9rez, Cionel",
+   "resid": -0.003714,
+   "adjRunsPerPitchPitcherPositive": 0.00147,
+   "n": 722
+  },
+  {
+   "name": "Cleavinger, Garrett",
+   "resid": -0.003684,
+   "adjRunsPerPitchPitcherPositive": 0.001458,
+   "n": 537
+  },
+  {
+   "name": "Marinaccio, Ron",
+   "resid": -0.003594,
+   "adjRunsPerPitchPitcherPositive": 0.001423,
+   "n": 850
   },
   {
    "name": "Lord, Brad",
-   "resid": 0.00356,
-   "adjRunsPerPitchPitcherPositive": -0.001409,
+   "resid": 0.003554,
+   "adjRunsPerPitchPitcherPositive": -0.001407,
    "n": 1025
   },
   {
    "name": "Borucki, Ryan",
-   "resid": 0.003552,
-   "adjRunsPerPitchPitcherPositive": -0.001406,
+   "resid": 0.003542,
+   "adjRunsPerPitchPitcherPositive": -0.001402,
    "n": 380
   },
   {
    "name": "Drohan, Shane",
-   "resid": 0.003549,
-   "adjRunsPerPitchPitcherPositive": -0.001405,
+   "resid": 0.003541,
+   "adjRunsPerPitchPitcherPositive": -0.001402,
    "n": 1275
   },
   {
-   "name": "McClanahan, Shane",
-   "resid": 0.00351,
-   "adjRunsPerPitchPitcherPositive": -0.001389,
-   "n": 1498
-  },
-  {
    "name": "Black, Mason",
-   "resid": -0.003505,
-   "adjRunsPerPitchPitcherPositive": 0.001387,
+   "resid": -0.003508,
+   "adjRunsPerPitchPitcherPositive": 0.001389,
    "n": 333
   },
   {
    "name": "Glasnow, Tyler",
-   "resid": -0.003499,
-   "adjRunsPerPitchPitcherPositive": 0.001385,
+   "resid": -0.003506,
+   "adjRunsPerPitchPitcherPositive": 0.001388,
    "n": 599
   },
   {
-   "name": "Beeter, Clayton",
-   "resid": 0.003482,
-   "adjRunsPerPitchPitcherPositive": -0.001378,
-   "n": 523
+   "name": "McClanahan, Shane",
+   "resid": 0.003502,
+   "adjRunsPerPitchPitcherPositive": -0.001387,
+   "n": 1498
   },
   {
-   "name": "Ginkel, Kevin",
-   "resid": 0.003441,
-   "adjRunsPerPitchPitcherPositive": -0.001362,
-   "n": 674
+   "name": "Johnson, Pierce",
+   "resid": -0.003487,
+   "adjRunsPerPitchPitcherPositive": 0.00138,
+   "n": 543
+  },
+  {
+   "name": "Rodriguez, Eduardo",
+   "resid": 0.003483,
+   "adjRunsPerPitchPitcherPositive": -0.001379,
+   "n": 2058
   },
   {
    "name": "Rocker, Kumar",
-   "resid": 0.003424,
-   "adjRunsPerPitchPitcherPositive": -0.001356,
+   "resid": 0.003443,
+   "adjRunsPerPitchPitcherPositive": -0.001363,
    "n": 1686
   },
   {
-   "name": "Yates, Kirby",
-   "resid": 0.003404,
-   "adjRunsPerPitchPitcherPositive": -0.001348,
-   "n": 412
+   "name": "Yean, Eddy",
+   "resid": 0.003403,
+   "adjRunsPerPitchPitcherPositive": -0.001347,
+   "n": 768
+  },
+  {
+   "name": "Mayza, Tim",
+   "resid": 0.003385,
+   "adjRunsPerPitchPitcherPositive": -0.00134,
+   "n": 773
   },
   {
    "name": "Cornelio, Riley",
-   "resid": 0.003386,
-   "adjRunsPerPitchPitcherPositive": -0.00134,
+   "resid": 0.003383,
+   "adjRunsPerPitchPitcherPositive": -0.001339,
    "n": 1227
   },
   {
+   "name": "Ginkel, Kevin",
+   "resid": 0.003376,
+   "adjRunsPerPitchPitcherPositive": -0.001337,
+   "n": 687
+  },
+  {
+   "name": "Williams, Gavin",
+   "resid": -0.003371,
+   "adjRunsPerPitchPitcherPositive": 0.001335,
+   "n": 2079
+  },
+  {
+   "name": "Sproat, Brandon",
+   "resid": -0.003366,
+   "adjRunsPerPitchPitcherPositive": 0.001332,
+   "n": 1627
+  },
+  {
    "name": "Griffin, Foster",
-   "resid": 0.003365,
-   "adjRunsPerPitchPitcherPositive": -0.001332,
+   "resid": 0.003358,
+   "adjRunsPerPitchPitcherPositive": -0.001329,
    "n": 1975
   },
   {
    "name": "McDonald, Trevor",
-   "resid": 0.003361,
-   "adjRunsPerPitchPitcherPositive": -0.001331,
+   "resid": 0.003352,
+   "adjRunsPerPitchPitcherPositive": -0.001327,
    "n": 1137
   },
   {
-   "name": "Sproat, Brandon",
-   "resid": -0.00336,
-   "adjRunsPerPitchPitcherPositive": 0.00133,
-   "n": 1627
+   "name": "Watson, Ryan",
+   "resid": -0.003347,
+   "adjRunsPerPitchPitcherPositive": 0.001325,
+   "n": 888
   },
   {
-   "name": "Yean, Eddy",
-   "resid": 0.003346,
-   "adjRunsPerPitchPitcherPositive": -0.001325,
-   "n": 757
-  },
-  {
-   "name": "Hill, Tim",
-   "resid": -0.003336,
-   "adjRunsPerPitchPitcherPositive": 0.001321,
-   "n": 542
-  },
-  {
-   "name": "Patrick, Chad",
-   "resid": 0.00333,
-   "adjRunsPerPitchPitcherPositive": -0.001318,
-   "n": 1247
-  },
-  {
-   "name": "Vesia, Alex",
-   "resid": 0.003318,
-   "adjRunsPerPitchPitcherPositive": -0.001313,
-   "n": 645
+   "name": "Kilian, Caleb",
+   "resid": -0.003334,
+   "adjRunsPerPitchPitcherPositive": 0.00132,
+   "n": 680
   },
   {
    "name": "Bido, Osvaldo",
-   "resid": -0.003313,
-   "adjRunsPerPitchPitcherPositive": 0.001311,
+   "resid": -0.00332,
+   "adjRunsPerPitchPitcherPositive": 0.001314,
    "n": 317
   },
   {
    "name": "Assad, Javier",
-   "resid": -0.003304,
-   "adjRunsPerPitchPitcherPositive": 0.001308,
+   "resid": -0.003312,
+   "adjRunsPerPitchPitcherPositive": 0.001311,
    "n": 1023
   },
   {
-   "name": "Mayza, Tim",
-   "resid": 0.0033,
-   "adjRunsPerPitchPitcherPositive": -0.001306,
-   "n": 767
-  },
-  {
-   "name": "Mu\u00f1oz, Andr\u00e9s",
-   "resid": -0.003277,
-   "adjRunsPerPitchPitcherPositive": 0.001297,
-   "n": 624
-  },
-  {
-   "name": "Rucker, Michael",
-   "resid": -0.003268,
-   "adjRunsPerPitchPitcherPositive": 0.001294,
-   "n": 304
-  },
-  {
-   "name": "Leasure, Jordan",
-   "resid": -0.003259,
-   "adjRunsPerPitchPitcherPositive": 0.00129,
-   "n": 313
+   "name": "Patrick, Chad",
+   "resid": 0.003305,
+   "adjRunsPerPitchPitcherPositive": -0.001309,
+   "n": 1294
   },
   {
    "name": "Alvarado, Jos\u00e9",
-   "resid": -0.00325,
-   "adjRunsPerPitchPitcherPositive": 0.001286,
-   "n": 757
+   "resid": -0.003294,
+   "adjRunsPerPitchPitcherPositive": 0.001304,
+   "n": 773
   },
   {
    "name": "Fermin, Jos\u00e9",
-   "resid": -0.003225,
-   "adjRunsPerPitchPitcherPositive": 0.001277,
-   "n": 586
+   "resid": -0.003284,
+   "adjRunsPerPitchPitcherPositive": 0.0013,
+   "n": 608
   },
   {
-   "name": "Ahlstrom, Robby",
-   "resid": 0.003223,
-   "adjRunsPerPitchPitcherPositive": -0.001276,
-   "n": 343
+   "name": "Leasure, Jordan",
+   "resid": -0.003261,
+   "adjRunsPerPitchPitcherPositive": 0.001291,
+   "n": 313
+  },
+  {
+   "name": "Mu\u00f1oz, Andr\u00e9s",
+   "resid": -0.003258,
+   "adjRunsPerPitchPitcherPositive": 0.00129,
+   "n": 653
+  },
+  {
+   "name": "Pag\u00e1n, Emilio",
+   "resid": -0.003237,
+   "adjRunsPerPitchPitcherPositive": 0.001281,
+   "n": 365
   },
   {
    "name": "Ohtani, Shohei",
-   "resid": -0.003211,
-   "adjRunsPerPitchPitcherPositive": 0.001271,
+   "resid": -0.003219,
+   "adjRunsPerPitchPitcherPositive": 0.001274,
    "n": 1335
   },
   {
-   "name": "Watson, Ryan",
-   "resid": -0.003199,
-   "adjRunsPerPitchPitcherPositive": 0.001267,
-   "n": 876
-  },
-  {
-   "name": "Hanifee, Brenan",
-   "resid": -0.003193,
-   "adjRunsPerPitchPitcherPositive": 0.001264,
-   "n": 338
+   "name": "Ahlstrom, Robby",
+   "resid": 0.003209,
+   "adjRunsPerPitchPitcherPositive": -0.00127,
+   "n": 343
   },
   {
    "name": "Gilbert, Logan",
-   "resid": -0.003174,
-   "adjRunsPerPitchPitcherPositive": 0.001256,
+   "resid": -0.00318,
+   "adjRunsPerPitchPitcherPositive": 0.001259,
    "n": 1969
   },
   {
-   "name": "Nardi, Andrew",
-   "resid": -0.003172,
-   "adjRunsPerPitchPitcherPositive": 0.001256,
-   "n": 378
-  },
-  {
    "name": "Kirby, George",
-   "resid": -0.003166,
-   "adjRunsPerPitchPitcherPositive": 0.001253,
+   "resid": -0.003182,
+   "adjRunsPerPitchPitcherPositive": 0.001259,
    "n": 1814
   },
   {
-   "name": "Kilian, Caleb",
-   "resid": -0.00316,
-   "adjRunsPerPitchPitcherPositive": 0.001251,
-   "n": 662
+   "name": "Nardi, Andrew",
+   "resid": -0.003176,
+   "adjRunsPerPitchPitcherPositive": 0.001257,
+   "n": 378
   },
   {
-   "name": "Pallante, Andre",
-   "resid": 0.003156,
-   "adjRunsPerPitchPitcherPositive": -0.001249,
-   "n": 1823
-  },
-  {
-   "name": "Gallen, Zac",
-   "resid": -0.003148,
-   "adjRunsPerPitchPitcherPositive": 0.001246,
-   "n": 1588
-  },
-  {
-   "name": "Bubic, Kris",
-   "resid": 0.003138,
-   "adjRunsPerPitchPitcherPositive": -0.001242,
-   "n": 811
+   "name": "Hanifee, Brenan",
+   "resid": -0.003166,
+   "adjRunsPerPitchPitcherPositive": 0.001253,
+   "n": 340
   },
   {
    "name": "Hader, Josh",
-   "resid": 0.003134,
-   "adjRunsPerPitchPitcherPositive": -0.00124,
-   "n": 348
+   "resid": 0.003158,
+   "adjRunsPerPitchPitcherPositive": -0.00125,
+   "n": 352
   },
   {
-   "name": "Arrighetti, Spencer",
-   "resid": -0.003121,
-   "adjRunsPerPitchPitcherPositive": 0.001236,
-   "n": 1496
+   "name": "Gallen, Zac",
+   "resid": -0.003153,
+   "adjRunsPerPitchPitcherPositive": 0.001248,
+   "n": 1588
+  },
+  {
+   "name": "Pallante, Andre",
+   "resid": 0.003147,
+   "adjRunsPerPitchPitcherPositive": -0.001246,
+   "n": 1823
+  },
+  {
+   "name": "Bubic, Kris",
+   "resid": 0.003132,
+   "adjRunsPerPitchPitcherPositive": -0.00124,
+   "n": 811
   },
   {
    "name": "Pomeranz, Drew",
-   "resid": -0.003122,
-   "adjRunsPerPitchPitcherPositive": 0.001236,
+   "resid": -0.003131,
+   "adjRunsPerPitchPitcherPositive": 0.001239,
    "n": 478
   },
   {
-   "name": "Williams, Gavin",
-   "resid": -0.003102,
-   "adjRunsPerPitchPitcherPositive": 0.001228,
-   "n": 1978
-  },
-  {
-   "name": "Rodriguez, Eduardo",
-   "resid": 0.003092,
-   "adjRunsPerPitchPitcherPositive": -0.001224,
-   "n": 1953
+   "name": "Arrighetti, Spencer",
+   "resid": -0.003127,
+   "adjRunsPerPitchPitcherPositive": 0.001238,
+   "n": 1496
   },
   {
    "name": "Kelly, Merrill",
-   "resid": -0.003089,
-   "adjRunsPerPitchPitcherPositive": 0.001223,
+   "resid": -0.003098,
+   "adjRunsPerPitchPitcherPositive": 0.001226,
    "n": 1746
   },
   {
    "name": "Springs, Jeffrey",
-   "resid": 0.003083,
-   "adjRunsPerPitchPitcherPositive": -0.00122,
+   "resid": 0.003076,
+   "adjRunsPerPitchPitcherPositive": -0.001218,
    "n": 1789
   },
   {
-   "name": "Winn, Keaton",
-   "resid": -0.003069,
-   "adjRunsPerPitchPitcherPositive": 0.001215,
-   "n": 523
-  },
-  {
-   "name": "Herget, Jimmy",
-   "resid": 0.00306,
-   "adjRunsPerPitchPitcherPositive": -0.001211,
-   "n": 521
-  },
-  {
    "name": "Rod\u00f3n, Carlos",
-   "resid": 0.00306,
-   "adjRunsPerPitchPitcherPositive": -0.001211,
+   "resid": 0.003054,
+   "adjRunsPerPitchPitcherPositive": -0.001209,
    "n": 828
   },
   {
-   "name": "Bigge, Hunter",
-   "resid": 0.003009,
-   "adjRunsPerPitchPitcherPositive": -0.001191,
-   "n": 307
-  },
-  {
-   "name": "Taillon, Jameson",
-   "resid": -0.002999,
-   "adjRunsPerPitchPitcherPositive": 0.001187,
-   "n": 1273
-  },
-  {
    "name": "Liberatore, Matthew",
-   "resid": 0.002994,
-   "adjRunsPerPitchPitcherPositive": -0.001185,
+   "resid": 0.003018,
+   "adjRunsPerPitchPitcherPositive": -0.001195,
    "n": 1719
   },
   {
+   "name": "Hill, Tim",
+   "resid": -0.003006,
+   "adjRunsPerPitchPitcherPositive": 0.00119,
+   "n": 554
+  },
+  {
+   "name": "Taillon, Jameson",
+   "resid": -0.003004,
+   "adjRunsPerPitchPitcherPositive": 0.001189,
+   "n": 1273
+  },
+  {
+   "name": "Bigge, Hunter",
+   "resid": 0.002999,
+   "adjRunsPerPitchPitcherPositive": -0.001187,
+   "n": 307
+  },
+  {
+   "name": "Herget, Jimmy",
+   "resid": 0.002963,
+   "adjRunsPerPitchPitcherPositive": -0.001173,
+   "n": 536
+  },
+  {
    "name": "Akin, Keegan",
-   "resid": 0.002962,
-   "adjRunsPerPitchPitcherPositive": -0.001172,
+   "resid": 0.002952,
+   "adjRunsPerPitchPitcherPositive": -0.001169,
    "n": 443
   },
   {
    "name": "Rodr\u00edguez, Elmer",
-   "resid": 0.002924,
-   "adjRunsPerPitchPitcherPositive": -0.001157,
+   "resid": 0.002915,
+   "adjRunsPerPitchPitcherPositive": -0.001154,
    "n": 474
   },
   {
-   "name": "Pag\u00e1n, Emilio",
-   "resid": -0.002846,
-   "adjRunsPerPitchPitcherPositive": 0.001127,
-   "n": 348
+   "name": "Festa, Matt",
+   "resid": -0.002912,
+   "adjRunsPerPitchPitcherPositive": 0.001153,
+   "n": 733
+  },
+  {
+   "name": "Wilcox, Cole",
+   "resid": -0.00282,
+   "adjRunsPerPitchPitcherPositive": 0.001116,
+   "n": 431
+  },
+  {
+   "name": "Legumina, Casey",
+   "resid": -0.002817,
+   "adjRunsPerPitchPitcherPositive": 0.001115,
+   "n": 719
   },
   {
    "name": "Senga, Kodai",
-   "resid": -0.002812,
-   "adjRunsPerPitchPitcherPositive": 0.001113,
+   "resid": -0.002816,
+   "adjRunsPerPitchPitcherPositive": 0.001115,
    "n": 866
   },
   {
    "name": "Rangel, Alan",
-   "resid": -0.002805,
-   "adjRunsPerPitchPitcherPositive": 0.00111,
+   "resid": -0.002812,
+   "adjRunsPerPitchPitcherPositive": 0.001113,
    "n": 665
   },
   {
+   "name": "Speier, Gabe",
+   "resid": 0.002812,
+   "adjRunsPerPitchPitcherPositive": -0.001113,
+   "n": 433
+  },
+  {
    "name": "Way, Beck",
-   "resid": -0.002798,
-   "adjRunsPerPitchPitcherPositive": 0.001108,
+   "resid": -0.002805,
+   "adjRunsPerPitchPitcherPositive": 0.00111,
    "n": 389
   },
   {
-   "name": "Irvin, Jake",
-   "resid": -0.002791,
-   "adjRunsPerPitchPitcherPositive": 0.001105,
-   "n": 948
-  },
-  {
-   "name": "Manaea, Sean",
-   "resid": 0.002792,
-   "adjRunsPerPitchPitcherPositive": -0.001105,
-   "n": 1519
-  },
-  {
    "name": "Topa, Justin",
-   "resid": -0.002792,
-   "adjRunsPerPitchPitcherPositive": 0.001105,
+   "resid": -0.002799,
+   "adjRunsPerPitchPitcherPositive": 0.001108,
    "n": 359
   },
   {
-   "name": "Legumina, Casey",
-   "resid": -0.002788,
-   "adjRunsPerPitchPitcherPositive": 0.001104,
-   "n": 695
-  },
-  {
-   "name": "Hoffman, Jeff",
-   "resid": -0.002773,
-   "adjRunsPerPitchPitcherPositive": 0.001098,
-   "n": 848
+   "name": "Irvin, Jake",
+   "resid": -0.002795,
+   "adjRunsPerPitchPitcherPositive": 0.001106,
+   "n": 948
   },
   {
    "name": "Brown, Hunter",
-   "resid": -0.002766,
-   "adjRunsPerPitchPitcherPositive": 0.001095,
+   "resid": -0.002773,
+   "adjRunsPerPitchPitcherPositive": 0.001098,
    "n": 822
   },
   {
-   "name": "Speier, Gabe",
-   "resid": 0.002762,
-   "adjRunsPerPitchPitcherPositive": -0.001094,
-   "n": 425
-  },
-  {
    "name": "Teng, Kai-Wei",
-   "resid": -0.002756,
-   "adjRunsPerPitchPitcherPositive": 0.001091,
+   "resid": -0.002763,
+   "adjRunsPerPitchPitcherPositive": 0.001094,
    "n": 1161
   },
   {
-   "name": "Wilcox, Cole",
-   "resid": -0.002754,
-   "adjRunsPerPitchPitcherPositive": 0.00109,
-   "n": 420
-  },
-  {
    "name": "Civale, Aaron",
-   "resid": -0.002744,
-   "adjRunsPerPitchPitcherPositive": 0.001086,
+   "resid": -0.002751,
+   "adjRunsPerPitchPitcherPositive": 0.001089,
    "n": 1386
   },
   {
    "name": "Walker, Ryan",
-   "resid": -0.0027,
-   "adjRunsPerPitchPitcherPositive": 0.001069,
+   "resid": -0.002709,
+   "adjRunsPerPitchPitcherPositive": 0.001072,
    "n": 476
   },
   {
+   "name": "Manaea, Sean",
+   "resid": 0.002704,
+   "adjRunsPerPitchPitcherPositive": -0.00107,
+   "n": 1608
+  },
+  {
+   "name": "Winn, Keaton",
+   "resid": -0.002703,
+   "adjRunsPerPitchPitcherPositive": 0.00107,
+   "n": 554
+  },
+  {
    "name": "Elder, Bryce",
-   "resid": 0.002677,
-   "adjRunsPerPitchPitcherPositive": -0.00106,
+   "resid": 0.002669,
+   "adjRunsPerPitchPitcherPositive": -0.001056,
    "n": 1706
   },
   {
+   "name": "Alcantara, Sandy",
+   "resid": -0.002663,
+   "adjRunsPerPitchPitcherPositive": 0.001054,
+   "n": 2257
+  },
+  {
    "name": "Adam, Jason",
-   "resid": 0.002671,
-   "adjRunsPerPitchPitcherPositive": -0.001057,
+   "resid": 0.002661,
+   "adjRunsPerPitchPitcherPositive": -0.001053,
    "n": 536
   },
   {
-   "name": "Festa, Matt",
-   "resid": -0.002653,
-   "adjRunsPerPitchPitcherPositive": 0.00105,
-   "n": 717
-  },
-  {
-   "name": "Lambert, Peter",
-   "resid": 0.002641,
-   "adjRunsPerPitchPitcherPositive": -0.001045,
-   "n": 1618
-  },
-  {
-   "name": "Paddack, Chris",
-   "resid": -0.002635,
-   "adjRunsPerPitchPitcherPositive": 0.001043,
-   "n": 1015
-  },
-  {
    "name": "Milner, Hoby",
-   "resid": -0.002631,
-   "adjRunsPerPitchPitcherPositive": 0.001041,
+   "resid": -0.002648,
+   "adjRunsPerPitchPitcherPositive": 0.001048,
    "n": 568
   },
   {
+   "name": "Paddack, Chris",
+   "resid": -0.002642,
+   "adjRunsPerPitchPitcherPositive": 0.001046,
+   "n": 1015
+  },
+  {
+   "name": "Myers, Tobias",
+   "resid": 0.002616,
+   "adjRunsPerPitchPitcherPositive": -0.001036,
+   "n": 747
+  },
+  {
    "name": "Englert, Mason",
-   "resid": -0.002609,
-   "adjRunsPerPitchPitcherPositive": 0.001033,
+   "resid": -0.002614,
+   "adjRunsPerPitchPitcherPositive": 0.001035,
    "n": 557
   },
   {
+   "name": "Weaver, Luke",
+   "resid": -0.002603,
+   "adjRunsPerPitchPitcherPositive": 0.001031,
+   "n": 630
+  },
+  {
    "name": "Mize, Casey",
-   "resid": 0.002609,
-   "adjRunsPerPitchPitcherPositive": -0.001033,
+   "resid": 0.002601,
+   "adjRunsPerPitchPitcherPositive": -0.00103,
    "n": 1310
   },
   {
-   "name": "Anderson, Drew",
-   "resid": -0.002605,
-   "adjRunsPerPitchPitcherPositive": 0.001031,
-   "n": 1033
+   "name": "Schreiber, John",
+   "resid": -0.002601,
+   "adjRunsPerPitchPitcherPositive": 0.001029,
+   "n": 678
   },
   {
-   "name": "Alcantara, Sandy",
-   "resid": -0.002587,
-   "adjRunsPerPitchPitcherPositive": 0.001024,
-   "n": 2160
+   "name": "Vesia, Alex",
+   "resid": 0.002595,
+   "adjRunsPerPitchPitcherPositive": -0.001027,
+   "n": 675
+  },
+  {
+   "name": "Anderson, Drew",
+   "resid": -0.002589,
+   "adjRunsPerPitchPitcherPositive": 0.001025,
+   "n": 1063
+  },
+  {
+   "name": "Lange, Alex",
+   "resid": -0.00258,
+   "adjRunsPerPitchPitcherPositive": 0.001021,
+   "n": 816
+  },
+  {
+   "name": "Hoffman, Jeff",
+   "resid": -0.002569,
+   "adjRunsPerPitchPitcherPositive": 0.001017,
+   "n": 864
+  },
+  {
+   "name": "Brubaker, JT",
+   "resid": 0.002561,
+   "adjRunsPerPitchPitcherPositive": -0.001014,
+   "n": 837
   },
   {
    "name": "Banda, Anthony",
-   "resid": 0.002558,
-   "adjRunsPerPitchPitcherPositive": -0.001013,
+   "resid": 0.002551,
+   "adjRunsPerPitchPitcherPositive": -0.00101,
    "n": 608
   },
   {
    "name": "Hill, Jaden",
-   "resid": 0.002544,
-   "adjRunsPerPitchPitcherPositive": -0.001007,
+   "resid": 0.002536,
+   "adjRunsPerPitchPitcherPositive": -0.001004,
    "n": 481
   },
   {
    "name": "Seabold, Connor",
-   "resid": 0.002543,
-   "adjRunsPerPitchPitcherPositive": -0.001007,
+   "resid": 0.002535,
+   "adjRunsPerPitchPitcherPositive": -0.001003,
    "n": 476
   },
   {
    "name": "Kent, Zak",
-   "resid": 0.002541,
-   "adjRunsPerPitchPitcherPositive": -0.001006,
-   "n": 595
+   "resid": 0.002531,
+   "adjRunsPerPitchPitcherPositive": -0.001002,
+   "n": 616
   },
   {
    "name": "McCullers Jr., Lance",
-   "resid": -0.002518,
-   "adjRunsPerPitchPitcherPositive": 0.000997,
+   "resid": -0.002524,
+   "adjRunsPerPitchPitcherPositive": 0.000999,
    "n": 783
   },
   {
-   "name": "Myers, Tobias",
-   "resid": 0.002498,
-   "adjRunsPerPitchPitcherPositive": -0.000989,
-   "n": 710
-  },
-  {
-   "name": "Thornton, Zac",
-   "resid": 0.002498,
-   "adjRunsPerPitchPitcherPositive": -0.000989,
-   "n": 571
-  },
-  {
    "name": "Tolle, Payton",
-   "resid": -0.002495,
-   "adjRunsPerPitchPitcherPositive": 0.000988,
+   "resid": -0.00251,
+   "adjRunsPerPitchPitcherPositive": 0.000994,
    "n": 1443
   },
   {
    "name": "Abbott, Andrew",
-   "resid": 0.002489,
-   "adjRunsPerPitchPitcherPositive": -0.000986,
+   "resid": 0.002483,
+   "adjRunsPerPitchPitcherPositive": -0.000983,
    "n": 2016
   },
   {
-   "name": "Kremer, Dean",
-   "resid": 0.002454,
-   "adjRunsPerPitchPitcherPositive": -0.000972,
-   "n": 516
+   "name": "Guerrero, Tyron",
+   "resid": 0.002478,
+   "adjRunsPerPitchPitcherPositive": -0.000981,
+   "n": 458
   },
   {
-   "name": "Lange, Alex",
-   "resid": -0.002452,
-   "adjRunsPerPitchPitcherPositive": 0.00097,
-   "n": 795
+   "name": "Thornton, Zac",
+   "resid": 0.002462,
+   "adjRunsPerPitchPitcherPositive": -0.000975,
+   "n": 571
   },
   {
-   "name": "De Los Santos, Enyel",
-   "resid": 0.002441,
-   "adjRunsPerPitchPitcherPositive": -0.000966,
-   "n": 765
-  },
-  {
-   "name": "Freeland, Kyle",
-   "resid": 0.002425,
-   "adjRunsPerPitchPitcherPositive": -0.00096,
-   "n": 1628
+   "name": "Lambert, Peter",
+   "resid": 0.002449,
+   "adjRunsPerPitchPitcherPositive": -0.00097,
+   "n": 1708
   },
   {
    "name": "Morgan, Eli",
-   "resid": -0.002418,
-   "adjRunsPerPitchPitcherPositive": 0.000957,
+   "resid": -0.002422,
+   "adjRunsPerPitchPitcherPositive": 0.000959,
    "n": 339
   },
   {
-   "name": "Bieber, Shane",
-   "resid": -0.002397,
-   "adjRunsPerPitchPitcherPositive": 0.000949,
-   "n": 519
+   "name": "Freeland, Kyle",
+   "resid": 0.002419,
+   "adjRunsPerPitchPitcherPositive": -0.000958,
+   "n": 1628
   },
   {
-   "name": "Gamboa, Alec",
-   "resid": 0.002398,
-   "adjRunsPerPitchPitcherPositive": -0.000949,
-   "n": 363
-  },
-  {
-   "name": "Weaver, Luke",
-   "resid": -0.002388,
-   "adjRunsPerPitchPitcherPositive": 0.000945,
-   "n": 618
-  },
-  {
-   "name": "Brubaker, JT",
-   "resid": 0.002384,
-   "adjRunsPerPitchPitcherPositive": -0.000944,
-   "n": 780
+   "name": "De Los Santos, Enyel",
+   "resid": 0.002413,
+   "adjRunsPerPitchPitcherPositive": -0.000955,
+   "n": 781
   },
   {
    "name": "Herrin, Tim",
-   "resid": 0.002376,
-   "adjRunsPerPitchPitcherPositive": -0.000941,
-   "n": 560
+   "resid": 0.002405,
+   "adjRunsPerPitchPitcherPositive": -0.000952,
+   "n": 572
   },
   {
-   "name": "Schreiber, John",
-   "resid": -0.00236,
-   "adjRunsPerPitchPitcherPositive": 0.000934,
-   "n": 670
+   "name": "Gamboa, Alec",
+   "resid": 0.002388,
+   "adjRunsPerPitchPitcherPositive": -0.000946,
+   "n": 363
   },
   {
    "name": "Casta\u00f1o, Blas",
-   "resid": -0.002329,
-   "adjRunsPerPitchPitcherPositive": 0.000922,
+   "resid": -0.002334,
+   "adjRunsPerPitchPitcherPositive": 0.000924,
    "n": 343
   },
   {
    "name": "Ritchie, JR",
-   "resid": -0.002318,
-   "adjRunsPerPitchPitcherPositive": 0.000917,
+   "resid": -0.002324,
+   "adjRunsPerPitchPitcherPositive": 0.00092,
    "n": 942
   },
   {
+   "name": "Thornton, Trent",
+   "resid": -0.002303,
+   "adjRunsPerPitchPitcherPositive": 0.000912,
+   "n": 459
+  },
+  {
+   "name": "Rogers, Trevor",
+   "resid": 0.002293,
+   "adjRunsPerPitchPitcherPositive": -0.000908,
+   "n": 1769
+  },
+  {
    "name": "Morgan, David",
-   "resid": 0.002298,
-   "adjRunsPerPitchPitcherPositive": -0.00091,
+   "resid": 0.00229,
+   "adjRunsPerPitchPitcherPositive": -0.000906,
    "n": 388
   },
   {
    "name": "Kolek, Stephen",
-   "resid": 0.002289,
-   "adjRunsPerPitchPitcherPositive": -0.000906,
+   "resid": 0.002279,
+   "adjRunsPerPitchPitcherPositive": -0.000902,
    "n": 837
   },
   {
-   "name": "Clarke, Taylor",
+   "name": "Miller, Mason",
    "resid": 0.002255,
    "adjRunsPerPitchPitcherPositive": -0.000893,
-   "n": 666
+   "n": 710
   },
   {
    "name": "Johnson, Ryan",
-   "resid": 0.002243,
-   "adjRunsPerPitchPitcherPositive": -0.000888,
+   "resid": 0.002236,
+   "adjRunsPerPitchPitcherPositive": -0.000885,
    "n": 752
   },
   {
    "name": "Gott, Trevor",
-   "resid": 0.002241,
-   "adjRunsPerPitchPitcherPositive": -0.000887,
+   "resid": 0.002231,
+   "adjRunsPerPitchPitcherPositive": -0.000883,
    "n": 576
   },
   {
-   "name": "Thornton, Trent",
-   "resid": -0.002241,
-   "adjRunsPerPitchPitcherPositive": 0.000887,
-   "n": 443
+   "name": "Clarke, Taylor",
+   "resid": 0.002222,
+   "adjRunsPerPitchPitcherPositive": -0.00088,
+   "n": 666
   },
   {
-   "name": "Skenes, Paul",
-   "resid": 0.002207,
-   "adjRunsPerPitchPitcherPositive": -0.000874,
-   "n": 2015
+   "name": "Soto, Gregory",
+   "resid": 0.002218,
+   "adjRunsPerPitchPitcherPositive": -0.000878,
+   "n": 757
   },
   {
    "name": "Treinen, Blake",
-   "resid": -0.002204,
-   "adjRunsPerPitchPitcherPositive": 0.000873,
+   "resid": -0.002209,
+   "adjRunsPerPitchPitcherPositive": 0.000874,
    "n": 374
   },
   {
+   "name": "Skenes, Paul",
+   "resid": 0.0022,
+   "adjRunsPerPitchPitcherPositive": -0.000871,
+   "n": 2015
+  },
+  {
    "name": "Early, Connelly",
-   "resid": 0.002203,
-   "adjRunsPerPitchPitcherPositive": -0.000872,
+   "resid": 0.002196,
+   "adjRunsPerPitchPitcherPositive": -0.000869,
    "n": 1528
   },
   {
-   "name": "Hurter, Brant",
-   "resid": 0.002162,
-   "adjRunsPerPitchPitcherPositive": -0.000856,
-   "n": 360
-  },
-  {
-   "name": "Kikuchi, Yusei",
-   "resid": 0.002161,
-   "adjRunsPerPitchPitcherPositive": -0.000856,
-   "n": 561
-  },
-  {
    "name": "Bello, Brayan",
-   "resid": -0.002153,
-   "adjRunsPerPitchPitcherPositive": 0.000852,
+   "resid": -0.002159,
+   "adjRunsPerPitchPitcherPositive": 0.000855,
    "n": 1256
   },
   {
    "name": "De Jesus, Enmanuel",
-   "resid": -0.002151,
-   "adjRunsPerPitchPitcherPositive": 0.000852,
+   "resid": -0.002159,
+   "adjRunsPerPitchPitcherPositive": 0.000855,
    "n": 509
   },
   {
+   "name": "Kikuchi, Yusei",
+   "resid": 0.002156,
+   "adjRunsPerPitchPitcherPositive": -0.000854,
+   "n": 561
+  },
+  {
+   "name": "Hurter, Brant",
+   "resid": 0.002152,
+   "adjRunsPerPitchPitcherPositive": -0.000852,
+   "n": 360
+  },
+  {
    "name": "Keller, Mitch",
-   "resid": -0.002132,
-   "adjRunsPerPitchPitcherPositive": 0.000844,
+   "resid": -0.00215,
+   "adjRunsPerPitchPitcherPositive": 0.000851,
    "n": 1818
   },
   {
-   "name": "Dodd, Dylan",
-   "resid": 0.002114,
-   "adjRunsPerPitchPitcherPositive": -0.000837,
-   "n": 485
+   "name": "Wilson, Bryse",
+   "resid": -0.002112,
+   "adjRunsPerPitchPitcherPositive": 0.000836,
+   "n": 533
   },
   {
-   "name": "Rogers, Trevor",
-   "resid": 0.002094,
-   "adjRunsPerPitchPitcherPositive": -0.000829,
-   "n": 1675
+   "name": "Kremer, Dean",
+   "resid": 0.002109,
+   "adjRunsPerPitchPitcherPositive": -0.000835,
+   "n": 597
   },
   {
    "name": "Feltner, Ryan",
-   "resid": 0.002087,
-   "adjRunsPerPitchPitcherPositive": -0.000826,
+   "resid": 0.002081,
+   "adjRunsPerPitchPitcherPositive": -0.000824,
    "n": 1157
   },
   {
-   "name": "Williamson, Brandon",
-   "resid": 0.002072,
-   "adjRunsPerPitchPitcherPositive": -0.00082,
-   "n": 518
-  },
-  {
-   "name": "Guerrero, Tyron",
-   "resid": 0.002065,
-   "adjRunsPerPitchPitcherPositive": -0.000817,
-   "n": 447
-  },
-  {
    "name": "Dom\u00ednguez, Seranthony",
-   "resid": -0.002062,
-   "adjRunsPerPitchPitcherPositive": 0.000816,
+   "resid": -0.00208,
+   "adjRunsPerPitchPitcherPositive": 0.000823,
    "n": 691
   },
   {
+   "name": "Thielbar, Caleb",
+   "resid": -0.00208,
+   "adjRunsPerPitchPitcherPositive": 0.000823,
+   "n": 565
+  },
+  {
+   "name": "Williamson, Brandon",
+   "resid": 0.002066,
+   "adjRunsPerPitchPitcherPositive": -0.000818,
+   "n": 518
+  },
+  {
    "name": "Soriano, Jos\u00e9",
-   "resid": -0.002056,
-   "adjRunsPerPitchPitcherPositive": 0.000814,
+   "resid": -0.002062,
+   "adjRunsPerPitchPitcherPositive": 0.000816,
    "n": 2042
   },
   {
-   "name": "Weissert, Greg",
-   "resid": -0.002051,
-   "adjRunsPerPitchPitcherPositive": 0.000812,
-   "n": 660
-  },
-  {
-   "name": "Soto, Gregory",
-   "resid": 0.002041,
-   "adjRunsPerPitchPitcherPositive": -0.000808,
-   "n": 735
-  },
-  {
-   "name": "Ribalta, Orlando",
-   "resid": 0.002018,
-   "adjRunsPerPitchPitcherPositive": -0.000799,
-   "n": 658
+   "name": "Schlittler, Cam",
+   "resid": -0.002032,
+   "adjRunsPerPitchPitcherPositive": 0.000804,
+   "n": 2025
   },
   {
    "name": "Young, Luke",
-   "resid": 0.001998,
-   "adjRunsPerPitchPitcherPositive": -0.000791,
+   "resid": 0.001994,
+   "adjRunsPerPitchPitcherPositive": -0.000789,
    "n": 475
   },
   {
    "name": "Rogers, Taylor",
-   "resid": 0.001994,
-   "adjRunsPerPitchPitcherPositive": -0.000789,
+   "resid": 0.001986,
+   "adjRunsPerPitchPitcherPositive": -0.000786,
    "n": 682
   },
   {
-   "name": "Roupp, Landen",
-   "resid": 0.001989,
-   "adjRunsPerPitchPitcherPositive": -0.000787,
-   "n": 1924
-  },
-  {
-   "name": "Hart, Kyle",
-   "resid": -0.001983,
-   "adjRunsPerPitchPitcherPositive": 0.000785,
-   "n": 614
-  },
-  {
-   "name": "Nola, Aaron",
-   "resid": -0.001962,
-   "adjRunsPerPitchPitcherPositive": 0.000777,
-   "n": 1882
-  },
-  {
-   "name": "Sisk, Evan",
-   "resid": 0.001946,
-   "adjRunsPerPitchPitcherPositive": -0.000771,
-   "n": 641
-  },
-  {
    "name": "Yamamoto, Yoshinobu",
-   "resid": -0.001944,
-   "adjRunsPerPitchPitcherPositive": 0.00077,
+   "resid": -0.001952,
+   "adjRunsPerPitchPitcherPositive": 0.000773,
    "n": 1860
   },
   {
-   "name": "Miller, Mason",
-   "resid": 0.001924,
-   "adjRunsPerPitchPitcherPositive": -0.000762,
-   "n": 684
+   "name": "Ribalta, Orlando",
+   "resid": 0.001939,
+   "adjRunsPerPitchPitcherPositive": -0.000768,
+   "n": 693
+  },
+  {
+   "name": "Sisk, Evan",
+   "resid": 0.001939,
+   "adjRunsPerPitchPitcherPositive": -0.000768,
+   "n": 641
+  },
+  {
+   "name": "Dodd, Dylan",
+   "resid": 0.001934,
+   "adjRunsPerPitchPitcherPositive": -0.000766,
+   "n": 520
+  },
+  {
+   "name": "Dobbins, Hunter",
+   "resid": -0.001933,
+   "adjRunsPerPitchPitcherPositive": 0.000765,
+   "n": 569
   },
   {
    "name": "Winn, Cole",
-   "resid": -0.001907,
-   "adjRunsPerPitchPitcherPositive": 0.000755,
+   "resid": -0.001912,
+   "adjRunsPerPitchPitcherPositive": 0.000757,
    "n": 564
   },
   {
    "name": "Hoppe, Alex",
-   "resid": -0.001902,
-   "adjRunsPerPitchPitcherPositive": 0.000753,
-   "n": 428
+   "resid": -0.001906,
+   "adjRunsPerPitchPitcherPositive": 0.000755,
+   "n": 442
   },
   {
-   "name": "Schlittler, Cam",
-   "resid": -0.001891,
-   "adjRunsPerPitchPitcherPositive": 0.000749,
-   "n": 1932
+   "name": "Nola, Aaron",
+   "resid": -0.001887,
+   "adjRunsPerPitchPitcherPositive": 0.000747,
+   "n": 1975
   },
   {
-   "name": "Thielbar, Caleb",
-   "resid": -0.001889,
-   "adjRunsPerPitchPitcherPositive": 0.000748,
-   "n": 547
+   "name": "Roupp, Landen",
+   "resid": 0.001884,
+   "adjRunsPerPitchPitcherPositive": -0.000746,
+   "n": 2008
   },
   {
    "name": "Samaniego, Tyler",
-   "resid": 0.001868,
-   "adjRunsPerPitchPitcherPositive": -0.00074,
+   "resid": 0.00186,
+   "adjRunsPerPitchPitcherPositive": -0.000736,
    "n": 393
   },
   {
-   "name": "Wilson, Bryse",
-   "resid": -0.001867,
-   "adjRunsPerPitchPitcherPositive": 0.000739,
-   "n": 498
-  },
-  {
-   "name": "Dobbins, Hunter",
-   "resid": -0.001855,
-   "adjRunsPerPitchPitcherPositive": 0.000735,
-   "n": 569
-  },
-  {
    "name": "Agnos, Zach",
-   "resid": -0.001849,
-   "adjRunsPerPitchPitcherPositive": 0.000732,
-   "n": 1024
+   "resid": -0.001845,
+   "adjRunsPerPitchPitcherPositive": 0.000731,
+   "n": 1044
+  },
+  {
+   "name": "Farris, Mitch",
+   "resid": 0.001829,
+   "adjRunsPerPitchPitcherPositive": -0.000724,
+   "n": 719
+  },
+  {
+   "name": "Weissert, Greg",
+   "resid": -0.001813,
+   "adjRunsPerPitchPitcherPositive": 0.000718,
+   "n": 675
   },
   {
    "name": "Matsui, Yuki",
-   "resid": 0.001818,
-   "adjRunsPerPitchPitcherPositive": -0.00072,
+   "resid": 0.001811,
+   "adjRunsPerPitchPitcherPositive": -0.000717,
    "n": 637
   },
   {
    "name": "Sheehan, Emmet",
-   "resid": 0.001816,
-   "adjRunsPerPitchPitcherPositive": -0.000719,
+   "resid": 0.001809,
+   "adjRunsPerPitchPitcherPositive": -0.000716,
    "n": 1640
   },
   {
    "name": "Gibson, Cade",
-   "resid": -0.001797,
-   "adjRunsPerPitchPitcherPositive": 0.000711,
+   "resid": -0.001802,
+   "adjRunsPerPitchPitcherPositive": 0.000713,
    "n": 550
   },
   {
-   "name": "Hancock, Emerson",
-   "resid": -0.001732,
-   "adjRunsPerPitchPitcherPositive": 0.000686,
-   "n": 1627
+   "name": "Lopez, Jacob",
+   "resid": 0.001719,
+   "adjRunsPerPitchPitcherPositive": -0.00068,
+   "n": 1324
   },
   {
    "name": "Doval, Camilo",
-   "resid": 0.00168,
-   "adjRunsPerPitchPitcherPositive": -0.000665,
-   "n": 647
-  },
-  {
-   "name": "Lopez, Jacob",
-   "resid": 0.001678,
-   "adjRunsPerPitchPitcherPositive": -0.000664,
-   "n": 1227
+   "resid": 0.001705,
+   "adjRunsPerPitchPitcherPositive": -0.000675,
+   "n": 664
   },
   {
    "name": "Orze, Eric",
-   "resid": -0.001677,
-   "adjRunsPerPitchPitcherPositive": 0.000664,
+   "resid": -0.001686,
+   "adjRunsPerPitchPitcherPositive": 0.000667,
    "n": 676
   },
   {
    "name": "Gausman, Kevin",
-   "resid": -0.001664,
-   "adjRunsPerPitchPitcherPositive": 0.000659,
+   "resid": -0.00167,
+   "adjRunsPerPitchPitcherPositive": 0.000661,
    "n": 2044
   },
   {
-   "name": "Jump, Gage",
-   "resid": -0.001665,
-   "adjRunsPerPitchPitcherPositive": 0.000659,
-   "n": 980
+   "name": "Garcia, Rico",
+   "resid": -0.001653,
+   "adjRunsPerPitchPitcherPositive": 0.000654,
+   "n": 672
+  },
+  {
+   "name": "Junis, Jakob",
+   "resid": -0.001611,
+   "adjRunsPerPitchPitcherPositive": 0.000638,
+   "n": 584
   },
   {
    "name": "Paredes, Mike",
-   "resid": 0.001608,
-   "adjRunsPerPitchPitcherPositive": -0.000636,
+   "resid": 0.001599,
+   "adjRunsPerPitchPitcherPositive": -0.000633,
    "n": 551
   },
   {
    "name": "Flaherty, Jack",
-   "resid": 0.001601,
-   "adjRunsPerPitchPitcherPositive": -0.000634,
+   "resid": 0.001596,
+   "adjRunsPerPitchPitcherPositive": -0.000632,
    "n": 1639
   },
   {
    "name": "Perkins, Jack",
-   "resid": -0.001578,
-   "adjRunsPerPitchPitcherPositive": 0.000625,
+   "resid": -0.001593,
+   "adjRunsPerPitchPitcherPositive": 0.000631,
    "n": 1156
   },
   {
+   "name": "Hart, Kyle",
+   "resid": -0.001589,
+   "adjRunsPerPitchPitcherPositive": 0.000629,
+   "n": 651
+  },
+  {
+   "name": "Henderson, Logan",
+   "resid": 0.001586,
+   "adjRunsPerPitchPitcherPositive": -0.000628,
+   "n": 676
+  },
+  {
+   "name": "Cole, Gerrit",
+   "resid": 0.001578,
+   "adjRunsPerPitchPitcherPositive": -0.000625,
+   "n": 1017
+  },
+  {
    "name": "Holmes, Grant",
-   "resid": 0.001572,
-   "adjRunsPerPitchPitcherPositive": -0.000622,
+   "resid": 0.001565,
+   "adjRunsPerPitchPitcherPositive": -0.000619,
    "n": 1594
   },
   {
    "name": "Cameron, Noah",
-   "resid": 0.001519,
-   "adjRunsPerPitchPitcherPositive": -0.000602,
+   "resid": 0.001514,
+   "adjRunsPerPitchPitcherPositive": -0.000599,
    "n": 1839
   },
   {
-   "name": "Dotel, Wilber",
-   "resid": 0.001513,
-   "adjRunsPerPitchPitcherPositive": -0.000599,
-   "n": 382
-  },
-  {
    "name": "Rolison, Ryan",
-   "resid": 0.001463,
-   "adjRunsPerPitchPitcherPositive": -0.000579,
+   "resid": 0.001486,
+   "adjRunsPerPitchPitcherPositive": -0.000588,
    "n": 622
   },
   {
    "name": "Romano, Jordan",
-   "resid": 0.001448,
-   "adjRunsPerPitchPitcherPositive": -0.000573,
+   "resid": 0.001444,
+   "adjRunsPerPitchPitcherPositive": -0.000571,
    "n": 326
   },
   {
-   "name": "Gasser, Robert",
-   "resid": 0.001432,
-   "adjRunsPerPitchPitcherPositive": -0.000567,
-   "n": 944
-  },
-  {
    "name": "Fisher, Braydon",
-   "resid": -0.00143,
-   "adjRunsPerPitchPitcherPositive": 0.000566,
+   "resid": -0.001437,
+   "adjRunsPerPitchPitcherPositive": 0.000569,
    "n": 846
   },
   {
    "name": "Bradish, Kyle",
-   "resid": -0.001427,
-   "adjRunsPerPitchPitcherPositive": 0.000565,
+   "resid": -0.001432,
+   "adjRunsPerPitchPitcherPositive": 0.000567,
    "n": 1958
   },
   {
-   "name": "Detmers, Reid",
-   "resid": 0.001426,
+   "name": "Gasser, Robert",
+   "resid": 0.001424,
    "adjRunsPerPitchPitcherPositive": -0.000564,
-   "n": 1866
+   "n": 944
   },
   {
    "name": "Young, Brandon",
-   "resid": 0.001414,
-   "adjRunsPerPitchPitcherPositive": -0.00056,
+   "resid": 0.001406,
+   "adjRunsPerPitchPitcherPositive": -0.000557,
    "n": 1521
   },
   {
+   "name": "Jump, Gage",
+   "resid": -0.001404,
+   "adjRunsPerPitchPitcherPositive": 0.000556,
+   "n": 1070
+  },
+  {
    "name": "Davila, Nick",
-   "resid": 0.00141,
-   "adjRunsPerPitchPitcherPositive": -0.000558,
+   "resid": 0.001399,
+   "adjRunsPerPitchPitcherPositive": -0.000554,
    "n": 355
   },
   {
-   "name": "Luzardo, Jes\u00fas",
-   "resid": 0.00141,
-   "adjRunsPerPitchPitcherPositive": -0.000558,
-   "n": 2023
-  },
-  {
-   "name": "Gray, Peyton",
-   "resid": -0.001391,
-   "adjRunsPerPitchPitcherPositive": 0.000551,
-   "n": 651
-  },
-  {
-   "name": "Rea, Colin",
-   "resid": -0.001393,
-   "adjRunsPerPitchPitcherPositive": 0.000551,
-   "n": 1753
+   "name": "Latz, Jacob",
+   "resid": 0.001382,
+   "adjRunsPerPitchPitcherPositive": -0.000547,
+   "n": 765
   },
   {
    "name": "Sulser, Cole",
-   "resid": 0.00138,
-   "adjRunsPerPitchPitcherPositive": -0.000546,
+   "resid": 0.001375,
+   "adjRunsPerPitchPitcherPositive": -0.000544,
    "n": 761
   },
   {
+   "name": "Gray, Peyton",
+   "resid": -0.001372,
+   "adjRunsPerPitchPitcherPositive": 0.000543,
+   "n": 664
+  },
+  {
+   "name": "Ure\u00f1a, Walbert",
+   "resid": 0.001367,
+   "adjRunsPerPitchPitcherPositive": -0.000541,
+   "n": 1601
+  },
+  {
+   "name": "Gore, MacKenzie",
+   "resid": 0.001357,
+   "adjRunsPerPitchPitcherPositive": -0.000537,
+   "n": 2067
+  },
+  {
+   "name": "Hancock, Emerson",
+   "resid": -0.001356,
+   "adjRunsPerPitchPitcherPositive": 0.000537,
+   "n": 1719
+  },
+  {
    "name": "Lodolo, Nick",
-   "resid": -0.001352,
-   "adjRunsPerPitchPitcherPositive": 0.000535,
+   "resid": -0.001357,
+   "adjRunsPerPitchPitcherPositive": 0.000537,
    "n": 1087
   },
   {
    "name": "Sugano, Tomoyuki",
-   "resid": -0.001352,
-   "adjRunsPerPitchPitcherPositive": 0.000535,
+   "resid": -0.001357,
+   "adjRunsPerPitchPitcherPositive": 0.000537,
    "n": 1539
   },
   {
-   "name": "Silseth, Chase",
-   "resid": 0.00135,
-   "adjRunsPerPitchPitcherPositive": -0.000534,
-   "n": 711
-  },
-  {
-   "name": "Ure\u00f1a, Walbert",
-   "resid": 0.001341,
-   "adjRunsPerPitchPitcherPositive": -0.000531,
-   "n": 1601
-  },
-  {
-   "name": "Farris, Mitch",
-   "resid": 0.001338,
-   "adjRunsPerPitchPitcherPositive": -0.00053,
-   "n": 676
-  },
-  {
    "name": "Hurt, Kyle",
-   "resid": 0.001338,
-   "adjRunsPerPitchPitcherPositive": -0.00053,
+   "resid": 0.001331,
+   "adjRunsPerPitchPitcherPositive": -0.000527,
    "n": 512
   },
   {
-   "name": "Cecconi, Slade",
-   "resid": 0.001312,
-   "adjRunsPerPitchPitcherPositive": -0.00052,
-   "n": 1697
+   "name": "Silseth, Chase",
+   "resid": 0.001331,
+   "adjRunsPerPitchPitcherPositive": -0.000527,
+   "n": 711
   },
   {
-   "name": "McGreevy, Michael",
-   "resid": 0.001309,
-   "adjRunsPerPitchPitcherPositive": -0.000518,
-   "n": 1777
-  },
-  {
-   "name": "Anderson, Jack",
+   "name": "Detmers, Reid",
    "resid": 0.001295,
    "adjRunsPerPitchPitcherPositive": -0.000513,
-   "n": 370
-  },
-  {
-   "name": "Pfaadt, Brandon",
-   "resid": -0.001284,
-   "adjRunsPerPitchPitcherPositive": 0.000508,
-   "n": 959
-  },
-  {
-   "name": "Gore, MacKenzie",
-   "resid": 0.001281,
-   "adjRunsPerPitchPitcherPositive": -0.000507,
-   "n": 1972
-  },
-  {
-   "name": "Latz, Jacob",
-   "resid": 0.001272,
-   "adjRunsPerPitchPitcherPositive": -0.000504,
-   "n": 755
-  },
-  {
-   "name": "Adams, Travis",
-   "resid": -0.001252,
-   "adjRunsPerPitchPitcherPositive": 0.000496,
-   "n": 541
-  },
-  {
-   "name": "Miles, Spencer",
-   "resid": -0.001254,
-   "adjRunsPerPitchPitcherPositive": 0.000496,
-   "n": 1082
-  },
-  {
-   "name": "Suarez, Jos\u00e9",
-   "resid": 0.001248,
-   "adjRunsPerPitchPitcherPositive": -0.000494,
-   "n": 945
+   "n": 1950
   },
   {
    "name": "Tolman, Erik",
-   "resid": 0.001222,
-   "adjRunsPerPitchPitcherPositive": -0.000484,
+   "resid": 0.001294,
+   "adjRunsPerPitchPitcherPositive": -0.000512,
    "n": 438
   },
   {
-   "name": "Pallette, Peyton",
-   "resid": -0.001215,
-   "adjRunsPerPitchPitcherPositive": 0.000481,
-   "n": 493
+   "name": "Bieber, Shane",
+   "resid": -0.001273,
+   "adjRunsPerPitchPitcherPositive": 0.000504,
+   "n": 561
   },
   {
-   "name": "Santana, Dennis",
-   "resid": -0.001213,
-   "adjRunsPerPitchPitcherPositive": 0.00048,
-   "n": 706
+   "name": "Miles, Spencer",
+   "resid": -0.001268,
+   "adjRunsPerPitchPitcherPositive": 0.000502,
+   "n": 1082
+  },
+  {
+   "name": "Rea, Colin",
+   "resid": -0.001253,
+   "adjRunsPerPitchPitcherPositive": 0.000496,
+   "n": 1847
+  },
+  {
+   "name": "Anderson, Jack",
+   "resid": 0.001252,
+   "adjRunsPerPitchPitcherPositive": -0.000495,
+   "n": 383
+  },
+  {
+   "name": "Dotel, Wilber",
+   "resid": 0.001251,
+   "adjRunsPerPitchPitcherPositive": -0.000495,
+   "n": 402
   },
   {
    "name": "Mlodzinski, Carmen",
-   "resid": 0.00121,
-   "adjRunsPerPitchPitcherPositive": -0.000479,
-   "n": 1496
+   "resid": 0.001241,
+   "adjRunsPerPitchPitcherPositive": -0.000491,
+   "n": 1526
+  },
+  {
+   "name": "Slaten, Justin",
+   "resid": 0.001221,
+   "adjRunsPerPitchPitcherPositive": -0.000484,
+   "n": 443
+  },
+  {
+   "name": "Pallette, Peyton",
+   "resid": -0.001221,
+   "adjRunsPerPitchPitcherPositive": 0.000483,
+   "n": 493
+  },
+  {
+   "name": "Cecconi, Slade",
+   "resid": 0.001217,
+   "adjRunsPerPitchPitcherPositive": -0.000482,
+   "n": 1781
   },
   {
    "name": "Phillips, Tyler",
-   "resid": -0.001205,
-   "adjRunsPerPitchPitcherPositive": 0.000477,
+   "resid": -0.001218,
+   "adjRunsPerPitchPitcherPositive": 0.000482,
    "n": 1357
   },
   {
+   "name": "Martin, Davis",
+   "resid": 0.00121,
+   "adjRunsPerPitchPitcherPositive": -0.000479,
+   "n": 1834
+  },
+  {
+   "name": "Mattson, Isaac",
+   "resid": -0.001202,
+   "adjRunsPerPitchPitcherPositive": 0.000476,
+   "n": 648
+  },
+  {
    "name": "Matthews, Zebby",
-   "resid": -0.001179,
-   "adjRunsPerPitchPitcherPositive": 0.000467,
+   "resid": -0.001186,
+   "adjRunsPerPitchPitcherPositive": 0.00047,
    "n": 1202
   },
   {
+   "name": "Adams, Travis",
+   "resid": -0.001184,
+   "adjRunsPerPitchPitcherPositive": 0.000469,
+   "n": 552
+  },
+  {
    "name": "Baz, Shane",
-   "resid": -0.001173,
-   "adjRunsPerPitchPitcherPositive": 0.000464,
+   "resid": -0.00118,
+   "adjRunsPerPitchPitcherPositive": 0.000467,
    "n": 2007
   },
   {
-   "name": "Quantrill, Cal",
-   "resid": 0.001172,
-   "adjRunsPerPitchPitcherPositive": -0.000464,
-   "n": 873
+   "name": "Cavalli, Cade",
+   "resid": -0.001173,
+   "adjRunsPerPitchPitcherPositive": 0.000465,
+   "n": 1959
   },
   {
-   "name": "Cole, Gerrit",
-   "resid": 0.001164,
-   "adjRunsPerPitchPitcherPositive": -0.000461,
-   "n": 918
+   "name": "Santana, Dennis",
+   "resid": -0.001164,
+   "adjRunsPerPitchPitcherPositive": 0.000461,
+   "n": 706
   },
   {
-   "name": "Kittredge, Andrew",
-   "resid": -0.001163,
-   "adjRunsPerPitchPitcherPositive": 0.00046,
-   "n": 458
-  },
-  {
-   "name": "Mejia, Juan",
-   "resid": 0.001152,
-   "adjRunsPerPitchPitcherPositive": -0.000456,
-   "n": 847
-  },
-  {
-   "name": "Garcia, Rico",
-   "resid": -0.001143,
-   "adjRunsPerPitchPitcherPositive": 0.000453,
-   "n": 663
+   "name": "Ferguson, Caleb",
+   "resid": 0.001155,
+   "adjRunsPerPitchPitcherPositive": -0.000457,
+   "n": 393
   },
   {
    "name": "Eovaldi, Nathan",
-   "resid": -0.001131,
-   "adjRunsPerPitchPitcherPositive": 0.000448,
+   "resid": -0.001137,
+   "adjRunsPerPitchPitcherPositive": 0.00045,
    "n": 1827
   },
   {
-   "name": "Woo, Bryan",
-   "resid": -0.001122,
-   "adjRunsPerPitchPitcherPositive": 0.000444,
-   "n": 1769
+   "name": "Franco, Jose",
+   "resid": 0.001137,
+   "adjRunsPerPitchPitcherPositive": -0.00045,
+   "n": 347
   },
   {
    "name": "Alexander, Tyler",
-   "resid": 0.001117,
-   "adjRunsPerPitchPitcherPositive": -0.000442,
-   "n": 732
+   "resid": 0.001133,
+   "adjRunsPerPitchPitcherPositive": -0.000448,
+   "n": 745
   },
   {
-   "name": "Henderson, Logan",
-   "resid": 0.001102,
-   "adjRunsPerPitchPitcherPositive": -0.000436,
-   "n": 583
+   "name": "Suarez, Jos\u00e9",
+   "resid": 0.001129,
+   "adjRunsPerPitchPitcherPositive": -0.000447,
+   "n": 957
+  },
+  {
+   "name": "Woo, Bryan",
+   "resid": -0.00113,
+   "adjRunsPerPitchPitcherPositive": 0.000447,
+   "n": 1769
   },
   {
    "name": "Canning, Griffin",
-   "resid": -0.001094,
-   "adjRunsPerPitchPitcherPositive": 0.000433,
-   "n": 1108
+   "resid": -0.001125,
+   "adjRunsPerPitchPitcherPositive": 0.000445,
+   "n": 1148
   },
   {
-   "name": "Miller, Erik",
-   "resid": 0.001086,
-   "adjRunsPerPitchPitcherPositive": -0.00043,
-   "n": 617
+   "name": "Gusto, Ryan",
+   "resid": -0.001118,
+   "adjRunsPerPitchPitcherPositive": 0.000443,
+   "n": 645
   },
   {
-   "name": "Webb, Logan",
-   "resid": -0.001078,
-   "adjRunsPerPitchPitcherPositive": 0.000427,
-   "n": 1693
+   "name": "Luzardo, Jes\u00fas",
+   "resid": 0.00107,
+   "adjRunsPerPitchPitcherPositive": -0.000423,
+   "n": 2123
+  },
+  {
+   "name": "Ryan, Joe",
+   "resid": 0.001068,
+   "adjRunsPerPitchPitcherPositive": -0.000423,
+   "n": 1989
   },
   {
    "name": "Fedde, Erick",
-   "resid": 0.001067,
-   "adjRunsPerPitchPitcherPositive": -0.000422,
+   "resid": 0.001059,
+   "adjRunsPerPitchPitcherPositive": -0.000419,
    "n": 1661
   },
   {
-   "name": "Melton, Troy",
-   "resid": 0.001066,
-   "adjRunsPerPitchPitcherPositive": -0.000422,
-   "n": 881
-  },
-  {
-   "name": "Hudson, Bryan",
-   "resid": 0.001062,
-   "adjRunsPerPitchPitcherPositive": -0.00042,
-   "n": 742
+   "name": "Miller, Erik",
+   "resid": 0.001056,
+   "adjRunsPerPitchPitcherPositive": -0.000418,
+   "n": 617
   },
   {
    "name": "Palmquist, Carson",
-   "resid": -0.001047,
-   "adjRunsPerPitchPitcherPositive": 0.000414,
+   "resid": -0.001054,
+   "adjRunsPerPitchPitcherPositive": 0.000417,
    "n": 430
   },
   {
-   "name": "King, Michael",
-   "resid": -0.001036,
-   "adjRunsPerPitchPitcherPositive": 0.00041,
-   "n": 1826
+   "name": "Quantrill, Cal",
+   "resid": 0.001055,
+   "adjRunsPerPitchPitcherPositive": -0.000417,
+   "n": 942
   },
   {
-   "name": "Whitlock, Garrett",
-   "resid": 0.001022,
+   "name": "Abreu, Bryan",
+   "resid": 0.001035,
+   "adjRunsPerPitchPitcherPositive": -0.00041,
+   "n": 700
+  },
+  {
+   "name": "King, Michael",
+   "resid": -0.001028,
+   "adjRunsPerPitchPitcherPositive": 0.000407,
+   "n": 1924
+  },
+  {
+   "name": "Hudson, Bryan",
+   "resid": 0.001023,
    "adjRunsPerPitchPitcherPositive": -0.000405,
-   "n": 549
+   "n": 753
+  },
+  {
+   "name": "Moll, Sam",
+   "resid": -0.001012,
+   "adjRunsPerPitchPitcherPositive": 0.000401,
+   "n": 798
+  },
+  {
+   "name": "Mejia, Juan",
+   "resid": 0.001006,
+   "adjRunsPerPitchPitcherPositive": -0.000398,
+   "n": 876
   },
   {
    "name": "Kochanowicz, Jack",
-   "resid": 0.001009,
-   "adjRunsPerPitchPitcherPositive": -0.000399,
+   "resid": 0.001002,
+   "adjRunsPerPitchPitcherPositive": -0.000397,
    "n": 1106
   },
   {
    "name": "Newcomb, Sean",
-   "resid": 0.001003,
-   "adjRunsPerPitchPitcherPositive": -0.000397,
+   "resid": 0.001,
+   "adjRunsPerPitchPitcherPositive": -0.000396,
    "n": 916
   },
   {
-   "name": "Criswell, Cooper",
-   "resid": 0.000995,
-   "adjRunsPerPitchPitcherPositive": -0.000394,
-   "n": 462
+   "name": "Melton, Troy",
+   "resid": 0.000998,
+   "adjRunsPerPitchPitcherPositive": -0.000395,
+   "n": 973
   },
   {
    "name": "Maton, Phil",
-   "resid": -0.000991,
-   "adjRunsPerPitchPitcherPositive": 0.000392,
+   "resid": -0.000994,
+   "adjRunsPerPitchPitcherPositive": 0.000393,
    "n": 546
   },
   {
-   "name": "Cavalli, Cade",
-   "resid": -0.000988,
-   "adjRunsPerPitchPitcherPositive": 0.000391,
-   "n": 1861
+   "name": "Criswell, Cooper",
+   "resid": 0.000985,
+   "adjRunsPerPitchPitcherPositive": -0.00039,
+   "n": 462
   },
   {
-   "name": "Ryan, Joe",
-   "resid": 0.000957,
-   "adjRunsPerPitchPitcherPositive": -0.000379,
-   "n": 1896
+   "name": "Whitlock, Garrett",
+   "resid": 0.000978,
+   "adjRunsPerPitchPitcherPositive": -0.000387,
+   "n": 562
   },
   {
-   "name": "Bibee, Tanner",
-   "resid": -0.000954,
-   "adjRunsPerPitchPitcherPositive": 0.000378,
-   "n": 1953
-  },
-  {
-   "name": "Strider, Spencer",
-   "resid": 0.000936,
-   "adjRunsPerPitchPitcherPositive": -0.000371,
-   "n": 691
-  },
-  {
-   "name": "Holton, Tyler",
-   "resid": 0.000903,
-   "adjRunsPerPitchPitcherPositive": -0.000357,
-   "n": 767
-  },
-  {
-   "name": "Martin, Davis",
-   "resid": 0.000899,
-   "adjRunsPerPitchPitcherPositive": -0.000356,
-   "n": 1728
-  },
-  {
-   "name": "Slaten, Justin",
-   "resid": 0.0009,
-   "adjRunsPerPitchPitcherPositive": -0.000356,
-   "n": 424
-  },
-  {
-   "name": "Barlow, Scott",
-   "resid": -0.000894,
-   "adjRunsPerPitchPitcherPositive": 0.000354,
-   "n": 581
-  },
-  {
-   "name": "Martinez, Nick",
-   "resid": -0.000886,
-   "adjRunsPerPitchPitcherPositive": 0.000351,
-   "n": 1644
-  },
-  {
-   "name": "Waldron, Matt",
-   "resid": 0.000875,
-   "adjRunsPerPitchPitcherPositive": -0.000347,
-   "n": 541
-  },
-  {
-   "name": "Ashcraft, Braxton",
-   "resid": -0.00087,
-   "adjRunsPerPitchPitcherPositive": 0.000344,
-   "n": 1868
-  },
-  {
-   "name": "Lugo, Seth",
-   "resid": -0.000868,
-   "adjRunsPerPitchPitcherPositive": 0.000344,
-   "n": 1883
-  },
-  {
-   "name": "Graceffo, Gordon",
-   "resid": -0.000863,
-   "adjRunsPerPitchPitcherPositive": 0.000342,
-   "n": 762
-  },
-  {
-   "name": "Mattson, Isaac",
-   "resid": -0.00086,
-   "adjRunsPerPitchPitcherPositive": 0.00034,
-   "n": 609
-  },
-  {
-   "name": "Shugart, Chase",
-   "resid": -0.000831,
-   "adjRunsPerPitchPitcherPositive": 0.000329,
-   "n": 602
-  },
-  {
-   "name": "Garcia, Brandyn",
-   "resid": 0.00083,
-   "adjRunsPerPitchPitcherPositive": -0.000328,
-   "n": 371
+   "name": "Murphy, Chris",
+   "resid": 0.000974,
+   "adjRunsPerPitchPitcherPositive": -0.000385,
+   "n": 463
   },
   {
    "name": "Sale, Chris",
-   "resid": 0.000823,
-   "adjRunsPerPitchPitcherPositive": -0.000326,
-   "n": 1770
+   "resid": 0.000966,
+   "adjRunsPerPitchPitcherPositive": -0.000382,
+   "n": 1864
   },
   {
-   "name": "Holmes, Clay",
-   "resid": -0.00081,
-   "adjRunsPerPitchPitcherPositive": 0.000321,
-   "n": 828
+   "name": "Bibee, Tanner",
+   "resid": -0.000961,
+   "adjRunsPerPitchPitcherPositive": 0.00038,
+   "n": 1953
   },
   {
-   "name": "Svanson, Matt",
-   "resid": -0.000809,
-   "adjRunsPerPitchPitcherPositive": 0.00032,
-   "n": 767
+   "name": "Kittredge, Andrew",
+   "resid": -0.000955,
+   "adjRunsPerPitchPitcherPositive": 0.000378,
+   "n": 462
   },
   {
-   "name": "Schultz, Noah",
-   "resid": 0.000795,
-   "adjRunsPerPitchPitcherPositive": -0.000315,
-   "n": 1131
+   "name": "Pfaadt, Brandon",
+   "resid": -0.00094,
+   "adjRunsPerPitchPitcherPositive": 0.000372,
+   "n": 1060
   },
   {
-   "name": "Ferguson, Caleb",
-   "resid": 0.000789,
-   "adjRunsPerPitchPitcherPositive": -0.000312,
-   "n": 359
+   "name": "Strider, Spencer",
+   "resid": 0.00093,
+   "adjRunsPerPitchPitcherPositive": -0.000368,
+   "n": 691
   },
   {
-   "name": "Johnson, Seth",
-   "resid": -0.000772,
-   "adjRunsPerPitchPitcherPositive": 0.000305,
-   "n": 425
+   "name": "McGreevy, Michael",
+   "resid": 0.000925,
+   "adjRunsPerPitchPitcherPositive": -0.000366,
+   "n": 1840
   },
   {
-   "name": "Santillan, Tony",
-   "resid": -0.00077,
-   "adjRunsPerPitchPitcherPositive": 0.000305,
-   "n": 498
+   "name": "Varland, Gus",
+   "resid": -0.00092,
+   "adjRunsPerPitchPitcherPositive": 0.000364,
+   "n": 719
   },
   {
-   "name": "Bednar, David",
-   "resid": 0.000754,
-   "adjRunsPerPitchPitcherPositive": -0.000299,
-   "n": 761
+   "name": "Garcia, Brandyn",
+   "resid": 0.000911,
+   "adjRunsPerPitchPitcherPositive": -0.000361,
+   "n": 396
   },
   {
-   "name": "Morillo, Juan",
-   "resid": -0.000755,
-   "adjRunsPerPitchPitcherPositive": 0.000299,
-   "n": 663
-  },
-  {
-   "name": "Mahle, Tyler",
-   "resid": 0.000753,
-   "adjRunsPerPitchPitcherPositive": -0.000298,
-   "n": 1479
-  },
-  {
-   "name": "Lorenzen, Michael",
-   "resid": 0.000751,
-   "adjRunsPerPitchPitcherPositive": -0.000297,
-   "n": 1841
-  },
-  {
-   "name": "Okert, Steven",
-   "resid": 0.000741,
-   "adjRunsPerPitchPitcherPositive": -0.000293,
-   "n": 786
-  },
-  {
-   "name": "Raley, Brooks",
-   "resid": -0.000733,
-   "adjRunsPerPitchPitcherPositive": 0.00029,
-   "n": 607
-  },
-  {
-   "name": "Sterner, Justin",
-   "resid": 0.000729,
-   "adjRunsPerPitchPitcherPositive": -0.000289,
-   "n": 726
-  },
-  {
-   "name": "Prielipp, Connor",
-   "resid": 0.000728,
-   "adjRunsPerPitchPitcherPositive": -0.000288,
-   "n": 1228
-  },
-  {
-   "name": "Moll, Sam",
-   "resid": -0.000721,
-   "adjRunsPerPitchPitcherPositive": 0.000285,
-   "n": 771
+   "name": "Barlow, Scott",
+   "resid": -0.000901,
+   "adjRunsPerPitchPitcherPositive": 0.000357,
+   "n": 581
   },
   {
    "name": "Cruz, Fernando",
-   "resid": 0.000718,
-   "adjRunsPerPitchPitcherPositive": -0.000284,
-   "n": 770
+   "resid": 0.000899,
+   "adjRunsPerPitchPitcherPositive": -0.000356,
+   "n": 785
   },
   {
-   "name": "Matz, Steven",
-   "resid": -0.000708,
-   "adjRunsPerPitchPitcherPositive": 0.00028,
-   "n": 918
+   "name": "Martinez, Nick",
+   "resid": -0.000896,
+   "adjRunsPerPitchPitcherPositive": 0.000355,
+   "n": 1644
+  },
+  {
+   "name": "Holton, Tyler",
+   "resid": 0.00088,
+   "adjRunsPerPitchPitcherPositive": -0.000348,
+   "n": 767
+  },
+  {
+   "name": "Ashcraft, Braxton",
+   "resid": -0.000877,
+   "adjRunsPerPitchPitcherPositive": 0.000347,
+   "n": 1868
+  },
+  {
+   "name": "Sandoval, Patrick",
+   "resid": -0.000862,
+   "adjRunsPerPitchPitcherPositive": 0.000341,
+   "n": 350
+  },
+  {
+   "name": "Lugo, Seth",
+   "resid": -0.00085,
+   "adjRunsPerPitchPitcherPositive": 0.000336,
+   "n": 1967
+  },
+  {
+   "name": "Shugart, Chase",
+   "resid": -0.000837,
+   "adjRunsPerPitchPitcherPositive": 0.000331,
+   "n": 602
+  },
+  {
+   "name": "Holmes, Clay",
+   "resid": -0.000818,
+   "adjRunsPerPitchPitcherPositive": 0.000324,
+   "n": 828
+  },
+  {
+   "name": "Bowlan, Jonathan",
+   "resid": -0.000815,
+   "adjRunsPerPitchPitcherPositive": 0.000322,
+   "n": 617
+  },
+  {
+   "name": "Okert, Steven",
+   "resid": 0.000788,
+   "adjRunsPerPitchPitcherPositive": -0.000312,
+   "n": 826
+  },
+  {
+   "name": "Schultz, Noah",
+   "resid": 0.000786,
+   "adjRunsPerPitchPitcherPositive": -0.000311,
+   "n": 1131
+  },
+  {
+   "name": "Santillan, Tony",
+   "resid": -0.000776,
+   "adjRunsPerPitchPitcherPositive": 0.000307,
+   "n": 498
+  },
+  {
+   "name": "Svanson, Matt",
+   "resid": -0.000765,
+   "adjRunsPerPitchPitcherPositive": 0.000303,
+   "n": 788
+  },
+  {
+   "name": "Mahle, Tyler",
+   "resid": 0.00075,
+   "adjRunsPerPitchPitcherPositive": -0.000297,
+   "n": 1479
+  },
+  {
+   "name": "Raley, Brooks",
+   "resid": -0.000741,
+   "adjRunsPerPitchPitcherPositive": 0.000293,
+   "n": 607
+  },
+  {
+   "name": "Webb, Logan",
+   "resid": -0.000733,
+   "adjRunsPerPitchPitcherPositive": 0.00029,
+   "n": 1789
+  },
+  {
+   "name": "Prielipp, Connor",
+   "resid": 0.000722,
+   "adjRunsPerPitchPitcherPositive": -0.000286,
+   "n": 1228
+  },
+  {
+   "name": "Sterner, Justin",
+   "resid": 0.000721,
+   "adjRunsPerPitchPitcherPositive": -0.000285,
+   "n": 726
   },
   {
    "name": "L\u00f3pez, Reynaldo",
-   "resid": 0.000703,
-   "adjRunsPerPitchPitcherPositive": -0.000278,
+   "resid": 0.000697,
+   "adjRunsPerPitchPitcherPositive": -0.000276,
    "n": 1226
   },
   {
    "name": "Harrison, Kyle",
-   "resid": -0.000676,
-   "adjRunsPerPitchPitcherPositive": 0.000268,
+   "resid": -0.000682,
+   "adjRunsPerPitchPitcherPositive": 0.00027,
    "n": 1457
   },
   {
-   "name": "Gusto, Ryan",
-   "resid": -0.000663,
-   "adjRunsPerPitchPitcherPositive": 0.000262,
-   "n": 566
+   "name": "Waldron, Matt",
+   "resid": 0.00068,
+   "adjRunsPerPitchPitcherPositive": -0.000269,
+   "n": 541
   },
   {
-   "name": "Cabrera, Edward",
-   "resid": 0.000638,
-   "adjRunsPerPitchPitcherPositive": -0.000252,
-   "n": 1203
+   "name": "Johnson, Seth",
+   "resid": -0.000677,
+   "adjRunsPerPitchPitcherPositive": 0.000268,
+   "n": 442
+  },
+  {
+   "name": "Bednar, David",
+   "resid": 0.000675,
+   "adjRunsPerPitchPitcherPositive": -0.000267,
+   "n": 786
+  },
+  {
+   "name": "Matz, Steven",
+   "resid": -0.000659,
+   "adjRunsPerPitchPitcherPositive": 0.000261,
+   "n": 940
   },
   {
    "name": "Gordon, Tanner",
-   "resid": -0.000633,
-   "adjRunsPerPitchPitcherPositive": 0.000251,
+   "resid": -0.000639,
+   "adjRunsPerPitchPitcherPositive": 0.000253,
    "n": 942
   },
   {
-   "name": "Painter, Andrew",
-   "resid": 0.000615,
-   "adjRunsPerPitchPitcherPositive": -0.000243,
-   "n": 1209
+   "name": "Cabrera, Edward",
+   "resid": 0.000632,
+   "adjRunsPerPitchPitcherPositive": -0.00025,
+   "n": 1203
   },
   {
    "name": "Parker, Mitchell",
-   "resid": -0.000604,
-   "adjRunsPerPitchPitcherPositive": 0.000239,
+   "resid": -0.000611,
+   "adjRunsPerPitchPitcherPositive": 0.000242,
    "n": 871
   },
   {
-   "name": "Wacha, Michael",
-   "resid": 0.000602,
-   "adjRunsPerPitchPitcherPositive": -0.000238,
-   "n": 1970
+   "name": "Painter, Andrew",
+   "resid": 0.000608,
+   "adjRunsPerPitchPitcherPositive": -0.000241,
+   "n": 1209
   },
   {
    "name": "Beck, Brendan",
-   "resid": 0.000599,
-   "adjRunsPerPitchPitcherPositive": -0.000237,
+   "resid": 0.000597,
+   "adjRunsPerPitchPitcherPositive": -0.000236,
    "n": 382
   },
   {
+   "name": "Wacha, Michael",
+   "resid": 0.000593,
+   "adjRunsPerPitchPitcherPositive": -0.000235,
+   "n": 1970
+  },
+  {
+   "name": "Lorenzen, Michael",
+   "resid": 0.000583,
+   "adjRunsPerPitchPitcherPositive": -0.000231,
+   "n": 1934
+  },
+  {
    "name": "Sandlin, David",
-   "resid": 0.00059,
-   "adjRunsPerPitchPitcherPositive": -0.000233,
+   "resid": 0.000583,
+   "adjRunsPerPitchPitcherPositive": -0.000231,
    "n": 313
   },
   {
-   "name": "Murphy, Chris",
-   "resid": 0.000584,
-   "adjRunsPerPitchPitcherPositive": -0.000231,
-   "n": 444
-  },
-  {
-   "name": "Houser, Adrian",
-   "resid": 0.000568,
-   "adjRunsPerPitchPitcherPositive": -0.000225,
-   "n": 1400
-  },
-  {
-   "name": "Bassitt, Chris",
-   "resid": 0.000565,
-   "adjRunsPerPitchPitcherPositive": -0.000224,
-   "n": 979
-  },
-  {
    "name": "Burrows, Mike",
-   "resid": -0.000565,
-   "adjRunsPerPitchPitcherPositive": 0.000224,
+   "resid": -0.000573,
+   "adjRunsPerPitchPitcherPositive": 0.000227,
    "n": 1563
   },
   {
    "name": "Gray, Sonny",
-   "resid": -0.000555,
-   "adjRunsPerPitchPitcherPositive": 0.00022,
+   "resid": -0.000563,
+   "adjRunsPerPitchPitcherPositive": 0.000223,
    "n": 1558
   },
   {
-   "name": "Povich, Cade",
-   "resid": 0.000555,
+   "name": "Houser, Adrian",
+   "resid": 0.00056,
+   "adjRunsPerPitchPitcherPositive": -0.000222,
+   "n": 1400
+  },
+  {
+   "name": "Bassitt, Chris",
+   "resid": 0.000557,
    "adjRunsPerPitchPitcherPositive": -0.00022,
+   "n": 979
+  },
+  {
+   "name": "Castillo, Luis",
+   "resid": -0.000549,
+   "adjRunsPerPitchPitcherPositive": 0.000218,
+   "n": 1765
+  },
+  {
+   "name": "Povich, Cade",
+   "resid": 0.000548,
+   "adjRunsPerPitchPitcherPositive": -0.000217,
    "n": 304
   },
   {
+   "name": "Medina, Luis",
+   "resid": -0.000546,
+   "adjRunsPerPitchPitcherPositive": 0.000216,
+   "n": 848
+  },
+  {
+   "name": "Morillo, Juan",
+   "resid": -0.000536,
+   "adjRunsPerPitchPitcherPositive": 0.000212,
+   "n": 670
+  },
+  {
    "name": "Buehler, Walker",
-   "resid": -0.00051,
-   "adjRunsPerPitchPitcherPositive": 0.000202,
+   "resid": -0.000517,
+   "adjRunsPerPitchPitcherPositive": 0.000205,
    "n": 1722
   },
   {
    "name": "Ragans, Cole",
-   "resid": -0.000509,
-   "adjRunsPerPitchPitcherPositive": 0.000201,
+   "resid": -0.000512,
+   "adjRunsPerPitchPitcherPositive": 0.000203,
    "n": 636
   },
   {
-   "name": "Abreu, Bryan",
-   "resid": 0.000498,
-   "adjRunsPerPitchPitcherPositive": -0.000197,
-   "n": 666
+   "name": "Harris, Hogan",
+   "resid": -0.000503,
+   "adjRunsPerPitchPitcherPositive": 0.000199,
+   "n": 910
   },
   {
-   "name": "Funderburk, Kody",
-   "resid": -0.000492,
-   "adjRunsPerPitchPitcherPositive": 0.000195,
-   "n": 486
+   "name": "Yoho, Craig",
+   "resid": 0.000503,
+   "adjRunsPerPitchPitcherPositive": -0.000199,
+   "n": 308
   },
   {
    "name": "Lovelady, Richard",
-   "resid": -0.000487,
-   "adjRunsPerPitchPitcherPositive": 0.000193,
+   "resid": -0.000493,
+   "adjRunsPerPitchPitcherPositive": 0.000195,
    "n": 538
   },
   {
    "name": "Davis, Tyler",
-   "resid": -0.000475,
-   "adjRunsPerPitchPitcherPositive": 0.000188,
+   "resid": -0.000484,
+   "adjRunsPerPitchPitcherPositive": 0.000192,
    "n": 431
   },
   {
-   "name": "Uribe, Abner",
-   "resid": -0.000472,
-   "adjRunsPerPitchPitcherPositive": 0.000187,
-   "n": 638
+   "name": "Lynch IV, Daniel",
+   "resid": 0.000474,
+   "adjRunsPerPitchPitcherPositive": -0.000187,
+   "n": 664
+  },
+  {
+   "name": "Wheeler, Zack",
+   "resid": -0.00047,
+   "adjRunsPerPitchPitcherPositive": 0.000186,
+   "n": 1674
   },
   {
    "name": "Henriquez, Edgardo",
-   "resid": 0.00047,
-   "adjRunsPerPitchPitcherPositive": -0.000186,
+   "resid": 0.00046,
+   "adjRunsPerPitchPitcherPositive": -0.000182,
    "n": 646
   },
   {
    "name": "Romero, JoJo",
-   "resid": 0.000464,
-   "adjRunsPerPitchPitcherPositive": -0.000184,
+   "resid": 0.000458,
+   "adjRunsPerPitchPitcherPositive": -0.000182,
    "n": 721
-  },
-  {
-   "name": "Skubal, Tarik",
-   "resid": -0.000465,
-   "adjRunsPerPitchPitcherPositive": 0.000184,
-   "n": 1339
-  },
-  {
-   "name": "Wheeler, Zack",
-   "resid": -0.000461,
-   "adjRunsPerPitchPitcherPositive": 0.000183,
-   "n": 1674
   },
   {
    "name": "Hicks, Jordan",
    "resid": 0.000447,
    "adjRunsPerPitchPitcherPositive": -0.000177,
-   "n": 505
+   "n": 543
   },
   {
    "name": "Scholtens, Jesse",
-   "resid": -0.000426,
-   "adjRunsPerPitchPitcherPositive": 0.000169,
+   "resid": -0.000433,
+   "adjRunsPerPitchPitcherPositive": 0.000171,
    "n": 601
   },
   {
+   "name": "Cano, Yennier",
+   "resid": 0.000421,
+   "adjRunsPerPitchPitcherPositive": -0.000167,
+   "n": 544
+  },
+  {
+   "name": "Graceffo, Gordon",
+   "resid": -0.000419,
+   "adjRunsPerPitchPitcherPositive": 0.000166,
+   "n": 800
+  },
+  {
+   "name": "Peralta, Wandy",
+   "resid": 0.000406,
+   "adjRunsPerPitchPitcherPositive": -0.000161,
+   "n": 834
+  },
+  {
    "name": "Kuhnel, Joel",
-   "resid": -0.000394,
-   "adjRunsPerPitchPitcherPositive": 0.000156,
+   "resid": -0.000402,
+   "adjRunsPerPitchPitcherPositive": 0.000159,
    "n": 562
   },
   {
-   "name": "Varland, Gus",
-   "resid": -0.000393,
-   "adjRunsPerPitchPitcherPositive": 0.000156,
-   "n": 703
-  },
-  {
-   "name": "M\u00e1rquez, Germ\u00e1n",
-   "resid": -0.000386,
-   "adjRunsPerPitchPitcherPositive": 0.000153,
-   "n": 745
-  },
-  {
-   "name": "Schweitzer, Tyler",
-   "resid": -0.000388,
-   "adjRunsPerPitchPitcherPositive": 0.000153,
-   "n": 306
-  },
-  {
-   "name": "Crochet, Garrett",
-   "resid": 0.000376,
-   "adjRunsPerPitchPitcherPositive": -0.000149,
-   "n": 518
-  },
-  {
-   "name": "Medina, Luis",
-   "resid": -0.000371,
-   "adjRunsPerPitchPitcherPositive": 0.000147,
-   "n": 818
-  },
-  {
-   "name": "Wrobleski, Justin",
-   "resid": 0.000372,
-   "adjRunsPerPitchPitcherPositive": -0.000147,
-   "n": 1524
-  },
-  {
-   "name": "Soroka, Michael",
-   "resid": -0.00036,
-   "adjRunsPerPitchPitcherPositive": 0.000142,
-   "n": 1290
-  },
-  {
-   "name": "Blubaugh, AJ",
-   "resid": 0.000348,
-   "adjRunsPerPitchPitcherPositive": -0.000138,
-   "n": 1186
-  },
-  {
-   "name": "Cano, Yennier",
-   "resid": 0.000345,
-   "adjRunsPerPitchPitcherPositive": -0.000137,
-   "n": 532
-  },
-  {
    "name": "Scherzer, Max",
-   "resid": 0.000345,
-   "adjRunsPerPitchPitcherPositive": -0.000136,
+   "resid": 0.000399,
+   "adjRunsPerPitchPitcherPositive": -0.000158,
    "n": 556
   },
   {
+   "name": "Kinley, Tyler",
+   "resid": -0.000395,
+   "adjRunsPerPitchPitcherPositive": 0.000156,
+   "n": 626
+  },
+  {
+   "name": "M\u00e1rquez, Germ\u00e1n",
+   "resid": -0.000392,
+   "adjRunsPerPitchPitcherPositive": 0.000155,
+   "n": 745
+  },
+  {
+   "name": "Ferrer, Jos\u00e9 A.",
+   "resid": -0.000376,
+   "adjRunsPerPitchPitcherPositive": 0.000149,
+   "n": 712
+  },
+  {
+   "name": "Crochet, Garrett",
+   "resid": 0.000372,
+   "adjRunsPerPitchPitcherPositive": -0.000147,
+   "n": 518
+  },
+  {
+   "name": "Soroka, Michael",
+   "resid": -0.000367,
+   "adjRunsPerPitchPitcherPositive": 0.000145,
+   "n": 1290
+  },
+  {
+   "name": "Skubal, Tarik",
+   "resid": -0.000357,
+   "adjRunsPerPitchPitcherPositive": 0.000141,
+   "n": 1431
+  },
+  {
    "name": "Henry, Cole",
-   "resid": -0.000337,
-   "adjRunsPerPitchPitcherPositive": 0.000134,
+   "resid": -0.000345,
+   "adjRunsPerPitchPitcherPositive": 0.000137,
    "n": 534
   },
   {
    "name": "Lowder, Rhett",
-   "resid": 0.000323,
-   "adjRunsPerPitchPitcherPositive": -0.000128,
+   "resid": 0.000317,
+   "adjRunsPerPitchPitcherPositive": -0.000126,
    "n": 1324
   },
   {
    "name": "Burke, Sean",
-   "resid": 0.000322,
-   "adjRunsPerPitchPitcherPositive": -0.000127,
+   "resid": 0.000315,
+   "adjRunsPerPitchPitcherPositive": -0.000125,
    "n": 1908
   },
   {
-   "name": "Junis, Jakob",
-   "resid": 0.0003,
-   "adjRunsPerPitchPitcherPositive": -0.000119,
-   "n": 575
+   "name": "Blubaugh, AJ",
+   "resid": 0.000287,
+   "adjRunsPerPitchPitcherPositive": -0.000113,
+   "n": 1186
+  },
+  {
+   "name": "Uribe, Abner",
+   "resid": -0.000283,
+   "adjRunsPerPitchPitcherPositive": 0.000112,
+   "n": 653
+  },
+  {
+   "name": "Wrobleski, Justin",
+   "resid": -0.000275,
+   "adjRunsPerPitchPitcherPositive": 0.000109,
+   "n": 1626
   },
   {
    "name": "Webb, Jacob",
-   "resid": -0.000274,
-   "adjRunsPerPitchPitcherPositive": 0.000109,
-   "n": 885
-  },
-  {
-   "name": "Javier, Cristian",
-   "resid": -0.000252,
-   "adjRunsPerPitchPitcherPositive": 0.0001,
-   "n": 395
+   "resid": -0.000248,
+   "adjRunsPerPitchPitcherPositive": 9.8e-05,
+   "n": 898
   },
   {
    "name": "Montero, Keider",
-   "resid": -0.000246,
-   "adjRunsPerPitchPitcherPositive": 9.7e-05,
+   "resid": -0.000244,
+   "adjRunsPerPitchPitcherPositive": 9.6e-05,
    "n": 1592
   },
   {
-   "name": "Lynch IV, Daniel",
-   "resid": 0.000238,
-   "adjRunsPerPitchPitcherPositive": -9.4e-05,
-   "n": 644
-  },
-  {
    "name": "Leiter Jr., Mark",
-   "resid": 0.000236,
-   "adjRunsPerPitchPitcherPositive": -9.3e-05,
+   "resid": 0.00023,
+   "adjRunsPerPitchPitcherPositive": -9.1e-05,
    "n": 551
   },
   {
-   "name": "Bradley, Taj",
-   "resid": -0.000231,
-   "adjRunsPerPitchPitcherPositive": 9.1e-05,
-   "n": 1948
+   "name": "Javier, Cristian",
+   "resid": -0.000225,
+   "adjRunsPerPitchPitcherPositive": 8.9e-05,
+   "n": 395
   },
   {
-   "name": "Bowlan, Jonathan",
-   "resid": -0.000215,
-   "adjRunsPerPitchPitcherPositive": 8.5e-05,
-   "n": 599
+   "name": "Bradley, Taj",
+   "resid": -0.000222,
+   "adjRunsPerPitchPitcherPositive": 8.8e-05,
+   "n": 2050
   },
   {
    "name": "Avila, Luinder",
-   "resid": 0.000204,
-   "adjRunsPerPitchPitcherPositive": -8.1e-05,
+   "resid": 0.000198,
+   "adjRunsPerPitchPitcherPositive": -7.8e-05,
    "n": 1233
   },
   {
-   "name": "Rodriguez, Bradgley",
-   "resid": -0.000193,
-   "adjRunsPerPitchPitcherPositive": 7.6e-05,
-   "n": 709
-  },
-  {
    "name": "Valdez, Framber",
-   "resid": -0.000185,
-   "adjRunsPerPitchPitcherPositive": 7.3e-05,
+   "resid": -0.000194,
+   "adjRunsPerPitchPitcherPositive": 7.7e-05,
    "n": 1823
   },
   {
+   "name": "Bruihl, Justin",
+   "resid": 0.000193,
+   "adjRunsPerPitchPitcherPositive": -7.6e-05,
+   "n": 891
+  },
+  {
    "name": "Erceg, Lucas",
-   "resid": -0.000176,
-   "adjRunsPerPitchPitcherPositive": 7e-05,
+   "resid": -0.000185,
+   "adjRunsPerPitchPitcherPositive": 7.3e-05,
    "n": 721
   },
   {
-   "name": "Castillo, Luis",
-   "resid": -0.000173,
-   "adjRunsPerPitchPitcherPositive": 6.8e-05,
-   "n": 1675
-  },
-  {
-   "name": "Murray, Jayden",
-   "resid": 0.00017,
-   "adjRunsPerPitchPitcherPositive": -6.7e-05,
-   "n": 304
+   "name": "Funderburk, Kody",
+   "resid": -0.000179,
+   "adjRunsPerPitchPitcherPositive": 7.1e-05,
+   "n": 513
   },
   {
    "name": "Ginn, J.T.",
-   "resid": -0.000167,
-   "adjRunsPerPitchPitcherPositive": 6.6e-05,
+   "resid": -0.000175,
+   "adjRunsPerPitchPitcherPositive": 6.9e-05,
    "n": 1728
   },
   {
+   "name": "Murray, Jayden",
+   "resid": 0.000164,
+   "adjRunsPerPitchPitcherPositive": -6.5e-05,
+   "n": 304
+  },
+  {
    "name": "Coulombe, Danny",
-   "resid": 0.000158,
-   "adjRunsPerPitchPitcherPositive": -6.3e-05,
+   "resid": 0.000148,
+   "adjRunsPerPitchPitcherPositive": -5.9e-05,
    "n": 404
   },
   {
-   "name": "Harris, Hogan",
-   "resid": -0.000153,
-   "adjRunsPerPitchPitcherPositive": 6.1e-05,
-   "n": 884
-  },
-  {
-   "name": "Ferrer, Jos\u00e9 A.",
-   "resid": 0.000143,
-   "adjRunsPerPitchPitcherPositive": -5.7e-05,
-   "n": 702
-  },
-  {
-   "name": "Weathers, Ryan",
-   "resid": 0.000111,
-   "adjRunsPerPitchPitcherPositive": -4.4e-05,
-   "n": 1719
-  },
-  {
-   "name": "Peterson, David",
-   "resid": 0.000107,
-   "adjRunsPerPitchPitcherPositive": -4.2e-05,
-   "n": 1554
-  },
-  {
    "name": "Armstrong, Shawn",
-   "resid": -0.000103,
-   "adjRunsPerPitchPitcherPositive": 4.1e-05,
+   "resid": -0.000111,
+   "adjRunsPerPitchPitcherPositive": 4.4e-05,
    "n": 597
   },
   {
-   "name": "Shuman, Seth",
-   "resid": 0.0001,
-   "adjRunsPerPitchPitcherPositive": -4e-05,
-   "n": 515
+   "name": "Peterson, David",
+   "resid": 0.000108,
+   "adjRunsPerPitchPitcherPositive": -4.3e-05,
+   "n": 1554
   },
   {
-   "name": "Bruihl, Justin",
-   "resid": 9.7e-05,
-   "adjRunsPerPitchPitcherPositive": -3.9e-05,
-   "n": 844
+   "name": "Weathers, Ryan",
+   "resid": 0.000106,
+   "adjRunsPerPitchPitcherPositive": -4.2e-05,
+   "n": 1719
   },
   {
    "name": "Walker, Taijuan",
-   "resid": -9.7e-05,
-   "adjRunsPerPitchPitcherPositive": 3.8e-05,
+   "resid": -0.000102,
+   "adjRunsPerPitchPitcherPositive": 4e-05,
    "n": 424
   },
   {
-   "name": "Kinley, Tyler",
-   "resid": -8.3e-05,
-   "adjRunsPerPitchPitcherPositive": 3.3e-05,
-   "n": 611
+   "name": "Rodriguez, Bradgley",
+   "resid": -9.1e-05,
+   "adjRunsPerPitchPitcherPositive": 3.6e-05,
+   "n": 738
+  },
+  {
+   "name": "Shuman, Seth",
+   "resid": 9.1e-05,
+   "adjRunsPerPitchPitcherPositive": -3.6e-05,
+   "n": 515
   },
   {
    "name": "S\u00e1nchez, Cristopher",
-   "resid": 8.3e-05,
-   "adjRunsPerPitchPitcherPositive": -3.3e-05,
+   "resid": 7.6e-05,
+   "adjRunsPerPitchPitcherPositive": -3e-05,
    "n": 2103
   },
   {
    "name": "Bazardo, Eduard",
-   "resid": 7.9e-05,
-   "adjRunsPerPitchPitcherPositive": -3.1e-05,
-   "n": 743
+   "resid": 6.6e-05,
+   "adjRunsPerPitchPitcherPositive": -2.6e-05,
+   "n": 754
+  },
+  {
+   "name": "Schweitzer, Tyler",
+   "resid": -4.7e-05,
+   "adjRunsPerPitchPitcherPositive": 1.9e-05,
+   "n": 344
   },
   {
    "name": "Miller, Bryce",
-   "resid": 5.3e-05,
-   "adjRunsPerPitchPitcherPositive": -2.1e-05,
+   "resid": 4.4e-05,
+   "adjRunsPerPitchPitcherPositive": -1.7e-05,
    "n": 999
   },
   {
    "name": "Peralta, Freddy",
-   "resid": 4.5e-05,
-   "adjRunsPerPitchPitcherPositive": -1.8e-05,
+   "resid": 3.7e-05,
+   "adjRunsPerPitchPitcherPositive": -1.5e-05,
    "n": 2093
   },
   {
-   "name": "Peralta, Wandy",
-   "resid": -4.1e-05,
-   "adjRunsPerPitchPitcherPositive": 1.6e-05,
-   "n": 823
-  },
-  {
    "name": "Hall, DL",
-   "resid": 3.1e-05,
-   "adjRunsPerPitchPitcherPositive": -1.2e-05,
+   "resid": 2.4e-05,
+   "adjRunsPerPitchPitcherPositive": -1e-05,
    "n": 539
   },
   {
    "name": "Perales, Luis",
-   "resid": 1.9e-05,
-   "adjRunsPerPitchPitcherPositive": -7e-06,
+   "resid": 1.3e-05,
+   "adjRunsPerPitchPitcherPositive": -5e-06,
    "n": 1304
   },
   {
    "name": "Gil, Luis",
-   "resid": -0.0,
-   "adjRunsPerPitchPitcherPositive": 0.0,
+   "resid": -8e-06,
+   "adjRunsPerPitchPitcherPositive": 3e-06,
    "n": 421
   }
  ]
