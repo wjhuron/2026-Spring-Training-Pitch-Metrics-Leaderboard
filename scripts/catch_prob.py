@@ -15,10 +15,13 @@ Inputs:
   --dist   distance needed, feet (fielder start to landing spot)
   --time   opportunity time, seconds (pitch release to landing). One number
            per play; the batter and fielder cards share it.
-  --hang   hang time fallback (contact to landing). Used only if --time is
-           absent: opportunity = hang + pitch flight. Flight is 37.6/velo
-           when --velo (mph) is given (fits real pitches within ~3 ms,
-           69-100 mph), else --flight (default 0.39s, typical fastball).
+  --hang   hang time (contact to landing). With --time absent it rebuilds
+           opportunity = hang + pitch flight. With BOTH --time and --hang
+           given, the two independently rounded reads are intersected to
+           narrow the timing window (best accuracy: give time, hang, and
+           plate). Flight = --plate if given (exact, from the card), else
+           37.6/velo if --velo (mph) given, else --flight (default 0.39s).
+  --plate  plate time from the card, seconds (pitch release to plate).
   --zone   fielding zone string from the card, e.g. "Standard", "RF Gap",
            "LF Line", "CF". Anything other than Standard is a wall zone
            (ball landing within 8 ft of the outfield wall) and sets the
@@ -97,6 +100,7 @@ def main():
     ap.add_argument('--hang', type=float)
     ap.add_argument('--flight', type=float, default=0.39)
     ap.add_argument('--velo', type=float, help='pitch velocity mph; refines hang fallback')
+    ap.add_argument('--plate', type=float, help='plate time s from the card (exact flight)')
     ap.add_argument('--zone', type=str, default='')
     ap.add_argument('--back', action='store_true')
     ap.add_argument('--wall', action='store_true')
@@ -112,13 +116,32 @@ def main():
             args.hang = float(input('Hang time (s): '))
         args.zone = input('Fielding zone [standard]: ').strip() or 'standard'
 
+    if args.time is None and args.hang is None:
+        ap.error('need --time or --hang')
+    fl = args.plate if args.plate else (37.6 / args.velo if args.velo
+                                        else args.flight)
+    # Research-portal cards TRUNCATE to one decimal (proven: Benge card
+    # 3.5 vs true 3.589 vs Savant's rounded 3.6; a rounding assumption
+    # gives an empty intersection with the card's own hang + plate time).
+    # So card value T means true time in [T, T + 0.1].
     if args.time is None:
-        if args.hang is None:
-            ap.error('need --time or --hang')
-        fl = 37.6 / args.velo if args.velo else args.flight
-        args.time = args.hang + fl
-        print(f'opportunity time = {args.hang} hang + {fl:.3f} flight '
-              f'= {args.time:.2f}s')
+        args.time = args.hang + 0.05 + fl
+        print(f'opportunity time = {args.hang} hang (+0.05 truncation '
+              f'center) + {fl:.3f} flight = {args.time:.2f}s')
+    elif args.hang is not None:
+        # intersect the two truncation intervals and take the midpoint
+        card = args.time
+        lo = max(card, args.hang + fl)
+        hi = min(card + 0.1, args.hang + 0.1 + fl)
+        if lo <= hi:
+            args.time = (lo + hi) / 2
+            print(f'combined opportunity estimate {args.time:.3f}s '
+                  f'(card [{card}, {card + 0.1:.1f}], hang+flight '
+                  f'[{args.hang + fl:.2f}, {args.hang + 0.1 + fl:.2f}])')
+        else:
+            args.time = card + 0.05
+    else:
+        args.time = args.time + 0.05
 
     zone = args.zone.strip().lower()
     # "Standard", "Standard Left", "Standard Right" = no wall factor;
@@ -130,7 +153,22 @@ def main():
         print('back flag inferred from angle (|angle| >= 150)')
 
     cells, meta = load_surface()
-    p, n, ring = lookup(cells, round(args.time, 2), args.dist, back, wall)
+    t = args.time
+    if abs(t - round(t, 1)) < 0.005:
+        p, n, ring = lookup(cells, round(t, 1), args.dist, back, wall)
+    else:
+        # off-grid time (from a combined estimate): interpolate the two
+        # adjacent tenth-of-a-second surfaces
+        import math
+        t_lo = math.floor(t * 10) / 10
+        t_hi = t_lo + 0.1
+        p1, n1, r1 = lookup(cells, round(t_lo, 1), args.dist, back, wall)
+        p2, n2, r2 = lookup(cells, round(t_hi, 1), args.dist, back, wall)
+        w = (t - t_lo) / 0.1
+        if p1 is not None and p2 is not None:
+            p, n, ring = (1 - w) * p1 + w * p2, n1 + n2, max(r1, r2)
+        else:
+            p, n, ring = (p1 if p1 is not None else p2), (n1 or n2), 6
     if p is None:
         print('No comparable plays in the surface (inputs outside tracked range).')
         return

@@ -63,14 +63,19 @@
           <input id="cp-time" type="number" min="0" max="9" step="0.1" placeholder="3.6">
         </div>
         <div class="catch-field">
-          <label for="cp-hang">Hang time (s), fallback</label>
-          <input id="cp-hang" type="number" min="0" max="9" step="0.1" placeholder="used only if opportunity time is blank">
-          <div class="catch-hint">opportunity = hang + pitch flight (0.39s, or 37.6/velocity if given)</div>
+          <label for="cp-hang">Hang time (s)</label>
+          <input id="cp-hang" type="number" min="0" max="9" step="0.1" placeholder="4.8">
+          <div class="catch-hint">give this ALONGSIDE opportunity time: two independently rounded reads narrow the timing window</div>
+        </div>
+        <div class="catch-field">
+          <label for="cp-plate">Plate time (s), optional</label>
+          <input id="cp-plate" type="number" min="0.3" max="0.7" step="0.01" placeholder="0.41">
+          <div class="catch-hint">exact pitch flight from the card; beats the velocity estimate</div>
         </div>
         <div class="catch-field">
           <label for="cp-velo">Pitch velocity (mph), optional</label>
-          <input id="cp-velo" type="number" min="55" max="107" step="0.1" placeholder="refines the hang time fallback">
-          <div class="catch-hint">only used with hang time; irrelevant when opportunity time is given</div>
+          <input id="cp-velo" type="number" min="55" max="107" step="0.1" placeholder="fallback if no plate time">
+          <div class="catch-hint">only used with hang time when plate time is blank</div>
         </div>
         <div class="catch-field">
           <label for="cp-zone">Fielding zone (from the card)</label>

@@ -81,20 +81,51 @@
     var time = parseFloat(document.getElementById('cp-time').value);
     var hang = parseFloat(document.getElementById('cp-hang').value);
     var velo = parseFloat(document.getElementById('cp-velo').value);
+    var plate = parseFloat(document.getElementById('cp-plate').value);
     var wall = document.getElementById('cp-zone').value;
     var angle = parseFloat(document.getElementById('cp-angle').value);
     var back = (!isNaN(angle) && Math.abs(angle) >= 150) ? '1' : '0';
     var res = document.getElementById('cp-result');
 
+    // pitch flight: plate time from the card is exact; 37.6/velo fits
+    // real pitches within ~3ms; 0.39s is the typical-fastball default
+    var flight = !isNaN(plate) && plate > 0 ? plate
+               : (!isNaN(velo) && velo > 0 ? 37.6 / velo : FLIGHT);
+    // Research-portal cards TRUNCATE to one decimal (card value T means
+    // true time in [T, T + 0.1]), so center every card read at +0.05 and,
+    // when both clocks are given, intersect the two truncation intervals.
+    var combined = null;
     if (isNaN(time) && !isNaN(hang)) {
-      // flight = 37.6/velo fits release-to-plate time within ~3ms across
-      // 69-100 mph; 0.39s is the typical-fastball default
-      time = hang + (!isNaN(velo) && velo > 0 ? 37.6 / velo : FLIGHT);
+      time = hang + 0.05 + flight;
+    } else if (!isNaN(time) && !isNaN(hang)) {
+      var lo = Math.max(time, hang + flight);
+      var hi = Math.min(time + 0.1, hang + 0.1 + flight);
+      time = lo <= hi ? (lo + hi) / 2 : time + 0.05;
+      if (lo <= hi) combined = time;
+    } else if (!isNaN(time)) {
+      time = time + 0.05;
     }
     if (isNaN(dist) || isNaN(time)) { res.style.display = 'none'; return; }
 
-    var out = lookup(Math.round(time * 10) / 10, Math.round(dist),
-                     back, wall);
+    var out;
+    var tTenth = Math.round(time * 10) / 10;
+    if (Math.abs(time - tTenth) < 0.005) {
+      out = lookup(tTenth, Math.round(dist), back, wall);
+    } else {
+      // off-grid time from a combined estimate: interpolate the two
+      // adjacent tenth-of-a-second surfaces
+      var tLo = Math.floor(time * 10) / 10;
+      var tHi = Math.round((tLo + 0.1) * 10) / 10;
+      var o1 = lookup(tLo, Math.round(dist), back, wall);
+      var o2 = lookup(tHi, Math.round(dist), back, wall);
+      if (o1 && o2) {
+        var w = (time - tLo) / 0.1;
+        out = { p: (1 - w) * o1.p + w * o2.p, n: o1.n + o2.n,
+                ring: Math.max(o1.ring, o2.ring) };
+      } else {
+        out = o1 || o2;
+      }
+    }
     if (!out) {
       showError('No comparable tracked plays for those inputs.');
       return;
@@ -106,6 +137,8 @@
       starRange(out.p) + ' · Savant display: ' +
       Math.round(bucket(out.p) * 100) + '%';
     document.getElementById('cp-detail').textContent =
+      (combined ? 'combined opportunity estimate ' + combined.toFixed(3) +
+                  's · ' : '') +
       'flags: ' + (back === '1' ? 'going back' : 'not back') + ', ' +
       (wall === '1' ? 'wall factor' : 'no wall') + ' · ' +
       out.n + ' comparable plays within ±' +
@@ -113,7 +146,7 @@
       meta.seasons + ', ' + meta.plays.toLocaleString() + ' tracked plays';
   }
 
-  ['cp-dist', 'cp-time', 'cp-hang', 'cp-velo', 'cp-zone', 'cp-angle'].forEach(function (id) {
+  ['cp-dist', 'cp-time', 'cp-hang', 'cp-velo', 'cp-plate', 'cp-zone', 'cp-angle'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', update);
   });
 })();
