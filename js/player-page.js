@@ -16,7 +16,7 @@ var PlayerPage = {
     // grades but is pitcher-level, not a per-pitch atom mean — see
     // pipeline_pitcherplus.py.
     { key: 'pitcherPlus',       label: 'Pitcher+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    { key: 'pitcherPlusProj',   label: 'Pitcher+ Proj',    format: function(v) { return v != null ? Math.round(v) : '—'; } },
+    // Pitcher+ Proj removed 2026-07-30 (already hidden on leaderboards).
     // Rate stats and their composite estimator.
     { key: 'kPct',              label: 'K%',               format: function(v) { return Utils.formatPct(v); } },
     { key: 'bbPct',             label: 'BB%',              format: function(v) { return Utils.formatPct(v); } },

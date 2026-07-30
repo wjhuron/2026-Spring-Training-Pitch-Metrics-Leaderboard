@@ -707,6 +707,9 @@ def fetch_boxscores_for_team(date_str, team_abbrev, include_live=False, game_pk=
 BUBBLE_COLUMNS = [
     ('RESULT', [
         ('xRV/100',       'xRv100',    'xRv100_pctl',   'dec1+'),
+        # Pitcher+ (2026-07-30): flagship composite right after the outcome
+        # stat — mirrors the hitter card, where Hitter+ sits second in RESULT.
+        ('Pitcher+',      'pitcherPlus', 'pitcherPlus_pctl', 'int'),
         ('xwOBA',         'xwOBA',     'xwOBA_pctl',    '3dec'),
         ('K%',            'kPct',      'kPct_pctl',     'pct1'),
         ('BB%',           'bbPct',     'bbPct_pctl',    'pct1'),
