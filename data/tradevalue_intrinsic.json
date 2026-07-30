@@ -228,7 +228,7 @@
   {
    "name": "Caminero, Junior",
    "team": "TB",
-   "pos": "3b",
+   "pos": "3B",
    "age": 22,
    "mls": "1.058",
    "mlbam": "691406",
@@ -361,7 +361,7 @@
   {
    "name": "Crow-Armstrong, Pete",
    "team": "CHC",
-   "pos": "cf",
+   "pos": "CF",
    "age": 24,
    "mls": "1.170",
    "mlbam": "691718",
@@ -590,7 +590,7 @@
   {
    "name": "Griffin, Konnor",
    "team": "PIT",
-   "pos": "ss",
+   "pos": "SS",
    "age": 20,
    "mls": "0.000",
    "mlbam": "804606",
@@ -692,7 +692,7 @@
   {
    "name": "Witt Jr., Bobby",
    "team": "KC",
-   "pos": "ss",
+   "pos": "SS",
    "age": 26,
    "mls": "4.000",
    "mlbam": "677951",
@@ -788,7 +788,7 @@
   {
    "name": "Wood, James",
    "team": "WSH",
-   "pos": "dh-lf",
+   "pos": "RF",
    "age": 23,
    "mls": "1.091",
    "mlbam": "695578",
@@ -936,7 +936,7 @@
   {
    "name": "Holliday, Jackson",
    "team": "BAL",
-   "pos": "2b",
+   "pos": "2B",
    "age": 22,
    "mls": "1.078",
    "mlbam": "702616",
@@ -1067,7 +1067,7 @@
   {
    "name": "De La Cruz, Elly",
    "team": "CIN",
-   "pos": "ss",
+   "pos": "SS",
    "age": 24,
    "mls": "2.118",
    "mlbam": "682829",
@@ -1128,7 +1128,7 @@
   {
    "name": "Vargas, Miguel",
    "team": "CWS",
-   "pos": "3b",
+   "pos": "3B",
    "age": 26,
    "mls": "2.101",
    "mlbam": "678246",
@@ -1211,7 +1211,7 @@
   {
    "name": "Ram\u00edrez, Jos\u00e9",
    "team": "CLE",
-   "pos": "3b",
+   "pos": "3B",
    "age": 33,
    "mls": "11.074",
    "mlbam": "608070",
@@ -1291,7 +1291,7 @@
   {
    "name": "Langford, Wyatt",
    "team": "TEX",
-   "pos": "lf",
+   "pos": "LF",
    "age": 24,
    "mls": "2.000",
    "mlbam": "694671",
@@ -1352,7 +1352,7 @@
   {
    "name": "Kurtz, Nick",
    "team": "ATH",
-   "pos": "1b",
+   "pos": "1B",
    "age": 23,
    "mls": "1.000",
    "mlbam": "701762",
@@ -1422,7 +1422,7 @@
   {
    "name": "Carroll, Corbin",
    "team": "AZ",
-   "pos": "lf",
+   "pos": "RF",
    "age": 24,
    "mls": "3.038",
    "mlbam": "682998",
@@ -1491,7 +1491,7 @@
   {
    "name": "Rodr\u00edguez, Julio",
    "team": "SEA",
-   "pos": "cf",
+   "pos": "CF",
    "age": 25,
    "mls": "4.000",
    "mlbam": "677594",
@@ -1553,7 +1553,7 @@
   {
    "name": "Buxton, Byron",
    "team": "MIN",
-   "pos": "cf",
+   "pos": "CF",
    "age": 32,
    "mls": "9.160",
    "mlbam": "621439",
@@ -1668,7 +1668,7 @@
   {
    "name": "McGonigle, Kevin",
    "team": "DET",
-   "pos": "ss-3b",
+   "pos": "SS",
    "age": 21,
    "mls": "0.000",
    "mlbam": "805808",
@@ -1880,7 +1880,7 @@
   {
    "name": "Alvarez, Yordan",
    "team": "HOU",
-   "pos": "dh-lf",
+   "pos": "DH",
    "age": 29,
    "mls": "6.113",
    "mlbam": "670541",
@@ -1926,7 +1926,7 @@
   {
    "name": "Marte, Ketel",
    "team": "AZ",
-   "pos": "2b",
+   "pos": "2B",
    "age": 31,
    "mls": "9.162",
    "mlbam": "606466",
@@ -2068,7 +2068,7 @@
   {
    "name": "Henderson, Gunnar",
    "team": "BAL",
-   "pos": "ss",
+   "pos": "SS",
    "age": 25,
    "mls": "3.036",
    "mlbam": "683002",
@@ -2259,7 +2259,7 @@
   {
    "name": "Pages, Andy",
    "team": "LAD",
-   "pos": "cf",
+   "pos": "CF",
    "age": 25,
    "mls": "1.155",
    "mlbam": "681624",
@@ -2328,7 +2328,7 @@
   {
    "name": "Chourio, Jackson",
    "team": "MIL",
-   "pos": "of",
+   "pos": "LF",
    "age": 22,
    "mls": "2.000",
    "mlbam": "694192",
@@ -2406,7 +2406,7 @@
   {
    "name": "Montgomery, Colson",
    "team": "CWS",
-   "pos": "ss",
+   "pos": "SS",
    "age": 24,
    "mls": "0.087",
    "mlbam": "695657",
@@ -2693,7 +2693,7 @@
   {
    "name": "Lopez, Otto",
    "team": "MIA",
-   "pos": "2b",
+   "pos": "SS",
    "age": 27,
    "mls": "2.109",
    "mlbam": "672640",
@@ -2833,7 +2833,7 @@
   {
    "name": "Walker, Jordan",
    "team": "STL",
-   "pos": "rf",
+   "pos": "RF",
    "age": 24,
    "mls": "2.044",
    "mlbam": "691023",
@@ -2894,7 +2894,7 @@
   {
    "name": "Greene, Riley",
    "team": "DET",
-   "pos": "lf",
+   "pos": "LF",
    "age": 25,
    "mls": "3.110",
    "mlbam": "682985",
@@ -3034,7 +3034,7 @@
   {
    "name": "Harris II, Michael",
    "team": "ATL",
-   "pos": "cf",
+   "pos": "CF",
    "age": 25,
    "mls": "4.000",
    "mlbam": "671739",
@@ -3297,7 +3297,7 @@
   {
    "name": "Abreu, Wilyer",
    "team": "BOS",
-   "pos": "of",
+   "pos": "RF",
    "age": 27,
    "mls": "2.041",
    "mlbam": "677800",
@@ -3436,7 +3436,7 @@
   {
    "name": "Perdomo, Geraldo",
    "team": "AZ",
-   "pos": "ss",
+   "pos": "SS",
    "age": 25,
    "mls": "4.015",
    "mlbam": "672695",
@@ -3560,7 +3560,7 @@
   {
    "name": "Garcia, Maikel",
    "team": "KC",
-   "pos": "3b",
+   "pos": "3B",
    "age": 26,
    "mls": "2.168",
    "mlbam": "672580",
@@ -3629,7 +3629,7 @@
   {
    "name": "Wetherholt, JJ",
    "team": "STL",
-   "pos": "2b",
+   "pos": "2B",
    "age": 23,
    "mls": "0.000",
    "mlbam": "802139",
@@ -3731,7 +3731,7 @@
   {
    "name": "Swanson, Dansby",
    "team": "CHC",
-   "pos": "ss",
+   "pos": "SS",
    "age": 32,
    "mls": "9.047",
    "mlbam": "621020",
@@ -3941,7 +3941,7 @@
   {
    "name": "Crews, Dylan",
    "team": "WSH",
-   "pos": "rf",
+   "pos": "RF",
    "age": 24,
    "mls": "1.035",
    "mlbam": "686611",
@@ -4418,7 +4418,7 @@
   {
    "name": "Contreras, Willson",
    "team": "BOS",
-   "pos": "1b-dh",
+   "pos": "1B",
    "age": 34,
    "mls": "9.108",
    "mlbam": "575929",
@@ -4504,7 +4504,7 @@
   {
    "name": "Soderstrom, Tyler",
    "team": "ATH",
-   "pos": "lf",
+   "pos": "LF",
    "age": 24,
    "mls": "2.053",
    "mlbam": "691016",
@@ -4590,7 +4590,7 @@
   {
    "name": "Stewart, Sal",
    "team": "CIN",
-   "pos": "1b",
+   "pos": "1B",
    "age": 22,
    "mls": "0.028",
    "mlbam": "701398",
@@ -4668,7 +4668,7 @@
   {
    "name": "Carter, Evan",
    "team": "TEX",
-   "pos": "cf",
+   "pos": "CF",
    "age": 23,
    "mls": "1.170",
    "mlbam": "694497",
@@ -4808,7 +4808,7 @@
   {
    "name": "Bazzana, Travis",
    "team": "CLE",
-   "pos": "2b",
+   "pos": "2B",
    "age": 23,
    "mls": "0.000",
    "mlbam": "683953",
@@ -4886,7 +4886,7 @@
   {
    "name": "Smith, Cam",
    "team": "HOU",
-   "pos": "rf",
+   "pos": "RF",
    "age": 23,
    "mls": "1.000",
    "mlbam": "701358",
@@ -4955,7 +4955,7 @@
   {
    "name": "Winn, Masyn",
    "team": "STL",
-   "pos": "ss",
+   "pos": "SS",
    "age": 24,
    "mls": "2.045",
    "mlbam": "691026",
@@ -5126,7 +5126,7 @@
   {
    "name": "Turang, Brice",
    "team": "MIL",
-   "pos": "2b",
+   "pos": "2B",
    "age": 26,
    "mls": "2.165",
    "mlbam": "668930",
@@ -5249,7 +5249,7 @@
   {
    "name": "Rafaela, Ceddanne",
    "team": "BOS",
-   "pos": "cf-inf",
+   "pos": "CF",
    "age": 25,
    "mls": "2.035",
    "mlbam": "678882",
@@ -5468,7 +5468,7 @@
   {
    "name": "DeLauter, Chase",
    "team": "CLE",
-   "pos": "rf",
+   "pos": "RF",
    "age": 24,
    "mls": "0.000",
    "mlbam": "800050",
@@ -5546,7 +5546,7 @@
   {
    "name": "Lindor, Francisco",
    "team": "NYM",
-   "pos": "ss",
+   "pos": "SS",
    "age": 32,
    "mls": "10.113",
    "mlbam": "596019",
@@ -5618,7 +5618,7 @@
   {
    "name": "Neto, Zach",
    "team": "LAA",
-   "pos": "ss",
+   "pos": "SS",
    "age": 25,
    "mls": "2.170",
    "mlbam": "687263",
@@ -5728,7 +5728,7 @@
   {
    "name": "Dom\u00ednguez, Jasson",
    "team": "NYY",
-   "pos": "lf",
+   "pos": "RF",
    "age": 23,
    "mls": "1.130",
    "mlbam": "691176",
@@ -5843,7 +5843,7 @@
   {
    "name": "Abrams, CJ",
    "team": "WSH",
-   "pos": "ss",
+   "pos": "SS",
    "age": 25,
    "mls": "3.130",
    "mlbam": "682928",
@@ -5889,7 +5889,7 @@
   {
    "name": "Merrill, Jackson",
    "team": "SD",
-   "pos": "cf",
+   "pos": "CF",
    "age": 23,
    "mls": "2.000",
    "mlbam": "701538",
@@ -6045,7 +6045,7 @@
   {
    "name": "Keaschall, Luke",
    "team": "MIN",
-   "pos": "2b",
+   "pos": "2B",
    "age": 23,
    "mls": "0.164",
    "mlbam": "807712",
@@ -7636,7 +7636,7 @@
   {
    "name": "Acu\u00f1a Jr., Ronald",
    "team": "ATL",
-   "pos": "rf",
+   "pos": "RF",
    "age": 28,
    "mls": "7.159",
    "mlbam": "660670",
@@ -7752,7 +7752,7 @@
   {
    "name": "Betts, Mookie",
    "team": "LAD",
-   "pos": "ss",
+   "pos": "SS",
    "age": 33,
    "mls": "11.070",
    "mlbam": "605141",
@@ -7964,7 +7964,7 @@
   {
    "name": "Aranda, Jonathan",
    "team": "TB",
-   "pos": "2b",
+   "pos": "1B",
    "age": 28,
    "mls": "2.030",
    "mlbam": "666018",
@@ -8071,7 +8071,7 @@
   {
    "name": "Rocchio, Brayan",
    "team": "CLE",
-   "pos": "ss",
+   "pos": "SS",
    "age": 25,
    "mls": "2.001",
    "mlbam": "677587",
@@ -8132,7 +8132,7 @@
   {
    "name": "Busch, Michael",
    "team": "CHC",
-   "pos": "3b",
+   "pos": "1B",
    "age": 28,
    "mls": "2.045",
    "mlbam": "683737",
@@ -8193,7 +8193,7 @@
   {
    "name": "Benge, Carson",
    "team": "NYM",
-   "pos": "rf",
+   "pos": "RF",
    "age": 23,
    "mls": "0.000",
    "mlbam": "701807",
@@ -8341,7 +8341,7 @@
   {
    "name": "Wilson, Jacob",
    "team": "ATH",
-   "pos": "ss",
+   "pos": "SS",
    "age": 24,
    "mls": "1.073",
    "mlbam": "805779",
@@ -8481,7 +8481,7 @@
   {
    "name": "Cowser, Colton",
    "team": "BAL",
-   "pos": "of",
+   "pos": "CF",
    "age": 26,
    "mls": "2.043",
    "mlbam": "681297",
@@ -8682,7 +8682,7 @@
   {
    "name": "Young, Cole",
    "team": "SEA",
-   "pos": "ss",
+   "pos": "2B",
    "age": 22,
    "mls": "0.121",
    "mlbam": "702284",
@@ -8760,7 +8760,7 @@
   {
    "name": "Okamoto, Kazuma",
    "team": "TOR",
-   "pos": "3b-of",
+   "pos": "3B",
    "age": 30,
    "mls": "0.000",
    "mlbam": "672960",
@@ -8814,7 +8814,7 @@
   {
    "name": "Muncy, Max",
    "team": "LAD",
-   "pos": "3b",
+   "pos": "3B",
    "age": 35,
    "mls": "9.027",
    "mlbam": "571970",
@@ -9073,7 +9073,7 @@
   {
    "name": "Mayo, Coby",
    "team": "BAL",
-   "pos": "3b",
+   "pos": "3B",
    "age": 24,
    "mls": "0.170",
    "mlbam": "691723",
@@ -9224,7 +9224,7 @@
   {
    "name": "Caglianone, Jac",
    "team": "KC",
-   "pos": "rf-1b",
+   "pos": "RF",
    "age": 26,
    "mls": "0.118",
    "mlbam": "695506",
@@ -9380,7 +9380,7 @@
   {
    "name": "Eldridge, Bryce",
    "team": "SF",
-   "pos": "1b",
+   "pos": "DH",
    "age": 21,
    "mls": "0.014",
    "mlbam": "805811",
@@ -9458,7 +9458,7 @@
   {
    "name": "Beavers, Dylan",
    "team": "BAL",
-   "pos": "of",
+   "pos": "RF",
    "age": 24,
    "mls": "0.044",
    "mlbam": "687637",
@@ -9536,7 +9536,7 @@
   {
    "name": "Nimmo, Brandon",
    "team": "TEX",
-   "pos": "rf",
+   "pos": "RF",
    "age": 33,
    "mls": "9.042",
    "mlbam": "607043",
@@ -9598,7 +9598,7 @@
   {
    "name": "Clemens, Kody",
    "team": "MIN",
-   "pos": "2b",
+   "pos": "1B",
    "age": 30,
    "mls": "2.134",
    "mlbam": "665019",
@@ -9722,7 +9722,7 @@
   {
    "name": "Cruz, Oneil",
    "team": "PIT",
-   "pos": "cf",
+   "pos": "CF",
    "age": 27,
    "mls": "3.110",
    "mlbam": "665833",
@@ -9768,7 +9768,7 @@
   {
    "name": "Pe\u00f1a, Jeremy",
    "team": "HOU",
-   "pos": "ss",
+   "pos": "SS",
    "age": 28,
    "mls": "4.000",
    "mlbam": "665161",
@@ -9885,7 +9885,7 @@
   {
    "name": "Montgomery, Braden",
    "team": "CWS",
-   "pos": "of",
+   "pos": "RF",
    "age": 23,
    "mls": "0.000",
    "mlbam": "695731",
@@ -9963,7 +9963,7 @@
   {
    "name": "Antonacci, Sam",
    "team": "CWS",
-   "pos": "2b-ss",
+   "pos": "LF",
    "age": 23,
    "mls": "0.000",
    "mlbam": "803011",
@@ -10635,7 +10635,7 @@
   {
    "name": "Lawlar, Jordan",
    "team": "AZ",
-   "pos": "ss",
+   "pos": "LF",
    "age": 23,
    "mls": "0.073",
    "mlbam": "691783",
@@ -10713,7 +10713,7 @@
   {
    "name": "Keith, Colt",
    "team": "DET",
-   "pos": "1b-dh",
+   "pos": "3B",
    "age": 24,
    "mls": "2.000",
    "mlbam": "690993",
@@ -11030,7 +11030,7 @@
   {
    "name": "Emerson, Colt",
    "team": "SEA",
-   "pos": "ss",
+   "pos": "SS",
    "age": 20,
    "mls": "0.000",
    "mlbam": "806068",
@@ -11203,7 +11203,7 @@
   {
    "name": "Paredes, Isaac",
    "team": "HOU",
-   "pos": "3b",
+   "pos": "3B",
    "age": 27,
    "mls": "4.160",
    "mlbam": "670623",
@@ -11243,7 +11243,7 @@
   {
    "name": "Edwards, Xavier",
    "team": "MIA",
-   "pos": "2b",
+   "pos": "2B",
    "age": 26,
    "mls": "2.034",
    "mlbam": "669364",
@@ -11304,7 +11304,7 @@
   {
    "name": "Waldschmidt, Ryan",
    "team": "AZ",
-   "pos": "of",
+   "pos": "CF",
    "age": 23,
    "mls": "0.000",
    "mlbam": "814439",
@@ -11563,7 +11563,7 @@
   {
    "name": "D\u00edaz, Yandy",
    "team": "TB",
-   "pos": "1b",
+   "pos": "DH",
    "age": 34,
    "mls": "7.122",
    "mlbam": "650490",
@@ -11752,7 +11752,7 @@
   {
    "name": "Ortiz, Joey",
    "team": "MIL",
-   "pos": "ss",
+   "pos": "SS",
    "age": 27,
    "mls": "2.030",
    "mlbam": "687401",
@@ -11940,7 +11940,7 @@
   {
    "name": "Williams, Carson",
    "team": "TB",
-   "pos": "ss",
+   "pos": "SS",
    "age": 23,
    "mls": "0.039",
    "mlbam": "700246",
@@ -12018,7 +12018,7 @@
   {
    "name": "Freeman, Freddie",
    "team": "LAD",
-   "pos": "1b",
+   "pos": "1B",
    "age": 36,
    "mls": "15.033",
    "mlbam": "518692",
@@ -12056,7 +12056,7 @@
   {
    "name": "Simpson, Chandler",
    "team": "TB",
-   "pos": "of",
+   "pos": "LF",
    "age": 25,
    "mls": "0.140",
    "mlbam": "802415",
@@ -12134,7 +12134,7 @@
   {
    "name": "Mayer, Marcelo",
    "team": "BOS",
-   "pos": "2b",
+   "pos": "2B",
    "age": 23,
    "mls": "0.128",
    "mlbam": "691785",
@@ -12212,7 +12212,7 @@
   {
    "name": "Duran, Jarren",
    "team": "BOS",
-   "pos": "lf",
+   "pos": "LF",
    "age": 29,
    "mls": "3.155",
    "mlbam": "680776",
@@ -12258,7 +12258,7 @@
   {
    "name": "Jung, Josh",
    "team": "TEX",
-   "pos": "3b",
+   "pos": "3B",
    "age": 28,
    "mls": "3.023",
    "mlbam": "673962",
@@ -12311,7 +12311,7 @@
   {
    "name": "Gelof, Zack",
    "team": "ATH",
-   "pos": "2b",
+   "pos": "3B",
    "age": 26,
    "mls": "2.051",
    "mlbam": "680869",
@@ -12442,7 +12442,7 @@
   {
    "name": "Troy, Tommy",
    "team": "AZ",
-   "pos": "ss",
+   "pos": "LF",
    "age": 12,
    "mls": "0.000",
    "mlbam": "694371",
@@ -12520,7 +12520,7 @@
   {
    "name": "Robert Jr., Luis",
    "team": "NYM",
-   "pos": "cf",
+   "pos": "CF",
    "age": 28,
    "mls": "6.000",
    "mlbam": "673357",
@@ -12776,7 +12776,7 @@
   {
    "name": "Hern\u00e1ndez, Teoscar",
    "team": "LAD",
-   "pos": "lf",
+   "pos": "LF",
    "age": 33,
    "mls": "8.097",
    "mlbam": "606192",
@@ -12900,7 +12900,7 @@
   {
    "name": "Shaw, Matt",
    "team": "CHC",
-   "pos": "3b",
+   "pos": "RF",
    "age": 24,
    "mls": "0.162",
    "mlbam": "807713",
@@ -12978,7 +12978,7 @@
   {
    "name": "Stott, Bryson",
    "team": "PHI",
-   "pos": "2b",
+   "pos": "2B",
    "age": 28,
    "mls": "4.000",
    "mlbam": "681082",
@@ -13238,7 +13238,7 @@
   {
    "name": "Murakami, Munetaka",
    "team": "CWS",
-   "pos": "1b",
+   "pos": "1B",
    "age": 26,
    "mls": "0.000",
    "mlbam": "808959",
@@ -13276,7 +13276,7 @@
   {
    "name": "Peters, Tristan",
    "team": "CWS",
-   "pos": "of",
+   "pos": "CF",
    "age": 26,
    "mls": "0.007",
    "mlbam": "671976",
@@ -13354,7 +13354,7 @@
   {
    "name": "Roden, Alan",
    "team": "MIN",
-   "pos": "of",
+   "pos": "RF",
    "age": 26,
    "mls": "0.134",
    "mlbam": "702176",
@@ -13432,7 +13432,7 @@
   {
    "name": "Durbin, Caleb",
    "team": "BOS",
-   "pos": "3b",
+   "pos": "3B",
    "age": 26,
    "mls": "0.164",
    "mlbam": "702332",
@@ -13510,7 +13510,7 @@
   {
    "name": "Gonzales, Nick",
    "team": "PIT",
-   "pos": "3b",
+   "pos": "3B",
    "age": 27,
    "mls": "2.018",
    "mlbam": "693304",
@@ -13650,7 +13650,7 @@
   {
    "name": "Meidroth, Chase",
    "team": "CWS",
-   "pos": "2b",
+   "pos": "2B",
    "age": 24,
    "mls": "0.171",
    "mlbam": "805367",
@@ -13728,7 +13728,7 @@
   {
    "name": "McLain, Matt",
    "team": "CIN",
-   "pos": "2b",
+   "pos": "2B",
    "age": 26,
    "mls": "2.140",
    "mlbam": "680574",
@@ -14047,7 +14047,7 @@
   {
    "name": "Duran, Ezequiel",
    "team": "TEX",
-   "pos": "2b",
+   "pos": "SS",
    "age": 27,
    "mls": "3.050",
    "mlbam": "677649",
@@ -14242,7 +14242,7 @@
   {
    "name": "Lee, Brooks",
    "team": "MIN",
-   "pos": "3b",
+   "pos": "3B",
    "age": 25,
    "mls": "1.089",
    "mlbam": "686797",
@@ -14311,7 +14311,7 @@
   {
    "name": "Alonso, Pete",
    "team": "BAL",
-   "pos": "1b",
+   "pos": "1B",
    "age": 31,
    "mls": "7.000",
    "mlbam": "624413",
@@ -14453,7 +14453,7 @@
   {
    "name": "Manzardo, Kyle",
    "team": "CLE",
-   "pos": "1b",
+   "pos": "1B",
    "age": 25,
    "mls": "1.073",
    "mlbam": "700932",
@@ -14522,7 +14522,7 @@
   {
    "name": "Nootbaar, Lars",
    "team": "STL",
-   "pos": "lf",
+   "pos": "LF",
    "age": 28,
    "mls": "4.076",
    "mlbam": "663457",
@@ -14560,7 +14560,7 @@
   {
    "name": "Burger, Jake",
    "team": "TEX",
-   "pos": "1b",
+   "pos": "1B",
    "age": 30,
    "mls": "3.127",
    "mlbam": "669394",
@@ -14652,7 +14652,7 @@
   {
    "name": "Bleday, JJ",
    "team": "CIN",
-   "pos": "cf",
+   "pos": "LF",
    "age": 28,
    "mls": "3.029",
    "mlbam": "668709",
@@ -14857,7 +14857,7 @@
   {
    "name": "Canzone, Dominic",
    "team": "SEA",
-   "pos": "of",
+   "pos": "DH",
    "age": 28,
    "mls": "2.014",
    "mlbam": "686527",
@@ -14918,7 +14918,7 @@
   {
    "name": "Burleson, Alec",
    "team": "STL",
-   "pos": "1b",
+   "pos": "1B",
    "age": 27,
    "mls": "3.029",
    "mlbam": "676475",
@@ -14971,7 +14971,7 @@
   {
    "name": "Ewing, A.J.",
    "team": "NYM",
-   "pos": "of-2b",
+   "pos": "CF",
    "age": 21,
    "mls": "0.000",
    "mlbam": "805999",
@@ -15049,7 +15049,7 @@
   {
    "name": "Bolte, Henry",
    "team": "ATH",
-   "pos": "of",
+   "pos": "CF",
    "age": 22,
    "mls": "0.000",
    "mlbam": "703607",
@@ -15206,7 +15206,7 @@
   {
    "name": "Mitchell, Garrett",
    "team": "MIL",
-   "pos": "cf",
+   "pos": "CF",
    "age": 27,
    "mls": "3.040",
    "mlbam": "669003",
@@ -15431,7 +15431,7 @@
   {
    "name": "Stowers, Kyle",
    "team": "MIA",
-   "pos": "dh-of",
+   "pos": "1B",
    "age": 28,
    "mls": "2.012",
    "mlbam": "669065",
@@ -15641,7 +15641,7 @@
   {
    "name": "Seager, Corey",
    "team": "TEX",
-   "pos": "ss",
+   "pos": "SS",
    "age": 32,
    "mls": "10.032",
    "mlbam": "608369",
@@ -15713,7 +15713,7 @@
   {
    "name": "Volpe, Anthony",
    "team": "NYY",
-   "pos": "ss",
+   "pos": "SS",
    "age": 25,
    "mls": "3.000",
    "mlbam": "683011",
@@ -15766,7 +15766,7 @@
   {
    "name": "Lile, Daylen",
    "team": "WSH",
-   "pos": "lf",
+   "pos": "LF",
    "age": 23,
    "mls": "0.120",
    "mlbam": "695734",
@@ -16088,7 +16088,7 @@
   {
    "name": "Torkelson, Spencer",
    "team": "DET",
-   "pos": "1b",
+   "pos": "1B",
    "age": 26,
    "mls": "3.076",
    "mlbam": "679529",
@@ -16134,7 +16134,7 @@
   {
    "name": "Harper, Bryce",
    "team": "PHI",
-   "pos": "rf-1b",
+   "pos": "1B",
    "age": 33,
    "mls": "13.159",
    "mlbam": "547180",
@@ -16246,7 +16246,7 @@
   {
    "name": "Marsee, Jakob",
    "team": "MIA",
-   "pos": "of",
+   "pos": "CF",
    "age": 25,
    "mls": "0.059",
    "mlbam": "805300",
@@ -16324,7 +16324,7 @@
   {
    "name": "Ramos, Heliot",
    "team": "SF",
-   "pos": "lf",
+   "pos": "LF",
    "age": 26,
    "mls": "2.103",
    "mlbam": "671218",
@@ -16511,7 +16511,7 @@
   {
    "name": "Olson, Matt",
    "team": "ATL",
-   "pos": "1b",
+   "pos": "1B",
    "age": 32,
    "mls": "8.103",
    "mlbam": "621566",
@@ -17596,7 +17596,7 @@
   {
    "name": "Hernandez, Heriberto",
    "team": "MIA",
-   "pos": "lf",
+   "pos": "LF",
    "age": 26,
    "mls": "0.122",
    "mlbam": "681715",
@@ -17736,7 +17736,7 @@
   {
    "name": "Mead, Curtis",
    "team": "BOS",
-   "pos": "3b-1b",
+   "pos": "3B",
    "age": 25,
    "mls": "1.094",
    "mlbam": "678554",
@@ -18016,7 +18016,7 @@
   {
    "name": "Karros, Kyle",
    "team": "COL",
-   "pos": "3b",
+   "pos": "3B",
    "age": 24,
    "mls": "0.052",
    "mlbam": "691720",
@@ -18186,7 +18186,7 @@
   {
    "name": "Scott II, Victor",
    "team": "STL",
-   "pos": "cf",
+   "pos": "CF",
    "age": 25,
    "mls": "1.083",
    "mlbam": "687363",
@@ -18467,7 +18467,7 @@
   {
    "name": "Lewis, Royce",
    "team": "MIN",
-   "pos": "3b-dh",
+   "pos": "3B",
    "age": 27,
    "mls": "3.142",
    "mlbam": "668904",
@@ -18692,7 +18692,7 @@
   {
    "name": "Crawford, Justin",
    "team": "PHI",
-   "pos": "cf",
+   "pos": "CF",
    "age": 22,
    "mls": "0.000",
    "mlbam": "702222",
@@ -18770,7 +18770,7 @@
   {
    "name": "Young, Jacob",
    "team": "WSH",
-   "pos": "cf",
+   "pos": "CF",
    "age": 26,
    "mls": "2.037",
    "mlbam": "696285",
@@ -18824,7 +18824,7 @@
   {
    "name": "Marte, Noelvi",
    "team": "CIN",
-   "pos": "rf",
+   "pos": "RF",
    "age": 24,
    "mls": "1.139",
    "mlbam": "682622",
@@ -18893,7 +18893,7 @@
   {
    "name": "Caballero, Jose",
    "team": "NYY",
-   "pos": "2b-ss",
+   "pos": "SS",
    "age": 29,
    "mls": "2.170",
    "mlbam": "676609",
@@ -19868,7 +19868,7 @@
   {
    "name": "Varsho, Daulton",
    "team": "TOR",
-   "pos": "lf",
+   "pos": "CF",
    "age": 28,
    "mls": "5.128",
    "mlbam": "662139",
@@ -19954,7 +19954,7 @@
   {
    "name": "Chisholm Jr., Jazz",
    "team": "NYY",
-   "pos": "2b",
+   "pos": "2B",
    "age": 28,
    "mls": "5.075",
    "mlbam": "665862",
@@ -21498,7 +21498,7 @@
   {
    "name": "Ward, Taylor",
    "team": "BAL",
-   "pos": "lf",
+   "pos": "LF",
    "age": 32,
    "mls": "5.164",
    "mlbam": "621493",
@@ -21528,7 +21528,7 @@
   {
    "name": "Raley, Luke",
    "team": "SEA",
-   "pos": "rf",
+   "pos": "RF",
    "age": 31,
    "mls": "3.106",
    "mlbam": "670042",
@@ -21653,7 +21653,7 @@
   {
    "name": "Kwan, Steven",
    "team": "CLE",
-   "pos": "lf",
+   "pos": "LF",
    "age": 28,
    "mls": "4.000",
    "mlbam": "680757",
@@ -21770,7 +21770,7 @@
   {
    "name": "Anthony, Roman",
    "team": "BOS",
-   "pos": "of",
+   "pos": "LF",
    "age": 22,
    "mls": "0.112",
    "mlbam": "701350",
@@ -21864,7 +21864,7 @@
   {
    "name": "Donovan, Brendan",
    "team": "SEA",
-   "pos": "2b-lf",
+   "pos": "3B",
    "age": 29,
    "mls": "4.000",
    "mlbam": "680977",
@@ -21935,7 +21935,7 @@
   {
    "name": "Martin, Austin",
    "team": "MIN",
-   "pos": "2b-of",
+   "pos": "RF",
    "age": 27,
    "mls": "1.041",
    "mlbam": "668885",
@@ -22004,7 +22004,7 @@
   {
    "name": "Peraza, Oswald",
    "team": "LAA",
-   "pos": "ss",
+   "pos": "2B",
    "age": 26,
    "mls": "2.014",
    "mlbam": "672724",
@@ -22065,7 +22065,7 @@
   {
    "name": "Baty, Brett",
    "team": "NYM",
-   "pos": "3b-dh",
+   "pos": "3B",
    "age": 26,
    "mls": "2.088",
    "mlbam": "683146",
@@ -22196,7 +22196,7 @@
   {
    "name": "Guzman, Denzer",
    "team": "LAA",
-   "pos": "ss",
+   "pos": "3B",
    "age": 22,
    "mls": "0.016",
    "mlbam": "694203",
@@ -22274,7 +22274,7 @@
   {
    "name": "Collins, Isaac",
    "team": "KC",
-   "pos": "lf",
+   "pos": "LF",
    "age": 28,
    "mls": "1.022",
    "mlbam": "686555",
@@ -22343,7 +22343,7 @@
   {
    "name": "Pasquantino, Vinnie",
    "team": "KC",
-   "pos": "1b",
+   "pos": "1B",
    "age": 28,
    "mls": "3.101",
    "mlbam": "686469",
@@ -22601,7 +22601,7 @@
   {
    "name": "Grisham, Trent",
    "team": "NYY",
-   "pos": "cf",
+   "pos": "CF",
    "age": 29,
    "mls": "6.060",
    "mlbam": "663757",
@@ -22709,7 +22709,7 @@
   {
    "name": "House, Brady",
    "team": "WSH",
-   "pos": "ss",
+   "pos": "3B",
    "age": 23,
    "mls": "0.105",
    "mlbam": "691781",
@@ -22917,7 +22917,7 @@
   {
    "name": "Mart\u00ednez, Angel",
    "team": "CLE",
-   "pos": "ss",
+   "pos": "LF",
    "age": 24,
    "mls": "1.118",
    "mlbam": "682657",
@@ -22986,7 +22986,7 @@
   {
    "name": "Schneemann, Daniel",
    "team": "CLE",
-   "pos": "3b",
+   "pos": "CF",
    "age": 29,
    "mls": "1.120",
    "mlbam": "682177",
@@ -23183,7 +23183,7 @@
   {
    "name": "Horwitz, Spencer",
    "team": "PIT",
-   "pos": "1b",
+   "pos": "1B",
    "age": 28,
    "mls": "1.152",
    "mlbam": "687462",
@@ -23252,7 +23252,7 @@
   {
    "name": "Alexander, Blaze",
    "team": "BAL",
-   "pos": "ss",
+   "pos": "3B",
    "age": 27,
    "mls": "1.053",
    "mlbam": "677942",
@@ -23321,7 +23321,7 @@
   {
    "name": "Arozarena, Randy",
    "team": "SEA",
-   "pos": "lf",
+   "pos": "LF",
    "age": 31,
    "mls": "5.129",
    "mlbam": "668227",
@@ -23397,7 +23397,7 @@
   {
    "name": "Lukes, Nathan",
    "team": "TOR",
-   "pos": "of",
+   "pos": "RF",
    "age": 31,
    "mls": "1.145",
    "mlbam": "664770",
@@ -23466,7 +23466,7 @@
   {
    "name": "Kreidler, Ryan",
    "team": "MIN",
-   "pos": "ss",
+   "pos": "SS",
    "age": 28,
    "mls": "1.006",
    "mlbam": "668952",
@@ -24295,7 +24295,7 @@
   {
    "name": "Tovar, Ezequiel",
    "team": "COL",
-   "pos": "ss",
+   "pos": "SS",
    "age": 24,
    "mls": "3.014",
    "mlbam": "678662",
@@ -24433,7 +24433,7 @@
   {
    "name": "Jimenez, Leo",
    "team": "MIA",
-   "pos": "ss",
+   "pos": "3B",
    "age": 25,
    "mls": "0.124",
    "mlbam": "677870",
@@ -24591,7 +24591,7 @@
   {
    "name": "Acu\u00f1a, Luisangel",
    "team": "CWS",
-   "pos": "cf",
+   "pos": "SS",
    "age": 24,
    "mls": "0.156",
    "mlbam": "682668",
@@ -24669,7 +24669,7 @@
   {
    "name": "Clarke, Denzel",
    "team": "ATH",
-   "pos": "of",
+   "pos": "CF",
    "age": 26,
    "mls": "0.129",
    "mlbam": "672016",
@@ -24917,7 +24917,7 @@
   {
    "name": "Caissie, Owen",
    "team": "MIA",
-   "pos": "rf",
+   "pos": "RF",
    "age": 23,
    "mls": "0.034",
    "mlbam": "683357",
@@ -25065,7 +25065,7 @@
   {
    "name": "Adell, Jo",
    "team": "LAA",
-   "pos": "of",
+   "pos": "RF",
    "age": 27,
    "mls": "4.085",
    "mlbam": "666176",
@@ -25103,7 +25103,7 @@
   {
    "name": "Julien, Edouard",
    "team": "COL",
-   "pos": "2b",
+   "pos": "2B",
    "age": 27,
    "mls": "2.009",
    "mlbam": "666397",
@@ -26634,7 +26634,7 @@
   {
    "name": "Tatis Jr., Fernando",
    "team": "SD",
-   "pos": "rf",
+   "pos": "RF",
    "age": 27,
    "mls": "6.120",
    "mlbam": "665487",
@@ -26914,7 +26914,7 @@
   {
    "name": "Church, Nathan",
    "team": "STL",
-   "pos": "lf",
+   "pos": "CF",
    "age": 25,
    "mls": "0.043",
    "mlbam": "701675",
@@ -26992,7 +26992,7 @@
   {
    "name": "Schanuel, Nolan",
    "team": "LAA",
-   "pos": "1b-of",
+   "pos": "1B",
    "age": 24,
    "mls": "2.045",
    "mlbam": "694384",
@@ -27239,7 +27239,7 @@
   {
    "name": "Grissom, Vaughn",
    "team": "LAA",
-   "pos": "2b",
+   "pos": "2B",
    "age": 25,
    "mls": "1.086",
    "mlbam": "687093",
@@ -27431,7 +27431,7 @@
   {
    "name": "Moore, Christian",
    "team": "LAA",
-   "pos": "2b",
+   "pos": "LF",
    "age": 23,
    "mls": "0.096",
    "mlbam": "695681",
@@ -27509,7 +27509,7 @@
   {
    "name": "Carpenter, Kerry",
    "team": "DET",
-   "pos": "rf",
+   "pos": "RF",
    "age": 28,
    "mls": "3.057",
    "mlbam": "681481",
@@ -27555,7 +27555,7 @@
   {
    "name": "DeLuca, Jonny",
    "team": "TB",
-   "pos": "lf",
+   "pos": "RF",
    "age": 27,
    "mls": "2.085",
    "mlbam": "676356",
@@ -27649,7 +27649,7 @@
   {
    "name": "Frelick, Sal",
    "team": "MIL",
-   "pos": "of",
+   "pos": "RF",
    "age": 26,
    "mls": "2.072",
    "mlbam": "686217",
@@ -27772,7 +27772,7 @@
   {
    "name": "Freeland, Alex",
    "team": "LAD",
-   "pos": "ss",
+   "pos": "2B",
    "age": 24,
    "mls": "0.038",
    "mlbam": "690976",
@@ -28007,7 +28007,7 @@
   {
    "name": "Clement, Ernie",
    "team": "TOR",
-   "pos": "ss",
+   "pos": "2B",
    "age": 30,
    "mls": "3.168",
    "mlbam": "676391",
@@ -28053,7 +28053,7 @@
   {
    "name": "Lee, Hao-Yu",
    "team": "DET",
-   "pos": "2b",
+   "pos": "2B",
    "age": 23,
    "mls": "0.000",
    "mlbam": "701678",
@@ -28131,7 +28131,7 @@
   {
    "name": "Mullins, Cedric",
    "team": "TB",
-   "pos": "cf",
+   "pos": "CF",
    "age": 31,
    "mls": "6.078",
    "mlbam": "656775",
@@ -28163,7 +28163,7 @@
   {
    "name": "Mesa, Victor Jr.",
    "team": "TB",
-   "pos": "of",
+   "pos": "RF",
    "age": 24,
    "mls": "0.034",
    "mlbam": "683748",
@@ -28241,7 +28241,7 @@
   {
    "name": "Steer, Spencer",
    "team": "CIN",
-   "pos": "3b-of",
+   "pos": "1B",
    "age": 28,
    "mls": "3.035",
    "mlbam": "668715",
@@ -28294,7 +28294,7 @@
   {
    "name": "Monasterio, Andruw",
    "team": "BOS",
-   "pos": "3b",
+   "pos": "SS",
    "age": 29,
    "mls": "2.099",
    "mlbam": "655316",
@@ -28348,7 +28348,7 @@
   {
    "name": "Mauricio, Ronny",
    "team": "NYM",
-   "pos": "ss",
+   "pos": "SS",
    "age": 25,
    "mls": "2.028",
    "mlbam": "677595",
@@ -28450,7 +28450,7 @@
   {
    "name": "Crawford, J.P.",
    "team": "SEA",
-   "pos": "ss",
+   "pos": "SS",
    "age": 31,
    "mls": "7.163",
    "mlbam": "641487",
@@ -28512,7 +28512,7 @@
   {
    "name": "Pereira, Everson",
    "team": "CWS",
-   "pos": "cf",
+   "pos": "RF",
    "age": 25,
    "mls": "0.090",
    "mlbam": "677592",
@@ -28590,7 +28590,7 @@
   {
    "name": "Ferm\u00edn, Jos\u00e9",
    "team": "STL",
-   "pos": "ss",
+   "pos": "LF",
    "age": 27,
    "mls": "1.075",
    "mlbam": "665877",
@@ -31267,7 +31267,7 @@
   {
    "name": "Gilbert, Drew",
    "team": "SF",
-   "pos": "cf",
+   "pos": "CF",
    "age": 25,
    "mls": "0.052",
    "mlbam": "687551",
@@ -31345,7 +31345,7 @@
   {
    "name": "McNeil, Jeff",
    "team": "ATH",
-   "pos": "2b",
+   "pos": "2B",
    "age": 34,
    "mls": "7.069",
    "mlbam": "643446",
@@ -31383,7 +31383,7 @@
   {
    "name": "Loftin, Nick",
    "team": "KC",
-   "pos": "2b",
+   "pos": "3B",
    "age": 27,
    "mls": "1.081",
    "mlbam": "679845",
@@ -31530,7 +31530,7 @@
   {
    "name": "Matthews, Brice",
    "team": "HOU",
-   "pos": "ss",
+   "pos": "LF",
    "age": 24,
    "mls": "0.030",
    "mlbam": "694728",
@@ -31640,7 +31640,7 @@
   {
    "name": "Sanoja, Javier",
    "team": "MIA",
-   "pos": "ss-cf",
+   "pos": "3B",
    "age": 23,
    "mls": "1.023",
    "mlbam": "691594",
@@ -31778,7 +31778,7 @@
   {
    "name": "Suzuki, Seiya",
    "team": "CHC",
-   "pos": "dh-rf",
+   "pos": "RF",
    "age": 31,
    "mls": "4.000",
    "mlbam": "673548",
@@ -31808,7 +31808,7 @@
   {
    "name": "Cortes, Carlos",
    "team": "ATH",
-   "pos": "of",
+   "pos": "RF",
    "age": 29,
    "mls": "0.069",
    "mlbam": "666126",
@@ -31880,7 +31880,7 @@
   {
    "name": "Triolo, Jared",
    "team": "PIT",
-   "pos": "ss",
+   "pos": "SS",
    "age": 28,
    "mls": "2.071",
    "mlbam": "669707",
@@ -32011,7 +32011,7 @@
   {
    "name": "Lowe, Brandon",
    "team": "PIT",
-   "pos": "2b",
+   "pos": "2B",
    "age": 31,
    "mls": "7.058",
    "mlbam": "664040",
@@ -32041,7 +32041,7 @@
   {
    "name": "Ruiz, Esteury",
    "team": "MIA",
-   "pos": "cf",
+   "pos": "RF",
    "age": 27,
    "mls": "2.064",
    "mlbam": "665923",
@@ -32102,7 +32102,7 @@
   {
    "name": "Williamson, Ben",
    "team": "TB",
-   "pos": "3b",
+   "pos": "2B",
    "age": 25,
    "mls": "0.110",
    "mlbam": "810938",
@@ -32180,7 +32180,7 @@
   {
    "name": "Arias, Gabriel",
    "team": "CLE",
-   "pos": "ss",
+   "pos": "3B",
    "age": 26,
    "mls": "2.124",
    "mlbam": "672356",
@@ -32373,7 +32373,7 @@
   {
    "name": "Vaughn, Andrew",
    "team": "MIL",
-   "pos": "1b",
+   "pos": "1B",
    "age": 28,
    "mls": "4.142",
    "mlbam": "683734",
@@ -34983,7 +34983,7 @@
   {
    "name": "Albies, Ozzie",
    "team": "ATL",
-   "pos": "2b",
+   "pos": "2B",
    "age": 29,
    "mls": "8.062",
    "mlbam": "645277",
@@ -35179,7 +35179,7 @@
   {
    "name": "Thomas, Colby",
    "team": "ATH",
-   "pos": "of",
+   "pos": "RF",
    "age": 25,
    "mls": "0.079",
    "mlbam": "687515",
@@ -35257,7 +35257,7 @@
   {
    "name": "Jarvis, Jim",
    "team": "ATL",
-   "pos": "ss",
+   "pos": "SS",
    "age": 25,
    "mls": "0.000",
    "mlbam": "805347",
@@ -35361,7 +35361,7 @@
   {
    "name": "Encarnacion-Strand, Christian",
    "team": "BAL",
-   "pos": "1b-3b",
+   "pos": "3B",
    "age": 26,
    "mls": "2.012",
    "mlbam": "687952",
@@ -35500,7 +35500,7 @@
   {
    "name": "Kayfus, C.J.",
    "team": "CLE",
-   "pos": "1b",
+   "pos": "LF",
    "age": 24,
    "mls": "0.058",
    "mlbam": "692216",
@@ -35658,7 +35658,7 @@
   {
    "name": "Jung, Jace",
    "team": "DET",
-   "pos": "2b",
+   "pos": "DH",
    "age": 25,
    "mls": "0.079",
    "mlbam": "690291",
@@ -35736,7 +35736,7 @@
   {
    "name": "Castro, Willi",
    "team": "COL",
-   "pos": "2b-of",
+   "pos": "2B",
    "age": 29,
    "mls": "6.017",
    "mlbam": "650489",
@@ -35844,7 +35844,7 @@
   {
    "name": "Happ, Ian",
    "team": "CHC",
-   "pos": "lf",
+   "pos": "LF",
    "age": 31,
    "mls": "8.036",
    "mlbam": "664023",
@@ -36057,7 +36057,7 @@
   {
    "name": "Marsh, Brandon",
    "team": "PHI",
-   "pos": "cf",
+   "pos": "LF",
    "age": 28,
    "mls": "4.078",
    "mlbam": "669016",
@@ -36143,7 +36143,7 @@
   {
    "name": "Schneider, Davis",
    "team": "TOR",
-   "pos": "inf",
+   "pos": "LF",
    "age": 27,
    "mls": "2.029",
    "mlbam": "676914",
@@ -36276,7 +36276,7 @@
   {
    "name": "Tawa, Tim",
    "team": "AZ",
-   "pos": "2b",
+   "pos": "LF",
    "age": 27,
    "mls": "0.112",
    "mlbam": "694374",
@@ -36416,7 +36416,7 @@
   {
    "name": "Gonz\u00e1lez, Romy",
    "team": "BOS",
-   "pos": "2b",
+   "pos": "DH",
    "age": 29,
    "mls": "3.083",
    "mlbam": "663853",
@@ -36532,7 +36532,7 @@
   {
    "name": "S\u00e1nchez, Jes\u00fas",
    "team": "TOR",
-   "pos": "of",
+   "pos": "RF",
    "age": 28,
    "mls": "4.118",
    "mlbam": "660821",
@@ -36624,7 +36624,7 @@
   {
    "name": "Myers, Dane",
    "team": "CIN",
-   "pos": "of",
+   "pos": "CF",
    "age": 30,
    "mls": "2.037",
    "mlbam": "667472",
@@ -36819,7 +36819,7 @@
   {
    "name": "Nu\u00f1ez, Nasim",
    "team": "WSH",
-   "pos": "ss",
+   "pos": "2B",
    "age": 25,
    "mls": "1.086",
    "mlbam": "683083",
@@ -41487,7 +41487,7 @@
   {
    "name": "Torres, Gleyber",
    "team": "DET",
-   "pos": "2b",
+   "pos": "2B",
    "age": 29,
    "mls": "7.162",
    "mlbam": "650402",
@@ -41517,7 +41517,7 @@
   {
    "name": "McCarthy, Jake",
    "team": "COL",
-   "pos": "rf",
+   "pos": "LF",
    "age": 27,
    "mls": "3.124",
    "mlbam": "664983",
@@ -41563,7 +41563,7 @@
   {
    "name": "Vientos, Mark",
    "team": "NYM",
-   "pos": "3b",
+   "pos": "1B",
    "age": 26,
    "mls": "2.102",
    "mlbam": "668901",
@@ -41624,7 +41624,7 @@
   {
    "name": "Meadows, Parker",
    "team": "DET",
-   "pos": "cf",
+   "pos": "CF",
    "age": 26,
    "mls": "1.169",
    "mlbam": "678009",
@@ -41820,7 +41820,7 @@
   {
    "name": "Garc\u00eda Jr., Luis",
    "team": "WSH",
-   "pos": "2b",
+   "pos": "1B",
    "age": 26,
    "mls": "4.142",
    "mlbam": "671277",
@@ -42077,7 +42077,7 @@
   {
    "name": "Vilade, Ryan",
    "team": "TB",
-   "pos": "lf",
+   "pos": "RF",
    "age": 27,
    "mls": "0.076",
    "mlbam": "668723",
@@ -42211,7 +42211,7 @@
   {
    "name": "Larnach, Trevor",
    "team": "MIN",
-   "pos": "lf",
+   "pos": "LF",
    "age": 29,
    "mls": "4.014",
    "mlbam": "663616",
@@ -42446,7 +42446,7 @@
   {
    "name": "Seigler, Anthony",
    "team": "BOS",
-   "pos": "2b",
+   "pos": "2B",
    "age": 27,
    "mls": "0.090",
    "mlbam": "678011",
@@ -42635,7 +42635,7 @@
   {
    "name": "Lowe, Josh",
    "team": "LAA",
-   "pos": "rf-3b",
+   "pos": "LF",
    "age": 28,
    "mls": "3.093",
    "mlbam": "666139",
@@ -42769,7 +42769,7 @@
   {
    "name": "Loperfido, Joey",
    "team": "HOU",
-   "pos": "lf-1b",
+   "pos": "LF",
    "age": 27,
    "mls": "1.021",
    "mlbam": "694388",
@@ -42838,7 +42838,7 @@
   {
    "name": "Wiemer, Joey",
    "team": "WSH",
-   "pos": "of",
+   "pos": "RF",
    "age": 27,
    "mls": "1.089",
    "mlbam": "686894",
@@ -42985,7 +42985,7 @@
   {
    "name": "Moniak, Mickey",
    "team": "COL",
-   "pos": "of",
+   "pos": "LF",
    "age": 28,
    "mls": "4.027",
    "mlbam": "666160",
@@ -43023,7 +43023,7 @@
   {
    "name": "Vierling, Matt",
    "team": "DET",
-   "pos": "rf",
+   "pos": "CF",
    "age": 29,
    "mls": "4.026",
    "mlbam": "663837",
@@ -43061,7 +43061,7 @@
   {
    "name": "Hamilton, David",
    "team": "MIL",
-   "pos": "ss-2b",
+   "pos": "3B",
    "age": 28,
    "mls": "2.011",
    "mlbam": "666152",
@@ -43591,7 +43591,7 @@
   {
    "name": "Jones, Jahmai",
    "team": "BOS",
-   "pos": "2b",
+   "pos": "DH",
    "age": 28,
    "mls": "1.148",
    "mlbam": "663330",
@@ -43653,7 +43653,7 @@
   {
    "name": "Meckler, Wade",
    "team": "LAA",
-   "pos": "ss-of",
+   "pos": "LF",
    "age": 26,
    "mls": "0.024",
    "mlbam": "685133",
@@ -43731,7 +43731,7 @@
   {
    "name": "Doyle, Brenton",
    "team": "COL",
-   "pos": "cf",
+   "pos": "CF",
    "age": 28,
    "mls": "2.161",
    "mlbam": "686668",
@@ -43792,7 +43792,7 @@
   {
    "name": "Barger, Addison",
    "team": "TOR",
-   "pos": "ss-3b",
+   "pos": "RF",
    "age": 26,
    "mls": "1.098",
    "mlbam": "680718",
@@ -43862,7 +43862,7 @@
   {
    "name": "Schuemann, Max",
    "team": "NYY",
-   "pos": "2b",
+   "pos": "LF",
    "age": 29,
    "mls": "2.000",
    "mlbam": "680474",
@@ -44083,7 +44083,7 @@
   {
    "name": "Saggese, Thomas",
    "team": "STL",
-   "pos": "ss-2b",
+   "pos": "LF",
    "age": 24,
    "mls": "0.144",
    "mlbam": "695336",
@@ -44161,7 +44161,7 @@
   {
    "name": "France, Ty",
    "team": "SD",
-   "pos": "1b",
+   "pos": "1B",
    "age": 31,
    "mls": "6.089",
    "mlbam": "664034",
@@ -49077,7 +49077,7 @@
   {
    "name": "Muncy, Max",
    "team": "ATH",
-   "pos": "ss",
+   "pos": "3B",
    "age": 23,
    "mls": "0.144",
    "mlbam": "691777",
@@ -49432,7 +49432,7 @@
   {
    "name": "Mangum, Jake",
    "team": "PIT",
-   "pos": "of",
+   "pos": "LF",
    "age": 30,
    "mls": "1.000",
    "mlbam": "663968",
@@ -49611,7 +49611,7 @@
   {
    "name": "Smith, Josh H.",
    "team": "TEX",
-   "pos": "2b",
+   "pos": "2B",
    "age": 28,
    "mls": "3.129",
    "mlbam": "669701",
@@ -49736,7 +49736,7 @@
   {
    "name": "Siri, Jose",
    "team": "LAA",
-   "pos": "cf",
+   "pos": "LF",
    "age": 30,
    "mls": "3.015",
    "mlbam": "642350",
@@ -50000,7 +50000,7 @@
   {
    "name": "Walls, Taylor",
    "team": "TB",
-   "pos": "ss",
+   "pos": "SS",
    "age": 29,
    "mls": "4.092",
    "mlbam": "670764",
@@ -50127,7 +50127,7 @@
   {
    "name": "Foscue, Justin",
    "team": "TEX",
-   "pos": "2b",
+   "pos": "2B",
    "age": 27,
    "mls": "0.146",
    "mlbam": "679822",
@@ -50415,7 +50415,7 @@
   {
    "name": "Hill, Derek",
    "team": "PHI",
-   "pos": "cf",
+   "pos": "RF",
    "age": 30,
    "mls": "3.040",
    "mlbam": "656537",
@@ -50461,7 +50461,7 @@
   {
    "name": "Wagner, Will",
    "team": "SD",
-   "pos": "2b",
+   "pos": "DH",
    "age": 27,
    "mls": "0.151",
    "mlbam": "695238",
@@ -50741,7 +50741,7 @@
   {
    "name": "Pinango, Yohendrick",
    "team": "TOR",
-   "pos": "of",
+   "pos": "LF",
    "age": 24,
    "mls": "0.000",
    "mlbam": "682818",
@@ -51357,7 +51357,7 @@
   {
    "name": "Rumfield, T.J.",
    "team": "COL",
-   "pos": "1b",
+   "pos": "1B",
    "age": 25,
    "mls": "0.000",
    "mlbam": "681198",
@@ -51496,7 +51496,7 @@
   {
    "name": "McKinstry, Zach",
    "team": "DET",
-   "pos": "2b",
+   "pos": "2B",
    "age": 31,
    "mls": "4.099",
    "mlbam": "656716",
@@ -51603,7 +51603,7 @@
   {
    "name": "Outman, James",
    "team": "DET",
-   "pos": "cf",
+   "pos": "CF",
    "age": 29,
    "mls": "2.007",
    "mlbam": "681546",
@@ -51990,7 +51990,7 @@
   {
    "name": "Norby, Connor",
    "team": "MIA",
-   "pos": "2b",
+   "pos": "1B",
    "age": 26,
    "mls": "1.057",
    "mlbam": "681393",
@@ -52138,7 +52138,7 @@
   {
    "name": "Hoskins, Rhys",
    "team": "CLE",
-   "pos": "1b",
+   "pos": "1B",
    "age": 33,
    "mls": "8.053",
    "mlbam": "656555",
@@ -52530,7 +52530,7 @@
   {
    "name": "Springer, George",
    "team": "TOR",
-   "pos": "rf",
+   "pos": "DH",
    "age": 36,
    "mls": "11.166",
    "mlbam": "543807",
@@ -52732,7 +52732,7 @@
   {
    "name": "Freeman, Tyler",
    "team": "COL",
-   "pos": "2b",
+   "pos": "RF",
    "age": 27,
    "mls": "3.046",
    "mlbam": "671289",
@@ -52778,7 +52778,7 @@
   {
    "name": "Wallner, Matt",
    "team": "MIN",
-   "pos": "rf",
+   "pos": "RF",
    "age": 28,
    "mls": "2.043",
    "mlbam": "670242",
@@ -52988,7 +52988,7 @@
   {
    "name": "Meyers, Jake",
    "team": "HOU",
-   "pos": "cf",
+   "pos": "CF",
    "age": 30,
    "mls": "4.044",
    "mlbam": "676694",
@@ -53026,7 +53026,7 @@
   {
    "name": "Jackson, Jeremiah",
    "team": "BAL",
-   "pos": "2b",
+   "pos": "2B",
    "age": 26,
    "mls": "0.061",
    "mlbam": "669236",
@@ -53146,7 +53146,7 @@
   {
    "name": "Tena, Jos\u00e9",
    "team": "WSH",
-   "pos": "ss",
+   "pos": "DH",
    "age": 25,
    "mls": "1.031",
    "mlbam": "677588",
@@ -53284,7 +53284,7 @@
   {
    "name": "Pauley, Graham",
    "team": "MIA",
-   "pos": "3b",
+   "pos": "3B",
    "age": 25,
    "mls": "1.005",
    "mlbam": "688363",
@@ -53524,7 +53524,7 @@
   {
    "name": "Osuna, Alejandro",
    "team": "TEX",
-   "pos": "of",
+   "pos": "LF",
    "age": 23,
    "mls": "0.107",
    "mlbam": "696030",
@@ -53681,7 +53681,7 @@
   {
    "name": "Beck, Jordan",
    "team": "COL",
-   "pos": "of",
+   "pos": "LF",
    "age": 25,
    "mls": "1.153",
    "mlbam": "687597",
@@ -53750,7 +53750,7 @@
   {
    "name": "Locklear, Tyler",
    "team": "AZ",
-   "pos": "3b",
+   "pos": "1B",
    "age": 25,
    "mls": "0.084",
    "mlbam": "682988",
@@ -54080,7 +54080,7 @@
   {
    "name": "Dunn, Blake",
    "team": "CIN",
-   "pos": "of",
+   "pos": "CF",
    "age": 27,
    "mls": "0.089",
    "mlbam": "694362",
@@ -54158,7 +54158,7 @@
   {
    "name": "Rodriguez, Johnathan",
    "team": "PIT",
-   "pos": "of",
+   "pos": "RF",
    "age": 26,
    "mls": "0.097",
    "mlbam": "671286",
@@ -54236,7 +54236,7 @@
   {
    "name": "Misner, Kameron",
    "team": "PHI",
-   "pos": "of",
+   "pos": "CF",
    "age": 28,
    "mls": "0.117",
    "mlbam": "670224",
@@ -54314,7 +54314,7 @@
   {
    "name": "Hernaiz, Darell",
    "team": "ATH",
-   "pos": "ss",
+   "pos": "SS",
    "age": 24,
    "mls": "1.040",
    "mlbam": "687231",
@@ -54383,7 +54383,7 @@
   {
    "name": "Cheng, Tsung-Che",
    "team": "BOS",
-   "pos": "ss",
+   "pos": "SS",
    "age": 24,
    "mls": "0.010",
    "mlbam": "691907",
@@ -54461,7 +54461,7 @@
   {
    "name": "Whitcomb, Shay",
    "team": "HOU",
-   "pos": "ss",
+   "pos": "3B",
    "age": 27,
    "mls": "0.085",
    "mlbam": "694376",
@@ -54617,7 +54617,7 @@
   {
    "name": "Barrosa, Jorge",
    "team": "AZ",
-   "pos": "lf",
+   "pos": "CF",
    "age": 25,
    "mls": "0.070",
    "mlbam": "678489",
@@ -54819,7 +54819,7 @@
   {
    "name": "Dezenzo, Zach",
    "team": "HOU",
-   "pos": "3b",
+   "pos": "LF",
    "age": 26,
    "mls": "1.055",
    "mlbam": "701305",
@@ -54888,7 +54888,7 @@
   {
    "name": "Koss, Christian",
    "team": "SF",
-   "pos": "ss",
+   "pos": "2B",
    "age": 28,
    "mls": "1.000",
    "mlbam": "683766",
@@ -55036,7 +55036,7 @@
   {
    "name": "Trammell, Taylor",
    "team": "HOU",
-   "pos": "of",
+   "pos": "LF",
    "age": 28,
    "mls": "2.144",
    "mlbam": "666211",
@@ -55169,7 +55169,7 @@
   {
    "name": "McCray, Grant",
    "team": "SF",
-   "pos": "cf",
+   "pos": "CF",
    "age": 25,
    "mls": "0.096",
    "mlbam": "687529",
@@ -55247,7 +55247,7 @@
   {
    "name": "Vel\u00e1zquez, Nelson",
    "team": "STL",
-   "pos": "of",
+   "pos": "LF",
    "age": 27,
    "mls": "1.101",
    "mlbam": "676369",
@@ -55363,7 +55363,7 @@
   {
    "name": "Vivas, Jorbit",
    "team": "WSH",
-   "pos": "2b",
+   "pos": "3B",
    "age": 25,
    "mls": "0.056",
    "mlbam": "678391",
@@ -55441,7 +55441,7 @@
   {
    "name": "Sosa, Edmundo",
    "team": "PHI",
-   "pos": "ss",
+   "pos": "LF",
    "age": 30,
    "mls": "5.140",
    "mlbam": "624641",
@@ -55471,7 +55471,7 @@
   {
    "name": "Taveras, Leody",
    "team": "BAL",
-   "pos": "cf",
+   "pos": "CF",
    "age": 27,
    "mls": "3.124",
    "mlbam": "665750",
@@ -55517,7 +55517,7 @@
   {
    "name": "Thomas, Lane",
    "team": "KC",
-   "pos": "rf",
+   "pos": "CF",
    "age": 30,
    "mls": "6.014",
    "mlbam": "657041",
@@ -55664,7 +55664,7 @@
   {
    "name": "Schmitt, Casey",
    "team": "SF",
-   "pos": "3b",
+   "pos": "LF",
    "age": 27,
    "mls": "2.035",
    "mlbam": "669477",
@@ -56088,7 +56088,7 @@
   {
    "name": "White, Eli",
    "team": "ATL",
-   "pos": "2b",
+   "pos": "RF",
    "age": 32,
    "mls": "3.140",
    "mlbam": "642201",
@@ -56134,7 +56134,7 @@
   {
    "name": "McMahon, Ryan",
    "team": "NYY",
-   "pos": "3b",
+   "pos": "3B",
    "age": 31,
    "mls": "8.006",
    "mlbam": "641857",
@@ -60964,7 +60964,7 @@
   {
    "name": "Williams, Alika",
    "team": "ATH",
-   "pos": "ss",
+   "pos": "SS",
    "age": 27,
    "mls": "1.032",
    "mlbam": "675961",
@@ -62402,7 +62402,7 @@
   {
    "name": "Bohm, Alec",
    "team": "PHI",
-   "pos": "3b",
+   "pos": "3B",
    "age": 29,
    "mls": "5.106",
    "mlbam": "664761",
@@ -62807,7 +62807,7 @@
   {
    "name": "Goldschmidt, Paul",
    "team": "NYY",
-   "pos": "1b",
+   "pos": "1B",
    "age": 38,
    "mls": "14.059",
    "mlbam": "502671",
@@ -63339,7 +63339,7 @@
   {
    "name": "Clase, Jonatan",
    "team": "TOR",
-   "pos": "of",
+   "pos": "LF",
    "age": 24,
    "mls": "0.109",
    "mlbam": "682729",
@@ -63496,7 +63496,7 @@
   {
    "name": "Harris, Brett",
    "team": "BOS",
-   "pos": "3b",
+   "pos": "3B",
    "age": 28,
    "mls": "0.105",
    "mlbam": "695391",
@@ -63574,7 +63574,7 @@
   {
    "name": "Bell, Josh",
    "team": "MIN",
-   "pos": "dh-1b",
+   "pos": "DH",
    "age": 33,
    "mls": "9.053",
    "mlbam": "605137",
@@ -63606,7 +63606,7 @@
   {
    "name": "Dunn, Oliver",
    "team": "TB",
-   "pos": "2b-lf",
+   "pos": "SS",
    "age": 28,
    "mls": "1.000",
    "mlbam": "686554",
@@ -63768,7 +63768,7 @@
   {
    "name": "Bliss, Ryan",
    "team": "SEA",
-   "pos": "ss",
+   "pos": "2B",
    "age": 25,
    "mls": "1.061",
    "mlbam": "669208",
@@ -63837,7 +63837,7 @@
   {
    "name": "Sosa, Lenyn",
    "team": "TOR",
-   "pos": "2b-ss",
+   "pos": "2B",
    "age": 26,
    "mls": "2.044",
    "mlbam": "672820",
@@ -63977,7 +63977,7 @@
   {
    "name": "Sheets, Gavin",
    "team": "SD",
-   "pos": "1b",
+   "pos": "1B",
    "age": 30,
    "mls": "4.076",
    "mlbam": "657757",
@@ -64063,7 +64063,7 @@
   {
    "name": "O'Neill, Tyler",
    "team": "BAL",
-   "pos": "lf",
+   "pos": "RF",
    "age": 31,
    "mls": "7.059",
    "mlbam": "641933",
@@ -64133,7 +64133,7 @@
   {
    "name": "Tolbert, Tyler",
    "team": "KC",
-   "pos": "2b-of",
+   "pos": "SS",
    "age": 28,
    "mls": "0.144",
    "mlbam": "686475",
@@ -64205,7 +64205,7 @@
   {
    "name": "Arenado, Nolan",
    "team": "AZ",
-   "pos": "3b",
+   "pos": "3B",
    "age": 35,
    "mls": "12.155",
    "mlbam": "571448",
@@ -64243,7 +64243,7 @@
   {
    "name": "Young, Jared",
    "team": "NYM",
-   "pos": "1b-of",
+   "pos": "1B",
    "age": 30,
    "mls": "0.133",
    "mlbam": "676724",
@@ -70083,7 +70083,7 @@
   {
    "name": "Call, Alex",
    "team": "LAD",
-   "pos": "cf",
+   "pos": "LF",
    "age": 31,
    "mls": "2.161",
    "mlbam": "669743",
@@ -70137,7 +70137,7 @@
   {
    "name": "Freeman, Cody",
    "team": "TEX",
-   "pos": "3b",
+   "pos": "LF",
    "age": 25,
    "mls": "0.051",
    "mlbam": "683227",
@@ -70366,7 +70366,7 @@
   {
    "name": "Rosario, Amed",
    "team": "NYY",
-   "pos": "2b",
+   "pos": "3B",
    "age": 30,
    "mls": "8.062",
    "mlbam": "642708",
@@ -70689,7 +70689,7 @@
   {
    "name": "Walton, Donovan",
    "team": "ATH",
-   "pos": "2b",
+   "pos": "2B",
    "age": 32,
    "mls": "1.029",
    "mlbam": "622268",
@@ -70881,7 +70881,7 @@
   {
    "name": "Riley, Austin",
    "team": "ATL",
-   "pos": "3b",
+   "pos": "3B",
    "age": 29,
    "mls": "6.138",
    "mlbam": "663586",
@@ -71433,7 +71433,7 @@
   {
    "name": "De Los Santos, Deyvison",
    "team": "MIA",
-   "pos": "3b",
+   "pos": "1B",
    "age": 23,
    "mls": "0.000",
    "mlbam": "691277",
@@ -71511,7 +71511,7 @@
   {
    "name": "Fernandez, Jose",
    "team": "AZ",
-   "pos": "ss",
+   "pos": "DH",
    "age": 22,
    "mls": "0.000",
    "mlbam": "699912",
@@ -71658,7 +71658,7 @@
   {
    "name": "Yorke, Nick",
    "team": "PIT",
-   "pos": "2b-of",
+   "pos": "3B",
    "age": 24,
    "mls": "0.042",
    "mlbam": "694377",
@@ -72867,7 +72867,7 @@
   {
    "name": "Ur\u00edas, Ram\u00f3n",
    "team": "STL",
-   "pos": "3b-2b",
+   "pos": "3B",
    "age": 32,
    "mls": "5.025",
    "mlbam": "602104",
@@ -72899,7 +72899,7 @@
   {
    "name": "Bauers, Jake",
    "team": "MIL",
-   "pos": "1b",
+   "pos": "1B",
    "age": 30,
    "mls": "5.084",
    "mlbam": "641343",
@@ -72929,7 +72929,7 @@
   {
    "name": "Ritter, Ryan",
    "team": "COL",
-   "pos": "ss",
+   "pos": "2B",
    "age": 25,
    "mls": "0.115",
    "mlbam": "690022",
@@ -73086,7 +73086,7 @@
   {
    "name": "Rave, John",
    "team": "KC",
-   "pos": "rf",
+   "pos": "RF",
    "age": 28,
    "mls": "0.102",
    "mlbam": "670231",
@@ -73415,7 +73415,7 @@
   {
    "name": "Edman, Tommy",
    "team": "LAD",
-   "pos": "2b-cf",
+   "pos": "2B",
    "age": 31,
    "mls": "6.114",
    "mlbam": "669242",
@@ -73477,7 +73477,7 @@
   {
    "name": "Dub\u00f3n, Mauricio",
    "team": "ATL",
-   "pos": "2b",
+   "pos": "LF",
    "age": 31,
    "mls": "5.162",
    "mlbam": "643289",
@@ -73660,7 +73660,7 @@
   {
    "name": "Straw, Myles",
    "team": "TOR",
-   "pos": "cf",
+   "pos": "LF",
    "age": 31,
    "mls": "5.125",
    "mlbam": "664702",
@@ -73950,7 +73950,7 @@
   {
    "name": "Arraez, Luis",
    "team": "SF",
-   "pos": "2b",
+   "pos": "2B",
    "age": 29,
    "mls": "6.121",
    "mlbam": "650333",
@@ -73980,7 +73980,7 @@
   {
    "name": "Taylor, Samad",
    "team": "SD",
-   "pos": "2b",
+   "pos": "LF",
    "age": 27,
    "mls": "0.078",
    "mlbam": "669392",
@@ -74427,7 +74427,7 @@
   {
    "name": "Isbel, Kyle",
    "team": "KC",
-   "pos": "cf",
+   "pos": "CF",
    "age": 29,
    "mls": "4.043",
    "mlbam": "664728",
@@ -75085,7 +75085,7 @@
   {
    "name": "Grichuk, Randal",
    "team": "CWS",
-   "pos": "rf",
+   "pos": "DH",
    "age": 34,
    "mls": "11.033",
    "mlbam": "545341",
@@ -75131,7 +75131,7 @@
   {
    "name": "P\u00e9rez, Wenceel",
    "team": "DET",
-   "pos": "cf",
+   "pos": "RF",
    "age": 26,
    "mls": "2.000",
    "mlbam": "672761",
@@ -75601,7 +75601,7 @@
   {
    "name": "Malgeri, Ben",
    "team": "DET",
-   "pos": "cf",
+   "pos": "RF",
    "age": 26,
    "mls": "0.000",
    "mlbam": "701162",
@@ -76084,7 +76084,7 @@
   {
    "name": "Bericoto, Victor",
    "team": "SF",
-   "pos": "1b-rf",
+   "pos": "RF",
    "age": 24,
    "mls": "0.000",
    "mlbam": "682674",
@@ -76241,7 +76241,7 @@
   {
    "name": "Conforto, Michael",
    "team": "CHC",
-   "pos": "dh-rf",
+   "pos": "RF",
    "age": 33,
    "mls": "9.043",
    "mlbam": "624424",
@@ -76271,7 +76271,7 @@
   {
    "name": "Ur\u00edas, Luis",
    "team": "TOR",
-   "pos": "3b",
+   "pos": "2B",
    "age": 29,
    "mls": "5.014",
    "mlbam": "649966",
@@ -76427,7 +76427,7 @@
   {
    "name": "Bogaerts, Xander",
    "team": "SD",
-   "pos": "ss",
+   "pos": "SS",
    "age": 33,
    "mls": "12.042",
    "mlbam": "593428",
@@ -76703,7 +76703,7 @@
   {
    "name": "Sogard, Nick",
    "team": "BOS",
-   "pos": "inf-of",
+   "pos": "2B",
    "age": 28,
    "mls": "0.119",
    "mlbam": "686765",
@@ -77210,7 +77210,7 @@
   {
    "name": "Perkins, Blake",
    "team": "MIL",
-   "pos": "cf",
+   "pos": "CF",
    "age": 29,
    "mls": "2.133",
    "mlbam": "663368",
@@ -77387,7 +77387,7 @@
   {
    "name": "Mateo, Jorge",
    "team": "ATL",
-   "pos": "ss",
+   "pos": "SS",
    "age": 31,
    "mls": "6.000",
    "mlbam": "622761",
@@ -77548,7 +77548,7 @@
   {
    "name": "Marte, Starling",
    "team": "KC",
-   "pos": "dh-rf",
+   "pos": "RF",
    "age": 37,
    "mls": "12.162",
    "mlbam": "516782",
@@ -168171,7 +168171,7 @@
   {
    "name": "Rojas, Josh",
    "team": "KC",
-   "pos": "2b-3b",
+   "pos": "3B",
    "age": 31,
    "mls": "4.126",
    "mlbam": "668942",
@@ -168815,7 +168815,7 @@
   {
    "name": "Chaparro, Andr\u00e9s",
    "team": "WSH",
-   "pos": "3b",
+   "pos": "1B",
    "age": 27,
    "mls": "1.002",
    "mlbam": "665953",
@@ -169532,7 +169532,7 @@
   {
    "name": "De La Cruz, Bryan",
    "team": "PHI",
-   "pos": "lf",
+   "pos": "RF",
    "age": 29,
    "mls": "3.056",
    "mlbam": "650559",
@@ -169578,7 +169578,7 @@
   {
    "name": "Wade Jr., LaMonte",
    "team": "HOU",
-   "pos": "1b",
+   "pos": "LF",
    "age": 32,
    "mls": "6.035",
    "mlbam": "664774",
@@ -169687,7 +169687,7 @@
   {
    "name": "Gasper, Mickey",
    "team": "BOS",
-   "pos": "1b",
+   "pos": "C",
    "age": 30,
    "mls": "0.149",
    "mlbam": "681508",
@@ -170460,7 +170460,7 @@
   {
    "name": "Spence, Lucas",
    "team": "HOU",
-   "pos": "cf",
+   "pos": "CF",
    "age": 23,
    "mls": "0.000",
    "mlbam": "828599",
@@ -171251,7 +171251,7 @@
   {
    "name": "Delgado, Raynel",
    "team": "HOU",
-   "pos": "2b",
+   "pos": "2B",
    "age": 26,
    "mls": "0.000",
    "mlbam": "669384",
@@ -171323,7 +171323,7 @@
   {
    "name": "Nishida, Rikuu",
    "team": "CWS",
-   "pos": "lf-2b",
+   "pos": "RF",
    "age": 25,
    "mls": "0.000",
    "mlbam": "807747",
@@ -171395,7 +171395,7 @@
   {
    "name": "Lowe, Nathaniel",
    "team": "CIN",
-   "pos": "1b",
+   "pos": "DH",
    "age": 30,
    "mls": "5.145",
    "mlbam": "663993",
@@ -171992,7 +171992,7 @@
   {
    "name": "Laureano, Ram\u00f3n",
    "team": "SD",
-   "pos": "rf",
+   "pos": "LF",
    "age": 31,
    "mls": "6.159",
    "mlbam": "657656",
@@ -172056,7 +172056,7 @@
   {
    "name": "Hicklen, Brewer",
    "team": "ATL",
-   "pos": "lf-cf",
+   "pos": "RF",
    "age": 30,
    "mls": "0.038",
    "mlbam": "676551",
@@ -172983,7 +172983,7 @@
   {
    "name": "Rivas, Leo",
    "team": "SEA",
-   "pos": "ss",
+   "pos": "3B",
    "age": 28,
    "mls": "1.008",
    "mlbam": "660844",
@@ -173201,7 +173201,7 @@
   {
    "name": "Stevens, Chad",
    "team": "COL",
-   "pos": "ss",
+   "pos": "2B",
    "age": 27,
    "mls": "0.000",
    "mlbam": "677060",
@@ -173551,7 +173551,7 @@
   {
    "name": "Reyes, Felix",
    "team": "PHI",
-   "pos": "of",
+   "pos": "LF",
    "age": 25,
    "mls": "0.000",
    "mlbam": "694025",
@@ -173971,7 +173971,7 @@
   {
    "name": "Wilson, Weston",
    "team": "SEA",
-   "pos": "3b-of",
+   "pos": "3B",
    "age": 31,
    "mls": "1.097",
    "mlbam": "642215",
@@ -174033,7 +174033,7 @@
   {
    "name": "Kemp, Otto",
    "team": "PHI",
-   "pos": "3b",
+   "pos": "LF",
    "age": 26,
    "mls": "0.092",
    "mlbam": "805249",
@@ -174215,7 +174215,7 @@
   {
    "name": "Hinds, Rece",
    "team": "MIA",
-   "pos": "of",
+   "pos": "RF",
    "age": 25,
    "mls": "0.089",
    "mlbam": "677956",
@@ -174473,7 +174473,7 @@
   {
    "name": "Rengifo, Luis",
    "team": "SD",
-   "pos": "2b",
+   "pos": "3B",
    "age": 29,
    "mls": "6.043",
    "mlbam": "650859",
@@ -174577,7 +174577,7 @@
   {
    "name": "Johnson, Ivan",
    "team": "CIN",
-   "pos": "2b",
+   "pos": "2B",
    "age": 27,
    "mls": "0.000",
    "mlbam": "671155",
@@ -175012,7 +175012,7 @@
   {
    "name": "Velazquez, Andrew",
    "team": "KC",
-   "pos": "ss-3b",
+   "pos": "SS",
    "age": 31,
    "mls": "3.033",
    "mlbam": "623205",
@@ -175277,7 +175277,7 @@
   {
    "name": "Teodosio, Bryce",
    "team": "LAA",
-   "pos": "cf",
+   "pos": "LF",
    "age": 27,
    "mls": "0.081",
    "mlbam": "669326",
@@ -175590,7 +175590,7 @@
   {
    "name": "Kennedy, Buddy",
    "team": "SEA",
-   "pos": "1b",
+   "pos": "3B",
    "age": 26,
    "mls": "0.131",
    "mlbam": "671083",
@@ -175944,7 +175944,7 @@
   {
    "name": "Helman, Michael",
    "team": "TEX",
-   "pos": "2b",
+   "pos": "CF",
    "age": 30,
    "mls": "0.095",
    "mlbam": "680737",
@@ -176470,7 +176470,7 @@
   {
    "name": "Dean, Justin",
    "team": "CHC",
-   "pos": "cf",
+   "pos": "RF",
    "age": 29,
    "mls": "0.052",
    "mlbam": "681909",
@@ -176542,7 +176542,7 @@
   {
    "name": "Joe, Connor",
    "team": "SEA",
-   "pos": "1b-of",
+   "pos": "RF",
    "age": 30,
    "mls": "3.136",
    "mlbam": "656582",
@@ -176588,7 +176588,7 @@
   {
    "name": "Eaton, Nate",
    "team": "BOS",
-   "pos": "of",
+   "pos": "LF",
    "age": 29,
    "mls": "1.020",
    "mlbam": "681987",
@@ -176913,7 +176913,7 @@
   {
    "name": "Wisdom, Patrick",
    "team": "SEA",
-   "pos": "3b-1b",
+   "pos": "3B",
    "age": 34,
    "mls": "4.058",
    "mlbam": "621550",
@@ -177013,7 +177013,7 @@
   {
    "name": "Gray, Tristan",
    "team": "MIN",
-   "pos": "3b",
+   "pos": "SS",
    "age": 29,
    "mls": "0.123",
    "mlbam": "656484",
@@ -177610,7 +177610,7 @@
   {
    "name": "Melendez, MJ",
    "team": "NYM",
-   "pos": "rf-lf",
+   "pos": "DH",
    "age": 27,
    "mls": "3.015",
    "mlbam": "669004",
@@ -177656,7 +177656,7 @@
   {
    "name": "Wagaman, Eric",
    "team": "NYM",
-   "pos": "1b",
+   "pos": "1B",
    "age": 28,
    "mls": "1.020",
    "mlbam": "676572",
@@ -177791,7 +177791,7 @@
   {
    "name": "Lopez, Nicky",
    "team": "TEX",
-   "pos": "2b",
+   "pos": "2B",
    "age": 31,
    "mls": "5.139",
    "mlbam": "670032",
@@ -177821,7 +177821,7 @@
   {
    "name": "Wilson, Will",
    "team": "SEA",
-   "pos": "ss",
+   "pos": "3B",
    "age": 27,
    "mls": "0.074",
    "mlbam": "669717",
@@ -177997,7 +177997,7 @@
   {
    "name": "Lockridge, Brandon",
    "team": "MIL",
-   "pos": "of",
+   "pos": "LF",
    "age": 29,
    "mls": "0.147",
    "mlbam": "663604",
@@ -178217,7 +178217,7 @@
   {
    "name": "Walker, Christian",
    "team": "HOU",
-   "pos": "1b",
+   "pos": "1B",
    "age": 34,
    "mls": "7.124",
    "mlbam": "572233",
@@ -178287,7 +178287,7 @@
   {
    "name": "Hern\u00e1ndez, Kik\u00e9",
    "team": "LAD",
-   "pos": "ss-cf",
+   "pos": "3B",
    "age": 34,
    "mls": "11.054",
    "mlbam": "571771",
@@ -178397,7 +178397,7 @@
   {
    "name": "Johnston, Troy",
    "team": "COL",
-   "pos": "of-1b",
+   "pos": "RF",
    "age": 29,
    "mls": "0.062",
    "mlbam": "687859",
@@ -178654,7 +178654,7 @@
   {
    "name": "Conine, Griffin",
    "team": "MIA",
-   "pos": "of",
+   "pos": "RF",
    "age": 28,
    "mls": "1.035",
    "mlbam": "665052",
@@ -178780,7 +178780,7 @@
   {
    "name": "Andujar, Miguel",
    "team": "SD",
-   "pos": "lf",
+   "pos": "DH",
    "age": 31,
    "mls": "6.053",
    "mlbam": "609280",
@@ -179104,7 +179104,7 @@
   {
    "name": "Rojas, Miguel",
    "team": "LAD",
-   "pos": "ss",
+   "pos": "2B",
    "age": 37,
    "mls": "11.043",
    "mlbam": "500743",
@@ -179261,7 +179261,7 @@
   {
    "name": "Palacios, Richie",
    "team": "TB",
-   "pos": "of-2b",
+   "pos": "2B",
    "age": 29,
    "mls": "2.156",
    "mlbam": "680700",
@@ -179315,7 +179315,7 @@
   {
    "name": "Fraley, Jake",
    "team": "TB",
-   "pos": "dh",
+   "pos": "RF",
    "age": 31,
    "mls": "5.097",
    "mlbam": "641584",
@@ -179810,7 +179810,7 @@
   {
    "name": "Cabrera, Oswaldo",
    "team": "NYY",
-   "pos": "3b",
+   "pos": "3B",
    "age": 27,
    "mls": "3.050",
    "mlbam": "665828",
@@ -179936,7 +179936,7 @@
   {
    "name": "Smith, Dominic",
    "team": "ATL",
-   "pos": "1b",
+   "pos": "DH",
    "age": 31,
    "mls": "6.151",
    "mlbam": "642086",
@@ -180058,7 +180058,7 @@
   {
    "name": "Gorman, Nolan",
    "team": "STL",
-   "pos": "3b",
+   "pos": "3B",
    "age": 26,
    "mls": "3.114",
    "mlbam": "669357",
@@ -180286,7 +180286,7 @@
   {
    "name": "Thomas, Alek",
    "team": "LAD",
-   "pos": "cf",
+   "pos": "CF",
    "age": 25,
    "mls": "3.103",
    "mlbam": "677950",
@@ -180332,7 +180332,7 @@
   {
    "name": "Allen, Nick",
    "team": "HOU",
-   "pos": "ss",
+   "pos": "SS",
    "age": 27,
    "mls": "2.164",
    "mlbam": "669397",
@@ -180378,7 +180378,7 @@
   {
    "name": "Vargas, Ildemaro",
    "team": "AZ",
-   "pos": "2b",
+   "pos": "1B",
    "age": 34,
    "mls": "5.129",
    "mlbam": "545121",
@@ -180543,7 +180543,7 @@
   {
    "name": "Taylor, Tyrone",
    "team": "NYM",
-   "pos": "of",
+   "pos": "LF",
    "age": 32,
    "mls": "5.093",
    "mlbam": "621438",
@@ -180749,7 +180749,7 @@
   {
    "name": "Frazier, Adam",
    "team": "LAA",
-   "pos": "2b-of",
+   "pos": "2B",
    "age": 34,
    "mls": "9.075",
    "mlbam": "624428",
@@ -180891,7 +180891,7 @@
   {
    "name": "Moncada, Yo\u00e1n",
    "team": "LAA",
-   "pos": "3b",
+   "pos": "3B",
    "age": 31,
    "mls": "8.106",
    "mlbam": "660162",
@@ -181025,7 +181025,7 @@
   {
    "name": "Robles, Victor",
    "team": "SEA",
-   "pos": "cf",
+   "pos": "RF",
    "age": 29,
    "mls": "7.033",
    "mlbam": "645302",
@@ -181074,7 +181074,7 @@
   {
    "name": "Friedl, TJ",
    "team": "CIN",
-   "pos": "cf",
+   "pos": "CF",
    "age": 30,
    "mls": "3.112",
    "mlbam": "670770",
@@ -181216,7 +181216,7 @@
   {
    "name": "Hays, Austin",
    "team": "CWS",
-   "pos": "lf",
+   "pos": "LF",
    "age": 30,
    "mls": "6.057",
    "mlbam": "669720",
@@ -181753,7 +181753,7 @@
   {
    "name": "Ozuna, Marcell",
    "team": "PIT",
-   "pos": "dh",
+   "pos": "DH",
    "age": 35,
    "mls": "12.124",
    "mlbam": "542303",
@@ -181791,7 +181791,7 @@
   {
    "name": "Mountcastle, Ryan",
    "team": "BAL",
-   "pos": "1b",
+   "pos": "1B",
    "age": 29,
    "mls": "5.105",
    "mlbam": "663624",
@@ -181831,7 +181831,7 @@
   {
    "name": "Pederson, Joc",
    "team": "TEX",
-   "pos": "dh-lf",
+   "pos": "DH",
    "age": 34,
    "mls": "11.028",
    "mlbam": "592626",
@@ -181901,7 +181901,7 @@
   {
    "name": "Refsnyder, Rob",
    "team": "SEA",
-   "pos": "2b-of",
+   "pos": "DH",
    "age": 35,
    "mls": "7.048",
    "mlbam": "608701",
@@ -182063,7 +182063,7 @@
   {
    "name": "Kiner-Falefa, Isiah",
    "team": "BOS",
-   "pos": "2b",
+   "pos": "2B",
    "age": 31,
    "mls": "8.000",
    "mlbam": "643396",
@@ -182428,7 +182428,7 @@
   {
    "name": "Yastrzemski, Mike",
    "team": "ATL",
-   "pos": "rf",
+   "pos": "LF",
    "age": 35,
    "mls": "6.128",
    "mlbam": "573262",
@@ -182584,7 +182584,7 @@
   {
    "name": "Su\u00e1rez, Eugenio",
    "team": "CIN",
-   "pos": "3b",
+   "pos": "DH",
    "age": 34,
    "mls": "11.061",
    "mlbam": "553993",
@@ -182916,7 +182916,7 @@
   {
    "name": "Bregman, Alex",
    "team": "CHC",
-   "pos": "3b",
+   "pos": "3B",
    "age": 32,
    "mls": "9.070",
    "mlbam": "608324",
@@ -183011,7 +183011,7 @@
   {
    "name": "India, Jonathan",
    "team": "KC",
-   "pos": "2b",
+   "pos": "2B",
    "age": 29,
    "mls": "5.000",
    "mlbam": "663697",
@@ -183075,7 +183075,7 @@
   {
    "name": "Hoerner, Nico",
    "team": "CHC",
-   "pos": "2b",
+   "pos": "2B",
    "age": 29,
    "mls": "6.014",
    "mlbam": "663538",
@@ -183201,7 +183201,7 @@
   {
    "name": "Gurriel Jr., Lourdes",
    "team": "AZ",
-   "pos": "dh",
+   "pos": "LF",
    "age": 32,
    "mls": "7.094",
    "mlbam": "666971",
@@ -183333,7 +183333,7 @@
   {
    "name": "Garc\u00eda, Adolis",
    "team": "PHI",
-   "pos": "rf",
+   "pos": "RF",
    "age": 33,
    "mls": "5.095",
    "mlbam": "666969",
@@ -183475,7 +183475,7 @@
   {
    "name": "Soler, Jorge",
    "team": "LAA",
-   "pos": "dh-rf",
+   "pos": "DH",
    "age": 34,
    "mls": "10.143",
    "mlbam": "624585",
@@ -183854,7 +183854,7 @@
   {
    "name": "Kim, Ha-Seong",
    "team": "ATL",
-   "pos": "ss",
+   "pos": "SS",
    "age": 30,
    "mls": "5.000",
    "mlbam": "673490",
@@ -183954,7 +183954,7 @@
   {
    "name": "Kim, Hyeseong",
    "team": "LAD",
-   "pos": "2b",
+   "pos": "SS",
    "age": 27,
    "mls": "0.149",
    "mlbam": "808975",
@@ -184067,7 +184067,7 @@
   {
    "name": "Trout, Mike",
    "team": "LAA",
-   "pos": "cf",
+   "pos": "CF",
    "age": 34,
    "mls": "14.070",
    "mlbam": "545361",
@@ -184177,7 +184177,7 @@
   {
    "name": "Reynolds, Bryan",
    "team": "PIT",
-   "pos": "lf",
+   "pos": "LF",
    "age": 31,
    "mls": "6.163",
    "mlbam": "668804",
@@ -184239,7 +184239,7 @@
   {
    "name": "O'Hearn, Ryan",
    "team": "PIT",
-   "pos": "rf",
+   "pos": "1B",
    "age": 32,
    "mls": "7.002",
    "mlbam": "656811",
@@ -184277,7 +184277,7 @@
   {
    "name": "Song, Sung Mun",
    "team": "SD",
-   "pos": "3b-2b",
+   "pos": "2B",
    "age": 29,
    "mls": "0.000",
    "mlbam": "823550",
@@ -184557,7 +184557,7 @@
   {
    "name": "Cronenworth, Jake",
    "team": "SD",
-   "pos": "1b",
+   "pos": "2B",
    "age": 32,
    "mls": "6.000",
    "mlbam": "630105",
@@ -184839,7 +184839,7 @@
   {
    "name": "Butler, Lawrence",
    "team": "ATH",
-   "pos": "rf",
+   "pos": "RF",
    "age": 25,
    "mls": "2.032",
    "mlbam": "671732",
@@ -184957,7 +184957,7 @@
   {
    "name": "Hayes, Ke'Bryan",
    "team": "CIN",
-   "pos": "3b",
+   "pos": "3B",
    "age": 29,
    "mls": "5.075",
    "mlbam": "663647",
@@ -185260,7 +185260,7 @@
   {
    "name": "Chapman, Matt",
    "team": "SF",
-   "pos": "3b",
+   "pos": "3B",
    "age": 33,
    "mls": "8.109",
    "mlbam": "656305",
@@ -185403,7 +185403,7 @@
   {
    "name": "Bader, Harrison",
    "team": "SF",
-   "pos": "cf",
+   "pos": "CF",
    "age": 32,
    "mls": "8.030",
    "mlbam": "664056",
@@ -185441,7 +185441,7 @@
   {
    "name": "Benintendi, Andrew",
    "team": "CWS",
-   "pos": "lf",
+   "pos": "DH",
    "age": 31,
    "mls": "9.062",
    "mlbam": "643217",
@@ -185600,7 +185600,7 @@
   {
    "name": "Yoshida, Masataka",
    "team": "BOS",
-   "pos": "lf",
+   "pos": "DH",
    "age": 32,
    "mls": "3.000",
    "mlbam": "807799",
@@ -185725,7 +185725,7 @@
   {
    "name": "Gim\u00e9nez, Andr\u00e9s",
    "team": "TOR",
-   "pos": "2b",
+   "pos": "SS",
    "age": 27,
    "mls": "5.106",
    "mlbam": "665926",
@@ -185872,7 +185872,7 @@
   {
    "name": "Story, Trevor",
    "team": "BOS",
-   "pos": "ss",
+   "pos": "SS",
    "age": 33,
    "mls": "10.000",
    "mlbam": "596115",
@@ -186154,7 +186154,7 @@
   {
    "name": "Bichette, Bo",
    "team": "NYM",
-   "pos": "3b",
+   "pos": "3B",
    "age": 28,
    "mls": "6.063",
    "mlbam": "666182",
@@ -186200,7 +186200,7 @@
   {
    "name": "Schwarber, Kyle",
    "team": "PHI",
-   "pos": "dh",
+   "pos": "DH",
    "age": 33,
    "mls": "10.086",
    "mlbam": "656941",
@@ -186366,7 +186366,7 @@
   {
    "name": "Altuve, Jose",
    "team": "HOU",
-   "pos": "2b-lf",
+   "pos": "2B",
    "age": 36,
    "mls": "14.072",
    "mlbam": "514888",
@@ -186420,7 +186420,7 @@
   {
    "name": "Polanco, Jorge",
    "team": "NYM",
-   "pos": "1b-3b",
+   "pos": "DH",
    "age": 32,
    "mls": "9.024",
    "mlbam": "593871",
@@ -186546,7 +186546,7 @@
   {
    "name": "Semien, Marcus",
    "team": "NYM",
-   "pos": "2b",
+   "pos": "2B",
    "age": 35,
    "mls": "11.118",
    "mlbam": "543760",
@@ -186785,7 +186785,7 @@
   {
    "name": "B\u00e1ez, Javier",
    "team": "DET",
-   "pos": "ss-cf",
+   "pos": "SS",
    "age": 33,
    "mls": "10.089",
    "mlbam": "595879",
@@ -186863,7 +186863,7 @@
   {
    "name": "Stanton, Giancarlo",
    "team": "NYY",
-   "pos": "dh-rf",
+   "pos": "DH",
    "age": 36,
    "mls": "15.118",
    "mlbam": "519317",
@@ -187007,7 +187007,7 @@
   {
    "name": "Turner, Trea",
    "team": "PHI",
-   "pos": "ss",
+   "pos": "SS",
    "age": 33,
    "mls": "9.135",
    "mlbam": "607208",
@@ -187208,7 +187208,7 @@
   {
    "name": "Naylor, Josh",
    "team": "SEA",
-   "pos": "1b",
+   "pos": "1B",
    "age": 29,
    "mls": "6.127",
    "mlbam": "647304",
@@ -187437,7 +187437,7 @@
   {
    "name": "Yelich, Christian",
    "team": "MIL",
-   "pos": "lf",
+   "pos": "DH",
    "age": 34,
    "mls": "12.069",
    "mlbam": "592885",
@@ -187485,7 +187485,7 @@
   {
    "name": "Rooker, Brent",
    "team": "ATH",
-   "pos": "dh-lf",
+   "pos": "DH",
    "age": 31,
    "mls": "4.059",
    "mlbam": "667670",
@@ -187654,7 +187654,7 @@
   {
    "name": "Judge, Aaron",
    "team": "NYY",
-   "pos": "rf-dh",
+   "pos": "RF",
    "age": 34,
    "mls": "9.051",
    "mlbam": "592450",
@@ -187838,7 +187838,7 @@
   {
    "name": "Lee, Jung Hoo",
    "team": "SF",
-   "pos": "rf",
+   "pos": "RF",
    "age": 27,
    "mls": "2.000",
    "mlbam": "808982",
@@ -187892,7 +187892,7 @@
   {
    "name": "Machado, Manny",
    "team": "SD",
-   "pos": "3b",
+   "pos": "3B",
    "age": 33,
    "mls": "13.056",
    "mlbam": "592518",
@@ -187980,7 +187980,7 @@
   {
    "name": "Adames, Willy",
    "team": "SF",
-   "pos": "ss",
+   "pos": "SS",
    "age": 30,
    "mls": "7.105",
    "mlbam": "642715",
@@ -188286,7 +188286,7 @@
   {
    "name": "Correa, Carlos",
    "team": "HOU",
-   "pos": "3b",
+   "pos": "SS",
    "age": 31,
    "mls": "10.119",
    "mlbam": "621043",
@@ -188343,7 +188343,7 @@
   {
    "name": "Bellinger, Cody",
    "team": "NYY",
-   "pos": "cf",
+   "pos": "LF",
    "age": 30,
    "mls": "8.160",
    "mlbam": "641355",
@@ -188405,7 +188405,7 @@
   {
    "name": "Devers, Rafael",
    "team": "SF",
-   "pos": "dh-3b",
+   "pos": "1B",
    "age": 29,
    "mls": "8.070",
    "mlbam": "646240",
@@ -188493,7 +188493,7 @@
   {
    "name": "Guerrero Jr., Vladimir",
    "team": "TOR",
-   "pos": "1b",
+   "pos": "1B",
    "age": 27,
    "mls": "6.157",
    "mlbam": "665489",
@@ -188597,7 +188597,7 @@
   {
    "name": "Tucker, Kyle",
    "team": "LAD",
-   "pos": "rf",
+   "pos": "RF",
    "age": 29,
    "mls": "6.079",
    "mlbam": "663656",
@@ -188786,7 +188786,7 @@
   {
    "name": "Soto, Juan",
    "team": "NYM",
-   "pos": "lf",
+   "pos": "LF",
    "age": 27,
    "mls": "7.134",
    "mlbam": "665742",

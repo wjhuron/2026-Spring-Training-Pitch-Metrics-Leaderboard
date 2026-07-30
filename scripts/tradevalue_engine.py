@@ -380,6 +380,16 @@ def main():
                  if len(parts) == 2 and parts[1].strip() else None)
         return full, loose
 
+    # site-canonical hitter positions (max games played, MLB API) override
+    # Cot's roster labels (Garcia Jr. is a 1B this season, not the 2b Cot's
+    # still lists)
+    pos_cache = {}
+    pos_path = DATA / "hitter_position_cache.json"
+    if pos_path.exists():
+        pos_cache = {k: v["position"]
+                     for k, v in json.loads(pos_path.read_text()).items()
+                     if v.get("position")}
+
     stuff_adj, stuff_loose = {}, {}
     adj_path = DATA / "tradevalue_stuffadj.json"
     if adj_path.exists():
@@ -418,8 +428,11 @@ def main():
             role = "SP" if (p.get("gsPit") or 0) / p["gPit"] >= 0.3 else "RP"
         else:
             role = role_of(p["pos"])
+        display_pos = p["pos"]
+        if role == "POS" and p["mlbam"] and str(p["mlbam"]) in pos_cache:
+            display_pos = pos_cache[str(p["mlbam"])]
         rec = {
-            "name": p["name"], "team": p["team"], "pos": p["pos"],
+            "name": p["name"], "team": p["team"], "pos": display_pos,
             "age": p["age"], "mls": p["mls"], "mlbam": p["mlbam"],
             "fgId": p["fgId"], "engine": "mlb", "role": role,
             "warY1": war_baseline,
