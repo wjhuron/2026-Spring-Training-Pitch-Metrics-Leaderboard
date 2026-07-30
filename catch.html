@@ -68,14 +68,22 @@
           <div class="catch-hint">opportunity = hang + 0.39s pitch flight</div>
         </div>
         <div class="catch-field">
-          <label for="cp-zone">Fielding zone / direction</label>
+          <label for="cp-zone">Fielding zone (from the card)</label>
           <select id="cp-zone">
-            <option value="0|0">Standard</option>
-            <option value="1|0">Standard, going back</option>
-            <option value="0|1">Wall</option>
-            <option value="1|1">Wall, going back</option>
+            <option value="0">Standard</option>
+            <option value="1">LF Line</option>
+            <option value="1">LF Gap</option>
+            <option value="1">CF</option>
+            <option value="1">RF Gap</option>
+            <option value="1">RF Line</option>
+            <option value="1">Other wall zone</option>
           </select>
-          <div class="catch-hint">going back = angle to ball landing beyond 90&deg;</div>
+          <div class="catch-hint">any zone besides Standard = wall factor (landing within 8 ft of the outfield wall)</div>
+        </div>
+        <div class="catch-field">
+          <label for="cp-angle">Angle to ball landing (deg)</label>
+          <input id="cp-angle" type="number" min="-180" max="180" step="1" placeholder="-49">
+          <div class="catch-hint">going back = |angle| &ge; 150&deg; (within 30&deg; of straight behind); blank = not going back</div>
         </div>
       </div>
       <div class="catch-result" id="cp-result">

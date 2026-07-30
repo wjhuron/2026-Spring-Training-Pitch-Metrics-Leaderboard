@@ -80,14 +80,16 @@
     var dist = parseFloat(document.getElementById('cp-dist').value);
     var time = parseFloat(document.getElementById('cp-time').value);
     var hang = parseFloat(document.getElementById('cp-hang').value);
-    var zone = document.getElementById('cp-zone').value.split('|');
+    var wall = document.getElementById('cp-zone').value;
+    var angle = parseFloat(document.getElementById('cp-angle').value);
+    var back = (!isNaN(angle) && Math.abs(angle) >= 150) ? '1' : '0';
     var res = document.getElementById('cp-result');
 
     if (isNaN(time) && !isNaN(hang)) time = hang + FLIGHT;
     if (isNaN(dist) || isNaN(time)) { res.style.display = 'none'; return; }
 
     var out = lookup(Math.round(time * 10) / 10, Math.round(dist),
-                     zone[0], zone[1]);
+                     back, wall);
     if (!out) {
       showError('No comparable tracked plays for those inputs.');
       return;
@@ -99,12 +101,14 @@
       starRange(out.p) + ' · Savant display: ' +
       Math.round(bucket(out.p) * 100) + '%';
     document.getElementById('cp-detail').textContent =
+      'flags: ' + (back === '1' ? 'going back' : 'not back') + ', ' +
+      (wall === '1' ? 'wall factor' : 'no wall') + ' · ' +
       out.n + ' comparable plays within ±' +
       (0.05 * out.ring).toFixed(2) + 's / ±' + out.ring + ' ft · ' +
       meta.seasons + ', ' + meta.plays.toLocaleString() + ' tracked plays';
   }
 
-  ['cp-dist', 'cp-time', 'cp-hang', 'cp-zone'].forEach(function (id) {
+  ['cp-dist', 'cp-time', 'cp-hang', 'cp-zone', 'cp-angle'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', update);
   });
 })();

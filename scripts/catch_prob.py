@@ -7,7 +7,7 @@ from Savant's player-services/range endpoint). No network access needed.
 Usage:
   python3 scripts/catch_prob.py --dist 56 --time 3.6
   python3 scripts/catch_prob.py --dist 56 --time 3.6 --zone "standard"
-  python3 scripts/catch_prob.py --dist 78 --time 4.1 --zone "wall back"
+  python3 scripts/catch_prob.py --dist 91 --time 5.2 --zone "RF Gap" --angle 105
   python3 scripts/catch_prob.py --dist 56 --hang 3.2          # opportunity time from hang + 0.39
   python3 scripts/catch_prob.py                                # interactive prompts
 
@@ -17,13 +17,13 @@ Inputs:
            per play; the batter and fielder cards share it.
   --hang   hang time fallback (contact to landing). Used only if --time is
            absent: opportunity = hang + pitch flight (--flight, default 0.39s).
-  --zone   fielding zone string from the card, e.g. "Standard", "Wall",
-           "Standard Back". 'wall' anywhere in it sets the wall flag,
-           'back' sets the back flag.
-  --back / --wall  set the flags directly (override the zone string).
-  --angle  angle to ball landing, degrees. Only used to infer back when
-           neither --zone nor --back says so: |angle| > 90 means the ball
-           is behind the fielder (back = 1).
+  --zone   fielding zone string from the card, e.g. "Standard", "RF Gap",
+           "LF Line", "CF". Anything other than Standard is a wall zone
+           (ball landing within 8 ft of the outfield wall) and sets the
+           wall flag. Zone strings do NOT encode direction.
+  --back / --wall  set the flags directly (override zone/angle).
+  --angle  angle to ball landing, degrees. Going back = |angle| >= 150
+           (within 30 degrees of straight behind, MLB's definition).
 
 Output is the official-style bucketed probability (0.05 steps, 0.99 cap)
 plus the star rating and the local surface detail.
@@ -116,12 +116,12 @@ def main():
         print(f'opportunity time = {args.hang} hang + {args.flight} flight '
               f'= {args.time:.2f}s')
 
-    zone = args.zone.lower()
-    wall = 1 if (args.wall or 'wall' in zone) else 0
-    back = 1 if (args.back or 'back' in zone) else 0
-    if not back and args.angle is not None and abs(args.angle) > 90:
+    zone = args.zone.strip().lower()
+    wall = 1 if (args.wall or zone not in ('', 'standard')) else 0
+    back = 1 if args.back else 0
+    if not back and args.angle is not None and abs(args.angle) >= 150:
         back = 1
-        print('back flag inferred from angle')
+        print('back flag inferred from angle (|angle| >= 150)')
 
     cells, meta = load_surface()
     p, n, ring = lookup(cells, round(args.time, 2), args.dist, back, wall)
