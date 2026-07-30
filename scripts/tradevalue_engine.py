@@ -303,6 +303,90 @@ def value_mlb(p, frac_y1):
     return surplus, years_out, flags
 
 
+RISK_ORD = {"Low": 0, "Medium": 1, "Med": 1, "High": 2, "Extreme": 3}
+
+
+def prospect_adjuster(prospects):
+    """Within-FV multiplier from the fitted heterogeneity artifact.
+
+    Features are demeaned against the CURRENT board's (fv, type) cells,
+    mirroring the fit's cell-demeaning; the relative adjustment divides by
+    the fit's own per-cell realized mean; features are clipped to the fitted
+    1st-99th percentile range (extrapolation guard, documented in the
+    artifact) and the multiplier itself is not otherwise capped.
+    """
+    adj_path = DATA / "tradevalue_prospect_adj.json"
+    if not adj_path.exists():
+        return lambda p: 1.0
+    art = json.loads(adj_path.read_text())
+    coefs, ranges = art["coefs"], art["featureRanges"]
+    cells = {}
+    for p in prospects:
+        fv = str(p.get("fv") or "").strip()
+        if fv not in CONFIG["fvTable"]:
+            continue
+        is_p = p["pos"] in PROSPECT_PITCHER_POS
+        cells.setdefault((fv, is_p), []).append(p)
+    means = {}
+    for cell, members in cells.items():
+        def _m(key, cast=float):
+            vals = []
+            for m in members:
+                try:
+                    v = cast(m.get(key))
+                except (TypeError, ValueError):
+                    continue
+                vals.append(v)
+            return sum(vals) / len(vals) if vals else None
+        means[cell] = {
+            "eta": _m("eta"), "age": _m("age"),
+            "risk": (sum(RISK_ORD.get(str(m.get("risk") or "").capitalize(), 1)
+                         for m in members) / len(members)),
+            "rank": _m("top100"),
+            "hasRank": sum(1 for m in members if m.get("top100")) / len(members),
+            "posSS": sum(1 for m in members if m["pos"] == "SS") / len(members),
+            "posC": sum(1 for m in members if m["pos"] == "C") / len(members),
+        }
+
+    def clip(f, v):
+        lo, hi = ranges[f]
+        return max(lo, min(hi, v))
+
+    def adjust(p):
+        fv = str(p.get("fv") or "").strip()
+        is_p = p["pos"] in PROSPECT_PITCHER_POS
+        cell = (fv, is_p)
+        if cell not in means:
+            return 1.0
+        mu = means[cell]
+        feats = {}
+        try:
+            eta = float(p.get("eta"))
+        except (TypeError, ValueError):
+            eta = None
+        feats["etaGap"] = clip("etaGap", eta - mu["eta"]) if (eta and mu["eta"]) else 0.0
+        try:
+            age = float(p.get("age"))
+        except (TypeError, ValueError):
+            age = None
+        feats["ageGap"] = clip("ageGap", age - mu["age"]) if (age and mu["age"]) else 0.0
+        feats["riskOrd"] = clip("riskOrd",
+                                RISK_ORD.get(str(p.get("risk") or "").capitalize(), 1)
+                                - mu["risk"])
+        feats["posSS"] = (1.0 if p["pos"] == "SS" else 0.0) - mu["posSS"]
+        feats["posC"] = (1.0 if p["pos"] == "C" else 0.0) - mu["posC"]
+        rank = p.get("top100")
+        feats["rankGap"] = (clip("rankGap", (rank - mu["rank"]) / 25.0)
+                            if (rank and mu["rank"]) else 0.0)
+        feats["hasRank"] = (1.0 if rank else 0.0) - mu["hasRank"]
+        # relative form: coefficients are fractions of tier value per
+        # feature unit; expectation floors at zero (structural)
+        adj = sum(coefs[f] * feats.get(f, 0.0) for f in coefs)
+        return max(0.0, 1.0 + adj)
+
+    return adjust
+
+
 def value_prospect(p):
     cfg = CONFIG
     row = cfg["fvTable"].get(p["fv"])
@@ -352,6 +436,13 @@ def market_multiplier(rec, fit, in_deadline):
     if rec.get("gradBlend") and "gradW" in m:
         # exponent = the blend weight, matching the corpus featurization
         out *= m["gradW"] ** rec["gradBlend"]["w"]
+    if "catcher" in m and (rec.get("role") == "C"
+                           or (rec["engine"] == "prospect"
+                               and rec.get("pos") == "C")):
+        out *= m["catcher"]
+    if "defFrac" in m and rec.get("defFrac"):
+        # continuous feature: multiplier^feature = exp(beta x feature)
+        out *= m["defFrac"] ** rec["defFrac"]
     return out
 
 
@@ -389,6 +480,22 @@ def main():
         pos_cache = {k: v["position"]
                      for k, v in json.loads(pos_path.read_text()).items()
                      if v.get("position")}
+
+    # defensive-value share for the fitted market discount (trailing
+    # 2025+2026 bbref run components, mirroring the corpus featurization)
+    def_frac_map = {}
+    import csv as _csv
+    wh = {}
+    for r in _csv.DictReader(open(DATA / "tradevalue_warhist.csv")):
+        if int(r["season"]) >= 2025:
+            rec = wh.setdefault(r["mlbam"], {"rb": 0.0, "rd": 0.0, "pa": 0.0})
+            rec["rb"] += float(r["runsBat"]) if r["runsBat"] else 0.0
+            rec["rd"] += float(r["runsDef"]) if r["runsDef"] else 0.0
+            rec["pa"] += float(r["pa"]) if r["pa"] else 0.0
+    for m_id, rec in wh.items():
+        denom = abs(rec["rb"]) + abs(rec["rd"])
+        if rec["pa"] >= 300 and denom > 1.0:
+            def_frac_map[m_id] = rec["rd"] / denom
 
     stuff_adj, stuff_loose = {}, {}
     adj_path = DATA / "tradevalue_stuffadj.json"
@@ -432,6 +539,8 @@ def main():
         if role == "POS" and p["mlbam"] and str(p["mlbam"]) in pos_cache:
             display_pos = pos_cache[str(p["mlbam"])]
         rec = {
+            "defFrac": (def_frac_map.get(str(p["mlbam"]))
+                        if role == "POS" or role == "C" else None),
             "name": p["name"], "team": p["team"], "pos": display_pos,
             "age": p["age"], "mls": p["mls"], "mlbam": p["mlbam"],
             "fgId": p["fgId"], "engine": "mlb", "role": role,
@@ -493,12 +602,18 @@ def main():
         n_blend += 1
     print(f"graduation blend applied to {n_blend} recent graduates")
 
+    adjust = prospect_adjuster(u["prospects"])
+    n_hetero = 0
     skipped_fv = 0
     for p in u["prospects"]:
         value, exp_war, star = value_prospect(p)
         if value is None:
             skipped_fv += 1
             continue
+        m_hetero = adjust(p)
+        if abs(m_hetero - 1.0) > 1e-9:
+            value *= m_hetero
+            n_hetero += 1
         mlb_rec = mlb_by_mlbam.get(p["mlbam"]) if p["mlbam"] else None
         players.append({
             "name": p["name"], "team": p["org"], "pos": p["pos"],
@@ -512,10 +627,12 @@ def main():
             # rookie-eligible 40-man players: FV value is the headline,
             # the MLB-engine number rides along as reference
             "mlbSurplus": mlb_rec["surplus"] if mlb_rec else None,
-            "flags": [],
+            "heteroMult": round(m_hetero, 3),
+            "flags": (["heteroAdj"] if abs(m_hetero - 1.0) > 1e-9 else []),
         })
     if skipped_fv:
         print(f"WARNING: {skipped_fv} prospects with unknown FV skipped")
+    print(f"within-FV heterogeneity adjustment applied to {n_hetero} prospects")
 
     for r in players:
         r["marketValue"] = r["surplus"] * market_multiplier(r, market_fit, in_deadline)

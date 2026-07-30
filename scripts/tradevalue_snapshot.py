@@ -115,6 +115,82 @@ def load_warhist():
     return hist
 
 
+PROSPECT_ADJ = (json.loads((DATA / "tradevalue_prospect_adj.json").read_text())
+                if (DATA / "tradevalue_prospect_adj.json").exists() else None)
+RISK_ORD = {"Low": 0, "Medium": 1, "Med": 1, "High": 2, "Extreme": 3}
+_PITCH_POS = {"SP", "RP", "SIRP", "MIRP", "RHP", "LHP", "TWP"}
+
+
+def _board_cell_means(rows):
+    """Per (fv, pitcher) tier means for the heterogeneity features."""
+    from collections import defaultdict
+    cells = defaultdict(list)
+    for r in rows:
+        fv = str(r.get("fv") or "").strip()
+        if not fv:
+            continue
+        cells[(fv, (r.get("pos") or "").upper() in _PITCH_POS)].append(r)
+    means = {}
+    for cell, ms in cells.items():
+        def num_list(key):
+            out = []
+            for m in ms:
+                try:
+                    out.append(float(m.get(key)))
+                except (TypeError, ValueError):
+                    pass
+            return out
+        etas, ages, ranks = num_list("eta"), num_list("age"), num_list("rank")
+        means[cell] = {
+            "eta": sum(etas) / len(etas) if etas else None,
+            "age": sum(ages) / len(ages) if ages else None,
+            "rank": sum(ranks) / len(ranks) if ranks else None,
+            "risk": sum(RISK_ORD.get(str(m.get("risk") or "").capitalize(), 1)
+                        for m in ms) / len(ms),
+            "posSS": sum(1 for m in ms
+                         if (m.get("pos") or "").upper() == "SS") / len(ms),
+            "hasRank": sum(1 for m in ms if m.get("rank")) / len(ms),
+        }
+    return means
+
+
+def hetero_mult(row, cell_means):
+    """Within-tier multiplier, mirroring the engine's relative form."""
+    if PROSPECT_ADJ is None:
+        return 1.0
+    fv = str(row.get("fv") or "").strip()
+    is_p = (row.get("pos") or "").upper() in _PITCH_POS
+    mu = cell_means.get((fv, is_p))
+    if not mu:
+        return 1.0
+    coefs, ranges = PROSPECT_ADJ["coefs"], PROSPECT_ADJ["featureRanges"]
+
+    def clip(f, v):
+        lo, hi = ranges[f]
+        return max(lo, min(hi, v))
+
+    def num(v):
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+    feats = {}
+    eta = num(row.get("eta"))
+    feats["etaGap"] = clip("etaGap", eta - mu["eta"]) if (eta and mu["eta"]) else 0.0
+    age = num(row.get("age"))
+    feats["ageGap"] = clip("ageGap", age - mu["age"]) if (age and mu["age"]) else 0.0
+    feats["riskOrd"] = clip("riskOrd",
+                            RISK_ORD.get(str(row.get("risk") or "").capitalize(), 1)
+                            - mu["risk"])
+    feats["posSS"] = (1.0 if (row.get("pos") or "").upper() == "SS" else 0.0) - mu["posSS"]
+    rank = num(row.get("rank"))
+    feats["rankGap"] = (clip("rankGap", (rank - mu["rank"]) / 25.0)
+                        if (rank and mu["rank"]) else 0.0)
+    feats["hasRank"] = (1.0 if rank else 0.0) - mu["hasRank"]
+    adj = sum(coefs[f] * feats.get(f, 0.0) for f in coefs)
+    return max(0.0, 1.0 + adj)
+
+
 def load_boards(idmap_fg_to_mlbam):
     """boardKey -> {mlbam or (normName, birthYear): row}"""
     raw = json.loads((DATA / "tradevalue_board_hist.json").read_text())
@@ -132,7 +208,8 @@ def load_boards(idmap_fg_to_mlbam):
         # name-only fallback for rows missing a birth date: unique names only
         by_name_only = {n: rs[0] for n, rs in name_only.items() if len(rs) == 1}
         boards[key] = {"byMlbam": by_mlbam, "byName": by_name,
-                       "byNameOnly": by_name_only}
+                       "byNameOnly": by_name_only,
+                       "cellMeans": _board_cell_means(rows)}
     return boards
 
 
@@ -363,6 +440,8 @@ def value_traded_player(mlbam, name, trade_date, season, ctx):
         if row is not None:
             fv_val = value_prospect_at(row)
             if fv_val is not None:
+                fv_val = dict(fv_val)
+                fv_val["value"] *= hetero_mult(row, board["cellMeans"])
                 break
     if fv_val is not None and debut_year is None:
         return fv_val  # still a prospect: pure FV, as before

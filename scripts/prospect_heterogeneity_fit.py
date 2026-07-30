@@ -104,6 +104,9 @@ def featurize(rows):
     for cell, members in cells.items():
         if len(members) < 8:
             continue
+        cell_mean_real = np.mean([m["realized"] for m in members])
+        if cell_mean_real < 0.5:
+            continue  # relative target undefined on near-zero cells
         etas = [m["eta"] for m in members if m["eta"]]
         ages = [m["age"] for m in members if m["age"]]
         ranks = [m["rank"] for m in members if m["rank"]]
@@ -125,7 +128,9 @@ def featurize(rows):
                             if (m["rank"] and mean_rank) else 0.0),
                 "hasRank": 1.0 * bool(m["rank"])
                            - np.mean([1.0 * bool(x["rank"]) for x in members]),
-                "y": m["realized"] - mean_real,
+                # RELATIVE target: fraction of the cell mean (the shipped
+                # multiplier form; additive-WAR fits distort small cells)
+                "y": (m["realized"] - mean_real) / cell_mean_real,
             })
     print(f"featurized: {len(out)} rows in cells of >=8")
     return out
@@ -191,6 +196,29 @@ def main():
     verdict = bool(stable) and wins >= 4
     print("\nVERDICT:", "fit multipliers from the stable set"
           if verdict else "NULL - FV grades already absorb these fields")
+
+    if verdict:
+        # emit the live artifact: pooled coefficients + per-cell realized
+        # means (the fit's own denominator for relative adjustments) +
+        # fitted feature ranges (extrapolation guard bounds)
+        import json as _json
+        from collections import defaultdict as _dd
+        cell_real = _dd(list)
+        for r in rows:
+            cell_real[(r["fv"], r["pitcher"])].append(r["realized"])
+        ranges = {f: [float(np.percentile([d[f] for d in data], 1)),
+                      float(np.percentile([d[f] for d in data], 99))]
+                  for f in stable}
+        artifact = {
+            "coefs": {f: float(b) for f, b in zip(stable, beta)},
+            "form": "relative",   # m = max(0, 1 + sum(coef * feature))
+            "featureRanges": ranges,
+            "fitNote": "relative-space refit: y = (realized - cellMean)/"
+                       "cellMean, cells mean>=0.5; LOSO-validated 2017-2021",
+        }
+        out = Path(__file__).parent.parent / "data" / "tradevalue_prospect_adj.json"
+        out.write_text(_json.dumps(artifact, indent=1))
+        print(f"artifact -> {out}")
 
 
 if __name__ == "__main__":
