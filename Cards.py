@@ -237,12 +237,40 @@ _EVENT_WOBA = {'Single': 0.884, 'Double': 1.256, 'Triple': 1.591, 'Home Run': 2.
 # per-100 rate is noise (e.g. a 1-pitch changeup), so the RV cells show '—'.
 PITCH_QUAL_MIN = 25
 
-# GB% coloring gate (2026-07-30): BIP required on a pitch type before the
-# GB% cell gets percentile tint (the value always renders). Measured: per-type
-# GB% split-half reliability crosses 0.5 between 20-30 total BIP in each of
-# 2023/2024/2025 (below at 10-20, above at 30-45 everywhere) — the crossing
-# lands on the site's existing QUAL.MIN_BIP_PCTL = 25 convention.
+# ── Season-card coloring gates (2026-07-30, Wally's package) ──────────────
+# Values ALWAYS render; these gate only the percentile tint, season and
+# date-range cards only (daily cards keep their historical behavior).
+#
+# Flat 50 for the outcome row (Zone%, Whiff%, Chase%, RV pair): measured as
+# the optimal single compromise over real arsenal row sizes — the
+# misclassification curve vs per-metric measured gates bottoms at 50-55
+# (flat 45-60). 50 IS Whiff%'s measured constant; Zone% k=29, Chase% k=96;
+# the RV pair colors as a ledger convention (its own k would be 359/1234).
+CARD_COLOR_MIN_PITCHES = 50
+# Stuff+ is shape-family: measured per-type k = 13 (seeds 12.9-13.8), so 15
+# colors only cells that are >=half signal without hiding real information.
+STUFF_COLOR_MIN_PITCHES = 15
+# Loc+ rides the site's measured per-group gates (retested 2026-07-30, all
+# six inside fresh seed spreads) — keeps card/Arsenal-leaderboard parity.
+# Mirrors js/aggregator.js QUAL.MIN_PITCH_LOCPLUS + LOCPLUS_GROUP.
+LOCPLUS_COLOR_MIN = {'FF': 81, 'SI': 96, 'FC': 122, 'SL': 70, 'CU': 93, 'CH': 72}
+LOCPLUS_COLOR_GROUP = {
+    'FF': 'FF', 'FA': 'FF', 'SI': 'SI', 'FC': 'FC', 'CF': 'FC',
+    'SL': 'SL', 'ST': 'SL', 'SW': 'SL', 'SV': 'SL',
+    'CU': 'CU', 'KC': 'CU', 'CS': 'CU',
+    'CH': 'CH', 'FS': 'CH', 'KN': 'CH', 'SC': 'CH'}
+LOCPLUS_COLOR_DEFAULT = 135   # overall crossing; unmapped types
+
+# BIP-denominated coloring gates: GB% 25 BIP is the measured reliability-0.5
+# crossing (== site MIN_BIP_PCTL); xwOBAcon 25 BIP is an accepted convention
+# (its measured k is ~175 BIP — the tint describes the sample, not stable skill).
 GB_COLOR_MIN_BIP = 25
+XWC_COLOR_MIN_BIP = 25
+
+
+def _locplus_color_min(pt):
+    g = LOCPLUS_COLOR_GROUP.get(pt)
+    return LOCPLUS_COLOR_MIN.get(g, LOCPLUS_COLOR_DEFAULT)
 
 def _compute_pitch_rv(pitches_list):
     """Per-pitch ACTUAL run value, pitcher perspective. The actual-outcome twin of
@@ -1712,9 +1740,9 @@ def render_card(config, pitches, output_file):
                    }[config.get('rv_mode') or 'per100']
     else:
         rv_cols = ['xPitchRV']
-    _pt_qual_min = config.get('pitch_qual') or PITCH_QUAL_MIN
+    _pt_qual_min = config.get('pitch_qual') or CARD_COLOR_MIN_PITCHES
     rv_qual_by_pt = {}   # pitch-type RV coloring gate (values always render)
-    bip_by_pt = {}       # pitch-type BIP counts for the GB% coloring gate
+    bip_by_pt = {}       # pitch-type BIP counts for the BIP coloring gates
 
     # Sort pitch types by usage (descending), with PITCH_ORDER as tiebreaker
     pitch_counts = {}
@@ -2011,6 +2039,9 @@ def render_card(config, pitches, output_file):
                 pc = pt_codes[r - 1]
                 if not pc or pc not in league_avgs:
                     continue
+                # Flat outcome coloring gate (season/date-range cards).
+                if is_season and pitch_counts.get(pc, 0) < CARD_COLOR_MIN_PITCHES:
+                    continue
                 la = league_avgs[pc].get(meta_key)
                 row_bg = DARK_CELL if r % 2 == 1 else ALT_ROW_BG
             if la is None:
@@ -2054,6 +2085,9 @@ def render_card(config, pitches, output_file):
                 la = league_avgs.get(pc, {}).get('xwOBAcon') if pc else None
                 row_bg = DARK_CELL if r % 2 == 1 else ALT_ROW_BG
             if la is None:
+                continue
+            # BIP coloring gate (season/date-range): xwOBAcon tints at 25 BIP.
+            if is_season and r < len(cell_data) and bip_by_pt.get(pc, 0) < XWC_COLOR_MIN_BIP:
                 continue
             val_str = cell_data[r - 1][xwc_col_idx]
             tinted = _pitcher_stat_cell_color(val_str, la, 0.05, False, row_bg, False)
@@ -2110,6 +2144,11 @@ def render_card(config, pitches, output_file):
     if 'Loc+' in col_headers:
         lp_col_idx = col_headers.index('Loc+')
         for r in range(1, len(cell_data) + 1):
+            # Loc+ colors at its measured per-group gate (site parity).
+            if is_season and r < len(cell_data):
+                _pc = pt_codes[r - 1]
+                if _pc and pitch_counts.get(_pc, 0) < _locplus_color_min(_pc):
+                    continue
             row_bg = DARKER if r == len(cell_data) else (DARK_CELL if r % 2 == 1 else ALT_ROW_BG)
             val_str = cell_data[r - 1][lp_col_idx]
             tinted = _pitcher_stat_cell_color(val_str, 100.0, 10.0, True, row_bg, False)
@@ -2121,6 +2160,11 @@ def render_card(config, pitches, output_file):
     if 'Stuff+' in col_headers:
         sp_col_idx = col_headers.index('Stuff+')
         for r in range(1, len(cell_data) + 1):
+            # Stuff+ is shape-fast (measured k=13): colors from 15 pitches.
+            if is_season and r < len(cell_data):
+                _pc = pt_codes[r - 1]
+                if _pc and pitch_counts.get(_pc, 0) < STUFF_COLOR_MIN_PITCHES:
+                    continue
             row_bg = DARKER if r == len(cell_data) else (DARK_CELL if r % 2 == 1 else ALT_ROW_BG)
             val_str = cell_data[r - 1][sp_col_idx]
             tinted = _pitcher_stat_cell_color(val_str, 100.0, 10.0, True, row_bg, False)
@@ -2787,7 +2831,8 @@ def main():
                              'totals (PitchRV/xPitchRV), or both pairs. Single-game cards '
                              'always show cumulative xPitchRV.')
     parser.add_argument('--pitch-qual', type=int, default=None,
-                        help=f'Min pitches for a pitch type\'s RV cells (default {PITCH_QUAL_MIN})')
+                        help='Min pitches for a pitch type\'s RV COLORING '
+                             f'(default {CARD_COLOR_MIN_PITCHES}; values always render)')
     parser.add_argument('--tab', default=None,
                         help='Read pitches from this scratch tab in the NLE2026 '
                              'workbook (e.g. Sheet2) instead of a team tab. '
