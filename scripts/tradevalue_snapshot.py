@@ -42,10 +42,11 @@ PEOPLE_CACHE = DATA / "tradevalue_people_cache.json"
 UA = {"User-Agent": "huronalytics-tradevalue/1.0"}
 
 MARCEL_WEIGHTS = (5, 4, 3)   # seasons S-1, S-2, S-3
-# proj = raw * sum_w/(sum_w+ballast): ballast 2 gives ~0.86 compression for a
-# full 3-season player, in line with Marcel's documented full-timer
-# reliability (~0.83). Sweep candidate in phase 5.
-MARCEL_BALLAST = 2
+# proj = raw * sum_w/(sum_w+ballast). Since the Steamer-preseason swap,
+# Marcel only backfills the ~2% of corpus player-seasons without a Steamer
+# row; the stage-1 ballast curve is flat there (1.6330/1.6317/1.6320 for
+# 0/1/2), best-on-grid 1 shipped to match the fit artifact.
+MARCEL_BALLAST = 1
 MARCEL_AGE_STEP = -0.4       # applied once when age >= 28
 SHORT_SEASON_SCALE = {2020: 162 / 60}  # COVID season WAR to full-season scale
 FILLER_VALUE = 300_000       # unranked minor leaguer floor (convention)
@@ -213,6 +214,35 @@ def load_boards(idmap_fg_to_mlbam):
     return boards
 
 
+_STEAMER = None
+
+
+def load_steamer():
+    """Preseason Steamer WAR by (season, mlbam), from tradevalue_steamerhist.
+
+    The at-trade-time projection for corpus trades 2017-2026; two-way players
+    sum bat + pit rows. The 2020 file was published on the 60-game schedule
+    (Trout 2.98 WAR / 234 PA) and is rescaled to full-season talent, matching
+    SHORT_SEASON_SCALE on the realized side.
+    """
+    global _STEAMER
+    if _STEAMER is None:
+        _STEAMER = {}
+        for p in sorted((DATA / "steamer_preseason").glob("steamer_*_*.csv")):
+            season = int(p.stem.split("_")[1])
+            scale = SHORT_SEASON_SCALE.get(season, 1.0)
+            for r in csv.DictReader(open(p)):
+                if not r["mlbam"]:
+                    continue
+                try:
+                    war = float(r["war"])
+                except (TypeError, ValueError):
+                    continue
+                key = (season, int(r["mlbam"]))
+                _STEAMER[key] = _STEAMER.get(key, 0.0) + war * scale
+    return _STEAMER
+
+
 def marcel(hist_for_player, season, age):
     total_w, acc = 0, 0.0
     for w, back in zip(MARCEL_WEIGHTS, (1, 2, 3)):
@@ -320,7 +350,8 @@ def value_mlb_at(mlbam, trade_date, season, people, warhist, hist_rec=None):
     # a mid-year debut leaves partial service in the debut season, so free
     # agency comes after debut_year + 6 (Soto: 5/2018 debut -> FA after 2024)
     control_left = max(1, min(7, debut_year + 6 - season + 1))
-    war1 = marcel(hist, season, age)
+    st = load_steamer().get((season, mlbam))
+    war1 = st if st is not None else marcel(hist, season, age)
     if hist_rec is not None:
         return value_mlb_contract(hist_rec, war1, age, trade_date, season,
                                   bool(person.get("pitcher")))

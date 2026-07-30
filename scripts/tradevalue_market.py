@@ -54,7 +54,8 @@ MIN_SIDE = 0.5e6
 Y_CLIP = math.log(10)
 BAND = math.log(1.5)
 
-GRID_LAMBDA = [0.09, 0.12, 0.15, 0.18, 0.21, 0.24, 0.27, 0.30, 0.33]
+GRID_LAMBDA = [0.0, 0.03, 0.06, 0.09, 0.12, 0.15, 0.18, 0.21, 0.24, 0.27,
+               0.30, 0.33]
 GRID_DELTA = [0.0, -0.05, -0.10, -0.15, -0.20, -0.30]
 GRID_BALLAST = [0, 1, 2, 3, 4]
 VALUEFIT_BASE_SEASONS = list(range(2016, 2023))  # horizons complete by 2026
@@ -194,7 +195,11 @@ def loso_score(rows, featset=None):
 
 
 def build_valuefit_sample(ctx):
-    """(war1_by_ballast, age, realized[4]) per active player-season."""
+    """(steamer_war1, marcel_acc, marcel_tw, age, realized[4]) per active
+    player-season. war1 source mirrors production: preseason Steamer where
+    available (2017+), Marcel components as fallback (ballast varies in the
+    grid without recompute)."""
+    steamer = snap.load_steamer()
     sample = []
     for mlbam, hist in ctx["warhist"].items():
         for s in VALUEFIT_BASE_SEASONS:
@@ -202,31 +207,34 @@ def build_valuefit_sample(ctx):
                 continue
             age = hist[s].get("age")
             age = int(age) if age else None
-            # marcel raw components so ballast can vary without recompute
+            st = steamer.get((s, mlbam))
             acc, tw = 0.0, 0
             for w, back in zip(snap.MARCEL_WEIGHTS, (1, 2, 3)):
                 rec = hist.get(s - back)
                 if rec is not None:
                     acc += w * rec["war"]
                     tw += w
-            if tw == 0:
+            if st is None and tw == 0:
                 continue
             realized = [
                 (hist.get(s + t) or {}).get("war", 0.0)
                 for t in range(1, VALUEFIT_HORIZON + 1)
             ]
-            sample.append((acc, tw, age, realized))
+            sample.append((st, acc, tw, age, realized))
     return sample
 
 
 def valuefit_mse(sample, lam, delta, ballast, hold_out_age_parity=None):
     err, n = 0.0, 0
-    for acc, tw, age, realized in sample:
-        raw = acc / tw
-        war1 = raw * (tw / (tw + ballast))
+    for st, acc, tw, age, realized in sample:
         a = age if age is not None else CONFIG["defaultAge"]
-        if a >= 28:
-            war1 += snap.MARCEL_AGE_STEP
+        if st is not None:
+            war1 = st
+        else:
+            raw = acc / tw
+            war1 = raw * (tw / (tw + ballast))
+            if a >= 28:
+                war1 += snap.MARCEL_AGE_STEP
         war1 = max(0.0, war1)
         for t, real in enumerate(realized, start=1):
             aging = sum(1 for k in range(2, t + 2)
@@ -273,11 +281,7 @@ def stage1_value_fit(ctx):
     wins = 0
     seasons = [s for s in VALUEFIT_BASE_SEASONS if s != 2020]
     for s in seasons:
-        sub = [x for x in build_valuefit_sample(ctx)]  # sample is per-season
-        # refit on other seasons
-        train = [x for x in sub]  # grid search cheap enough: reuse full-fit
-        held = [(acc, tw, age, r) for (acc, tw, age, r) in sub]
-        # simple: score best vs anchor on the held season only
+        # score best vs anchor on the held season only
         held_s = [x for x in _sample_by_season(ctx, s)]
         b_mse = valuefit_mse(held_s, best["lambda"], best["delta"], best["ballast"])
         a_mse = valuefit_mse(held_s, anchor["lambda"], anchor["delta"], anchor["ballast"])
@@ -290,23 +294,25 @@ def stage1_value_fit(ctx):
 
 
 def _sample_by_season(ctx, season):
+    steamer = snap.load_steamer()
     sample = []
     for mlbam, hist in ctx["warhist"].items():
         if season not in hist or season == 2020:
             continue
         age = hist[season].get("age")
         age = int(age) if age else None
+        st = steamer.get((season, mlbam))
         acc, tw = 0.0, 0
         for w, back in zip(snap.MARCEL_WEIGHTS, (1, 2, 3)):
             rec = hist.get(season - back)
             if rec is not None:
                 acc += w * rec["war"]
                 tw += w
-        if tw == 0:
+        if st is None and tw == 0:
             continue
         realized = [(hist.get(season + t) or {}).get("war", 0.0)
                     for t in range(1, VALUEFIT_HORIZON + 1)]
-        sample.append((acc, tw, age, realized))
+        sample.append((st, acc, tw, age, realized))
     return sample
 
 
@@ -319,7 +325,9 @@ def stage1b_bucketed_lambda(ctx, best):
     sample = build_valuefit_sample(ctx)
     delta, ballast = best["delta"], best["ballast"]
 
-    def war1_of(acc, tw, age):
+    def war1_of(st, acc, tw, age):
+        if st is not None:
+            return max(0.0, st)
         raw = acc / tw
         w = raw * (tw / (tw + ballast))
         a = age if age is not None else CONFIG["defaultAge"]
@@ -329,7 +337,7 @@ def stage1b_bucketed_lambda(ctx, best):
 
     fitted = []
     for lo, hi in WAR_BUCKETS:
-        rows = [x for x in sample if lo <= war1_of(x[0], x[1], x[2]) < hi]
+        rows = [x for x in sample if lo <= war1_of(x[0], x[1], x[2], x[3]) < hi]
         curve = [(lam, valuefit_mse(rows, lam, delta, ballast))
                  for lam in GRID_LAMBDA_FINE]
         lam_best, mse_best = min(curve, key=lambda c: c[1])
@@ -345,7 +353,7 @@ def stage1b_bucketed_lambda(ctx, best):
         wins, tot = 0, 0
         for s in [x for x in VALUEFIT_BASE_SEASONS if x != 2020]:
             held = [x for x in _sample_by_season(ctx, s)
-                    if lo <= war1_of(x[0], x[1], x[2]) < hi]
+                    if lo <= war1_of(x[0], x[1], x[2], x[3]) < hi]
             if not held:
                 continue
             tot += 1
@@ -376,10 +384,12 @@ def main():
     buckets = stage1b_bucketed_lambda(ctx, best)
 
     # --- stage 2: market multipliers at fixed engine constants ---
-    # Bucketed-lambda verdict: TESTED AND REJECTED for shipping. Tier fits
-    # land within 0.03 of the pooled 0.21 and beat it out of sample in only
-    # 3/6, 3/6, 4/6 held-out seasons (coin flips). The pooled value stands;
-    # the bucket study is recorded in the output for the receipts.
+    # Bucketed-lambda verdict: REJECTED for shipping, re-checked on the
+    # Steamer-basis sample 2026-07-30. Tier fits land within 0.03 of the
+    # pooled 0.21 and beat it out of sample in 0/6, 3/6, 5/6 held-out
+    # seasons - the majority of buckets favor pooled. The 4+ WAR bucket
+    # (lambda 0.18, 5/6) is a MONITOR item, not shipped: one bucket of
+    # three at n=221, and the effect is ~4% on long-control stars.
     set_config(best["lambda"], best["delta"], best["ballast"])
     rows = value_and_featurize(trades, ctx)
 
