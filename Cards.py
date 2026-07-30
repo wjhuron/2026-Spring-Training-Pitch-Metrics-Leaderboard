@@ -702,8 +702,12 @@ def fetch_boxscore(game_pk):
             })
     return result
 
-def fetch_boxscores_for_team(date_str, team_abbrev, include_live=False, game_pk=None):
-    """Fetch boxscore stats for all pitchers on a team for a given date."""
+def fetch_boxscores_for_team(date_str, team_abbrev, include_live=False, game_pk=None, per_game=False):
+    """Fetch boxscore stats for all pitchers on a team for a given date.
+
+    per_game=True returns a LIST of per-game {name: pbox} dicts (so a
+    reliever pitching both ends of a doubleheader counts twice); the default
+    merged dict is kept for the single-game (game_pk) caller."""
     milb_config = MILB_TEAMS.get(team_abbrev)
     if game_pk:
         game_pks = [int(game_pk)]
@@ -717,14 +721,18 @@ def fetch_boxscores_for_team(date_str, team_abbrev, include_live=False, game_pk=
         status = "games (including live)" if include_live else "completed games"
         print(f"  Found {len(game_pks)} {status}")
     pitcher_stats = {}
+    games = []
     for gpk in game_pks:
         box = fetch_boxscore(gpk)
         if not box: continue
+        game = {}
         for p in box['pitchers']:
             if p['team'] == team_abbrev:
-                pitcher_stats[p['name']] = p
+                game[p['name']] = p
+        games.append(game)
+        pitcher_stats.update(game)
         time_module.sleep(0.1)
-    return pitcher_stats
+    return games if per_game else pitcher_stats
 
 
 # ── Fast multi-date boxscore path (2026-07-30) ────────────────────────────
@@ -733,8 +741,9 @@ def fetch_boxscores_for_team(date_str, team_abbrev, include_live=False, game_pk=
 # ~1,700 sequential requests. This path is request-minimal with identical
 # aggregation semantics: ONE ranged schedule call filtered to the team, a
 # disk cache of parsed boxscores (Final games are immutable), and a small
-# thread pool for the misses. Returns a LIST of per-date {name: pbox} dicts,
-# preserving the per-date name-keyed merge the caller has always done.
+# thread pool for the misses. Returns a LIST of per-GAME {name: pbox} dicts —
+# per game, not per date, so a reliever pitching both ends of a doubleheader
+# counts both appearances (the old per-date merge dropped one).
 
 BOXSCORE_CACHE_PATH = os.path.join(os.path.dirname(METADATA_PATH), '_boxscore_cache.pkl')
 
@@ -794,8 +803,9 @@ def fetch_boxscores_for_team_dates(dates, team_abbrev, include_live=False):
                     (game['gamePk'], state == 'Final'))
     except Exception as e:
         print(f"  Error fetching ranged schedule: {e} — falling back to per-date fetch")
-        return [fetch_boxscores_for_team(gd, team_abbrev, include_live=include_live)
-                for gd in sorted(date_set)]
+        return [g for gd in sorted(date_set)
+                for g in fetch_boxscores_for_team(gd, team_abbrev,
+                                                  include_live=include_live, per_game=True)]
 
     cache = _load_boxscore_cache()
     # Live games always refetch; Final games come from / land in the cache.
@@ -822,15 +832,16 @@ def fetch_boxscores_for_team_dates(dates, team_abbrev, include_live=False):
 
     out = []
     for gd in sorted(games_by_date):
-        day = {}
         for (pk, final) in games_by_date[gd]:
             box = fetched.get(pk) if pk in fetched else cache.get(str(pk))
             if not box:
                 continue
+            game = {}
             for p in box['pitchers']:
                 if p['team'] == team_abbrev:
-                    day[p['name']] = p
-        out.append(day)
+                    game[p['name']] = p
+            if game:
+                out.append(game)
     return out
 
 
