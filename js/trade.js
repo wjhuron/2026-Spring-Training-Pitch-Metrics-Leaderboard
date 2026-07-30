@@ -2,8 +2,10 @@
 // inflated in-browser (same DecompressionStream pattern as js/data.js —
 // the payload used to ship as an 830 KB inline script).
 // Verdict bands come from the market-layer fit residuals: within 1.5x =
-// balanced by market standards; within e^0.9 (~2.4x, the median real-trade
-// miss) = inside historical trade noise; beyond that = lopsided.
+// balanced by market standards; within e^0.814 (~2.3x, the fitted LOSO
+// median |log-imbalance| of real trades, tradevalue_market_fit.json
+// losoFitted) = inside historical trade noise; beyond that = lopsided.
+// Keep BAND_NOISE in sync with losoFitted when the market layer refits.
 (function () {
   'use strict';
 
@@ -22,7 +24,7 @@
 
   var DATA = [];
   var BAND_FAIR = Math.log(1.5);
-  var BAND_NOISE = 0.9;
+  var BAND_NOISE = 0.814;
   var VALUE_FLOOR_M = 0.5; // avoids log blowups on near-empty sides
 
   var sides = { a: [], b: [] };
