@@ -237,6 +237,13 @@ _EVENT_WOBA = {'Single': 0.884, 'Double': 1.256, 'Triple': 1.591, 'Home Run': 2.
 # per-100 rate is noise (e.g. a 1-pitch changeup), so the RV cells show '—'.
 PITCH_QUAL_MIN = 25
 
+# GB% coloring gate (2026-07-30): BIP required on a pitch type before the
+# GB% cell gets percentile tint (the value always renders). Measured: per-type
+# GB% split-half reliability crosses 0.5 between 20-30 total BIP in each of
+# 2023/2024/2025 (below at 10-20, above at 30-45 everywhere) — the crossing
+# lands on the site's existing QUAL.MIN_BIP_PCTL = 25 convention.
+GB_COLOR_MIN_BIP = 25
+
 def _compute_pitch_rv(pitches_list):
     """Per-pitch ACTUAL run value, pitcher perspective. The actual-outcome twin of
     _compute_pitch_xrv: for each BIP use the outcome's wOBA weight (hit value, else
@@ -720,6 +727,10 @@ BUBBLE_COLUMNS = [
     # rel .26), Zone% (pred ~0), FPS% (pred ~0) — all still in page tables.
     ('SWING & MISS', [
         ('Whiff%',     'swStrPct',          'swStrPct_pctl',          'pct1'),
+        # Z-Whiff% (2026-07-30, scripts/zwhiff_incremental.py): predicts
+        # next-season xwOBA-against beyond Whiff%+Chase%+K% in 8/8 replicates
+        # (mean partial r .14); the unique bat-missing signal lives in-zone.
+        ('Z-Whiff%',   'izWhiffPct',        'izWhiffPct_pctl',        'pct1'),
         ('Chase%',     'chasePct',          'chasePct_pctl',          'pct1'),
     ]),
     ('CONTACT MGMT', [
@@ -1702,6 +1713,8 @@ def render_card(config, pitches, output_file):
     else:
         rv_cols = ['xPitchRV']
     _pt_qual_min = config.get('pitch_qual') or PITCH_QUAL_MIN
+    rv_qual_by_pt = {}   # pitch-type RV coloring gate (values always render)
+    bip_by_pt = {}       # pitch-type BIP counts for the GB% coloring gate
 
     # Sort pitch types by usage (descending), with PITCH_ORDER as tiebreaker
     pitch_counts = {}
@@ -1761,13 +1774,11 @@ def render_card(config, pitches, output_file):
         else:
             rvs_x = _compute_pitch_xrv(pp)
             xrv_cum = (round(sum(rvs_x), 1) + 0.0) if rvs_x else None   # +0.0 kills -0.0
-        # Qualification gate: below the pitch-type minimum the RV cells are
-        # noise (rates especially, but totals blank too so cards read
-        # consistently). Single-game cumulative stays ungated as before.
-        if n < _pt_qual_min:
-            prv_100 = xrv_100 = None
-            if is_season:
-                prv_cum = xrv_cum = None
+        # Qualification rework (2026-07-30, Wally): RV values always render;
+        # on season/date-range cards the pitch-type minimum now gates only the
+        # percentile COLORING below (site convention — qualification is a
+        # render-only coloring gate). Daily cards were never gated here.
+        rv_qual_by_pt[pt] = n >= _pt_qual_min
         _rvmap = {'PitchRV': prv_cum, 'xPitchRV': xrv_cum,
                   'PitchRV/100': prv_100, 'xPitchRV/100': xrv_100,
                   'xRVOE/100': ((round(xrvoe100_by_pt[pt], 1) + 0.0)
@@ -1782,6 +1793,12 @@ def render_card(config, pitches, output_file):
         # on ROC cards too.
         bip_xw = [v for v in (sf(p.get('xwOBA')) for p in pp if p.get('Description') == 'In Play' and not str(p.get('BBType', '')).startswith('bunt')) if v is not None]
         xwobacon = sum(bip_xw) / len(bip_xw) if bip_xw else xwc_by_pt.get(pt)
+        # GB% — ground balls over BIP (BBType-based, bunts excluded; the site's
+        # definition). Value always renders; coloring gates at GB_COLOR_MIN_BIP.
+        _bips_n = sum(1 for p in pp if p.get('BBType') and not str(p.get('BBType')).startswith('bunt'))
+        _gb_n = sum(1 for p in pp if p.get('BBType') == 'ground_ball')
+        gb_pct = _gb_n / _bips_n if _bips_n else None
+        bip_by_pt[pt] = _bips_n
         pt_name='Fastball' if pt=='FF' else PITCH_NAMES.get(pt,pt)
         _nvaa = nvaa_by_pt.get(pt)
         _nhaa = nhaa_by_pt.get(pt)
@@ -1802,7 +1819,8 @@ def render_card(config, pitches, output_file):
             f"{iz_n/n*100:.1f}%" if n else '—',
             f"{len(whiffs)/len(swings)*100:.1f}%" if swings else '—',
             f"{chase_pct*100:.1f}%" if chase_pct is not None else '—',
-            f"{xwobacon:.3f}".replace('0.', '.') if xwobacon is not None else '—']
+            f"{xwobacon:.3f}".replace('0.', '.') if xwobacon is not None else '—',
+            f"{gb_pct*100:.1f}%" if gb_pct is not None else '—']
         for _h in rv_cols:
             _v = _rvmap.get(_h)
             row.append(str(_v) if _v is not None else '—')
@@ -1826,6 +1844,10 @@ def render_card(config, pitches, output_file):
     t_bip_xw = [v for v in (sf(p.get('xwOBA')) for p in pitches if p.get('Description') == 'In Play' and not str(p.get('BBType', '')).startswith('bunt')) if v is not None]
     t_xwobacon = (sum(t_bip_xw) / len(t_bip_xw) if t_bip_xw
                   else (config.get('pctl_row') or {}).get('xwOBAcon'))
+    # GB% total — same BBType-based definition as the per-type rows.
+    t_bips_n = sum(1 for p in pitches if p.get('BBType') and not str(p.get('BBType')).startswith('bunt'))
+    t_gb_n = sum(1 for p in pitches if p.get('BBType') == 'ground_ball')
+    t_gb_pct = t_gb_n / t_bips_n if t_bips_n else None
     # Pitcher-level Loc+ for the Total row (from the bubble's leaderboard row).
     _total_locplus = (config.get('pctl_row') or {}).get('locPlus')
     _total_stuff = (config.get('pctl_row') or {}).get('stuffScore')
@@ -1866,7 +1888,8 @@ def render_card(config, pitches, output_file):
         f"{t_iz/tc*100:.1f}%" if tc else '—',
         f"{len(t_wh)/len(t_sw)*100:.1f}%" if t_sw else '—',
         f"{t_chase*100:.1f}%" if t_chase is not None else '—',
-        f"{t_xwobacon:.3f}".replace('0.', '.') if t_xwobacon is not None else '—']
+        f"{t_xwobacon:.3f}".replace('0.', '.') if t_xwobacon is not None else '—',
+        f"{t_gb_pct*100:.1f}%" if t_gb_pct is not None else '—']
     for _h in rv_cols:
         _v = _trvmap.get(_h)
         total_row.append(str(_v) if _v is not None else '—')
@@ -1874,7 +1897,7 @@ def render_card(config, pitches, output_file):
     # Source-data presence check — RV needs RunExp on at least one pitch.
     has_pitchrv_data = any(p.get('RunExp') is not None and str(p.get('RunExp','')).strip() != '' for p in pitches)
 
-    all_col_headers=['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate','IVB','HB','nVAA','nHAA','RelZ','RelX','Ext','Arm Angle','Stuff+','Loc+','Pitching+','Zone%','Whiff%','Chase%','xwOBAcon'] + rv_cols
+    all_col_headers=['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate','IVB','HB','nVAA','nHAA','RelZ','RelX','Ext','Arm Angle','Stuff+','Loc+','Pitching+','Zone%','Whiff%','Chase%','xwOBAcon','GB%'] + rv_cols
     all_cell_data=[r[1] for r in pitch_stats]+[total_row]
 
     # Daily cards use a different column ORDER than season (Wally's layout):
@@ -1893,6 +1916,12 @@ def render_card(config, pitches, output_file):
 
     # Columns to force-exclude based on data availability and card type.
     force_exclude = set()
+    # Per-pitch Pitching+ dropped on season/date-range cards (2026-07-30,
+    # Wally): it is the deterministic 0.8/0.2 blend of the adjacent
+    # Stuff+/Loc+ columns — zero new information. Daily layout keeps it.
+    # GB% is season/date-range only (not in the daily column order).
+    if is_season:
+        force_exclude.add('Pitching+')
     _have_xrv = any(v is not None for v in xrv100_by_pt.values()) if is_season else has_pitchrv_data
     if not _have_xrv:
         for _h in ('PitchRV', 'xPitchRV', 'PitchRV/100', 'xPitchRV/100'):
@@ -2031,6 +2060,29 @@ def render_card(config, pitches, output_file):
             if tinted:
                 table.get_celld()[(r, xwc_col_idx)].set_facecolor(tinted)
 
+    # GB% coloring — higher is better for pitcher, vs the per-type league
+    # average (same pct tint family as Zone%/Whiff%/Chase%). The value always
+    # renders; tint gates at GB_COLOR_MIN_BIP (measured reliability crossing,
+    # aligned with the site's MIN_BIP_PCTL). Total row colors vs overall avg.
+    if 'GB%' in col_headers:
+        gb_col_idx = col_headers.index('GB%')
+        for r in range(1, len(cell_data) + 1):
+            if r == len(cell_data):
+                la = overall_avgs.get('gbPct')
+                row_bg = DARKER
+                qual = True
+            else:
+                pc = pt_codes[r - 1]
+                la = league_avgs.get(pc, {}).get('gbPct') if pc else None
+                row_bg = DARK_CELL if r % 2 == 1 else ALT_ROW_BG
+                qual = bip_by_pt.get(pc, 0) >= GB_COLOR_MIN_BIP
+            if la is None or not qual:
+                continue
+            val_str = cell_data[r - 1][gb_col_idx]
+            tinted = _pitcher_stat_cell_color(val_str, la, 1.0, True, row_bg, True)
+            if tinted:
+                table.get_celld()[(r, gb_col_idx)].set_facecolor(tinted)
+
     # xPitchRV coloring — higher is better for pitcher, centered at 0. The
     # per-100 rate gets scale 2.0; the cumulative column spans wider (a full
     # season of one pitch type), so it uses scale 3.0.
@@ -2040,6 +2092,13 @@ def render_card(config, pitches, output_file):
             continue
         rv_scale = 2.0 if col_name.endswith('/100') else 3.0
         for r in range(1, len(cell_data) + 1):
+            # Coloring gate (2026-07-30): below the pitch-type minimum the
+            # value renders untinted. Season/date-range cards only; the Total
+            # row always colors.
+            if is_season and r < len(cell_data):
+                _pc = pt_codes[r - 1]
+                if _pc and not rv_qual_by_pt.get(_pc, True):
+                    continue
             row_bg = DARKER if r == len(cell_data) else (DARK_CELL if r % 2 == 1 else ALT_ROW_BG)
             val_str = cell_data[r - 1][c]
             tinted = _pitcher_stat_cell_color(val_str, 0.0, rv_scale, True, row_bg, False)
