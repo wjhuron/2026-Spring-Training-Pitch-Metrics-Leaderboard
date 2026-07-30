@@ -85,10 +85,10 @@
     var zone = (zoneRaw || '0|0').split('|');   // blank zone = assume standard
     var wall = zone[1];
     var angle = parseFloat(document.getElementById('cp-angle').value);
-    // back if the zone says so ("Standard Back") OR the angle is within
-    // 30 degrees of straight behind
-    var back = (zone[0] === '1' ||
-                (!isNaN(angle) && Math.abs(angle) >= 150)) ? '1' : '0';
+    // back = angle within 30 degrees of straight behind, ONLY. Zone labels
+    // like "Standard Back" are descriptive and do not set the model flag
+    // (verified: Trammell 4/19 play, zone "Standard Back", official back=0)
+    var back = (!isNaN(angle) && Math.abs(angle) >= 150) ? '1' : '0';
     var res = document.getElementById('cp-result');
 
     // pitch flight: plate time from the card is exact, else the

@@ -81,7 +81,7 @@
             <option value="0|0">Standard</option>
             <option value="0|0">Standard Left</option>
             <option value="0|0">Standard Right</option>
-            <option value="1|0">Standard Back</option>
+            <option value="0|0">Standard Back</option>
             <option value="0|1">Line</option>
             <option value="0|1">LF Line</option>
             <option value="0|1">LF Gap</option>
@@ -90,12 +90,12 @@
             <option value="0|1">RF Line</option>
             <option value="0|1">Other wall zone</option>
           </select>
-          <div class="catch-hint">Standard variants = no wall factor ("Standard Back" also sets going back); named wall zones = landing within 8 ft of the outfield wall</div>
+          <div class="catch-hint">Standard variants (incl. "Standard Back") = no wall factor; named wall zones = landing within 8 ft of the outfield wall. Zone labels are descriptive and never set going back</div>
         </div>
         <div class="catch-field">
           <label for="cp-angle">Angle to Ball Landing</label>
           <input id="cp-angle" type="number" min="-180" max="180" step="1">
-          <div class="catch-hint">degrees; going back = |angle| &ge; 150&deg;, or any "Back" fielding zone</div>
+          <div class="catch-hint">degrees; going back = |angle| &ge; 150&deg; (within 30&deg; of straight behind). This is the ONLY back trigger</div>
         </div>
       </div>
       <div class="catch-result" id="cp-result">
