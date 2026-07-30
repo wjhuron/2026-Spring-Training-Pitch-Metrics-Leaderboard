@@ -80,17 +80,19 @@
         <div class="catch-field">
           <label for="cp-zone">Fielding zone (from the card)</label>
           <select id="cp-zone">
-            <option value="0">Standard</option>
-            <option value="0">Standard Left</option>
-            <option value="0">Standard Right</option>
-            <option value="1">LF Line</option>
-            <option value="1">LF Gap</option>
-            <option value="1">CF</option>
-            <option value="1">RF Gap</option>
-            <option value="1">RF Line</option>
-            <option value="1">Other wall zone</option>
+            <option value="0|0">Standard</option>
+            <option value="0|0">Standard Left</option>
+            <option value="0|0">Standard Right</option>
+            <option value="1|0">Standard Back</option>
+            <option value="0|1">Line</option>
+            <option value="0|1">LF Line</option>
+            <option value="0|1">LF Gap</option>
+            <option value="0|1">CF</option>
+            <option value="0|1">RF Gap</option>
+            <option value="0|1">RF Line</option>
+            <option value="0|1">Other wall zone</option>
           </select>
-          <div class="catch-hint">any Standard variant = no wall factor; named wall zones = landing within 8 ft of the outfield wall</div>
+          <div class="catch-hint">Standard variants = no wall factor ("Standard Back" also sets going back); named wall zones = landing within 8 ft of the outfield wall</div>
         </div>
         <div class="catch-field">
           <label for="cp-angle">Angle to ball landing (deg)</label>

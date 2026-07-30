@@ -144,10 +144,12 @@ def main():
         args.time = args.time + 0.05
 
     zone = args.zone.strip().lower()
-    # "Standard", "Standard Left", "Standard Right" = no wall factor;
-    # named wall zones (RF Gap, LF Line, CF, ...) = wall flag
+    # Standard variants ("Standard", "Standard Left/Right/Back") = no wall
+    # factor; named wall zones (Line, RF Gap, LF Line, CF, ...) = wall flag
     wall = 1 if (args.wall or (zone and not zone.startswith('standard'))) else 0
-    back = 1 if args.back else 0
+    # back if flagged, if the zone says so ("Standard Back"), or if the
+    # angle is within 30 degrees of straight behind
+    back = 1 if (args.back or 'back' in zone) else 0
     if not back and args.angle is not None and abs(args.angle) >= 150:
         back = 1
         print('back flag inferred from angle (|angle| >= 150)')

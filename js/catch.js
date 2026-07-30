@@ -82,9 +82,13 @@
     var hang = parseFloat(document.getElementById('cp-hang').value);
     var velo = parseFloat(document.getElementById('cp-velo').value);
     var plate = parseFloat(document.getElementById('cp-plate').value);
-    var wall = document.getElementById('cp-zone').value;
+    var zone = document.getElementById('cp-zone').value.split('|');
+    var wall = zone[1];
     var angle = parseFloat(document.getElementById('cp-angle').value);
-    var back = (!isNaN(angle) && Math.abs(angle) >= 150) ? '1' : '0';
+    // back if the zone says so ("Standard Back") OR the angle is within
+    // 30 degrees of straight behind
+    var back = (zone[0] === '1' ||
+                (!isNaN(angle) && Math.abs(angle) >= 150)) ? '1' : '0';
     var res = document.getElementById('cp-result');
 
     // pitch flight: plate time from the card is exact; 37.6/velo fits
