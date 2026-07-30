@@ -16,7 +16,9 @@ Inputs:
   --time   opportunity time, seconds (pitch release to landing). One number
            per play; the batter and fielder cards share it.
   --hang   hang time fallback (contact to landing). Used only if --time is
-           absent: opportunity = hang + pitch flight (--flight, default 0.39s).
+           absent: opportunity = hang + pitch flight. Flight is 37.6/velo
+           when --velo (mph) is given (fits real pitches within ~3 ms,
+           69-100 mph), else --flight (default 0.39s, typical fastball).
   --zone   fielding zone string from the card, e.g. "Standard", "RF Gap",
            "LF Line", "CF". Anything other than Standard is a wall zone
            (ball landing within 8 ft of the outfield wall) and sets the
@@ -94,6 +96,7 @@ def main():
     ap.add_argument('--time', type=float)
     ap.add_argument('--hang', type=float)
     ap.add_argument('--flight', type=float, default=0.39)
+    ap.add_argument('--velo', type=float, help='pitch velocity mph; refines hang fallback')
     ap.add_argument('--zone', type=str, default='')
     ap.add_argument('--back', action='store_true')
     ap.add_argument('--wall', action='store_true')
@@ -112,12 +115,15 @@ def main():
     if args.time is None:
         if args.hang is None:
             ap.error('need --time or --hang')
-        args.time = args.hang + args.flight
-        print(f'opportunity time = {args.hang} hang + {args.flight} flight '
+        fl = 37.6 / args.velo if args.velo else args.flight
+        args.time = args.hang + fl
+        print(f'opportunity time = {args.hang} hang + {fl:.3f} flight '
               f'= {args.time:.2f}s')
 
     zone = args.zone.strip().lower()
-    wall = 1 if (args.wall or zone not in ('', 'standard')) else 0
+    # "Standard", "Standard Left", "Standard Right" = no wall factor;
+    # named wall zones (RF Gap, LF Line, CF, ...) = wall flag
+    wall = 1 if (args.wall or (zone and not zone.startswith('standard'))) else 0
     back = 1 if args.back else 0
     if not back and args.angle is not None and abs(args.angle) >= 150:
         back = 1

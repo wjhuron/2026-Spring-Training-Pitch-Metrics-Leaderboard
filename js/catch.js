@@ -80,12 +80,17 @@
     var dist = parseFloat(document.getElementById('cp-dist').value);
     var time = parseFloat(document.getElementById('cp-time').value);
     var hang = parseFloat(document.getElementById('cp-hang').value);
+    var velo = parseFloat(document.getElementById('cp-velo').value);
     var wall = document.getElementById('cp-zone').value;
     var angle = parseFloat(document.getElementById('cp-angle').value);
     var back = (!isNaN(angle) && Math.abs(angle) >= 150) ? '1' : '0';
     var res = document.getElementById('cp-result');
 
-    if (isNaN(time) && !isNaN(hang)) time = hang + FLIGHT;
+    if (isNaN(time) && !isNaN(hang)) {
+      // flight = 37.6/velo fits release-to-plate time within ~3ms across
+      // 69-100 mph; 0.39s is the typical-fastball default
+      time = hang + (!isNaN(velo) && velo > 0 ? 37.6 / velo : FLIGHT);
+    }
     if (isNaN(dist) || isNaN(time)) { res.style.display = 'none'; return; }
 
     var out = lookup(Math.round(time * 10) / 10, Math.round(dist),
@@ -108,7 +113,7 @@
       meta.seasons + ', ' + meta.plays.toLocaleString() + ' tracked plays';
   }
 
-  ['cp-dist', 'cp-time', 'cp-hang', 'cp-zone', 'cp-angle'].forEach(function (id) {
+  ['cp-dist', 'cp-time', 'cp-hang', 'cp-velo', 'cp-zone', 'cp-angle'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', update);
   });
 })();
