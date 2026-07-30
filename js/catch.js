@@ -150,4 +150,13 @@
   ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-wall', 'cp-angle'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', update);
   });
+
+  document.getElementById('cp-reset').addEventListener('click', function () {
+    ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-angle'].forEach(function (id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('cp-wall').value = '0';
+    document.getElementById('cp-result').style.display = 'none';
+    showError('');
+  });
 })();

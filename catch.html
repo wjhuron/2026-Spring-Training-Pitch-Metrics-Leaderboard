@@ -29,6 +29,13 @@
     .catch-result .stars { font-size: 1.0rem; font-weight: 600; margin-top: 2px; }
     .catch-result .detail { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
     .catch-error { margin-top: 14px; color: var(--accent); font-size: 0.9rem; display: none; }
+    .catch-reset {
+      font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+      padding: 6px 14px; border-radius: 6px;
+      background: var(--bg-primary); color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .catch-reset:hover { color: var(--accent); border-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -87,6 +94,9 @@
           <input id="cp-angle" type="number" min="-180" max="180" step="1">
           <div class="catch-hint">degrees; going back = |angle| &ge; 150&deg; (within 30&deg; of straight behind). This is the ONLY back trigger</div>
         </div>
+      </div>
+      <div style="margin-top: 14px; text-align: right;">
+        <button id="cp-reset" type="button" class="catch-reset">Reset</button>
       </div>
       <div class="catch-result" id="cp-result">
         <div class="big" id="cp-big"></div>
