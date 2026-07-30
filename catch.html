@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch Probability | Huronalytics</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,500;0,600;0,700;0,800;0,900;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css?v=20260730093541">
+  <style>
+    .catch-wrap { max-width: 720px; margin: 0 auto; padding: 12px 16px 48px; }
+    .catch-intro { color: var(--text-secondary); font-size: 0.92rem; margin: 6px 0 18px; max-width: 72ch; }
+    .catch-panel {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 8px var(--shadow);
+    }
+    .catch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 18px; }
+    @media (max-width: 560px) { .catch-grid { grid-template-columns: 1fr; } }
+    .catch-field label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 4px; color: var(--text-secondary); }
+    .catch-field input, .catch-field select {
+      width: 100%; box-sizing: border-box; padding: 8px 10px; font: inherit;
+      background: var(--bg-primary); color: var(--text-primary);
+      border: 1px solid var(--border); border-radius: 6px;
+    }
+    .catch-field input:focus, .catch-field select:focus { outline: 2px solid var(--accent-light); border-color: var(--accent); }
+    .catch-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
+    .catch-result { margin-top: 18px; padding: 16px; border-radius: 8px; background: var(--bg-primary); border: 1px solid var(--border-light); text-align: center; display: none; }
+    .catch-result .big { font-family: 'Bitter', serif; font-size: 2.6rem; font-weight: 800; line-height: 1.1; }
+    .catch-result .stars { font-size: 1.0rem; font-weight: 600; margin-top: 2px; }
+    .catch-result .detail { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; }
+    .catch-error { margin-top: 14px; color: var(--accent); font-size: 0.9rem; display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-main">
+      <h1>Huronalytics</h1>
+      <p class="subtitle">Outfield Catch Probability</p>
+    </div>
+    <div class="header-actions">
+      <a class="back-link" href="index.html">&larr; Leaderboards</a>
+    </div>
+  </header>
+
+  <div class="catch-wrap">
+    <p class="catch-intro">
+      Enter the tracked inputs for an outfield ball in play and get the
+      Statcast style catch probability. Built from 95,055 official per play
+      catch probabilities (2024&ndash;2026). Opportunity time is one number per
+      play: pitch release to landing. If you only have hang time
+      (contact to landing), leave opportunity time blank and 0.39s of pitch
+      flight is added automatically.
+    </p>
+
+    <div class="catch-panel">
+      <div class="catch-grid">
+        <div class="catch-field">
+          <label for="cp-dist">Distance needed (ft)</label>
+          <input id="cp-dist" type="number" min="0" max="150" step="1" placeholder="56">
+        </div>
+        <div class="catch-field">
+          <label for="cp-time">Opportunity time (s)</label>
+          <input id="cp-time" type="number" min="0" max="9" step="0.1" placeholder="3.6">
+        </div>
+        <div class="catch-field">
+          <label for="cp-hang">Hang time (s), fallback</label>
+          <input id="cp-hang" type="number" min="0" max="9" step="0.1" placeholder="used only if opportunity time is blank">
+          <div class="catch-hint">opportunity = hang + 0.39s pitch flight</div>
+        </div>
+        <div class="catch-field">
+          <label for="cp-zone">Fielding zone / direction</label>
+          <select id="cp-zone">
+            <option value="0|0">Standard</option>
+            <option value="1|0">Standard, going back</option>
+            <option value="0|1">Wall</option>
+            <option value="1|1">Wall, going back</option>
+          </select>
+          <div class="catch-hint">going back = angle to ball landing beyond 90&deg;</div>
+        </div>
+      </div>
+      <div class="catch-result" id="cp-result">
+        <div class="big" id="cp-big"></div>
+        <div class="stars" id="cp-stars"></div>
+        <div class="detail" id="cp-detail"></div>
+      </div>
+      <div class="catch-error" id="cp-error"></div>
+    </div>
+  </div>
+
+  <script src="js/catch.js?v=20260730093541"></script>
+</body>
+</html>
