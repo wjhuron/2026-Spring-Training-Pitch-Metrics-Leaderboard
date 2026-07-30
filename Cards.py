@@ -727,6 +727,113 @@ def fetch_boxscores_for_team(date_str, team_abbrev, include_live=False, game_pk=
     return pitcher_stats
 
 
+# ── Fast multi-date boxscore path (2026-07-30) ────────────────────────────
+# The per-date loop above fetches the day's FULL league schedule and every
+# boxscore in it (~16 requests/date, one team kept) — a season card burned
+# ~1,700 sequential requests. This path is request-minimal with identical
+# aggregation semantics: ONE ranged schedule call filtered to the team, a
+# disk cache of parsed boxscores (Final games are immutable), and a small
+# thread pool for the misses. Returns a LIST of per-date {name: pbox} dicts,
+# preserving the per-date name-keyed merge the caller has always done.
+
+BOXSCORE_CACHE_PATH = os.path.join(os.path.dirname(METADATA_PATH), '_boxscore_cache.pkl')
+
+
+def _load_boxscore_cache():
+    try:
+        import pickle
+        with open(BOXSCORE_CACHE_PATH, 'rb') as f:
+            return pickle.load(f)
+    except Exception:
+        return {}
+
+
+def _save_boxscore_cache(cache):
+    try:
+        import pickle
+        with open(BOXSCORE_CACHE_PATH, 'wb') as f:
+            pickle.dump(cache, f)
+    except Exception as e:
+        print(f"  WARNING: could not save boxscore cache: {e}")
+
+
+def fetch_boxscores_for_team_dates(dates, team_abbrev, include_live=False):
+    """Boxscores for a team across many dates: one schedule request, cached +
+    parallel boxscore fetches. Only dates in `dates` are used (parity with the
+    sheet-driven per-date loop)."""
+    milb_config = MILB_TEAMS.get(team_abbrev)
+    sport_id = milb_config['sport_id'] if milb_config else 1
+    date_set = set(dates)
+    lo, hi = min(date_set), max(date_set)
+    url = (f"https://statsapi.mlb.com/api/v1/schedule?startDate={lo}&endDate={hi}"
+           f"&sportId={sport_id}&gameType=R,F,D,L,W")
+    if not milb_config:
+        team_id = TEAM_ABBREV_TO_ID.get(team_abbrev)
+        if team_id:
+            url += f"&teamId={team_id}"
+    print(f"  Fetching {team_abbrev} schedule {lo} → {hi} (one request)...")
+    games_by_date = {}   # date -> [(game_pk, is_final), ...] in schedule order
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read())
+        for date_data in data.get('dates', []):
+            gd = date_data.get('date', '')
+            if gd not in date_set:
+                continue
+            for game in date_data.get('games', []):
+                state = game.get('status', {}).get('abstractGameState', '')
+                if state != 'Final' and not (include_live and state == 'Live'):
+                    continue
+                if milb_config:
+                    away = game.get('teams', {}).get('away', {}).get('team', {}).get('name', '')
+                    home = game.get('teams', {}).get('home', {}).get('team', {}).get('name', '')
+                    if milb_config['search_name'] not in away and milb_config['search_name'] not in home:
+                        continue
+                games_by_date.setdefault(gd, []).append(
+                    (game['gamePk'], state == 'Final'))
+    except Exception as e:
+        print(f"  Error fetching ranged schedule: {e} — falling back to per-date fetch")
+        return [fetch_boxscores_for_team(gd, team_abbrev, include_live=include_live)
+                for gd in sorted(date_set)]
+
+    cache = _load_boxscore_cache()
+    # Live games always refetch; Final games come from / land in the cache.
+    to_fetch = sorted({pk for pks in games_by_date.values()
+                       for (pk, final) in pks if not (final and str(pk) in cache)})
+    fetched = {}
+    if to_fetch:
+        print(f"  Fetching {len(to_fetch)} boxscores "
+              f"({sum(len(v) for v in games_by_date.values()) - len(to_fetch)} cached)...")
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=8) as ex:
+            for pk, box in zip(to_fetch, ex.map(fetch_boxscore, to_fetch)):
+                fetched[pk] = box
+    else:
+        print(f"  All {sum(len(v) for v in games_by_date.values())} boxscores cached")
+    cache_dirty = False
+    for pks in games_by_date.values():
+        for (pk, final) in pks:
+            if final and pk in fetched and fetched[pk] is not None:
+                cache[str(pk)] = fetched[pk]
+                cache_dirty = True
+    if cache_dirty:
+        _save_boxscore_cache(cache)
+
+    out = []
+    for gd in sorted(games_by_date):
+        day = {}
+        for (pk, final) in games_by_date[gd]:
+            box = fetched.get(pk) if pk in fetched else cache.get(str(pk))
+            if not box:
+                continue
+            for p in box['pitchers']:
+                if p['team'] == team_abbrev:
+                    day[p['name']] = p
+        out.append(day)
+    return out
+
+
 # ═══════════════════════════════════════════════════════════════
 # CARD RENDERING (v30)
 # ═══════════════════════════════════════════════════════════════
@@ -1385,16 +1492,7 @@ def render_card(config, pitches, output_file):
             ax_spark.axis('off')
 
             _label_y = strip_top + 0.07
-            # Relievers get 'BY OUTING' — a 0-GS arm has no starts to plot by.
-            _gs_val = 0
-            try:
-                _sh = config.get('stat_headers') or []
-                if 'GS' in _sh:
-                    _gs_val = int(float(config.get('stat_values')[_sh.index('GS')]))
-            except (TypeError, ValueError, IndexError):
-                pass
-            _velo_label = 'FB VELO BY START' if _gs_val > 0 else 'FB VELO BY OUTING'
-            ax_main.text(photo_left, _label_y, _velo_label, fontsize=8.5,
+            ax_main.text(photo_left, _label_y, 'FB VELO BY OUTING', fontsize=8.5,
                          color=TEXT_SECONDARY, fontweight='bold',
                          fontfamily='IBM Plex Sans', va='bottom')
             ax_main.text(photo_left + strip_w_in, _label_y,
@@ -3144,9 +3242,15 @@ def main():
                 if pbox.get('is_starter'):
                     box_stats[nk]['gs'] += 1
     for t in ([] if scratch_tab else teams):
-      for gd in sorted(team_dates.get(t, ())):
-        print(f"  Fetching boxscores for {gd} ({t})...")
-        day_box = fetch_boxscores_for_team(gd, t, include_live=bool(game_pk), game_pk=game_pk if _single_date else None)
+      _t_dates = sorted(team_dates.get(t, ()))
+      if not _t_dates:
+          continue
+      if game_pk and _single_date:
+          # Explicit game PK (live/in-progress): the per-date path handles it.
+          day_boxes = [fetch_boxscores_for_team(_t_dates[0], t, include_live=True, game_pk=game_pk)]
+      else:
+          day_boxes = fetch_boxscores_for_team_dates(_t_dates, t, include_live=bool(game_pk))
+      for day_box in day_boxes:
         for pname, pbox in day_box.items():
             nk = _normalize_name(pname)
             if nk not in box_stats:
