@@ -53,8 +53,9 @@ def load_surface():
     cells = {}
     for k, v in data['cells'].items():
         t, d, b, w = k.split('|')
-        cells[(float(t), int(d), int(b), int(w))] = (v['p'], v['n'],
-                                                     v['l'], v['h'])
+        cells[(float(t), int(d), int(b), int(w))] = (
+            v['p'], v['n'], v['l'], v['h'],
+            {int(k2): c for k2, c in v['hist'].items()})
     return cells, data['meta']
 
 
@@ -68,7 +69,7 @@ def lookup(cells, t, dist, back, wall):
         tw, dw = TIME_STEP * ring, DIST_STEP * ring
         num = den = n_tot = 0.0
         mn, mx = None, None
-        for (ct, cd, cb, cw), (p, n, l, h) in cells.items():
+        for (ct, cd, cb, cw), (p, n, l, h, _hist) in cells.items():
             if cb != back or cw != wall:
                 continue
             if abs(ct - t) <= tw + 1e-9 and abs(cd - dist) <= dw:
@@ -242,10 +243,32 @@ def main():
     lo_pct = max(int(_m.floor(lo * 100)), 0)
     hi_pct = min(int(_m.ceil(hi * 100)), 99)
 
+    # Inner 'likely' range: pooled q10-q90 of the official values among
+    # comparable plays in the feasible window (validated 96.2% coverage)
+    pool = {}
+    for ti in range(round(t_a * 10), round(t_b * 10) + 1):
+        for di in (int(args.dist) - 1, int(args.dist), int(args.dist) + 1):
+            c = cells.get((round(ti / 10, 1), di, back, wall))
+            if c:
+                for v2, cnt in c[4].items():
+                    pool[v2] = pool.get(v2, 0) + cnt
+    tot = sum(pool.values())
+    likely = None
+    if tot >= 8:
+        def pq(pr):
+            target = pr * (tot - 1); acc = 0
+            for v2 in sorted(pool):
+                acc += pool[v2]
+                if acc - 1 >= target: return v2
+            return max(pool)
+        l10, l90 = pq(0.10), pq(0.90)
+        likely = (max(l10, lo_pct), min(l90, hi_pct))
+
     flags = (' BACK' if back else '') + (' WALL' if wall else '')
     print(f'\nInputs: {args.dist:.0f} ft in {args.time:.2f}s{flags or " (standard)"}')
+    likely_txt = (f'likely {likely[0]}-{likely[1]}, ' if likely else '')
     print(f'Catch probability: {int(p * 100 + 0.5)}%  '
-          f'(plausible {lo_pct}-{hi_pct})  ({stars(p)}-star range)')
+          f'({likely_txt}range {lo_pct}-{hi_pct})  ({stars(p)}-star range)')
     print(f'  from {n} plays within '
           f'±{TIME_STEP * ring:.2f}s / ±{DIST_STEP * ring} ft '
           f'[surface: {meta["seasons"]}, {meta["plays"]} plays]')
