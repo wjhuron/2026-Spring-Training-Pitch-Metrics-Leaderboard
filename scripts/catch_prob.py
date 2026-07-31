@@ -240,11 +240,8 @@ def main():
     if e_lo is not None:
         lo = min(lo, e_lo - 0.025)
         hi = max(hi, e_hi + 0.025)
-    lo_pct = max(int(_m.floor(lo * 100)), 0)
-    hi_pct = min(int(_m.ceil(hi * 100)), 99)
-
-    # Inner 'likely' range: pooled q10-q90 of the official values among
-    # comparable plays in the feasible window (validated 96.2% coverage)
+    # Inner 'likely' pool: official values among comparable plays in the
+    # feasible window (per-cell histograms)
     pool = {}
     for ti in range(round(t_a * 10), round(t_b * 10) + 1):
         for di in (int(args.dist) - 1, int(args.dist), int(args.dist) + 1):
@@ -253,6 +250,19 @@ def main():
                 for v2, cnt in c[4].items():
                     pool[v2] = pool.get(v2, 0) + cnt
     tot = sum(pool.values())
+
+    # Sparse-data penalty on the OUTER range only: swept c in {0, .05,
+    # .1, .15}; 0.1 is the smallest lifting sparse-window (n<=30) range
+    # coverage to 100% in validation; dense windows pay ~1 point
+    pen = 0.10 / _m.sqrt(max(tot, 1))
+    lo -= pen
+    hi += pen
+    lo = max(lo, 0.0)
+    hi = min(hi, 1.0)
+    lo_pct = max(int(_m.floor(lo * 100)), 0)
+    hi_pct = min(int(_m.ceil(hi * 100)), 99)
+
+    # Inner 'likely' range: pooled q10-q90 (validated 96.2% coverage)
     likely = None
     if tot >= 8:
         def pq(pr):
