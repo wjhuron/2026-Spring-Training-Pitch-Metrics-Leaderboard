@@ -622,6 +622,33 @@ def main():
         n_blend += 1
     print(f"graduation blend applied to {n_blend} recent graduates")
 
+    # eephus.io PROSPX valuations (data/eephus_prospx.json, scraped from
+    # their timeseries payload): an independent full prospect valuation on
+    # the SAME Clemens-2026 dollar scale, with live performance signals.
+    # Used as an unweighted 2-source consensus on our final prospect value
+    # (CONVENTION, not fitted: eephus has no history to fit a weight
+    # against; revisit when their archive accumulates), and as real values
+    # for depth-layer players we currently floor at $0.3M. Their ranking
+    # covers pre-debut prospects only (debuted players like Harry Ford are
+    # absent by design and keep our pipeline's value).
+    def _enrm(s):
+        s = unicodedata.normalize("NFKD", s or "")
+        s = "".join(c for c in s if not unicodedata.combining(c))
+        return s.lower().replace(".", "").strip()
+
+    eephus, eephus_draft = {}, {}
+    ee_path = DATA / "eephus_prospx.json"
+    if ee_path.exists():
+        _ee_raw = json.loads(ee_path.read_text())
+        for e in _ee_raw["players"]:
+            if e.get("mlbam") and e.get("valueMM") is not None:
+                eephus[str(e["mlbam"])] = e
+        # 2026 draftees: the MiLB module predates the July 13 draft, so
+        # fresh picks (Cholowsky, Lackey) fall back to the draft module's
+        # consensus-FV Clemens tier value, keyed by normalized name
+        for e in _ee_raw.get("draft2026", []):
+            eephus_draft[_enrm(e["name"])] = e
+
     # ensemble RoS WAR by mlbam, for pre-graduation blends of ready
     # prospects outside the Cot's universe (no mlb_rec to lean on)
     ens_proj = {}
@@ -672,6 +699,15 @@ def main():
             if proj_surplus is not None:
                 pregrad = w_tier
                 value = pregrad * value + (1 - pregrad) * proj_surplus
+        ee = eephus.get(str(p["mlbam"])) if p["mlbam"] else None
+        ee_usd = ee["valueMM"] * 1e6 if ee is not None else None
+        if ee_usd is None:
+            dr = eephus_draft.get(_enrm(p["name"] or ""))
+            if dr is not None:
+                ee = dr
+                ee_usd = dr["clemensUSD"]
+        if ee_usd is not None:
+            value = 0.5 * value + 0.5 * ee_usd
         players.append({
             "name": p["name"], "team": p["org"], "pos": p["pos"],
             "age": p["age"], "mlbam": p["mlbam"], "fgId": p["fgId"],
@@ -686,8 +722,10 @@ def main():
             "mlbSurplus": mlb_rec["surplus"] if mlb_rec else None,
             "heteroMult": round(m_hetero, 3),
             "pregradW": pregrad,
+            "eephusMM": round(ee_usd / 1e6, 1) if ee_usd is not None else None,
             "flags": ((["heteroAdj"] if abs(m_hetero - 1.0) > 1e-9 else [])
-                      + (["pregradBlend"] if pregrad is not None else [])),
+                      + (["pregradBlend"] if pregrad is not None else [])
+                      + (["eephusConsensus"] if ee_usd is not None else [])),
         })
     if skipped_fv:
         print(f"WARNING: {skipped_fv} prospects with unknown FV skipped")
@@ -710,19 +748,36 @@ def main():
     lvl_short = {"Triple-A": "AAA", "Double-A": "AA", "High-A": "A+",
                  "Single-A": "A", "Rookie": "Rk"}
     n_depth = 0
+    n_depth_ee = 0
     if depth_path.exists():
         for d in json.loads(depth_path.read_text())["players"]:
+            ee = eephus.get(str(d["mlbam"]))
+            val, mkt, flags_d = d["value"], d["value"], [d.get("path", "")]
+            if ee is not None:
+                # eephus-ranked but below our Board universe: their full
+                # valuation replaces the ignorance floor (these ARE graded
+                # prospects, so the fitted prospect discount applies)
+                val = max(d["value"], ee["valueMM"] * 1e6)
+                mkt = val * ((market_fit or {}).get("multipliers", {})
+                             .get("prospect", 1.0)) if val > d["value"] else val
+                flags_d.append("eephusValued")
+                n_depth_ee += 1
             players.append({
                 "name": d["name"], "team": d["team"], "pos": d.get("pos", ""),
                 "mlbam": str(d["mlbam"]), "fgId": None, "engine": "depth",
                 "level": lvl_short.get(d.get("level", ""), d.get("level", "")),
                 "warY1": d.get("warProj"),
                 "controlYears": d.get("controlLeft"),
-                "surplus": d["value"],
-                "marketValue": d["value"],
-                "flags": [d.get("path", "")],
+                "surplus": val,
+                "marketValue": mkt,
+                "eephusMM": ee["valueMM"] if ee is not None else None,
+                "flags": flags_d,
             })
             n_depth += 1
+    n_ee_pros = sum(1 for r in players
+                    if r["engine"] == "prospect" and r.get("eephusMM") is not None)
+    print(f"eephus consensus: {n_ee_pros} prospects averaged, "
+          f"{n_depth_ee} depth players upgraded from the floor")
     players.sort(key=lambda r: r["surplus"], reverse=True)
     out = {
         "generated": date.today().isoformat(),
