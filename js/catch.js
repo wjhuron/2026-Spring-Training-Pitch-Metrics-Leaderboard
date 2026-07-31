@@ -118,11 +118,9 @@
     // pitch flight: plate time from the card is exact, else the
     // typical-fastball default
     var flight = !isNaN(plate) && plate > 0 ? plate : FLIGHT;
-    // Research-portal cards TRUNCATE to one decimal (card value T means
-    // true time in [T, T + 0.1]), so center every card read at +0.05 and,
-    // when both clocks are given, intersect the two truncation intervals.
-    // values entered with 2+ decimals are treated as exact (unrounded
-    // source); one-decimal values get the card truncation treatment
+    // Card conventions (verified per field): opportunity time TRUNCATES
+    // (T -> [T, T+0.1)), hang time ROUNDS (H -> [H-0.05, H+0.05]), plate
+    // time rounds (negligible). Values with 2+ decimals are exact.
     var decs = function (id) {
       var v = document.getElementById(id).value;
       return (v.split('.')[1] || '').length;
@@ -132,11 +130,11 @@
       tA = tB = time;  // exact time: use as-is
     } else if (isNaN(time) && !isNaN(hang)) {
       if (decs('cp-hang') >= 2) { tA = tB = hang + flight; }
-      else { tA = hang + flight; tB = hang + 0.1 + flight; }
+      else { tA = hang - 0.05 + flight; tB = hang + 0.05 + flight; }
       time = (tA + tB) / 2;
     } else if (!isNaN(time) && !isNaN(hang)) {
-      var lo = Math.max(time, hang + flight);
-      var hi = Math.min(time + 0.1, hang + 0.1 + flight);
+      var lo = Math.max(time, hang - 0.05 + flight);
+      var hi = Math.min(time + 0.1, hang + 0.05 + flight);
       if (lo <= hi) { tA = lo; tB = hi; time = (lo + hi) / 2; combined = time; }
       else { tA = time; tB = time + 0.1; time = time + 0.05; }
     } else if (!isNaN(time)) {

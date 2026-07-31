@@ -146,11 +146,14 @@ def main():
         ap.error('need --time or --hang')
     fl = args.plate if args.plate else (37.6 / args.velo if args.velo
                                         else args.flight)
-    # Research-portal cards TRUNCATE to one decimal (proven: Benge card
-    # 3.5 vs true 3.589 vs Savant's rounded 3.6; a rounding assumption
-    # gives an empty intersection with the card's own hang + plate time).
-    # So card value T means true time in [T, T + 0.1]. Values entered with
-    # two or more decimals are treated as exact (unrounded source).
+    # Card display conventions (verified per field, 2026-07-31):
+    #   opportunity time TRUNCATES (card T -> true in [T, T+0.1); Benge
+    #     3.5 and Mesa 4.5 both read one tenth below Savant's rounded
+    #     value, never above)
+    #   hang time ROUNDS (H -> true in [H-0.05, H+0.05]; hang-truncation
+    #     gives an empty interval on the Mesa play)
+    #   plate time ROUNDS (Lee pitch: exact 0.4195 displayed as 0.42)
+    # Values entered with two or more decimals are treated as exact.
     def exact(v):
         return v is not None and abs(v * 10 - round(v * 10)) > 1e-9
     if args.time is not None and exact(args.time):
@@ -159,21 +162,21 @@ def main():
         if exact(args.hang):
             t_a = t_b = args.hang + fl
         else:
-            t_a, t_b = args.hang + fl, args.hang + 0.1 + fl
+            t_a, t_b = args.hang - 0.05 + fl, args.hang + 0.05 + fl
         args.time = (t_a + t_b) / 2
         print(f'opportunity time = {args.hang} hang + {fl:.3f} flight '
               f'= {args.time:.2f}s')
     elif args.hang is not None:
         # intersect the two truncation intervals and take the midpoint
         card = args.time
-        lo = max(card, args.hang + fl)
-        hi = min(card + 0.1, args.hang + 0.1 + fl)
+        lo = max(card, args.hang - 0.05 + fl)
+        hi = min(card + 0.1, args.hang + 0.05 + fl)
         if lo <= hi:
             t_a, t_b = lo, hi
             args.time = (lo + hi) / 2
             print(f'combined opportunity estimate {args.time:.3f}s '
                   f'(card [{card}, {card + 0.1:.1f}], hang+flight '
-                  f'[{args.hang + fl:.2f}, {args.hang + 0.1 + fl:.2f}])')
+                  f'[{args.hang - 0.05 + fl:.2f}, {args.hang + 0.05 + fl:.2f}])')
         else:
             t_a, t_b = card, card + 0.1
             args.time = card + 0.05
