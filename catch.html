@@ -82,17 +82,40 @@
           <div class="catch-hint">feet</div>
         </div>
         <div class="catch-field">
-          <label for="cp-wall">Near the Wall</label>
-          <select id="cp-wall">
-            <option value="0" selected>No</option>
-            <option value="1">Yes</option>
-          </select>
-          <div class="catch-hint">yes = ball projected to land within 8 ft of the outfield wall (and under 8 ft high on it). The card's Fielding Zone is a positioning label and does not answer this</div>
-        </div>
-        <div class="catch-field">
           <label for="cp-angle">Angle to Ball Landing</label>
           <input id="cp-angle" type="number" min="-180" max="180" step="1">
           <div class="catch-hint">degrees; going back = |angle| &ge; 150&deg; (within 30&deg; of straight behind). This is the ONLY back trigger</div>
+        </div>
+        <div class="catch-field">
+          <label for="cp-park">Park</label>
+          <select id="cp-park"><option value="" selected></option></select>
+          <div class="catch-hint">with Hit Distance and Direction, sets the wall flag automatically</div>
+        </div>
+        <div class="catch-field">
+          <label for="cp-hitdist">Hit Distance</label>
+          <input id="cp-hitdist" type="number" min="0" max="500" step="1">
+          <div class="catch-hint">feet; projected landing distance from the hitter card</div>
+        </div>
+        <div class="catch-field">
+          <label for="cp-dir">Direction</label>
+          <select id="cp-dir">
+            <option value="" selected></option>
+            <option value="0">LF Line</option>
+            <option value="1">LF Gap</option>
+            <option value="2">CF</option>
+            <option value="3">RF Gap</option>
+            <option value="4">RF Line</option>
+          </select>
+          <div class="catch-hint">which wall sector the ball headed toward</div>
+        </div>
+        <div class="catch-field">
+          <label for="cp-wall">Near the Wall</label>
+          <select id="cp-wall">
+            <option value="auto" selected>Auto (from park inputs)</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+          <div class="catch-hint">auto = wall flag when hit distance reaches within 12 ft of the park's wall in that direction (threshold calibrated against 95k official flags, ~95% agreement); markers are published dimensions, override when borderline</div>
         </div>
       </div>
       <div style="margin-top: 14px; text-align: right;">

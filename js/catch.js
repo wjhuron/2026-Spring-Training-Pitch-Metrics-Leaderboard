@@ -12,6 +12,41 @@
   var MAX_RING = 6;
   var FLIGHT = 0.39;
 
+  // published outfield wall distances [LF line, LF gap, CF, RF gap, RF line];
+  // approximate where parks have irregular walls, may lag renovations
+  var PARKS = {
+    'ARI Chase Field':            [330, 374, 407, 374, 334],
+    'ATH Sutter Health Park':     [330, 375, 403, 375, 325],
+    'ATL Truist Park':            [335, 385, 400, 375, 325],
+    'BAL Camden Yards':           [332, 373, 400, 373, 318],
+    'BOS Fenway Park':            [310, 379, 390, 380, 302],
+    'CHC Wrigley Field':          [355, 368, 400, 368, 353],
+    'CIN Great American':         [328, 379, 404, 370, 325],
+    'CLE Progressive Field':      [325, 370, 400, 375, 325],
+    'COL Coors Field':            [347, 390, 415, 375, 350],
+    'CWS Rate Field':             [330, 375, 400, 375, 335],
+    'DET Comerica Park':          [345, 370, 412, 365, 330],
+    'HOU Daikin Park':            [315, 362, 409, 373, 326],
+    'KC Kauffman Stadium':        [330, 387, 410, 387, 330],
+    'LAA Angel Stadium':          [330, 387, 396, 370, 348],
+    'LAD Dodger Stadium':         [330, 385, 395, 385, 330],
+    'MIA loanDepot park':         [344, 386, 400, 387, 335],
+    'MIL American Family Field':  [342, 371, 400, 374, 345],
+    'MIN Target Field':           [339, 377, 404, 367, 328],
+    'NYM Citi Field':             [335, 358, 405, 375, 330],
+    'NYY Yankee Stadium':         [318, 399, 408, 385, 314],
+    'PHI Citizens Bank Park':     [329, 374, 401, 369, 330],
+    'PIT PNC Park':               [325, 389, 399, 375, 320],
+    'SD Petco Park':              [336, 390, 396, 391, 322],
+    'SEA T-Mobile Park':          [331, 378, 401, 381, 326],
+    'SF Oracle Park':             [339, 364, 391, 415, 309],
+    'STL Busch Stadium':          [336, 375, 400, 375, 335],
+    'TB Tropicana Field':         [315, 370, 404, 370, 322],
+    'TEX Globe Life Field':       [329, 372, 407, 374, 326],
+    'TOR Rogers Centre':          [328, 368, 400, 359, 328],
+    'WSH Nationals Park':         [336, 377, 402, 370, 335]
+  };
+
   var surface = null;   // {"b|w": Map("t|d" -> [p, n])}
   var meta = null;
 
@@ -33,6 +68,15 @@
     .catch(function () {
       showError('Could not load the catch probability surface.');
     });
+
+  (function () {
+    var sel = document.getElementById('cp-park');
+    Object.keys(PARKS).forEach(function (k) {
+      var o = document.createElement('option');
+      o.value = k; o.textContent = k;
+      sel.appendChild(o);
+    });
+  })();
 
   function lookup(t, dist, back, wall) {
     var grid = surface[back + '|' + wall];
@@ -107,9 +151,28 @@
     var time = parseFloat(document.getElementById('cp-time').value);
     var hang = parseFloat(document.getElementById('cp-hang').value);
     var plate = parseFloat(document.getElementById('cp-plate').value);
-    // wall is an explicit input: the card's Fielding Zone is a positioning
-    // label and carries no wall information
-    var wall = document.getElementById('cp-wall').value;
+    // wall flag: manual, or auto from park + hit distance + direction.
+    // Threshold calibrated against 95k official wall flags: accuracy
+    // peaks at gap <= 12 ft (0.955, interior optimum; R=10 and 15 both
+    // lower). Gap 12-20 is genuinely ambiguous (29-46% official wall
+    // rate) because five markers approximate real wall polygons.
+    var wallSel = document.getElementById('cp-wall').value;
+    var wall = '0', wallNote = '';
+    if (wallSel === 'auto') {
+      var park = document.getElementById('cp-park').value;
+      var hitd = parseFloat(document.getElementById('cp-hitdist').value);
+      var dir = document.getElementById('cp-dir').value;
+      if (park && dir !== '' && !isNaN(hitd)) {
+        var wd = PARKS[park][parseInt(dir, 10)];
+        var short = Math.round(wd - hitd);
+        wall = short <= 12 ? '1' : '0';
+        wallNote = short < 0 ? 'ball at/over the ' + wd + ' ft wall'
+                 : short + ' ft short of the ' + wd + ' ft wall' +
+                   (short > 12 && short <= 20 ? ', borderline: consider override' : '');
+      }
+    } else {
+      wall = wallSel;
+    }
     var angle = parseFloat(document.getElementById('cp-angle').value);
     // back = angle within 30 degrees of straight behind, ONLY
     var back = (!isNaN(angle) && Math.abs(angle) >= 150) ? '1' : '0';
@@ -236,21 +299,25 @@
       (combined ? 'combined opportunity estimate ' + combined.toFixed(3) +
                   's · ' : '') +
       'flags: ' + (back === '1' ? 'going back' : 'not back') + ', ' +
-      (wall === '1' ? 'wall factor' : 'no wall') + ' · ' +
+      (wall === '1' ? 'wall factor' : 'no wall') +
+      (wallNote ? ' (' + wallNote + ')' : '') + ' · ' +
       out.n + ' comparable plays within ±' +
       (0.05 * out.ring).toFixed(2) + 's / ±' + out.ring + ' ft · ' +
       meta.seasons + ', ' + meta.plays.toLocaleString() + ' tracked plays';
   }
 
-  ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-wall', 'cp-angle'].forEach(function (id) {
+  ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-wall', 'cp-angle',
+   'cp-park', 'cp-hitdist', 'cp-dir'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', update);
   });
 
   document.getElementById('cp-reset').addEventListener('click', function () {
-    ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-angle'].forEach(function (id) {
+    ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-angle', 'cp-hitdist'].forEach(function (id) {
       document.getElementById(id).value = '';
     });
-    document.getElementById('cp-wall').value = '0';
+    document.getElementById('cp-park').value = '';
+    document.getElementById('cp-dir').value = '';
+    document.getElementById('cp-wall').value = 'auto';
     document.getElementById('cp-result').style.display = 'none';
     showError('');
   });

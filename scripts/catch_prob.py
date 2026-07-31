@@ -38,6 +38,27 @@ import os
 
 SURFACE_PATH = os.path.join(os.path.dirname(__file__), '..', 'data',
                             'catch_prob_surface.json')
+
+# published wall distances [LF line, LF gap, CF, RF gap, RF line];
+# approximate where walls are irregular, may lag renovations
+PARKS = {
+    'ARI': [330, 374, 407, 374, 334], 'ATH': [330, 375, 403, 375, 325],
+    'ATL': [335, 385, 400, 375, 325], 'BAL': [332, 373, 400, 373, 318],
+    'BOS': [310, 379, 390, 380, 302], 'CHC': [355, 368, 400, 368, 353],
+    'CIN': [328, 379, 404, 370, 325], 'CLE': [325, 370, 400, 375, 325],
+    'COL': [347, 390, 415, 375, 350], 'CWS': [330, 375, 400, 375, 335],
+    'DET': [345, 370, 412, 365, 330], 'HOU': [315, 362, 409, 373, 326],
+    'KC':  [330, 387, 410, 387, 330], 'LAA': [330, 387, 396, 370, 348],
+    'LAD': [330, 385, 395, 385, 330], 'MIA': [344, 386, 400, 387, 335],
+    'MIL': [342, 371, 400, 374, 345], 'MIN': [339, 377, 404, 367, 328],
+    'NYM': [335, 358, 405, 375, 330], 'NYY': [318, 399, 408, 385, 314],
+    'PHI': [329, 374, 401, 369, 330], 'PIT': [325, 389, 399, 375, 320],
+    'SD':  [336, 390, 396, 391, 322], 'SEA': [331, 378, 401, 381, 326],
+    'SF':  [339, 364, 391, 415, 309], 'STL': [336, 375, 400, 375, 335],
+    'TB':  [315, 370, 404, 370, 322], 'TEX': [329, 372, 407, 374, 326],
+    'TOR': [328, 368, 400, 359, 328], 'WSH': [336, 377, 402, 370, 335],
+}
+DIRS = {'lf': 0, 'lfgap': 1, 'cf': 2, 'rfgap': 3, 'rf': 4}
 # LOO sweep on 4000 informative 2026 plays: MAE flat at 0.0243-0.0252 for
 # K in 1-10, degrades above (0.0269 at 40, 0.0305 at 80). Any K in 1-10 is
 # equivalent; 5 is a convention from the middle of the flat region.
@@ -131,6 +152,9 @@ def main():
     ap.add_argument('--plate', type=float, help='plate time s from the card (exact flight)')
     ap.add_argument('--back', action='store_true')
     ap.add_argument('--wall', action='store_true')
+    ap.add_argument('--park', type=str, help='team abbrev (STL, NYM, ...) for auto wall flag')
+    ap.add_argument('--hitdist', type=float, help='projected hit distance ft from the hitter card')
+    ap.add_argument('--dir', type=str, help='wall sector: lf, lfgap, cf, rfgap, rf')
     ap.add_argument('--angle', type=float)
     args = ap.parse_args()
 
@@ -186,6 +210,16 @@ def main():
         args.time = args.time + 0.05
 
     wall = 1 if args.wall else 0
+    if not wall and args.park and args.hitdist is not None and args.dir:
+        # threshold calibrated vs 95k official wall flags: accuracy peaks
+        # at gap <= 12 ft (0.955, interior optimum; 10 and 15 both lower);
+        # gap 12-20 is genuinely ambiguous (29-46% official wall rate)
+        wd = PARKS[args.park.upper()][DIRS[args.dir.lower().replace(' ', '')]]
+        short = wd - args.hitdist
+        wall = 1 if short <= 12 else 0
+        note = ' (borderline, consider --wall)' if 12 < short <= 20 else ''
+        print(f'wall check: {args.hitdist:.0f} ft vs {wd} ft wall -> '
+              f'{"WALL" if wall else f"{short:.0f} ft short, no wall{note}"}')
     # back = --back, or angle within 30 degrees of straight behind, ONLY
     back = 1 if args.back else 0
     if not back and args.angle is not None and abs(args.angle) >= 150:
