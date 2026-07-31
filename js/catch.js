@@ -15,7 +15,7 @@
   var surface = null;   // {"b|w": Map("t|d" -> [p, n])}
   var meta = null;
 
-  fetch('data/catch_prob_surface.json?v=20260731')
+  fetch('data/catch_prob_surface.json?v=20260731b')
     .then(function (r) { return r.json(); })
     .then(function (data) {
       meta = data.meta;
