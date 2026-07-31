@@ -158,7 +158,27 @@ jobs:
               # --autostash: the pipeline leaves unstaged changes in tracked
               # files outside the committed set; without it the rebase refuses
               # to run ("You have unstaged changes") and the retry dies
-              git pull --rebase --autostash origin main
+              if ! git pull --rebase --autostash origin main; then
+                # Expected collision: bump_asset_version rewrites every ?v=
+                # stamp in index.html both locally and in CI, so a mid-run
+                # push always conflicts there. Resolve by taking main's copy
+                # (keeps any human edits) and re-stamping it fresh.
+                restamped=false
+                if git status --porcelain | grep -q "^UU index.html$"; then
+                  git checkout --ours -- index.html
+                  sed -E -i "s/\?v=[A-Za-z0-9_-]+/?v=$(date +%Y%m%d%H%M%S)/g" index.html
+                  git add -- index.html
+                  restamped=true
+                fi
+                if [ "$restamped" = true ] && git -c core.editor=true rebase --continue; then
+                  echo "Resolved ?v= stamp conflict against main and continued."
+                else
+                  echo "Unresolvable rebase conflict — aborting:"
+                  git status --porcelain
+                  git rebase --abort
+                  exit 1
+                fi
+              fi
               if [ $attempt -eq 5 ]; then
                 echo "Push still failing after 5 attempts."
                 exit 1
