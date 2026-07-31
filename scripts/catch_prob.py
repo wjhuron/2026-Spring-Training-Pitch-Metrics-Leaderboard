@@ -120,11 +120,18 @@ def main():
     # Research-portal cards TRUNCATE to one decimal (proven: Benge card
     # 3.5 vs true 3.589 vs Savant's rounded 3.6; a rounding assumption
     # gives an empty intersection with the card's own hang + plate time).
-    # So card value T means true time in [T, T + 0.1].
-    if args.time is None:
-        args.time = args.hang + 0.05 + fl
-        print(f'opportunity time = {args.hang} hang (+0.05 truncation '
-              f'center) + {fl:.3f} flight = {args.time:.2f}s')
+    # So card value T means true time in [T, T + 0.1]. Values entered with
+    # two or more decimals are treated as exact (unrounded source).
+    def exact(v):
+        return v is not None and abs(v * 10 - round(v * 10)) > 1e-9
+    if args.time is not None and exact(args.time):
+        pass  # unrounded time: use as-is, no truncation centering
+    elif args.time is None:
+        h_off = 0.0 if exact(args.hang) else 0.05
+        args.time = args.hang + h_off + fl
+        print(f'opportunity time = {args.hang} hang'
+              f'{" (+0.05 truncation center)" if h_off else ""} '
+              f'+ {fl:.3f} flight = {args.time:.2f}s')
     elif args.hang is not None:
         # intersect the two truncation intervals and take the midpoint
         card = args.time

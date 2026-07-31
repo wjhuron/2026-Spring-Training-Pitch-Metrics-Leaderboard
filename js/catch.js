@@ -95,9 +95,17 @@
     // Research-portal cards TRUNCATE to one decimal (card value T means
     // true time in [T, T + 0.1]), so center every card read at +0.05 and,
     // when both clocks are given, intersect the two truncation intervals.
+    // values entered with 2+ decimals are treated as exact (unrounded
+    // source); one-decimal values get the card truncation treatment
+    var decs = function (id) {
+      var v = document.getElementById(id).value;
+      return (v.split('.')[1] || '').length;
+    };
     var combined = null;
-    if (isNaN(time) && !isNaN(hang)) {
-      time = hang + 0.05 + flight;
+    if (!isNaN(time) && decs('cp-time') >= 2) {
+      // exact time: use as-is
+    } else if (isNaN(time) && !isNaN(hang)) {
+      time = hang + (decs('cp-hang') >= 2 ? 0 : 0.05) + flight;
     } else if (!isNaN(time) && !isNaN(hang)) {
       var lo = Math.max(time, hang + flight);
       var hi = Math.min(time + 0.1, hang + 0.1 + flight);
