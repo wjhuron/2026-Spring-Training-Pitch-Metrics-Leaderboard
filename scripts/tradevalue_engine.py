@@ -796,6 +796,21 @@ def main():
                     if r["engine"] == "prospect" and r.get("eephusMM") is not None)
     print(f"eephus consensus: {n_ee_pros} prospects averaged, "
           f"{n_depth_ee} depth players upgraded from the floor")
+    # tradeable draft picks as searchable entries. MLB rules: ONLY
+    # Competitive Balance round picks can be traded, so exactly these two
+    # exist. Values from the fitted pick curve (isotonic median of eephus
+    # implied pick surplus, data/tradevalue_pick_curve.json).
+    pick_curve_path = DATA / "tradevalue_pick_curve.json"
+    if pick_curve_path.exists():
+        pc = json.loads(pick_curve_path.read_text())["valuesMM"]
+        for label, pick in (("Comp Balance Round A Pick (~#35)", 35),
+                            ("Comp Balance Round B Pick (~#70)", 70)):
+            v = pc[str(pick)] * 1e6
+            players.append({
+                "name": label, "team": "Picks", "pos": "pick",
+                "mlbam": None, "fgId": None, "engine": "pick",
+                "surplus": v, "marketValue": v, "flags": ["pickCurve"],
+            })
     players.sort(key=lambda r: r["surplus"], reverse=True)
     out = {
         "generated": date.today().isoformat(),
@@ -834,6 +849,8 @@ def main():
             if r.get("warY1"):
                 rec["w"] = r["warY1"]
                 rec["c"] = r["controlYears"]
+        elif r["engine"] == "pick":
+            pass
         else:
             rec["w"] = r["warY1"]
             rec["c"] = r["controlYears"]

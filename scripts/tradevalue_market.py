@@ -46,12 +46,23 @@ OUT_PATH = BASE / "data" / "tradevalue_market_fit.json"
 # held-out seasons vs the set without it.
 FEATURES = ["prospect", "rental", "star", "rentalDeadline", "relieverDl",
             "gradW", "rlvRentalDl", "rlvCtrlDl", "defFrac", "catcher",
-            "onIL"]
+            "onIL", "spDl", "starDl"]
 F0 = ["prospect", "rental", "star", "rentalDeadline", "relieverDl", "gradW"]
+# RETIRED candidates (tested on the pick-expanded corpus 2026-07-31,
+# role-based groups ordered first per the working hypothesis):
+#   E spDeadline  4/10 reject - rental (1.97) + star already carry
+#                 deadline-SP economics; no residual SP effect
+#   F starDeadline 4/10 reject - year-round star discount suffices
+#   B defFrac     4/10 reject; 1 pass in 5 corpus versions = noise.
+#                 Position-player defensive share is DEAD as a market
+#                 feature (the hypothesis was right).
+#   D onIL        2/10 reject - injury is intrinsic (CONFIG ilDiscount),
+#                 not market behavior
+# Surviving structure is role-based + catcher: the reliever deadline
+# split (strongest effect, 2.9x/2.2x) and the catcher discount (passed
+# 3 of 5 corpus versions, 7/10 on the current one).
 GROUPS = [("A relieverSplit", ["rlvRentalDl", "rlvCtrlDl"], ["relieverDl"]),
-          ("B defFrac", ["defFrac"], []),
-          ("C catcher", ["catcher"], []),
-          ("D onIL", ["onIL"], [])]
+          ("C catcher", ["catcher"], [])]
 MIN_SIDE = 0.5e6
 Y_CLIP = math.log(10)
 BAND = math.log(1.5)
@@ -97,21 +108,41 @@ def on_il_at(mlbam, trade_date):
     return False
 
 
+# Tradeable comp-round picks in otherwise-clean trades, hand-mapped from
+# descriptions (only 7 pick trades exist in the corpus; 2 others stay
+# excluded: Priester has a PTBNL, Donovan has a 3-team-id anomaly).
+# Values from data/tradevalue_pick_curve.json (isotonic median of eephus
+# implied pick surplus, Clemens-2026 dollars). The Waters and Baker
+# trades are pick-ONLY sides - structurally unfittable before this.
+PICK_TRADES = {
+    ("2022-07-11", 144): 12.3e6,   # ATL gets CBA #35 for Waters package
+    ("2024-12-14", 139): 12.35e6,  # TBR gets CBA-A (~#33) in Springs deal
+    ("2025-01-07", 119): 12.0e6,   # LAD gets CIN comp-A (#40) for Lux
+    ("2025-07-10", 110): 12.3e6,   # BAL gets #37 for Bryan Baker
+    ("2025-12-19", 139): 12.35e6,  # TBR gets 2026 CBA #33 in Baz deal
+}
+
+
 def build_fit_trades(ctx):
     """Fit-eligible trades with per-player metadata (values filled later)."""
     out = []
     for tr in ctx["trades"]:
-        if tr["flags"]:
+        pick_sides = {tid: v for (d, tid), v in PICK_TRADES.items()
+                      if d == tr["date"]}
+        if tr["flags"] and not (tr["flags"] == ["draftPick"] and pick_sides):
             continue
         sides = {}
         for p in tr["players"]:
             sides.setdefault(p["toTeamId"], []).append(p)
+        for tid in pick_sides:
+            sides.setdefault(tid, [])
         if len(sides) != 2:
             continue
         out.append({
             "season": tr["season"], "date": tr["date"],
             "deadline": tr["deadline"],
-            "sides": list(sides.values()),
+            "sides": [(tid, ps) for tid, ps in sides.items()],
+            "pickValues": pick_sides,
         })
     return out
 
@@ -142,8 +173,11 @@ def value_and_featurize(trades, ctx):
     rows = []
     for tr in trades:
         vals, feats = [], []
-        for side in tr["sides"]:
-            v_tot, f_tot = 0.0, np.zeros(len(FEATURES))
+        for tid, side in tr["sides"]:
+            # comp-round picks: face value from the fitted curve, no
+            # market-feature flags (they are neither MLB nor Board rows)
+            v_tot = tr.get("pickValues", {}).get(tid, 0.0)
+            f_tot = np.zeros(len(FEATURES))
             for p in side:
                 val = snap.value_traded_player(
                     p["mlbam"], p["name"], tr["date"], tr["season"], ctx)
@@ -169,6 +203,9 @@ def value_and_featurize(trades, ctx):
                         if is_mlb and not person.get("pitcher") else 0.0)
                 x[9] = pos == "C"
                 x[10] = is_mlb and on_il_at(p["mlbam"], tr["date"])
+                sp = is_mlb and person.get("pitcher") and not rlv
+                x[11] = sp and tr["deadline"]
+                x[12] = star and tr["deadline"]
                 v_tot += v
                 f_tot += v * x
             vals.append(v_tot)

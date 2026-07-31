@@ -52,6 +52,9 @@
       if (p.w) d += ' · ' + p.w + ' WAR';
       return d;
     }
+    if (p.e === 'pick') {
+      return 'Tradeable draft pick · fitted pick-value curve';
+    }
     return p.t + ' · ' + p.p + ' · ' + p.w + ' WAR · ' +
            p.c + (p.c === 1 ? ' yr' : ' yrs') + ' control' + ilTag(p);
   }
@@ -251,7 +254,9 @@
         ? 'FV ' + p.fv + (p.eta ? ' · ETA ' + p.eta : '')
         : p.e === 'depth'
           ? p.lvl + (p.w ? ' · ' + p.w + ' WAR' : ' · unranked')
-          : p.w + ' WAR · ' + p.c + (p.c === 1 ? ' yr' : ' yrs')) + ilTag(p));
+          : p.e === 'pick'
+            ? 'tradeable pick'
+            : p.w + ' WAR · ' + p.c + (p.c === 1 ? ' yr' : ' yrs')) + ilTag(p));
       td('td-num' + (p.s < 0 ? ' neg' : ''), fmtM(p.s));
       td('td-num' + (p.m < 0 ? ' neg' : ''), fmtM(p.m) + (p.sc ? '\u2020' : ''));
       var actions = document.createElement('td');
