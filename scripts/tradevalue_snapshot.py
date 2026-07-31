@@ -194,20 +194,31 @@ def load_boards(idmap_fg_to_mlbam):
 _STEAMER = None
 
 
-def load_steamer():
-    """Preseason Steamer WAR by (season, mlbam), from tradevalue_steamerhist.
+# fitted preseason-system weights (sweep 2026-07-31): pooled optimum 0.80
+# steamer / 0.20 zips, interior (curve 1.4902 @ 1.0 -> 1.4776 @ 0.80 ->
+# 1.5165 @ 0.50), fold ws 0.80-0.85, beats steamer-only in 7/8 held-out
+# seasons on same-season realized WAR. A 50/50 convention FAILED (2/8) -
+# the FG-archived ZiPS vintage is staler than Steamer's spring finals.
+PRESEASON_SYS_W = {"steamer": 0.8, "zips": 0.2}
 
-    The at-trade-time projection for corpus trades 2017-2026; two-way players
-    sum bat + pit rows. The 2020 file was published on the 60-game schedule
-    (Trout 2.98 WAR / 234 PA) and is rescaled to full-season talent, matching
-    SHORT_SEASON_SCALE on the realized side.
-    """
+
+def load_steamer():
+    """Preseason projection WAR by (season, mlbam): fitted-weight blend of
+    Steamer and ZiPS where both project a player, else whichever exists
+    (ZiPS covers ~1,200-1,900 MLB-relevant players/yr vs Steamer's 4-5k
+    incl. deep minors; 2026 is Steamer-only - ZiPS not archived yet).
+    Two-way players sum bat + pit rows within a system before blending.
+    Both systems' 2020 files are 60-game basis (Trout 2.98 / 2.82) and are
+    rescaled to full-season talent, matching SHORT_SEASON_SCALE on the
+    realized side. Files from tradevalue_steamerhist.py."""
     global _STEAMER
     if _STEAMER is None:
-        _STEAMER = {}
-        for p in sorted((DATA / "steamer_preseason").glob("steamer_*_*.csv")):
-            season = int(p.stem.split("_")[1])
+        by_sys = {}
+        for p in sorted((DATA / "steamer_preseason").glob("*_*_*.csv")):
+            system, season, _side = p.stem.split("_")
+            season = int(season)
             scale = SHORT_SEASON_SCALE.get(season, 1.0)
+            d = by_sys.setdefault(system, {})
             for r in csv.DictReader(open(p)):
                 if not r["mlbam"]:
                     continue
@@ -216,7 +227,16 @@ def load_steamer():
                 except (TypeError, ValueError):
                     continue
                 key = (season, int(r["mlbam"]))
-                _STEAMER[key] = _STEAMER.get(key, 0.0) + war * scale
+                d[key] = d.get(key, 0.0) + war * scale
+        acc, wsum = {}, {}
+        for system, d in by_sys.items():
+            w = PRESEASON_SYS_W.get(system, 0.0)
+            if w <= 0:
+                continue
+            for key, war in d.items():
+                acc[key] = acc.get(key, 0.0) + w * war
+                wsum[key] = wsum.get(key, 0.0) + w
+        _STEAMER = {key: acc[key] / wsum[key] for key in acc}
     return _STEAMER
 
 
