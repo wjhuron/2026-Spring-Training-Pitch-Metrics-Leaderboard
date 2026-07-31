@@ -56,6 +56,15 @@ CONFIG = {
     "arbLadder": {1: 0.15, 2: 0.35, 3: 0.50, 4: 0.75},  # FG 2026, fitted to awards
     # fitted 21%/yr multiplicative decline (pooled roles; role split untested)
     "riskDecay": {"SP": 0.21, "RP": 0.21, "C": 0.21, "POS": 0.21},
+    # IL discount (il_discount_fit.py, 2026-07-31): players on an MLB IL
+    # deliver a fitted shortfall vs an injury-blind talent projection
+    # (next-season realized, 7/7 held-out seasons). Severity split shipped
+    # per pre-registration (4/7): a 10/15-day stint is a NEW problem the
+    # projection hasn't priced (0.30); 60-day stints are long injuries
+    # projections already discount (0.10). Live engine applies to future
+    # years only (RoS systems already price year-1 injury); the corpus
+    # applies to all years (preseason projections are injury-blind).
+    "ilDiscount": {"10": 0.30, "15": 0.30, "60": 0.10},
     # per-talent-tier decline overrides the pooled value when present:
     # [[upper WAR bound, lambda], ...] fitted in tradevalue_market stage 1b
     "riskDecayByWar": None,
@@ -264,6 +273,13 @@ def value_mlb(p, frac_y1):
     if p["warBat"] is None and p["warPit"] is None:
         flags.append("noProjection")
 
+    # fitted IL discount on future years only: the RoS ensemble already
+    # prices the current season's injury, but out-years are built off the
+    # same annualized talent number the fit showed falls short for IL
+    # players (see CONFIG["ilDiscount"])
+    il_code = str(p.get("ilStatus") or "")
+    il_d = cfg["ilDiscount"].get(il_code.lstrip("D"), 0.0) if il_code else 0.0
+
     years_out, surplus = [], 0.0
     aging_seasons = 0
     for t, step in enumerate(ladder, start=1):
@@ -272,6 +288,8 @@ def value_mlb(p, frac_y1):
             aging_seasons += 1
         war_t = (max(0.0, war1 + cfg["agingDelta"] * aging_seasons)
                  * (1 - lam) ** (t - 1))
+        if il_d and t > 1:
+            war_t *= 1 - il_d
         market = rate_for(war_t) * war_t * (1 + cfg["winInflation"]) ** (t - 1)
         value = market
         if step["status"] in ("signed", "playerOption"):

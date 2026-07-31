@@ -393,7 +393,7 @@
       "mlbam": 518649,
       "name": "Brett Eibner",
       "kind": "mlb",
-      "warProj": 0.06,
+      "warProj": 0.04,
       "controlLeft": 6,
       "value": 0.0
      }
@@ -1051,15 +1051,15 @@
   "sides": [
    {
     "teamId": 110,
-    "value": 7159959.237937154,
+    "value": 6866520.30420959,
     "players": [
      {
       "mlbam": 612434,
       "name": "Miguel Castro",
       "kind": "mlb",
-      "warProj": 0.17,
+      "warProj": 0.12,
       "controlLeft": 5,
-      "value": 7159959.237937154,
+      "value": 6866520.30420959,
       "gradBlendW": 0.45
      }
     ]
@@ -1700,15 +1700,15 @@
    },
    {
     "teamId": 144,
-    "value": 966322.0704321672,
+    "value": 82947.1884329514,
     "players": [
      {
       "mlbam": 571431,
       "name": "Matt Adams",
       "kind": "mlb",
-      "warProj": 0.47,
+      "warProj": 0.33,
       "controlLeft": 2,
-      "value": 966322.0704321672
+      "value": 82947.1884329514
      }
     ]
    }
@@ -2126,15 +2126,15 @@
    },
    {
     "teamId": 139,
-    "value": 2508776.575965847,
+    "value": 1096551.2118717448,
     "players": [
      {
       "mlbam": 588751,
       "name": "Adeiny Hechavarr\u00eda",
       "kind": "mlb",
-      "warProj": 0.97,
+      "warProj": 0.68,
       "controlLeft": 2,
-      "value": 2508776.575965847
+      "value": 1096551.2118717448
      }
     ]
    }
@@ -2688,15 +2688,15 @@
   "sides": [
    {
     "teamId": 139,
-    "value": 1736459.1599150074,
+    "value": 1007383.7712776493,
     "players": [
      {
       "mlbam": 475054,
       "name": "Chaz Roe",
       "kind": "mlb",
-      "warProj": 0.32,
+      "warProj": 0.23,
       "controlLeft": 3,
-      "value": 1736459.1599150074
+      "value": 1007383.7712776493
      }
     ]
    }
@@ -3107,7 +3107,7 @@
    },
    {
     "teamId": 135,
-    "value": 36008305.21185588,
+    "value": 34850617.47088628,
     "players": [
      {
       "mlbam": 475243,
@@ -3121,9 +3121,9 @@
       "mlbam": 621381,
       "name": "Matt Strahm",
       "kind": "mlb",
-      "warProj": 0.59,
+      "warProj": 0.41,
       "controlLeft": 6,
-      "value": 36519931.85995756,
+      "value": 35362244.11898796,
       "gradBlendW": 0.6
      },
      {
@@ -3304,15 +3304,15 @@
    },
    {
     "teamId": 111,
-    "value": 2131223.441535056,
+    "value": 619533.9225626641,
     "players": [
      {
       "mlbam": 456488,
       "name": "Eduardo N\u00fa\u00f1ez",
       "kind": "mlb",
-      "warProj": 1.23,
+      "warProj": 0.86,
       "controlLeft": 1,
-      "value": 2131223.441535056
+      "value": 619533.9225626641
      }
     ]
    }
@@ -4010,7 +4010,7 @@
       "mlbam": 641583,
       "name": "Dustin Fowler",
       "kind": "mlb",
-      "warProj": -0.05,
+      "warProj": -0.03,
       "controlLeft": 7,
       "value": 31337116.502846774,
       "gradBlendW": 0.6
@@ -4823,15 +4823,15 @@
    },
    {
     "teamId": 141,
-    "value": 2133383.202475216,
+    "value": 886788.8122664418,
     "players": [
      {
       "mlbam": 543408,
       "name": "Tom Koehler",
       "kind": "mlb",
-      "warProj": 1.08,
+      "warProj": 0.76,
       "controlLeft": 2,
-      "value": 2133383.202475216
+      "value": 886788.8122664418
      }
     ]
    }
@@ -5609,7 +5609,7 @@
       "mlbam": 643265,
       "name": "Garrett Cooper",
       "kind": "mlb",
-      "warProj": -0.15,
+      "warProj": -0.11,
       "controlLeft": 7,
       "value": 0.0
      }
@@ -5792,15 +5792,15 @@
    },
    {
     "teamId": 141,
-    "value": 32814947.86832876,
+    "value": 22092082.87050937,
     "players": [
      {
       "mlbam": 649557,
       "name": "Aledmys D\u00edaz",
       "kind": "mlb",
-      "warProj": 2.41,
+      "warProj": 1.69,
       "controlLeft": 6,
-      "value": 32814947.86832876
+      "value": 22092082.87050937
      }
     ]
    }
@@ -5960,15 +5960,15 @@
   "sides": [
    {
     "teamId": 139,
-    "value": 1404015.4232298709,
+    "value": 400135.4237211373,
     "players": [
      {
       "mlbam": 621563,
       "name": "Joey Wendle",
       "kind": "mlb",
-      "warProj": 0.28,
+      "warProj": 0.19,
       "controlLeft": 6,
-      "value": 1404015.4232298709
+      "value": 400135.4237211373
      }
     ]
    }
@@ -5985,15 +5985,15 @@
   "sides": [
    {
     "teamId": 135,
-    "value": 4457370.882809306,
+    "value": 3120159.617966515,
     "players": [
      {
       "mlbam": 571951,
       "name": "Bryan Mitchell",
       "kind": "mlb",
-      "warProj": 0.74,
+      "warProj": 0.52,
       "controlLeft": 4,
-      "value": 4457370.882809306
+      "value": 3120159.617966515
      },
      {
       "mlbam": 452104,
@@ -6321,15 +6321,15 @@
    },
    {
     "teamId": 133,
-    "value": 18765019.145418976,
+    "value": 12455684.648299076,
     "players": [
      {
       "mlbam": 572039,
       "name": "Stephen Piscotty",
       "kind": "mlb",
-      "warProj": 1.82,
+      "warProj": 1.27,
       "controlLeft": 5,
-      "value": 18765019.145418976
+      "value": 12455684.648299076
      }
     ]
    }
@@ -6777,15 +6777,15 @@
   "sides": [
    {
     "teamId": 134,
-    "value": 135533024.23208767,
+    "value": 98838174.89322235,
     "players": [
      {
       "mlbam": 605397,
       "name": "Joe Musgrove",
       "kind": "mlb",
-      "warProj": 2.54,
+      "warProj": 1.77,
       "controlLeft": 5,
-      "value": 66467658.23216908
+      "value": 32809341.47733133
      },
      {
       "mlbam": 641829,
@@ -6807,9 +6807,9 @@
       "mlbam": 593140,
       "name": "Michael Feliz",
       "kind": "mlb",
-      "warProj": 0.78,
+      "warProj": 0.55,
       "controlLeft": 4,
-      "value": 9546275.280091887
+      "value": 6509742.696064322
      }
     ]
    },
@@ -7057,7 +7057,7 @@
    },
    {
     "teamId": 118,
-    "value": 5111728.003232628,
+    "value": 3957806.4585283888,
     "players": [
      {
       "mlbam": 641571,
@@ -7072,9 +7072,9 @@
       "mlbam": 534910,
       "name": "Jesse Hahn",
       "kind": "mlb",
-      "warProj": 0.3,
+      "warProj": 0.21,
       "controlLeft": 3,
-      "value": 2416167.8120201947
+      "value": 1262246.267315955
      }
     ]
    }
@@ -7202,15 +7202,15 @@
   "sides": [
    {
     "teamId": 139,
-    "value": 3074923.2274832963,
+    "value": 1462446.259238307,
     "players": [
      {
       "mlbam": 543068,
       "name": "C.J. Cron",
       "kind": "mlb",
-      "warProj": 0.51,
+      "warProj": 0.36,
       "controlLeft": 3,
-      "value": 3074923.2274832963
+      "value": 1462446.259238307
      }
     ]
    }
@@ -8468,7 +8468,7 @@
       "mlbam": 572204,
       "name": "Trayce Thompson",
       "kind": "mlb",
-      "warProj": 0.03,
+      "warProj": 0.02,
       "controlLeft": 4,
       "value": 0.0
      }
@@ -8564,7 +8564,7 @@
       "mlbam": 606273,
       "name": "Roenis El\u00edas",
       "kind": "mlb",
-      "warProj": 0.06,
+      "warProj": 0.05,
       "controlLeft": 3,
       "value": 0.0
      }
@@ -8765,15 +8765,15 @@
   "sides": [
    {
     "teamId": 113,
-    "value": 2418593.8188879397,
+    "value": -444306.7857356991,
     "players": [
      {
       "mlbam": 518774,
       "name": "Matt Harvey",
       "kind": "mlb",
-      "warProj": 1.03,
+      "warProj": 0.72,
       "controlLeft": 1,
-      "value": 2418593.8188879397
+      "value": -444306.7857356991
      }
     ]
    },
@@ -9264,15 +9264,15 @@
    },
    {
     "teamId": 158,
-    "value": 982189.4578562293,
+    "value": -112195.64037020493,
     "players": [
      {
       "mlbam": 543543,
       "name": "Brad Miller",
       "kind": "mlb",
-      "warProj": 0.67,
+      "warProj": 0.47,
       "controlLeft": 2,
-      "value": 982189.4578562293
+      "value": -112195.64037020493
      }
     ]
    }
@@ -9448,15 +9448,15 @@
   "sides": [
    {
     "teamId": 111,
-    "value": -948315.929549759,
+    "value": -1591130.933293527,
     "players": [
      {
       "mlbam": 456665,
       "name": "Steve Pearce",
       "kind": "mlb",
-      "warProj": 0.62,
+      "warProj": 0.43,
       "controlLeft": 1,
-      "value": -948315.929549759
+      "value": -1591130.933293527
      }
     ]
    },
@@ -9625,15 +9625,15 @@
   "sides": [
    {
     "teamId": 114,
-    "value": 4932472.198941166,
+    "value": 2806728.49717309,
     "players": [
      {
       "mlbam": 624586,
       "name": "James Hoyt",
       "kind": "mlb",
-      "warProj": 0.47,
+      "warProj": 0.33,
       "controlLeft": 5,
-      "value": 4932472.198941166
+      "value": 2806728.49717309
      }
     ]
    },
@@ -10007,15 +10007,15 @@
    },
    {
     "teamId": 147,
-    "value": -2353323.1950416737,
+    "value": -2541903.919015767,
     "players": [
      {
       "mlbam": 502154,
       "name": "Zack Britton",
       "kind": "mlb",
-      "warProj": 0.76,
+      "warProj": 0.69,
       "controlLeft": 1,
-      "value": -2353323.1950416737
+      "value": -2541903.919015767
      }
     ]
    }
@@ -10215,23 +10215,23 @@
   "sides": [
    {
     "teamId": 141,
-    "value": 16061615.348179055,
+    "value": 14201686.565548096,
     "players": [
      {
       "mlbam": 592273,
       "name": "Brandon Drury",
       "kind": "mlb",
-      "warProj": 0.67,
+      "warProj": 0.47,
       "controlLeft": 4,
-      "value": 5365316.920022661
+      "value": 3691841.898363689
      },
      {
       "mlbam": 641856,
       "name": "Billy McKinney",
       "kind": "mlb",
-      "warProj": 0.19,
+      "warProj": 0.13,
       "controlLeft": 7,
-      "value": 10696298.428156395,
+      "value": 10509844.667184407,
       "gradBlendW": 0.6
      }
     ]
@@ -10822,7 +10822,7 @@
   "sides": [
    {
     "teamId": 110,
-    "value": 10189862.011607358,
+    "value": 9706495.022237496,
     "players": [
      {
       "mlbam": 672802,
@@ -10844,23 +10844,23 @@
       "mlbam": 542340,
       "name": "Jonathan Villar",
       "kind": "mlb",
-      "warProj": 0.46,
+      "warProj": 0.32,
       "controlLeft": 2,
-      "value": 807418.9500734517
+      "value": 324051.96070359
      }
     ]
    },
    {
     "teamId": 158,
-    "value": 15319537.38795967,
+    "value": 5558603.483418998,
     "players": [
      {
       "mlbam": 570731,
       "name": "Jonathan Schoop",
       "kind": "mlb",
-      "warProj": 2.77,
+      "warProj": 1.94,
       "controlLeft": 2,
-      "value": 15319537.38795967
+      "value": 5558603.483418998
      }
     ]
    }
@@ -10875,7 +10875,7 @@
   "sides": [
    {
     "teamId": 144,
-    "value": 15485946.089127777,
+    "value": 15394389.401526807,
     "players": [
      {
       "mlbam": 592332,
@@ -10889,9 +10889,9 @@
       "mlbam": 503285,
       "name": "Darren O'Day",
       "kind": "mlb",
-      "warProj": 0.55,
+      "warProj": 0.39,
       "controlLeft": 1,
-      "value": 305188.95866990084
+      "value": 213632.27106893063
      }
     ]
    },
@@ -11276,15 +11276,15 @@
    },
    {
     "teamId": 139,
-    "value": 30665800.79118361,
+    "value": 17843002.200202398,
     "players": [
      {
       "mlbam": 502054,
       "name": "Tommy Pham",
       "kind": "mlb",
-      "warProj": 3.06,
+      "warProj": 2.14,
       "controlLeft": 3,
-      "value": 30665800.79118361
+      "value": 17843002.200202398
      }
     ]
    }
@@ -11301,15 +11301,15 @@
   "sides": [
    {
     "teamId": 143,
-    "value": 2303618.6666901186,
+    "value": 808728.7188569959,
     "players": [
      {
       "mlbam": 467092,
       "name": "Wilson Ramos",
       "kind": "mlb",
-      "warProj": 1.86,
+      "warProj": 1.3,
       "controlLeft": 1,
-      "value": 2303618.6666901186
+      "value": 808728.7188569959
      }
     ]
    }
@@ -11371,15 +11371,15 @@
    },
    {
     "teamId": 134,
-    "value": 15932239.817002364,
+    "value": 10545774.362119045,
     "players": [
      {
       "mlbam": 502042,
       "name": "Chris Archer",
       "kind": "mlb",
-      "warProj": 4.38,
+      "warProj": 3.07,
       "controlLeft": 1,
-      "value": 15932239.817002364
+      "value": 10545774.362119045
      }
     ]
    }
@@ -11482,15 +11482,15 @@
    },
    {
     "teamId": 143,
-    "value": 294796.5528063076,
+    "value": 34958.13044267606,
     "players": [
      {
       "mlbam": 571901,
       "name": "Aaron Loup",
       "kind": "mlb",
-      "warProj": 0.39,
+      "warProj": 0.27,
       "controlLeft": 1,
-      "value": 294796.5528063076
+      "value": 34958.13044267606
      }
     ]
    }
@@ -11954,15 +11954,15 @@
   "sides": [
    {
     "teamId": 108,
-    "value": 2268184.989930981,
+    "value": 1509533.8407777739,
     "players": [
      {
       "mlbam": 628333,
       "name": "Odrisamer Despaigne",
       "kind": "mlb",
-      "warProj": 0.48,
+      "warProj": 0.34,
       "controlLeft": 3,
-      "value": 2268184.989930981
+      "value": 1509533.8407777739
      }
     ]
    }
@@ -12326,7 +12326,7 @@
       "mlbam": 435064,
       "name": "Bobby Wilson",
       "kind": "mlb",
-      "warProj": 0.02,
+      "warProj": 0.01,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -12571,15 +12571,15 @@
   "sides": [
    {
     "teamId": 114,
-    "value": 7848889.024676069,
+    "value": 4481722.317273248,
     "players": [
      {
       "mlbam": 518626,
       "name": "Josh Donaldson",
       "kind": "mlb",
-      "warProj": 5.88,
+      "warProj": 4.12,
       "controlLeft": 1,
-      "value": 7848889.024676069
+      "value": 4481722.317273248
      }
     ]
    }
@@ -12986,7 +12986,7 @@
       "mlbam": 592767,
       "name": "Drew Smyly",
       "kind": "mlb",
-      "warProj": 0.25,
+      "warProj": 0.23,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -13352,7 +13352,7 @@
       "mlbam": 605155,
       "name": "Colten Brewer",
       "kind": "mlb",
-      "warProj": 0.08,
+      "warProj": 0.06,
       "controlLeft": 7,
       "value": 0.0
      }
@@ -13597,7 +13597,7 @@
       "mlbam": 600303,
       "name": "Tommy La Stella",
       "kind": "mlb",
-      "warProj": 0.08,
+      "warProj": 0.05,
       "controlLeft": 3,
       "value": 0.0
      }
@@ -13772,7 +13772,7 @@
       "mlbam": 429664,
       "name": "Robinson Can\u00f3",
       "kind": "mlb",
-      "warProj": 2.95,
+      "warProj": 2.07,
       "controlLeft": 1,
       "value": 0.0
      },
@@ -13827,15 +13827,15 @@
    },
    {
     "teamId": 136,
-    "value": 69603089.88667642,
+    "value": 67864715.42376861,
     "players": [
      {
       "mlbam": 641487,
       "name": "J.P. Crawford",
       "kind": "mlb",
-      "warProj": 1.19,
+      "warProj": 0.83,
       "controlLeft": 6,
-      "value": 69603089.88667642,
+      "value": 67864715.42376861,
       "gradBlendW": 0.6
      },
      {
@@ -13859,7 +13859,7 @@
   "sides": [
    {
     "teamId": 109,
-    "value": 73931634.63819328,
+    "value": 72901463.06864408,
     "players": [
      {
       "mlbam": 670370,
@@ -13871,9 +13871,9 @@
       "mlbam": 608348,
       "name": "Carson Kelly",
       "kind": "mlb",
-      "warProj": 0.63,
+      "warProj": 0.44,
       "controlLeft": 5,
-      "value": 39419313.115307085,
+      "value": 38389141.54575787,
       "gradBlendW": 0.45
      },
      {
@@ -14423,29 +14423,29 @@
   "sides": [
    {
     "teamId": 136,
-    "value": 7464673.605069341,
+    "value": 4303164.784098796,
     "players": [
      {
       "mlbam": 570267,
       "name": "Domingo Santana",
       "kind": "mlb",
-      "warProj": 1.73,
+      "warProj": 1.21,
       "controlLeft": 3,
-      "value": 7464673.605069341
+      "value": 4303164.784098796
      }
     ]
    },
    {
     "teamId": 158,
-    "value": 5278072.383630024,
+    "value": 4806323.012714957,
     "players": [
      {
       "mlbam": 592325,
       "name": "Ben Gamel",
       "kind": "mlb",
-      "warProj": 0.26,
+      "warProj": 0.18,
       "controlLeft": 5,
-      "value": 4978072.383630024,
+      "value": 4506323.012714957,
       "gradBlendW": 0.45
      },
      {
@@ -15772,7 +15772,7 @@
       "mlbam": 608596,
       "name": "Tom Murphy",
       "kind": "mlb",
-      "warProj": 0.05,
+      "warProj": 0.03,
       "controlLeft": 3,
       "value": 1057809.8995950357,
       "gradBlendW": 0.1
@@ -15970,7 +15970,7 @@
       "mlbam": 571882,
       "name": "Derek Law",
       "kind": "mlb",
-      "warProj": 0.1,
+      "warProj": 0.07,
       "controlLeft": 4,
       "value": 0.0
      },
@@ -16572,15 +16572,15 @@
   "sides": [
    {
     "teamId": 136,
-    "value": -1085843.4655076377,
+    "value": -1479636.6267228131,
     "players": [
      {
       "mlbam": 527055,
       "name": "Arodys Vizca\u00edno",
       "kind": "mlb",
-      "warProj": 0.27,
+      "warProj": 0.19,
       "controlLeft": 1,
-      "value": -2078660.4771088376
+      "value": -2472453.638324013
      },
      {
       "mlbam": 592145,
@@ -16894,7 +16894,7 @@
       "mlbam": 543105,
       "name": "Alex Dickerson",
       "kind": "mlb",
-      "warProj": 0.05,
+      "warProj": 0.04,
       "controlLeft": 3,
       "value": 0.0
      }
@@ -16925,15 +16925,15 @@
   "sides": [
    {
     "teamId": 143,
-    "value": 286186.1044167933,
+    "value": 200330.2730917553,
     "players": [
      {
       "mlbam": 543543,
       "name": "Brad Miller",
       "kind": "mlb",
-      "warProj": 0.28,
+      "warProj": 0.2,
       "controlLeft": 1,
-      "value": 286186.1044167933
+      "value": 200330.2730917553
      }
     ]
    }
@@ -17272,15 +17272,15 @@
   "sides": [
    {
     "teamId": 114,
-    "value": 2771024.886132805,
+    "value": 2614983.8887686064,
     "players": [
      {
       "mlbam": 664208,
       "name": "Phil Maton",
       "kind": "mlb",
-      "warProj": 0.16,
+      "warProj": 0.11,
       "controlLeft": 5,
-      "value": 2771024.886132805,
+      "value": 2614983.8887686064,
       "gradBlendW": 0.45
      }
     ]
@@ -17528,7 +17528,7 @@
       "mlbam": 518748,
       "name": "Justin Grimm",
       "kind": "mlb",
-      "warProj": 0.03,
+      "warProj": 0.02,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -17861,24 +17861,24 @@
   "sides": [
    {
     "teamId": 114,
-    "value": 29919088.93517155,
+    "value": 29319823.655929975,
     "players": [
      {
       "mlbam": 624414,
       "name": "Christian Arroyo",
       "kind": "mlb",
-      "warProj": 0.16,
+      "warProj": 0.11,
       "controlLeft": 5,
-      "value": 26724047.371919487,
+      "value": 26608751.87641596,
       "gradBlendW": 0.45
      },
      {
       "mlbam": 621056,
       "name": "Hunter Wood",
       "kind": "mlb",
-      "warProj": 0.24,
+      "warProj": 0.17,
       "controlLeft": 5,
-      "value": 3195041.5632520607,
+      "value": 2711071.7795140143,
       "gradBlendW": 0.45
      }
     ]
@@ -17934,15 +17934,15 @@
   "sides": [
    {
     "teamId": 139,
-    "value": 86944.77380594383,
+    "value": 50915.689490247634,
     "players": [
      {
       "mlbam": 519299,
       "name": "Eric Sogard",
       "kind": "mlb",
-      "warProj": 0.05,
+      "warProj": 0.04,
       "controlLeft": 1,
-      "value": 86944.77380594383
+      "value": 50915.689490247634
      }
     ]
    }
@@ -18390,15 +18390,15 @@
    },
    {
     "teamId": 140,
-    "value": -280532.5188900899,
+    "value": -636101.0240926282,
     "players": [
      {
       "mlbam": 518858,
       "name": "Nate Jones",
       "kind": "mlb",
-      "warProj": 0.54,
+      "warProj": 0.38,
       "controlLeft": 1,
-      "value": -280532.5188900899
+      "value": -636101.0240926282
      }
     ]
    }
@@ -18497,15 +18497,15 @@
   "sides": [
    {
     "teamId": 137,
-    "value": -1128794.5635799677,
+    "value": -1714531.1945059777,
     "players": [
      {
       "mlbam": 571697,
       "name": "Scooter Gennett",
       "kind": "mlb",
-      "warProj": 0.88,
+      "warProj": 0.62,
       "controlLeft": 1,
-      "value": -1128794.5635799677
+      "value": -1714531.1945059777
      }
     ]
    }
@@ -18578,15 +18578,15 @@
   "sides": [
    {
     "teamId": 112,
-    "value": 1393873.414768857,
+    "value": 34787.477294721684,
     "players": [
      {
       "mlbam": 592206,
       "name": "Nick Castellanos",
       "kind": "mlb",
-      "warProj": 1.69,
+      "warProj": 1.18,
       "controlLeft": 1,
-      "value": 1393873.414768857
+      "value": 34787.477294721684
      }
     ]
    },
@@ -18841,15 +18841,15 @@
    },
    {
     "teamId": 146,
-    "value": 61922867.01172385,
+    "value": 60742682.56462999,
     "players": [
      {
       "mlbam": 592773,
       "name": "Ryne Stanek",
       "kind": "mlb",
-      "warProj": 0.57,
+      "warProj": 0.4,
       "controlLeft": 5,
-      "value": 6008531.364381632,
+      "value": 4828346.917287767,
       "gradBlendW": 0.45
      },
      {
@@ -18942,15 +18942,15 @@
   "sides": [
    {
     "teamId": 143,
-    "value": 2664604.0557604046,
+    "value": 1061418.4912061964,
     "players": [
      {
       "mlbam": 572816,
       "name": "Corey Dickerson",
       "kind": "mlb",
-      "warProj": 1.99,
+      "warProj": 1.4,
       "controlLeft": 1,
-      "value": 2664604.0557604046
+      "value": 1061418.4912061964
      }
     ]
    }
@@ -18965,15 +18965,15 @@
   "sides": [
    {
     "teamId": 135,
-    "value": 1743935.0436051383,
+    "value": 1068128.7328795649,
     "players": [
      {
       "mlbam": 605218,
       "name": "Carl Edwards Jr.",
       "kind": "mlb",
-      "warProj": 0.39,
+      "warProj": 0.27,
       "controlLeft": 3,
-      "value": 1743935.0436051383
+      "value": 1068128.7328795649
      }
     ]
    },
@@ -19003,7 +19003,7 @@
   "sides": [
    {
     "teamId": 158,
-    "value": 5138591.354565872,
+    "value": 4943605.707828741,
     "players": [
      {
       "mlbam": 519141,
@@ -19017,9 +19017,9 @@
       "mlbam": 605143,
       "name": "Ray Black",
       "kind": "mlb",
-      "warProj": 0.3,
+      "warProj": 0.27,
       "controlLeft": 6,
-      "value": 4498610.738721475,
+      "value": 4303625.091984344,
       "gradBlendW": 0.6
      }
     ]
@@ -19185,15 +19185,15 @@
   "sides": [
    {
     "teamId": 119,
-    "value": -1305637.5715852268,
+    "value": -2488211.531036599,
     "players": [
      {
       "mlbam": 576397,
       "name": "Jedd Gyorko",
       "kind": "mlb",
-      "warProj": 1.04,
+      "warProj": 0.73,
       "controlLeft": 1,
-      "value": -1305637.5715852268
+      "value": -2488211.531036599
      }
     ]
    },
@@ -19211,7 +19211,7 @@
       "mlbam": 571561,
       "name": "Tony Cingrani",
       "kind": "mlb",
-      "warProj": 0.07,
+      "warProj": 0.05,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -19803,15 +19803,15 @@
   "sides": [
    {
     "teamId": 113,
-    "value": 572742.1364711666,
+    "value": 66043.68956427957,
     "players": [
      {
       "mlbam": 608671,
       "name": "Travis Jankowski",
       "kind": "mlb",
-      "warProj": 0.21,
+      "warProj": 0.15,
       "controlLeft": 3,
-      "value": 572742.1364711666
+      "value": 66043.68956427957
      }
     ]
    }
@@ -19934,15 +19934,15 @@
   "sides": [
    {
     "teamId": 113,
-    "value": 4493563.079024987,
+    "value": 3750703.964017529,
     "players": [
      {
       "mlbam": 592254,
       "name": "Jos\u00e9 De Le\u00f3n",
       "kind": "mlb",
-      "warProj": 0.33,
+      "warProj": 0.23,
       "controlLeft": 4,
-      "value": 4493563.079024987,
+      "value": 3750703.964017529,
       "gradBlendW": 0.3
      }
     ]
@@ -19960,15 +19960,15 @@
   "sides": [
    {
     "teamId": 112,
-    "value": 19194953.44775536,
+    "value": 18499643.65897353,
     "players": [
      {
       "mlbam": 605194,
       "name": "Jharel Cotton",
       "kind": "mlb",
-      "warProj": 0.54,
+      "warProj": 0.38,
       "controlLeft": 4,
-      "value": 19194953.44775536,
+      "value": 18499643.65897353,
       "gradBlendW": 0.3
      }
     ]
@@ -20147,7 +20147,7 @@
       "mlbam": 542340,
       "name": "Jonathan Villar",
       "kind": "mlb",
-      "warProj": 1.76,
+      "warProj": 1.23,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -20388,15 +20388,15 @@
   "sides": [
    {
     "teamId": 135,
-    "value": 11335669.81219664,
+    "value": 7068115.1480308175,
     "players": [
      {
       "mlbam": 502054,
       "name": "Tommy Pham",
       "kind": "mlb",
-      "warProj": 3.27,
+      "warProj": 2.29,
       "controlLeft": 2,
-      "value": 7869249.735341234
+      "value": 3601695.0711754113
      },
      {
       "mlbam": 630105,
@@ -20598,7 +20598,7 @@
   "sides": [
    {
     "teamId": 114,
-    "value": 5550721.557115909,
+    "value": 4919158.817355069,
     "players": [
      {
       "mlbam": 661403,
@@ -20613,9 +20613,9 @@
       "mlbam": 592261,
       "name": "Delino DeShields",
       "kind": "mlb",
-      "warProj": 0.59,
+      "warProj": 0.42,
       "controlLeft": 3,
-      "value": 2105209.13253613
+      "value": 1473646.392775291
      }
     ]
    },
@@ -21648,7 +21648,7 @@
       "mlbam": 594988,
       "name": "Scott Schebler",
       "kind": "mlb",
-      "warProj": 0.04,
+      "warProj": 0.03,
       "controlLeft": 2,
       "value": 0.0
      }
@@ -21765,15 +21765,15 @@
   "sides": [
    {
     "teamId": 121,
-    "value": 104444.49973755324,
+    "value": 55053.29491732291,
     "players": [
      {
       "mlbam": 571740,
       "name": "Billy Hamilton",
       "kind": "mlb",
-      "warProj": 0.2,
+      "warProj": 0.14,
       "controlLeft": 1,
-      "value": 104444.49973755324
+      "value": 55053.29491732291
      }
     ]
    },
@@ -22063,15 +22063,15 @@
    },
    {
     "teamId": 143,
-    "value": -57180.95117329824,
+    "value": -276167.78816231416,
     "players": [
      {
       "mlbam": 519443,
       "name": "Brandon Workman",
       "kind": "mlb",
-      "warProj": 0.52,
+      "warProj": 0.36,
       "controlLeft": 1,
-      "value": 26151.775470632427
+      "value": -192835.06151838347
      },
      {
       "mlbam": 592390,
@@ -22131,15 +22131,15 @@
   "sides": [
    {
     "teamId": 137,
-    "value": 5089283.852327578,
+    "value": 4277493.381727407,
     "players": [
      {
       "mlbam": 621002,
       "name": "Daniel Robertson",
       "kind": "mlb",
-      "warProj": 0.47,
+      "warProj": 0.33,
       "controlLeft": 4,
-      "value": 5089283.852327578,
+      "value": 4277493.381727407,
       "gradBlendW": 0.3
      }
     ]
@@ -22184,15 +22184,15 @@
   "sides": [
    {
     "teamId": 134,
-    "value": 16281.35886209792,
+    "value": 0.0,
     "players": [
      {
       "mlbam": 656354,
       "name": "Austin Davis",
       "kind": "mlb",
-      "warProj": 0.12,
+      "warProj": 0.09,
       "controlLeft": 5,
-      "value": 16281.35886209792
+      "value": 0.0
      }
     ]
    }
@@ -22407,15 +22407,15 @@
    },
    {
     "teamId": 108,
-    "value": 26874639.078815255,
+    "value": 25612956.205577035,
     "players": [
      {
       "mlbam": 620439,
       "name": "Franklin Barreto",
       "kind": "mlb",
-      "warProj": 0.86,
+      "warProj": 0.6,
       "controlLeft": 4,
-      "value": 26874639.078815255,
+      "value": 25612956.205577035,
       "gradBlendW": 0.3
      }
     ]
@@ -22433,15 +22433,15 @@
   "sides": [
    {
     "teamId": 144,
-    "value": 405453.9348911387,
+    "value": 279252.53703249275,
     "players": [
      {
       "mlbam": 543548,
       "name": "Tommy Milone",
       "kind": "mlb",
-      "warProj": 0.39,
+      "warProj": 0.28,
       "controlLeft": 1,
-      "value": 405453.9348911387
+      "value": 279252.53703249275
      }
     ]
    }
@@ -22573,7 +22573,7 @@
   "sides": [
    {
     "teamId": 109,
-    "value": 14795587.92996925,
+    "value": 10479029.850112185,
     "players": [
      {
       "mlbam": 650668,
@@ -22588,9 +22588,9 @@
       "mlbam": 592761,
       "name": "Caleb Smith",
       "kind": "mlb",
-      "warProj": 1.52,
+      "warProj": 1.07,
       "controlLeft": 4,
-      "value": 11827160.324061329
+      "value": 7510602.244204264
      }
     ]
    },
@@ -22622,15 +22622,15 @@
   "sides": [
    {
     "teamId": 112,
-    "value": 220425.66152455274,
+    "value": 20251.76741501295,
     "players": [
      {
       "mlbam": 605177,
       "name": "Andrew Chafin",
       "kind": "mlb",
-      "warProj": 0.65,
+      "warProj": 0.45,
       "controlLeft": 1,
-      "value": 220425.66152455274
+      "value": 20251.76741501295
      }
     ]
    }
@@ -22734,15 +22734,15 @@
   "sides": [
    {
     "teamId": 121,
-    "value": 515937.60145249224,
+    "value": 314933.49492978794,
     "players": [
      {
       "mlbam": 612434,
       "name": "Miguel Castro",
       "kind": "mlb",
-      "warProj": 0.29,
+      "warProj": 0.2,
       "controlLeft": 2,
-      "value": 515937.60145249224
+      "value": 314933.49492978794
      }
     ]
    },
@@ -23047,15 +23047,15 @@
   "sides": [
    {
     "teamId": 141,
-    "value": 921616.3279863206,
+    "value": 284153.1687208593,
     "players": [
      {
       "mlbam": 542340,
       "name": "Jonathan Villar",
       "kind": "mlb",
-      "warProj": 1.7,
+      "warProj": 1.19,
       "controlLeft": 1,
-      "value": 921616.3279863206
+      "value": 284153.1687208593
      }
     ]
    }
@@ -23095,7 +23095,7 @@
   "sides": [
    {
     "teamId": 136,
-    "value": 78499667.52536772,
+    "value": 78486881.60599129,
     "players": [
      {
       "mlbam": 664034,
@@ -23125,9 +23125,9 @@
       "mlbam": 662253,
       "name": "Andr\u00e9s Mu\u00f1oz",
       "kind": "mlb",
-      "warProj": 0.14,
+      "warProj": 0.13,
       "controlLeft": 6,
-      "value": 3496383.901436758,
+      "value": 3483597.982060332,
       "gradBlendW": 0.6
      }
     ]
@@ -23183,7 +23183,7 @@
       "mlbam": 592865,
       "name": "Taylor Williams",
       "kind": "mlb",
-      "warProj": 0.06,
+      "warProj": 0.04,
       "controlLeft": 4,
       "value": 1959456.363390263,
       "gradBlendW": 0.3
@@ -23203,15 +23203,15 @@
   "sides": [
    {
     "teamId": 137,
-    "value": 3728763.8187713316,
+    "value": 2913980.655670435,
     "players": [
      {
       "mlbam": 607455,
       "name": "Anthony Banda",
       "kind": "mlb",
-      "warProj": 0.37,
+      "warProj": 0.26,
       "controlLeft": 4,
-      "value": 3728763.8187713316,
+      "value": 2913980.655670435,
       "gradBlendW": 0.3
      }
     ]
@@ -23963,7 +23963,7 @@
   "sides": [
    {
     "teamId": 113,
-    "value": 11053434.13092648,
+    "value": 10008293.813098364,
     "players": [
      {
       "mlbam": 695406,
@@ -23975,9 +23975,9 @@
       "mlbam": 656546,
       "name": "Jeff Hoffman",
       "kind": "mlb",
-      "warProj": 1.09,
+      "warProj": 0.76,
       "controlLeft": 3,
-      "value": 10753434.13092648,
+      "value": 9708293.813098364,
       "gradBlendW": 0.1
      }
     ]
@@ -24637,7 +24637,7 @@
   "sides": [
    {
     "teamId": 139,
-    "value": 78668323.41148612,
+    "value": 77543964.36676641,
     "players": [
      {
       "mlbam": 677961,
@@ -24659,9 +24659,9 @@
       "mlbam": 642336,
       "name": "Francisco Mej\u00eda",
       "kind": "mlb",
-      "warProj": 0.89,
+      "warProj": 0.63,
       "controlLeft": 4,
-      "value": 25911759.87762221,
+      "value": 24787400.83290249,
       "gradBlendW": 0.3
      },
      {
@@ -25024,15 +25024,15 @@
    },
    {
     "teamId": 121,
-    "value": 21826775.17335309,
+    "value": 19380592.63530752,
     "players": [
      {
       "mlbam": 664192,
       "name": "Joey Lucchesi",
       "kind": "mlb",
-      "warProj": 0.95,
+      "warProj": 0.67,
       "controlLeft": 4,
-      "value": 21826775.17335309,
+      "value": 19380592.63530752,
       "gradBlendW": 0.3
      }
     ]
@@ -25818,7 +25818,7 @@
       "mlbam": 681911,
       "name": "Alex Vesia",
       "kind": "mlb",
-      "warProj": 0.04,
+      "warProj": 0.03,
       "controlLeft": 6,
       "value": 4384037.756494266,
       "gradBlendW": 0.6
@@ -25868,7 +25868,7 @@
       "mlbam": 681911,
       "name": "Alex Vesia",
       "kind": "mlb",
-      "warProj": 0.04,
+      "warProj": 0.03,
       "controlLeft": 6,
       "value": 4384037.756494266,
       "gradBlendW": 0.6
@@ -26523,7 +26523,7 @@
       "mlbam": 642731,
       "name": "Thairo Estrada",
       "kind": "mlb",
-      "warProj": 0.07,
+      "warProj": 0.05,
       "controlLeft": 5,
       "value": 4868660.441903573,
       "gradBlendW": 0.45
@@ -26618,15 +26618,15 @@
    },
    {
     "teamId": 147,
-    "value": 165058.18183732862,
+    "value": -160398.80335118895,
     "players": [
      {
       "mlbam": 593974,
       "name": "Wandy Peralta",
       "kind": "mlb",
-      "warProj": 0.15,
+      "warProj": 0.1,
       "controlLeft": 2,
-      "value": 165058.18183732862
+      "value": -160398.80335118895
      }
     ]
    }
@@ -26766,7 +26766,7 @@
       "mlbam": 572204,
       "name": "Trayce Thompson",
       "kind": "mlb",
-      "warProj": -0.52,
+      "warProj": -0.36,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -26886,15 +26886,15 @@
   "sides": [
    {
     "teamId": 139,
-    "value": 1701306.819092759,
+    "value": 1281245.160147584,
     "players": [
      {
       "mlbam": 664092,
       "name": "Sean Poppen",
       "kind": "mlb",
-      "warProj": 0.25,
+      "warProj": 0.22,
       "controlLeft": 5,
-      "value": 1701306.819092759
+      "value": 1281245.160147584
      }
     ]
    }
@@ -27062,15 +27062,15 @@
    },
    {
     "teamId": 121,
-    "value": 7581324.547256615,
+    "value": 6499753.200218423,
     "players": [
      {
       "mlbam": 641856,
       "name": "Billy McKinney",
       "kind": "mlb",
-      "warProj": 0.34,
+      "warProj": 0.24,
       "controlLeft": 4,
-      "value": 7581324.547256615,
+      "value": 6499753.200218423,
       "gradBlendW": 0.3
      }
     ]
@@ -27635,7 +27635,7 @@
       "mlbam": 594311,
       "name": "Jandel Gustave",
       "kind": "mlb",
-      "warProj": 0.02,
+      "warProj": 0.01,
       "controlLeft": 2,
       "value": 0.0
      },
@@ -27706,15 +27706,15 @@
    },
    {
     "teamId": 141,
-    "value": -293563.54832459707,
+    "value": -1121601.5378784218,
     "players": [
      {
       "mlbam": 572816,
       "name": "Corey Dickerson",
       "kind": "mlb",
-      "warProj": 0.81,
+      "warProj": 0.56,
       "controlLeft": 1,
-      "value": -1519764.6725017435
+      "value": -2347802.6620555683
      },
      {
       "mlbam": 643256,
@@ -27819,15 +27819,15 @@
   "sides": [
    {
     "teamId": 121,
-    "value": 943930.4602047943,
+    "value": 677661.6306851661,
     "players": [
      {
       "mlbam": 607455,
       "name": "Anthony Banda",
       "kind": "mlb",
-      "warProj": 0.16,
+      "warProj": 0.11,
       "controlLeft": 3,
-      "value": 943930.4602047943,
+      "value": 677661.6306851661,
       "gradBlendW": 0.1
      }
     ]
@@ -27907,15 +27907,15 @@
   "sides": [
    {
     "teamId": 134,
-    "value": 5578706.640046946,
+    "value": 2958940.734889993,
     "players": [
      {
       "mlbam": 596056,
       "name": "John Nogowski",
       "kind": "mlb",
-      "warProj": 0.48,
+      "warProj": 0.33,
       "controlLeft": 6,
-      "value": 5578706.640046946
+      "value": 2958940.734889993
      }
     ]
    }
@@ -28309,15 +28309,15 @@
   "sides": [
    {
     "teamId": 134,
-    "value": 979369.7853068064,
+    "value": 651812.3051801296,
     "players": [
      {
       "mlbam": 596071,
       "name": "Dillon Peters",
       "kind": "mlb",
-      "warProj": 0.18,
+      "warProj": 0.12,
       "controlLeft": 3,
-      "value": 979369.7853068064,
+      "value": 651812.3051801296,
       "gradBlendW": 0.1
      }
     ]
@@ -28333,15 +28333,15 @@
   "sides": [
    {
     "teamId": 119,
-    "value": 7241918.377772577,
+    "value": 6312021.05549264,
     "players": [
      {
       "mlbam": 641856,
       "name": "Billy McKinney",
       "kind": "mlb",
-      "warProj": 0.34,
+      "warProj": 0.24,
       "controlLeft": 4,
-      "value": 7241918.377772577,
+      "value": 6312021.05549264,
       "gradBlendW": 0.3
      }
     ]
@@ -28447,7 +28447,7 @@
   "sides": [
    {
     "teamId": 139,
-    "value": -149095.0024866772,
+    "value": -256486.06695806538,
     "players": [
      {
       "mlbam": 686546,
@@ -28459,9 +28459,9 @@
       "mlbam": 488984,
       "name": "Tommy Hunter",
       "kind": "mlb",
-      "warProj": 0.14,
+      "warProj": 0.1,
       "controlLeft": 1,
-      "value": -449095.0024866772
+      "value": -556486.0669580654
      }
     ]
    },
@@ -28563,15 +28563,15 @@
    },
    {
     "teamId": 133,
-    "value": 669428.6972928373,
+    "value": 237485.9576702035,
     "players": [
      {
       "mlbam": 605177,
       "name": "Andrew Chafin",
       "kind": "mlb",
-      "warProj": 0.6,
+      "warProj": 0.42,
       "controlLeft": 1,
-      "value": 669428.6972928373
+      "value": 237485.9576702035
      }
     ]
    }
@@ -28663,15 +28663,15 @@
    },
    {
     "teamId": 135,
-    "value": 13250917.372053105,
+    "value": 6197491.871509083,
     "players": [
      {
       "mlbam": 624428,
       "name": "Adam Frazier",
       "kind": "mlb",
-      "warProj": 2.44,
+      "warProj": 1.71,
       "controlLeft": 2,
-      "value": 13250917.372053105
+      "value": 6197491.871509083
      }
     ]
    }
@@ -28686,7 +28686,7 @@
   "sides": [
    {
     "teamId": 117,
-    "value": 446733.82808874757,
+    "value": 287118.30702479556,
     "players": [
      {
       "mlbam": 606160,
@@ -28700,15 +28700,15 @@
       "mlbam": 608665,
       "name": "Kendall Graveman",
       "kind": "mlb",
-      "warProj": 0.23,
+      "warProj": 0.16,
       "controlLeft": 1,
-      "value": 110856.08470592689
+      "value": -48759.43635802512
      }
     ]
    },
    {
     "teamId": 136,
-    "value": 17490630.088449363,
+    "value": 17327693.926574204,
     "players": [
      {
       "mlbam": 647351,
@@ -28723,9 +28723,9 @@
       "mlbam": 501925,
       "name": "Joe Smith",
       "kind": "mlb",
-      "warProj": 0.23,
+      "warProj": 0.16,
       "controlLeft": 1,
-      "value": -804705.5473726533
+      "value": -967641.7092478137
      }
     ]
    }
@@ -28759,15 +28759,15 @@
    },
    {
     "teamId": 113,
-    "value": -10715.622009739922,
+    "value": -410299.84845029615,
     "players": [
      {
       "mlbam": 571710,
       "name": "Mychal Givens",
       "kind": "mlb",
-      "warProj": 0.57,
+      "warProj": 0.4,
       "controlLeft": 1,
-      "value": -10715.622009739922
+      "value": -410299.84845029615
      }
     ]
    }
@@ -28828,30 +28828,30 @@
   "sides": [
    {
     "teamId": 146,
-    "value": 61495663.627247185,
+    "value": 53689678.37783897,
     "players": [
      {
       "mlbam": 666200,
       "name": "Jes\u00fas Luzardo",
       "kind": "mlb",
-      "warProj": 2.48,
+      "warProj": 1.73,
       "controlLeft": 5,
-      "value": 61495663.627247185,
+      "value": 53689678.37783897,
       "gradBlendW": 0.45
      }
     ]
    },
    {
     "teamId": 133,
-    "value": 5353298.378272764,
+    "value": 202828.6222964138,
     "players": [
      {
       "mlbam": 516782,
       "name": "Starling Marte",
       "kind": "mlb",
-      "warProj": 2.2,
+      "warProj": 1.54,
       "controlLeft": 1,
-      "value": 5353298.378272764
+      "value": 202828.6222964138
      }
     ]
    }
@@ -28910,23 +28910,23 @@
   "sides": [
    {
     "teamId": 113,
-    "value": -361008.52677437384,
+    "value": -640586.4035246704,
     "players": [
      {
       "mlbam": 458677,
       "name": "Justin Wilson",
       "kind": "mlb",
-      "warProj": 0.31,
+      "warProj": 0.21,
       "controlLeft": 1,
-      "value": -233604.2262515859
+      "value": -446974.0453326319
      },
      {
       "mlbam": 570666,
       "name": "Luis Cessa",
       "kind": "mlb",
-      "warProj": 0.1,
+      "warProj": 0.07,
       "controlLeft": 2,
-      "value": -127404.30052278793
+      "value": -193612.3581920385
      }
     ]
    }
@@ -28961,15 +28961,15 @@
    },
    {
     "teamId": 136,
-    "value": 5527344.048530601,
+    "value": 3339345.205192979,
     "players": [
      {
       "mlbam": 542881,
       "name": "Tyler Anderson",
       "kind": "mlb",
-      "warProj": 1.45,
+      "warProj": 1.01,
       "controlLeft": 2,
-      "value": 5527344.048530601
+      "value": 3339345.205192979
      }
     ]
    }
@@ -29085,15 +29085,15 @@
   "sides": [
    {
     "teamId": 119,
-    "value": -831460.6466868196,
+    "value": -2098326.800506861,
     "players": [
      {
       "mlbam": 518633,
       "name": "Danny Duffy",
       "kind": "mlb",
-      "warProj": 1.52,
+      "warProj": 1.07,
       "controlLeft": 1,
-      "value": -831460.6466868196
+      "value": -2098326.800506861
      }
     ]
    }
@@ -29268,15 +29268,15 @@
   "sides": [
    {
     "teamId": 111,
-    "value": 6788715.709336912,
+    "value": 1869266.7050928306,
     "players": [
      {
       "mlbam": 656941,
       "name": "Kyle Schwarber",
       "kind": "mlb",
-      "warProj": 2.14,
+      "warProj": 1.5,
       "controlLeft": 1,
-      "value": 6788715.709336912
+      "value": 1869266.7050928306
      }
     ]
    },
@@ -29405,15 +29405,15 @@
    },
    {
     "teamId": 143,
-    "value": 869356.0478568085,
+    "value": 464255.75523889624,
     "players": [
      {
       "mlbam": 520471,
       "name": "Freddy Galvis",
       "kind": "mlb",
-      "warProj": 0.6,
+      "warProj": 0.42,
       "controlLeft": 1,
-      "value": 869356.0478568085
+      "value": 464255.75523889624
      }
     ]
    }
@@ -29471,7 +29471,7 @@
   "sides": [
    {
     "teamId": 112,
-    "value": 96506555.24777934,
+    "value": 93911759.9835363,
     "players": [
      {
       "mlbam": 676051,
@@ -29486,9 +29486,9 @@
       "mlbam": 663611,
       "name": "Nick Madrigal",
       "kind": "mlb",
-      "warProj": 3.0,
+      "warProj": 2.7,
       "controlLeft": 6,
-      "value": 85739829.84063828,
+      "value": 83145034.57639523,
       "gradBlendW": 0.6
      }
     ]
@@ -29533,7 +29533,7 @@
    },
    {
     "teamId": 121,
-    "value": 14674525.570383335,
+    "value": 12976244.230235418,
     "players": [
      {
       "mlbam": 595879,
@@ -29547,9 +29547,9 @@
       "mlbam": 592866,
       "name": "Trevor Williams",
       "kind": "mlb",
-      "warProj": 1.1,
+      "warProj": 0.77,
       "controlLeft": 2,
-      "value": 3623846.24241568
+      "value": 1925564.9022677639
      }
     ]
    }
@@ -29572,7 +29572,7 @@
       "mlbam": 467055,
       "name": "Pablo Sandoval",
       "kind": "mlb",
-      "warProj": -0.09,
+      "warProj": -0.08,
       "controlLeft": 1,
       "value": -320652.17391304346
      }
@@ -29580,15 +29580,15 @@
    },
    {
     "teamId": 144,
-    "value": 8934881.557464367,
+    "value": 2698289.4352474865,
     "players": [
      {
       "mlbam": 592696,
       "name": "Eddie Rosario",
       "kind": "mlb",
-      "warProj": 2.76,
+      "warProj": 1.93,
       "controlLeft": 1,
-      "value": 8934881.557464367
+      "value": 2698289.4352474865
      }
     ]
    }
@@ -29603,15 +29603,15 @@
   "sides": [
    {
     "teamId": 139,
-    "value": 7703369.753410063,
+    "value": 4595922.467141739,
     "players": [
      {
       "mlbam": 656669,
       "name": "Jordan Luplow",
       "kind": "mlb",
-      "warProj": 1.31,
+      "warProj": 0.92,
       "controlLeft": 3,
-      "value": 7703369.753410063
+      "value": 4595922.467141739
      },
      {
       "mlbam": 597113,
@@ -29662,15 +29662,15 @@
    },
    {
     "teamId": 117,
-    "value": 4526221.994168321,
+    "value": 3910821.813445772,
     "players": [
      {
       "mlbam": 664208,
       "name": "Phil Maton",
       "kind": "mlb",
-      "warProj": 0.34,
+      "warProj": 0.24,
       "controlLeft": 3,
-      "value": 2047246.740066973,
+      "value": 1431846.559344424,
       "gradBlendW": 0.1
      },
      {
@@ -29881,15 +29881,15 @@
    },
    {
     "teamId": 146,
-    "value": 13822202.24195027,
+    "value": 13700263.721301436,
     "players": [
      {
       "mlbam": 656577,
       "name": "Alex Jackson",
       "kind": "mlb",
-      "warProj": 0.2,
+      "warProj": 0.18,
       "controlLeft": 5,
-      "value": 13822202.24195027,
+      "value": 13700263.721301436,
       "gradBlendW": 0.45
      }
     ]
@@ -29920,15 +29920,15 @@
    },
    {
     "teamId": 158,
-    "value": 360373.9943506508,
+    "value": 250763.9554083396,
     "players": [
      {
       "mlbam": 595928,
       "name": "John Curtiss",
       "kind": "mlb",
-      "warProj": 0.15,
+      "warProj": 0.1,
       "controlLeft": 3,
-      "value": 360373.9943506508,
+      "value": 250763.9554083396,
       "gradBlendW": 0.1
      }
     ]
@@ -30074,7 +30074,7 @@
       "mlbam": 656354,
       "name": "Austin Davis",
       "kind": "mlb",
-      "warProj": 0.06,
+      "warProj": 0.05,
       "controlLeft": 4,
       "value": 0.0
      }
@@ -30186,15 +30186,15 @@
   "sides": [
    {
     "teamId": 135,
-    "value": 1345257.9401482285,
+    "value": 845484.905929847,
     "players": [
      {
       "mlbam": 545350,
       "name": "Jake Marisnick",
       "kind": "mlb",
-      "warProj": 0.74,
+      "warProj": 0.52,
       "controlLeft": 1,
-      "value": 1345257.9401482285
+      "value": 845484.905929847
      }
     ]
    },
@@ -30222,15 +30222,15 @@
   "sides": [
    {
     "teamId": 120,
-    "value": 8692683.82646699,
+    "value": 7796011.906814035,
     "players": [
      {
       "mlbam": 657041,
       "name": "Lane Thomas",
       "kind": "mlb",
-      "warProj": 0.34,
+      "warProj": 0.24,
       "controlLeft": 5,
-      "value": 8692683.82646699,
+      "value": 7796011.906814035,
       "gradBlendW": 0.45
      }
     ]
@@ -30405,15 +30405,15 @@
    },
    {
     "teamId": 135,
-    "value": -1365470.0348477361,
+    "value": -1533002.9374368936,
     "players": [
      {
       "mlbam": 543339,
       "name": "Daniel Hudson",
       "kind": "mlb",
-      "warProj": 0.25,
+      "warProj": 0.17,
       "controlLeft": 1,
-      "value": -1365470.0348477361
+      "value": -1533002.9374368936
      }
     ]
    }
@@ -30465,7 +30465,7 @@
    },
    {
     "teamId": 119,
-    "value": 22470540.48940082,
+    "value": 17033905.369346783,
     "players": [
      {
       "mlbam": 453286,
@@ -30479,9 +30479,9 @@
       "mlbam": 607208,
       "name": "Trea Turner",
       "kind": "mlb",
-      "warProj": 4.35,
+      "warProj": 3.04,
       "controlLeft": 1,
-      "value": 13953638.805977222
+      "value": 8517003.685923183
      }
     ]
    }
@@ -30841,15 +30841,15 @@
    },
    {
     "teamId": 158,
-    "value": 6221762.775105819,
+    "value": 4142506.6698468006,
     "players": [
      {
       "mlbam": 670712,
       "name": "Mike Brosseau",
       "kind": "mlb",
-      "warProj": 0.72,
+      "warProj": 0.5,
       "controlLeft": 5,
-      "value": 6221762.775105819
+      "value": 4142506.6698468006
      }
     ]
    }
@@ -31084,7 +31084,7 @@
       "mlbam": 623912,
       "name": "Harold Ram\u00edrez",
       "kind": "mlb",
-      "warProj": 0.13,
+      "warProj": 0.09,
       "controlLeft": 5,
       "value": 3265023.000603233,
       "gradBlendW": 0.45
@@ -31130,7 +31130,7 @@
   "sides": [
    {
     "teamId": 140,
-    "value": 14015895.92983267,
+    "value": 13270174.209044902,
     "players": [
      {
       "mlbam": 676646,
@@ -31145,9 +31145,9 @@
       "mlbam": 641856,
       "name": "Billy McKinney",
       "kind": "mlb",
-      "warProj": 0.34,
+      "warProj": 0.24,
       "controlLeft": 4,
-      "value": 6829782.314827672,
+      "value": 6084060.594039903,
       "gradBlendW": 0.3
      }
     ]
@@ -31227,15 +31227,15 @@
    },
    {
     "teamId": 109,
-    "value": 5379646.473838859,
+    "value": 3256364.3412712803,
     "players": [
      {
       "mlbam": 656669,
       "name": "Jordan Luplow",
       "kind": "mlb",
-      "warProj": 1.31,
+      "warProj": 0.92,
       "controlLeft": 3,
-      "value": 5379646.473838859
+      "value": 3256364.3412712803
      }
     ]
    }
@@ -31250,15 +31250,15 @@
   "sides": [
    {
     "teamId": 136,
-    "value": 3842548.684827448,
+    "value": 2689784.079379212,
     "players": [
      {
       "mlbam": 624428,
       "name": "Adam Frazier",
       "kind": "mlb",
-      "warProj": 2.44,
+      "warProj": 1.71,
       "controlLeft": 2,
-      "value": 3842548.684827448
+      "value": 2689784.079379212
      }
     ]
    },
@@ -31499,15 +31499,15 @@
    },
    {
     "teamId": 140,
-    "value": 27771036.17106898,
+    "value": 11715059.191851059,
     "players": [
      {
       "mlbam": 641598,
       "name": "Mitch Garver",
       "kind": "mlb",
-      "warProj": 2.13,
+      "warProj": 1.49,
       "controlLeft": 2,
-      "value": 27771036.17106898
+      "value": 11715059.191851059
      }
     ]
    }
@@ -31567,7 +31567,7 @@
   "sides": [
    {
     "teamId": 142,
-    "value": 10046404.468333744,
+    "value": 6123347.303667102,
     "players": [
      {
       "mlbam": 677868,
@@ -31580,9 +31580,9 @@
       "mlbam": 543243,
       "name": "Sonny Gray",
       "kind": "mlb",
-      "warProj": 2.23,
+      "warProj": 1.56,
       "controlLeft": 1,
-      "value": 7234006.119243454
+      "value": 3310948.9545768127
      }
     ]
    },
@@ -31632,23 +31632,23 @@
   "sides": [
    {
     "teamId": 142,
-    "value": 9534406.954447431,
+    "value": 735455.2044987287,
     "players": [
      {
       "mlbam": 570482,
       "name": "Gio Urshela",
       "kind": "mlb",
-      "warProj": 1.74,
+      "warProj": 1.22,
       "controlLeft": 1,
-      "value": 8224071.582330281
+      "value": 3791850.1076311953
      },
      {
       "mlbam": 596142,
       "name": "Gary S\u00e1nchez",
       "kind": "mlb",
-      "warProj": 1.21,
+      "warProj": 0.85,
       "controlLeft": 1,
-      "value": 1310335.3721171506
+      "value": -3056394.9031324666
      }
     ]
    },
@@ -31719,7 +31719,7 @@
    },
    {
     "teamId": 113,
-    "value": 37739541.927057974,
+    "value": 35601504.37566016,
     "players": [
      {
       "mlbam": 682227,
@@ -31732,18 +31732,18 @@
       "mlbam": 643290,
       "name": "Justin Dunn",
       "kind": "mlb",
-      "warProj": 0.21,
+      "warProj": 0.14,
       "controlLeft": 4,
-      "value": 1545228.8929521376,
+      "value": 917553.6483515834,
       "gradBlendW": 0.3
      },
      {
       "mlbam": 641584,
       "name": "Jake Fraley",
       "kind": "mlb",
-      "warProj": 0.55,
+      "warProj": 0.39,
       "controlLeft": 4,
-      "value": 8020800.625802569,
+      "value": 6510438.319005309,
       "gradBlendW": 0.3
      }
     ]
@@ -31759,7 +31759,7 @@
   "sides": [
    {
     "teamId": 133,
-    "value": 100079439.04770628,
+    "value": 97554088.80805984,
     "players": [
      {
       "mlbam": 683155,
@@ -31779,9 +31779,9 @@
       "mlbam": 665506,
       "name": "Cristian Pache",
       "kind": "mlb",
-      "warProj": 0.92,
+      "warProj": 0.65,
       "controlLeft": 5,
-      "value": 35614532.68452325,
+      "value": 33089182.444876812,
       "gradBlendW": 0.45
      },
      {
@@ -31822,15 +31822,15 @@
   "sides": [
    {
     "teamId": 118,
-    "value": 227035.0126054361,
+    "value": -448575.4911761948,
     "players": [
      {
       "mlbam": 607237,
       "name": "Amir Garrett",
       "kind": "mlb",
-      "warProj": 0.27,
+      "warProj": 0.19,
       "controlLeft": 2,
-      "value": 227035.0126054361
+      "value": -448575.4911761948
      }
     ]
    },
@@ -31997,15 +31997,15 @@
   "sides": [
    {
     "teamId": 115,
-    "value": 2381213.9028924014,
+    "value": 1372699.7793144435,
     "players": [
      {
       "mlbam": 545341,
       "name": "Randal Grichuk",
       "kind": "mlb",
-      "warProj": 1.12,
+      "warProj": 0.78,
       "controlLeft": 1,
-      "value": 2381213.9028924014
+      "value": 1372699.7793144435
      }
     ]
    },
@@ -32056,15 +32056,15 @@
    },
    {
     "teamId": 139,
-    "value": 4429756.972300983,
+    "value": 2559635.6177738225,
     "players": [
      {
       "mlbam": 623912,
       "name": "Harold Ram\u00edrez",
       "kind": "mlb",
-      "warProj": 0.4,
+      "warProj": 0.28,
       "controlLeft": 4,
-      "value": 4429756.972300983
+      "value": 2559635.6177738225
      }
     ]
    }
@@ -32147,7 +32147,7 @@
       "mlbam": 663897,
       "name": "Luke Williams",
       "kind": "mlb",
-      "warProj": 0.06,
+      "warProj": 0.04,
       "controlLeft": 6,
       "value": 0.0
      }
@@ -32164,15 +32164,15 @@
   "sides": [
    {
     "teamId": 135,
-    "value": 7110730.900042823,
+    "value": 5759102.62075297,
     "players": [
      {
       "mlbam": 607461,
       "name": "Matt Beaty",
       "kind": "mlb",
-      "warProj": 0.45,
+      "warProj": 0.32,
       "controlLeft": 4,
-      "value": 7110730.900042823,
+      "value": 5759102.62075297,
       "gradBlendW": 0.3
      }
     ]
@@ -32389,15 +32389,15 @@
    },
    {
     "teamId": 147,
-    "value": 7739397.805684877,
+    "value": 5774070.359011921,
     "players": [
      {
       "mlbam": 624431,
       "name": "Jose Trevino",
       "kind": "mlb",
-      "warProj": 0.92,
+      "warProj": 0.64,
       "controlLeft": 3,
-      "value": 7739397.805684877,
+      "value": 5774070.359011921,
       "gradBlendW": 0.1
      }
     ]
@@ -32629,15 +32629,15 @@
    },
    {
     "teamId": 139,
-    "value": 21892691.101479627,
+    "value": 16609045.96018803,
     "players": [
      {
       "mlbam": 670623,
       "name": "Isaac Paredes",
       "kind": "mlb",
-      "warProj": 1.37,
+      "warProj": 0.96,
       "controlLeft": 5,
-      "value": 21892691.101479627,
+      "value": 16609045.96018803,
       "gradBlendW": 0.45
      }
     ]
@@ -32773,7 +32773,7 @@
       "mlbam": 656577,
       "name": "Alex Jackson",
       "kind": "mlb",
-      "warProj": 0.11,
+      "warProj": 0.1,
       "controlLeft": 4,
       "value": 8989948.181744056,
       "gradBlendW": 0.3
@@ -33101,7 +33101,7 @@
       "mlbam": 656413,
       "name": "Stuart Fairchild",
       "kind": "mlb",
-      "warProj": -0.08,
+      "warProj": -0.05,
       "controlLeft": 6,
       "value": 6346859.397570213,
       "gradBlendW": 0.6
@@ -33371,7 +33371,7 @@
       "mlbam": 656413,
       "name": "Stuart Fairchild",
       "kind": "mlb",
-      "warProj": -0.08,
+      "warProj": -0.05,
       "controlLeft": 6,
       "value": 6346859.397570213,
       "gradBlendW": 0.6
@@ -33573,15 +33573,15 @@
   "sides": [
    {
     "teamId": 134,
-    "value": 8613255.629582088,
+    "value": 6859667.649003055,
     "players": [
      {
       "mlbam": 644374,
       "name": "Yu Chang",
       "kind": "mlb",
-      "warProj": 0.8,
+      "warProj": 0.56,
       "controlLeft": 4,
-      "value": 8613255.629582088,
+      "value": 6859667.649003055,
       "gradBlendW": 0.3
      }
     ]
@@ -33694,7 +33694,7 @@
       "mlbam": 656061,
       "name": "Albert Abreu",
       "kind": "mlb",
-      "warProj": -0.04,
+      "warProj": -0.03,
       "controlLeft": 5,
       "value": 962068.9692161889,
       "gradBlendW": 0.45
@@ -33857,7 +33857,7 @@
       "mlbam": 642851,
       "name": "Austin Wynns",
       "kind": "mlb",
-      "warProj": 0.06,
+      "warProj": 0.04,
       "controlLeft": 3,
       "value": 0.0
      }
@@ -33945,7 +33945,7 @@
       "mlbam": 572204,
       "name": "Trayce Thompson",
       "kind": "mlb",
-      "warProj": 0.03,
+      "warProj": 0.02,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -34721,15 +34721,15 @@
   "sides": [
    {
     "teamId": 147,
-    "value": 2406073.5837052567,
+    "value": 825012.3781588965,
     "players": [
      {
       "mlbam": 643217,
       "name": "Andrew Benintendi",
       "kind": "mlb",
-      "warProj": 1.84,
+      "warProj": 1.29,
       "controlLeft": 1,
-      "value": 2406073.5837052567
+      "value": 825012.3781588965
      }
     ]
    },
@@ -34770,7 +34770,7 @@
   "sides": [
    {
     "teamId": 121,
-    "value": 419213.9260617076,
+    "value": -106862.75175680475,
     "players": [
      {
       "mlbam": 670426,
@@ -34784,9 +34784,9 @@
       "mlbam": 571980,
       "name": "Tyler Naquin",
       "kind": "mlb",
-      "warProj": 0.76,
+      "warProj": 0.53,
       "controlLeft": 1,
-      "value": 419213.9260617076
+      "value": -106862.75175680475
      }
     ]
    },
@@ -34856,29 +34856,29 @@
   "sides": [
    {
     "teamId": 119,
-    "value": -456241.0985023508,
+    "value": -559857.8993864282,
     "players": [
      {
       "mlbam": 455119,
       "name": "Chris Martin",
       "kind": "mlb",
-      "warProj": 0.15,
+      "warProj": 0.11,
       "controlLeft": 1,
-      "value": -456241.0985023508
+      "value": -559857.8993864282
      }
     ]
    },
    {
     "teamId": 112,
-    "value": 14129487.477285681,
+    "value": 13819814.425009824,
     "players": [
      {
       "mlbam": 656716,
       "name": "Zach McKinstry",
       "kind": "mlb",
-      "warProj": 0.2,
+      "warProj": 0.14,
       "controlLeft": 5,
-      "value": 14129487.477285681,
+      "value": 13819814.425009824,
       "gradBlendW": 0.45
      }
     ]
@@ -34928,15 +34928,15 @@
    },
    {
     "teamId": 136,
-    "value": 17917084.137079272,
+    "value": 10038027.31503985,
     "players": [
      {
       "mlbam": 622491,
       "name": "Luis Castillo",
       "kind": "mlb",
-      "warProj": 3.08,
+      "warProj": 2.16,
       "controlLeft": 2,
-      "value": 17917084.137079272
+      "value": 10038027.31503985
      }
     ]
    }
@@ -34951,15 +34951,15 @@
   "sides": [
    {
     "teamId": 143,
-    "value": 5334805.845990134,
+    "value": 4105832.4261789536,
     "players": [
      {
       "mlbam": 624641,
       "name": "Edmundo Sosa",
       "kind": "mlb",
-      "warProj": 0.91,
+      "warProj": 0.64,
       "controlLeft": 3,
-      "value": 5334805.845990134,
+      "value": 4105832.4261789536,
       "gradBlendW": 0.1
      }
     ]
@@ -34972,7 +34972,7 @@
       "mlbam": 668941,
       "name": "JoJo Romero",
       "kind": "mlb",
-      "warProj": -0.01,
+      "warProj": -0.0,
       "controlLeft": 5,
       "value": 5086820.585533712,
       "gradBlendW": 0.45
@@ -35027,30 +35027,30 @@
   "sides": [
    {
     "teamId": 109,
-    "value": 7146981.093499515,
+    "value": 7127261.011893732,
     "players": [
      {
       "mlbam": 656896,
       "name": "Emmanuel Rivera",
       "kind": "mlb",
-      "warProj": 0.13,
+      "warProj": 0.09,
       "controlLeft": 6,
-      "value": 7146981.093499515,
+      "value": 7127261.011893732,
       "gradBlendW": 0.6
      }
     ]
    },
    {
     "teamId": 118,
-    "value": 626569.5433057104,
+    "value": 171411.1803139973,
     "players": [
      {
       "mlbam": 596133,
       "name": "Luke Weaver",
       "kind": "mlb",
-      "warProj": 0.7,
+      "warProj": 0.49,
       "controlLeft": 1,
-      "value": 626569.5433057104
+      "value": 171411.1803139973
      }
     ]
    }
@@ -35284,7 +35284,7 @@
       "mlbam": 664076,
       "name": "Garrett Cleavinger",
       "kind": "mlb",
-      "warProj": 0.03,
+      "warProj": 0.02,
       "controlLeft": 5,
       "value": 0.0
      }
@@ -35327,7 +35327,7 @@
    },
    {
     "teamId": 158,
-    "value": 9091931.746339027,
+    "value": 8272378.876194186,
     "players": [
      {
       "mlbam": 573124,
@@ -35357,9 +35357,9 @@
       "mlbam": 659275,
       "name": "Dinelson Lamet",
       "kind": "mlb",
-      "warProj": 0.79,
+      "warProj": 0.55,
       "controlLeft": 2,
-      "value": 1252630.9439610676
+      "value": 433078.07381622575
      }
     ]
    }
@@ -35411,13 +35411,13 @@
    },
    {
     "teamId": 147,
-    "value": 9665899.174886009,
+    "value": 6020327.791985422,
     "players": [
      {
       "mlbam": 642152,
       "name": "Lou Trivino III",
       "kind": "mlb",
-      "warProj": -0.03,
+      "warProj": -0.02,
       "controlLeft": 3,
       "value": -929347.8260869565
      },
@@ -35425,9 +35425,9 @@
       "mlbam": 593423,
       "name": "Frankie Montas",
       "kind": "mlb",
-      "warProj": 3.02,
+      "warProj": 2.11,
       "controlLeft": 1,
-      "value": 10595247.000972966
+      "value": 6949675.618072379
      }
     ]
    }
@@ -35448,7 +35448,7 @@
       "mlbam": 670912,
       "name": "Johan Oviedo",
       "kind": "mlb",
-      "warProj": 0.09,
+      "warProj": 0.07,
       "controlLeft": 5,
       "value": 4128821.435023208,
       "gradBlendW": 0.45
@@ -35578,15 +35578,15 @@
    },
    {
     "teamId": 144,
-    "value": -40921.70219969987,
+    "value": -168047.36545283342,
     "players": [
      {
       "mlbam": 501303,
       "name": "Ehire Adrianza",
       "kind": "mlb",
-      "warProj": 0.2,
+      "warProj": 0.14,
       "controlLeft": 1,
-      "value": -40921.70219969987
+      "value": -168047.36545283342
      }
     ]
    }
@@ -35615,15 +35615,15 @@
    },
    {
     "teamId": 144,
-    "value": -852050.5490785014,
+    "value": -1326870.1669636464,
     "players": [
      {
       "mlbam": 543606,
       "name": "Jake Odorizzi",
       "kind": "mlb",
-      "warProj": 0.74,
+      "warProj": 0.52,
       "controlLeft": 1,
-      "value": -852050.5490785014
+      "value": -1326870.1669636464
      }
     ]
    }
@@ -35751,7 +35751,7 @@
       "mlbam": 571710,
       "name": "Mychal Givens",
       "kind": "mlb",
-      "warProj": -0.01,
+      "warProj": -0.0,
       "controlLeft": 1,
       "value": -1065217.391304348
      }
@@ -35781,15 +35781,15 @@
    },
    {
     "teamId": 135,
-    "value": 116912.37856382134,
+    "value": 17925.621516414038,
     "players": [
      {
       "mlbam": 592273,
       "name": "Brandon Drury",
       "kind": "mlb",
-      "warProj": 0.15,
+      "warProj": 0.11,
       "controlLeft": 1,
-      "value": 116912.37856382134
+      "value": 17925.621516414038
      }
     ]
    }
@@ -35861,7 +35861,7 @@
       "mlbam": 641656,
       "name": "Ian Hamilton",
       "kind": "mlb",
-      "warProj": 0.05,
+      "warProj": 0.04,
       "controlLeft": 3,
       "value": 284607.3325799205,
       "gradBlendW": 0.1
@@ -35893,15 +35893,15 @@
   "sides": [
    {
     "teamId": 144,
-    "value": 2665993.3974634,
+    "value": 1409673.6390939446,
     "players": [
      {
       "mlbam": 543257,
       "name": "Robbie Grossman",
       "kind": "mlb",
-      "warProj": 1.62,
+      "warProj": 1.13,
       "controlLeft": 1,
-      "value": 2665993.3974634
+      "value": 1409673.6390939446
      }
     ]
    },
@@ -35928,15 +35928,15 @@
   "sides": [
    {
     "teamId": 142,
-    "value": -148204.08576789426,
+    "value": -555699.3817766565,
     "players": [
      {
       "mlbam": 605242,
       "name": "Michael Fulmer",
       "kind": "mlb",
-      "warProj": 0.64,
+      "warProj": 0.45,
       "controlLeft": 1,
-      "value": -148204.08576789426
+      "value": -555699.3817766565
      }
     ]
    },
@@ -36046,7 +36046,7 @@
   "sides": [
    {
     "teamId": 108,
-    "value": 8767693.588348262,
+    "value": 8752410.348368403,
     "players": [
      {
       "mlbam": 689909,
@@ -36059,24 +36059,24 @@
       "mlbam": 666160,
       "name": "Mickey Moniak",
       "kind": "mlb",
-      "warProj": 0.12,
+      "warProj": 0.09,
       "controlLeft": 5,
-      "value": 5035077.291387968,
+      "value": 5019794.051408109,
       "gradBlendW": 0.45
      }
     ]
    },
    {
     "teamId": 143,
-    "value": 2800213.9081108617,
+    "value": 1881062.0825171666,
     "players": [
      {
       "mlbam": 592789,
       "name": "Noah Syndergaard",
       "kind": "mlb",
-      "warProj": 2.32,
+      "warProj": 2.09,
       "controlLeft": 1,
-      "value": 2800213.9081108617
+      "value": 1881062.0825171666
      }
     ]
    }
@@ -36262,15 +36262,15 @@
    },
    {
     "teamId": 147,
-    "value": 16624665.53955346,
+    "value": 9494980.25891732,
     "players": [
      {
       "mlbam": 664056,
       "name": "Harrison Bader",
       "kind": "mlb",
-      "warProj": 2.86,
+      "warProj": 2.0,
       "controlLeft": 2,
-      "value": 16624665.53955346
+      "value": 9494980.25891732
      }
     ]
    }
@@ -36374,15 +36374,15 @@
   "sides": [
    {
     "teamId": 135,
-    "value": 1368665.2018160461,
+    "value": 877261.2934451452,
     "players": [
      {
       "mlbam": 595956,
       "name": "Cam Gallagher",
       "kind": "mlb",
-      "warProj": 0.48,
+      "warProj": 0.33,
       "controlLeft": 2,
-      "value": 1368665.2018160461
+      "value": 877261.2934451452
      }
     ]
    },
@@ -36432,7 +36432,7 @@
       "mlbam": 663378,
       "name": "Thomas Szapucki",
       "kind": "mlb",
-      "warProj": -0.03,
+      "warProj": -0.02,
       "controlLeft": 6,
       "value": 3969981.5550109353,
       "gradBlendW": 0.6
@@ -36471,23 +36471,23 @@
   "sides": [
    {
     "teamId": 136,
-    "value": 1614764.913359309,
+    "value": 1087857.0030715102,
     "players": [
      {
       "mlbam": 571510,
       "name": "Matthew Boyd",
       "kind": "mlb",
-      "warProj": 1.51,
+      "warProj": 1.36,
       "controlLeft": 1,
-      "value": 974564.3403391024
+      "value": 877107.9063051919
      },
      {
       "mlbam": 592200,
       "name": "Curt Casali",
       "kind": "mlb",
-      "warProj": 0.67,
+      "warProj": 0.47,
       "controlLeft": 1,
-      "value": 640200.5730202065
+      "value": 210749.09676631834
      }
     ]
    },
@@ -36533,15 +36533,15 @@
    },
    {
     "teamId": 158,
-    "value": 88276.12880223784,
+    "value": 9781.856298439823,
     "players": [
      {
       "mlbam": 572096,
       "name": "Trevor Rosenthal",
       "kind": "mlb",
-      "warProj": 0.17,
+      "warProj": 0.12,
       "controlLeft": 1,
-      "value": 88276.12880223784
+      "value": 9781.856298439823
      }
     ]
    }
@@ -36745,7 +36745,7 @@
       "mlbam": 647315,
       "name": "Zach Pop",
       "kind": "mlb",
-      "warProj": 0.03,
+      "warProj": 0.02,
       "controlLeft": 6,
       "value": 3699176.1487875283,
       "gradBlendW": 0.6
@@ -36786,15 +36786,15 @@
    },
    {
     "teamId": 120,
-    "value": 158665429.93901417,
+    "value": 157633370.15228415,
     "players": [
      {
       "mlbam": 682928,
       "name": "CJ Abrams",
       "kind": "mlb",
-      "warProj": 0.77,
+      "warProj": 0.69,
       "controlLeft": 7,
-      "value": 51319803.28080861,
+      "value": 50806525.339738704,
       "gradBlendW": 0.6
      },
      {
@@ -36815,9 +36815,9 @@
       "mlbam": 669022,
       "name": "MacKenzie Gore",
       "kind": "mlb",
-      "warProj": 0.29,
+      "warProj": 0.2,
       "controlLeft": 7,
-      "value": 33316876.22864339,
+      "value": 32798094.382983282,
       "gradBlendW": 0.6
      },
      {
@@ -37198,7 +37198,7 @@
       "mlbam": 543606,
       "name": "Jake Odorizzi",
       "kind": "mlb",
-      "warProj": 0.74,
+      "warProj": 0.52,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -37288,15 +37288,15 @@
   "sides": [
    {
     "teamId": 113,
-    "value": 24018121.61841187,
+    "value": 23639805.33455705,
     "players": [
      {
       "mlbam": 669256,
       "name": "Nick Solak",
       "kind": "mlb",
-      "warProj": 0.9,
+      "warProj": 0.81,
       "controlLeft": 4,
-      "value": 24018121.61841187,
+      "value": 23639805.33455705,
       "gradBlendW": 0.3
      }
     ]
@@ -37391,7 +37391,7 @@
       "mlbam": 667727,
       "name": "Steele Walker",
       "kind": "mlb",
-      "warProj": -0.06,
+      "warProj": -0.04,
       "controlLeft": 7,
       "value": 16552151.633667134,
       "gradBlendW": 0.6
@@ -37561,7 +37561,7 @@
       "mlbam": 606192,
       "name": "Teoscar Hern\u00e1ndez",
       "kind": "mlb",
-      "warProj": 1.92,
+      "warProj": 1.34,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -37569,7 +37569,7 @@
    },
    {
     "teamId": 141,
-    "value": 8699486.245760659,
+    "value": 8104417.813962752,
     "players": [
      {
       "mlbam": 671936,
@@ -37582,9 +37582,9 @@
       "mlbam": 657024,
       "name": "Erik Swanson",
       "kind": "mlb",
-      "warProj": 0.26,
+      "warProj": 0.18,
       "controlLeft": 4,
-      "value": 4974075.821499476,
+      "value": 4379007.389701569,
       "gradBlendW": 0.3
      }
     ]
@@ -37600,15 +37600,15 @@
   "sides": [
    {
     "teamId": 109,
-    "value": 11592972.995627811,
+    "value": 10412922.400951099,
     "players": [
      {
       "mlbam": 641786,
       "name": "Kyle Lewis",
       "kind": "mlb",
-      "warProj": 0.94,
+      "warProj": 0.66,
       "controlLeft": 4,
-      "value": 11592972.995627811,
+      "value": 10412922.400951099,
       "gradBlendW": 0.3
      }
     ]
@@ -37739,7 +37739,7 @@
       "mlbam": 570482,
       "name": "Gio Urshela",
       "kind": "mlb",
-      "warProj": 1.74,
+      "warProj": 1.22,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -37948,7 +37948,7 @@
    },
    {
     "teamId": 158,
-    "value": 20672654.021847155,
+    "value": 19598833.618765112,
     "players": [
      {
       "mlbam": 608385,
@@ -37962,9 +37962,9 @@
       "mlbam": 647351,
       "name": "Abraham Toro",
       "kind": "mlb",
-      "warProj": 0.85,
+      "warProj": 0.6,
       "controlLeft": 4,
-      "value": 14246955.072104504,
+      "value": 13173134.66902246,
       "gradBlendW": 0.3
      }
     ]
@@ -38087,7 +38087,7 @@
       "mlbam": 548384,
       "name": "Brooks Raley",
       "kind": "mlb",
-      "warProj": 0.32,
+      "warProj": 0.23,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -39094,15 +39094,15 @@
    },
    {
     "teamId": 119,
-    "value": 22238559.290863317,
+    "value": 7873609.829279749,
     "players": [
      {
       "mlbam": 500743,
       "name": "Miguel Rojas",
       "kind": "mlb",
-      "warProj": 2.04,
+      "warProj": 1.43,
       "controlLeft": 1,
-      "value": 22238559.290863317
+      "value": 7873609.829279749
      }
     ]
    }
@@ -39140,15 +39140,15 @@
   "sides": [
    {
     "teamId": 115,
-    "value": 4593042.874089946,
+    "value": 3918209.909788757,
     "players": [
      {
       "mlbam": 657756,
       "name": "Connor Seabold",
       "kind": "mlb",
-      "warProj": 0.24,
+      "warProj": 0.17,
       "controlLeft": 5,
-      "value": 4593042.874089946,
+      "value": 3918209.909788757,
       "gradBlendW": 0.45
      }
     ]
@@ -39344,15 +39344,15 @@
   "sides": [
    {
     "teamId": 111,
-    "value": -2050147.5003152743,
+    "value": -2485103.250220692,
     "players": [
      {
       "mlbam": 542947,
       "name": "Richard Bleier",
       "kind": "mlb",
-      "warProj": 0.21,
+      "warProj": 0.14,
       "controlLeft": 1,
-      "value": -2050147.5003152743
+      "value": -2485103.250220692
      }
     ]
    },
@@ -39697,15 +39697,15 @@
    },
    {
     "teamId": 116,
-    "value": 14470253.394352637,
+    "value": 12730453.51267495,
     "players": [
      {
       "mlbam": 656716,
       "name": "Zach McKinstry",
       "kind": "mlb",
-      "warProj": 0.64,
+      "warProj": 0.45,
       "controlLeft": 4,
-      "value": 14470253.394352637,
+      "value": 12730453.51267495,
       "gradBlendW": 0.3
      }
     ]
@@ -39827,15 +39827,15 @@
    },
    {
     "teamId": 143,
-    "value": 18860153.713573676,
+    "value": 18670373.47356072,
     "players": [
      {
       "mlbam": 665506,
       "name": "Cristian Pache",
       "kind": "mlb",
-      "warProj": 0.14,
+      "warProj": 0.1,
       "controlLeft": 4,
-      "value": 18860153.713573676,
+      "value": 18670373.47356072,
       "gradBlendW": 0.3
      }
     ]
@@ -40042,15 +40042,15 @@
   "sides": [
    {
     "teamId": 109,
-    "value": -554054.1557892367,
+    "value": -645731.9307915961,
     "players": [
      {
       "mlbam": 614179,
       "name": "Jos\u00e9 Ruiz",
       "kind": "mlb",
-      "warProj": 0.05,
+      "warProj": 0.03,
       "controlLeft": 1,
-      "value": -554054.1557892367
+      "value": -645731.9307915961
      }
     ]
    }
@@ -40364,15 +40364,15 @@
   "sides": [
    {
     "teamId": 110,
-    "value": 1433938.8294598216,
+    "value": 716148.484969701,
     "players": [
      {
       "mlbam": 620443,
       "name": "Luis Torrens",
       "kind": "mlb",
-      "warProj": 0.43,
+      "warProj": 0.3,
       "controlLeft": 1,
-      "value": 1433938.8294598216
+      "value": 716148.484969701
      }
     ]
    }
@@ -40657,15 +40657,15 @@
   "sides": [
    {
     "teamId": 146,
-    "value": 517948.17412991787,
+    "value": 57749.29966424729,
     "players": [
      {
       "mlbam": 641505,
       "name": "Jonathan Davis",
       "kind": "mlb",
-      "warProj": 0.18,
+      "warProj": 0.12,
       "controlLeft": 2,
-      "value": 517948.17412991787
+      "value": 57749.29966424729
      }
     ]
    },
@@ -40930,7 +40930,7 @@
       "mlbam": 621294,
       "name": "Ben Heller",
       "kind": "mlb",
-      "warProj": -0.1,
+      "warProj": -0.09,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -41097,7 +41097,7 @@
       "mlbam": 605441,
       "name": "Yacksel R\u00edos",
       "kind": "mlb",
-      "warProj": -0.09,
+      "warProj": -0.06,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -41148,7 +41148,7 @@
       "mlbam": 605463,
       "name": "Tayler Scott",
       "kind": "mlb",
-      "warProj": 0.02,
+      "warProj": 0.01,
       "controlLeft": 3,
       "value": 0.0
      }
@@ -41701,15 +41701,15 @@
   "sides": [
    {
     "teamId": 146,
-    "value": 67739.02383748147,
+    "value": -28756.596357241273,
     "players": [
      {
       "mlbam": 620454,
       "name": "Jos\u00e9 Castillo",
       "kind": "mlb",
-      "warProj": 0.13,
+      "warProj": 0.09,
       "controlLeft": 2,
-      "value": 67739.02383748147
+      "value": -28756.596357241273
      }
     ]
    }
@@ -41835,15 +41835,15 @@
    },
    {
     "teamId": 114,
-    "value": -195423.16136039523,
+    "value": -620989.540876529,
     "players": [
      {
       "mlbam": 592789,
       "name": "Noah Syndergaard",
       "kind": "mlb",
-      "warProj": 1.46,
+      "warProj": 1.32,
       "controlLeft": 1,
-      "value": -195423.16136039523
+      "value": -620989.540876529
      }
     ]
    }
@@ -42021,15 +42021,15 @@
    },
    {
     "teamId": 117,
-    "value": -1912784.961436041,
+    "value": -2134601.646918272,
     "players": [
      {
       "mlbam": 608665,
       "name": "Kendall Graveman",
       "kind": "mlb",
-      "warProj": 0.32,
+      "warProj": 0.22,
       "controlLeft": 1,
-      "value": -1912784.961436041
+      "value": -2134601.646918272
      }
     ]
    }
@@ -42044,7 +42044,7 @@
   "sides": [
    {
     "teamId": 119,
-    "value": 2996033.5638014805,
+    "value": -2916901.422886881,
     "players": [
      {
       "mlbam": 523260,
@@ -42058,23 +42058,23 @@
       "mlbam": 458681,
       "name": "Lance Lynn",
       "kind": "mlb",
-      "warProj": 2.53,
+      "warProj": 1.77,
       "controlLeft": 1,
-      "value": 4770132.198703794
+      "value": -1142802.787984568
      }
     ]
    },
    {
     "teamId": 145,
-    "value": 21530901.838421106,
+    "value": 20025374.748459823,
     "players": [
      {
       "mlbam": 572204,
       "name": "Trayce Thompson",
       "kind": "mlb",
-      "warProj": 1.26,
+      "warProj": 0.88,
       "controlLeft": 1,
-      "value": 3074010.218447226
+      "value": 1568483.1284859458
      },
      {
       "mlbam": 680897,
@@ -42597,7 +42597,7 @@
   "sides": [
    {
     "teamId": 137,
-    "value": 2611629.0536715863,
+    "value": 2170324.597905036,
     "players": [
      {
       "mlbam": 664029,
@@ -42611,9 +42611,9 @@
       "mlbam": 572041,
       "name": "AJ Pollock",
       "kind": "mlb",
-      "warProj": 0.67,
+      "warProj": 0.47,
       "controlLeft": 1,
-      "value": -735506.8865752678
+      "value": -1176811.342341818
      }
     ]
    }
@@ -42703,15 +42703,15 @@
    },
    {
     "teamId": 112,
-    "value": 3673760.6128777396,
+    "value": 2098806.3420578954,
     "players": [
      {
       "mlbam": 600869,
       "name": "Jeimer Candelario",
       "kind": "mlb",
-      "warProj": 1.96,
+      "warProj": 1.37,
       "controlLeft": 1,
-      "value": 3673760.6128777396
+      "value": 2098806.3420578954
      }
     ]
    }
@@ -42726,15 +42726,15 @@
   "sides": [
    {
     "teamId": 158,
-    "value": -911986.550637574,
+    "value": -1149531.889794128,
     "players": [
      {
       "mlbam": 605177,
       "name": "Andrew Chafin",
       "kind": "mlb",
-      "warProj": 0.37,
+      "warProj": 0.26,
       "controlLeft": 1,
-      "value": -911986.550637574
+      "value": -1149531.889794128
      }
     ]
    },
@@ -43033,15 +43033,15 @@
   "sides": [
    {
     "teamId": 119,
-    "value": 1456230.2282974087,
+    "value": 1217672.4228589719,
     "players": [
      {
       "mlbam": 642232,
       "name": "Ryan Yarbrough",
       "kind": "mlb",
-      "warProj": 0.69,
+      "warProj": 0.62,
       "controlLeft": 2,
-      "value": 1456230.2282974087
+      "value": 1217672.4228589719
      }
     ]
    },
@@ -43402,7 +43402,7 @@
       "mlbam": 608678,
       "name": "Dominic Leone",
       "kind": "mlb",
-      "warProj": 0.04,
+      "warProj": 0.02,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -43462,15 +43462,15 @@
   "sides": [
    {
     "teamId": 134,
-    "value": 11041157.712609116,
+    "value": 8660264.10522741,
     "players": [
      {
       "mlbam": 663559,
       "name": "Bailey Falter",
       "kind": "mlb",
-      "warProj": 1.12,
+      "warProj": 0.79,
       "controlLeft": 5,
-      "value": 11041157.712609116,
+      "value": 8660264.10522741,
       "gradBlendW": 0.45
      }
     ]
@@ -43684,7 +43684,7 @@
       "mlbam": 672715,
       "name": "Luis Pati\u00f1o",
       "kind": "mlb",
-      "warProj": 0.11,
+      "warProj": 0.08,
       "controlLeft": 4,
       "value": 19185864.888779126,
       "gradBlendW": 0.3
@@ -43849,7 +43849,7 @@
       "mlbam": 656794,
       "name": "Sean Newcomb",
       "kind": "mlb",
-      "warProj": 0.07,
+      "warProj": 0.05,
       "controlLeft": 1,
       "value": 0.0
      }
@@ -44174,15 +44174,15 @@
    },
    {
     "teamId": 133,
-    "value": 5242180.66314129,
+    "value": 4736281.837048672,
     "players": [
      {
       "mlbam": 647351,
       "name": "Abraham Toro",
       "kind": "mlb",
-      "warProj": 0.53,
+      "warProj": 0.37,
       "controlLeft": 3,
-      "value": 5242180.66314129,
+      "value": 4736281.837048672,
       "gradBlendW": 0.1
      }
     ]
@@ -44536,7 +44536,7 @@
   "sides": [
    {
     "teamId": 136,
-    "value": 4928974.747657398,
+    "value": 4161894.3443370936,
     "players": [
      {
       "mlbam": 672841,
@@ -44551,9 +44551,9 @@
       "mlbam": 664874,
       "name": "Seby Zavala",
       "kind": "mlb",
-      "warProj": 0.8,
+      "warProj": 0.56,
       "controlLeft": 3,
-      "value": 3754620.280235176,
+      "value": 2987539.8769148723,
       "gradBlendW": 0.1
      }
     ]
@@ -44841,15 +44841,15 @@
    },
    {
     "teamId": 147,
-    "value": 32179142.01207737,
+    "value": 25010160.771365426,
     "players": [
      {
       "mlbam": 663757,
       "name": "Trent Grisham",
       "kind": "mlb",
-      "warProj": 2.69,
+      "warProj": 1.89,
       "controlLeft": 3,
-      "value": 15136551.89076799,
+      "value": 7967570.65005605,
       "gradBlendW": 0.1
      },
      {
@@ -46246,15 +46246,15 @@
   "sides": [
    {
     "teamId": 143,
-    "value": 1051504.4124253355,
+    "value": 1009334.4401950086,
     "players": [
      {
       "mlbam": 621074,
       "name": "Michael Rucker",
       "kind": "mlb",
-      "warProj": 0.03,
+      "warProj": 0.02,
       "controlLeft": 5,
-      "value": 1051504.4124253355,
+      "value": 1009334.4401950086,
       "contractSource": "cots",
       "gradBlendW": 0.3
      }
@@ -46273,15 +46273,15 @@
   "sides": [
    {
     "teamId": 137,
-    "value": 5741139.175129094,
+    "value": 5640809.588441568,
     "players": [
      {
       "mlbam": 663629,
       "name": "Ethan Small",
       "kind": "mlb",
-      "warProj": 0.15,
+      "warProj": 0.14,
       "controlLeft": 6,
-      "value": 5741139.175129094,
+      "value": 5640809.588441568,
       "contractSource": "cots",
       "gradBlendW": 0.45
      }
@@ -47084,7 +47084,7 @@
       "mlbam": 519008,
       "name": "T.J. McFarland",
       "kind": "mlb",
-      "warProj": -0.08,
+      "warProj": -0.05,
       "controlLeft": 1,
       "value": -850000.0,
       "contractSource": "cots"
@@ -47351,15 +47351,15 @@
   "sides": [
    {
     "teamId": 147,
-    "value": 1890509.1815225268,
+    "value": 1623198.2830569153,
     "players": [
      {
       "mlbam": 664141,
       "name": "JT Brubaker",
       "kind": "mlb",
-      "warProj": 0.31,
+      "warProj": 0.28,
       "controlLeft": 2,
-      "value": 1890509.1815225268,
+      "value": 1623198.2830569153,
       "contractSource": "cots",
       "gradBlendW": 0.1
      }
@@ -47376,15 +47376,15 @@
   "sides": [
    {
     "teamId": 147,
-    "value": -300142.23725159426,
+    "value": -353638.9030326377,
     "players": [
      {
       "mlbam": 664776,
       "name": "Jake Cousins",
       "kind": "mlb",
-      "warProj": 0.03,
+      "warProj": 0.02,
       "controlLeft": 5,
-      "value": -300142.23725159426,
+      "value": -353638.9030326377,
       "contractSource": "cots"
      }
     ]
@@ -48764,15 +48764,15 @@
   "sides": [
    {
     "teamId": 141,
-    "value": -170966.666592217,
+    "value": -195746.8187884649,
     "players": [
      {
       "mlbam": 621114,
       "name": "Ryan Burr",
       "kind": "mlb",
-      "warProj": 0.02,
+      "warProj": 0.01,
       "controlLeft": 5,
-      "value": -170966.666592217,
+      "value": -195746.8187884649,
       "contractSource": "cots"
      }
     ]
@@ -48816,15 +48816,15 @@
   "sides": [
    {
     "teamId": 121,
-    "value": 27504.893067351673,
+    "value": -133460.5036572017,
     "players": [
      {
       "mlbam": 620443,
       "name": "Luis Torrens",
       "kind": "mlb",
-      "warProj": 0.12,
+      "warProj": 0.08,
       "controlLeft": 3,
-      "value": 27504.893067351673,
+      "value": -133460.5036572017,
       "contractSource": "cots"
      }
     ]
@@ -49998,15 +49998,15 @@
   "sides": [
    {
     "teamId": 158,
-    "value": 1088988.649486108,
+    "value": 1072277.7257356192,
     "players": [
      {
       "mlbam": 683232,
       "name": "Nick Mears",
       "kind": "mlb",
-      "warProj": 0.03,
+      "warProj": 0.02,
       "controlLeft": 4,
-      "value": 1088988.649486108,
+      "value": 1072277.7257356192,
       "contractSource": "cots",
       "gradBlendW": 0.1
      }
@@ -50272,15 +50272,15 @@
    },
    {
     "teamId": 112,
-    "value": 48224036.669775605,
+    "value": 26847427.594443735,
     "players": [
      {
       "mlbam": 670623,
       "name": "Isaac Paredes",
       "kind": "mlb",
-      "warProj": 3.46,
+      "warProj": 2.42,
       "controlLeft": 4,
-      "value": 48224036.669775605,
+      "value": 26847427.594443735,
       "contractSource": "cots",
       "gradBlendW": 0.1
      }
@@ -50459,7 +50459,7 @@
       "mlbam": 554431,
       "name": "Tyler Matzek",
       "kind": "mlb",
-      "warProj": -0.04,
+      "warProj": -0.03,
       "controlLeft": 2,
       "value": -209852.6086956522,
       "contractSource": "cots"
@@ -50527,15 +50527,15 @@
   "sides": [
    {
     "teamId": 119,
-    "value": 7808033.465447106,
+    "value": 1611210.4924358192,
     "players": [
      {
       "mlbam": 669242,
       "name": "Tommy Edman",
       "kind": "mlb",
-      "warProj": 1.77,
+      "warProj": 1.24,
       "controlLeft": 2,
-      "value": 6655449.991027417,
+      "value": 458627.01801612927,
       "contractSource": "cots"
      },
      {
@@ -51331,15 +51331,15 @@
    },
    {
     "teamId": 140,
-    "value": 100953.37337231798,
+    "value": -113707.67070459483,
     "players": [
      {
       "mlbam": 605177,
       "name": "Andrew Chafin",
       "kind": "mlb",
-      "warProj": 0.32,
+      "warProj": 0.22,
       "controlLeft": 1,
-      "value": 100953.37337231798,
+      "value": -113707.67070459483,
       "contractSource": "cots"
      }
     ]
@@ -51491,7 +51491,7 @@
   "sides": [
    {
     "teamId": 135,
-    "value": 6069852.427536925,
+    "value": 5427873.759475615,
     "players": [
      {
       "mlbam": 656945,
@@ -51506,9 +51506,9 @@
       "mlbam": 663773,
       "name": "Bryan Hoeing",
       "kind": "mlb",
-      "warProj": 0.28,
+      "warProj": 0.19,
       "controlLeft": 5,
-      "value": 4541147.091114449,
+      "value": 3899168.4230531384,
       "contractSource": "cots",
       "gradBlendW": 0.45
      }
@@ -52038,15 +52038,15 @@
    },
    {
     "teamId": 114,
-    "value": 8996832.304114839,
+    "value": 3538140.5289276447,
     "players": [
      {
       "mlbam": 502171,
       "name": "Alex Cobb",
       "kind": "mlb",
-      "warProj": 2.41,
+      "warProj": 1.69,
       "controlLeft": 1,
-      "value": 8996832.304114839,
+      "value": 3538140.5289276447,
       "contractSource": "cots"
      }
     ]
@@ -52206,15 +52206,15 @@
    },
    {
     "teamId": 134,
-    "value": 34154.97693394753,
+    "value": -2141790.626818174,
     "players": [
      {
       "mlbam": 643396,
       "name": "Isiah Kiner-Falefa",
       "kind": "mlb",
-      "warProj": 0.98,
+      "warProj": 0.68,
       "controlLeft": 2,
-      "value": 34154.97693394753,
+      "value": -2141790.626818174,
       "contractSource": "cots"
      }
     ]
@@ -52232,15 +52232,15 @@
   "sides": [
    {
     "teamId": 141,
-    "value": 603715.7455242618,
+    "value": 501659.38836314005,
     "players": [
      {
       "mlbam": 642232,
       "name": "Ryan Yarbrough",
       "kind": "mlb",
-      "warProj": 0.45,
+      "warProj": 0.41,
       "controlLeft": 1,
-      "value": 603715.7455242618,
+      "value": 501659.38836314005,
       "contractSource": "cots"
      }
     ]
@@ -52418,7 +52418,7 @@
   "sides": [
    {
     "teamId": 141,
-    "value": 2485303.8204898015,
+    "value": 2472425.4021076164,
     "players": [
      {
       "mlbam": 667297,
@@ -52426,7 +52426,7 @@
       "kind": "mlb",
       "warProj": 0.09,
       "controlLeft": 4,
-      "value": 2485303.8204898015,
+      "value": 2472425.4021076164,
       "contractSource": "cots",
       "gradBlendW": 0.3
      }
@@ -53359,15 +53359,15 @@
   "sides": [
    {
     "teamId": 117,
-    "value": 74921494.86576173,
+    "value": 57568172.6432164,
     "players": [
      {
       "mlbam": 670623,
       "name": "Isaac Paredes",
       "kind": "mlb",
-      "warProj": 3.46,
+      "warProj": 2.42,
       "controlLeft": 4,
-      "value": 35162140.66121173,
+      "value": 17808818.438666414,
       "contractSource": "cots",
       "gradBlendW": 0.1
      },
@@ -54003,15 +54003,15 @@
    },
    {
     "teamId": 145,
-    "value": -524095.74796119006,
+    "value": -618441.3235728331,
     "players": [
      {
       "mlbam": 656457,
       "name": "Tyler Gilbert",
       "kind": "mlb",
-      "warProj": 0.04,
+      "warProj": 0.03,
       "controlLeft": 5,
-      "value": -524095.74796119006,
+      "value": -618441.3235728331,
       "contractSource": "cots"
      }
     ]
@@ -55359,15 +55359,15 @@
    },
    {
     "teamId": 119,
-    "value": 15311130.90595071,
+    "value": 12775211.409776911,
     "players": [
      {
       "mlbam": 665923,
       "name": "Esteury Ruiz",
       "kind": "mlb",
-      "warProj": 0.76,
+      "warProj": 0.53,
       "controlLeft": 4,
-      "value": 15311130.90595071,
+      "value": 12775211.409776911,
       "contractSource": "cots",
       "gradBlendW": 0.3
      }
@@ -55759,7 +55759,7 @@
   "sides": [
    {
     "teamId": 112,
-    "value": -958234.7744562352,
+    "value": -1003175.791032408,
     "players": [
      {
       "mlbam": 519141,
@@ -55767,7 +55767,7 @@
       "kind": "mlb",
       "warProj": 0.02,
       "controlLeft": 1,
-      "value": -958234.7744562352,
+      "value": -1003175.791032408,
       "contractSource": "cots"
      }
     ]
@@ -56206,15 +56206,15 @@
   "sides": [
    {
     "teamId": 158,
-    "value": -340974.6990327226,
+    "value": -398429.87954029714,
     "players": [
      {
       "mlbam": 642239,
       "name": "Rob Zastryzny",
       "kind": "mlb",
-      "warProj": 0.04,
+      "warProj": 0.03,
       "controlLeft": 5,
-      "value": -340974.6990327226,
+      "value": -398429.87954029714,
       "contractSource": "cots"
      }
     ]
@@ -56741,15 +56741,15 @@
    },
    {
     "teamId": 111,
-    "value": 35337213.074691474,
+    "value": 31869189.341020245,
     "players": [
      {
       "mlbam": 663855,
       "name": "Jordan Hicks",
       "kind": "mlb",
-      "warProj": 0.89,
+      "warProj": 0.62,
       "controlLeft": 3,
-      "value": -16048975.864406481,
+      "value": -19516999.59807771,
       "contractSource": "cots"
      },
      {
@@ -58343,7 +58343,7 @@
   "sides": [
    {
     "teamId": 158,
-    "value": 337558.1094470953,
+    "value": 259363.19041033817,
     "players": [
      {
       "mlbam": 571946,
@@ -58351,16 +58351,16 @@
       "kind": "mlb",
       "warProj": 0.02,
       "controlLeft": 1,
-      "value": -50721.56823541391,
+      "value": -65501.56298218104,
       "contractSource": "cots"
      },
      {
       "mlbam": 656756,
       "name": "Jordan Montgomery",
       "kind": "mlb",
-      "warProj": 0.29,
+      "warProj": 0.26,
       "controlLeft": 1,
-      "value": 388279.67768250924,
+      "value": 324864.7533925192,
       "contractSource": "cots"
      }
     ]
@@ -58816,15 +58816,15 @@
   "sides": [
    {
     "teamId": 116,
-    "value": -86799.56425311876,
+    "value": -240738.67541196579,
     "players": [
      {
       "mlbam": 623149,
       "name": "Paul Sewald",
       "kind": "mlb",
-      "warProj": 0.23,
+      "warProj": 0.16,
       "controlLeft": 1,
-      "value": -86799.56425311876,
+      "value": -240738.67541196579,
       "contractSource": "cots"
      }
     ]
@@ -58840,15 +58840,15 @@
   "sides": [
    {
     "teamId": 141,
-    "value": -1304267.8272169004,
+    "value": -6810133.61762251,
     "players": [
      {
       "mlbam": 669456,
       "name": "Shane Bieber",
       "kind": "mlb",
-      "warProj": 1.59,
+      "warProj": 1.11,
       "controlLeft": 2,
-      "value": -1304267.8272169004,
+      "value": -6810133.61762251,
       "contractSource": "cots"
      }
     ]
@@ -59136,7 +59136,7 @@
   "sides": [
    {
     "teamId": 135,
-    "value": 4972991.937853881,
+    "value": 3386001.3850528877,
     "players": [
      {
       "mlbam": 815894,
@@ -59149,9 +59149,9 @@
       "mlbam": 641482,
       "name": "Nestor Cortes",
       "kind": "mlb",
-      "warProj": 1.97,
+      "warProj": 1.38,
       "controlLeft": 1,
-      "value": 4530057.237597513,
+      "value": 2943066.68479652,
       "contractSource": "cots"
      }
     ]
@@ -60326,7 +60326,7 @@
       "mlbam": 680702,
       "name": "Joey Gerber",
       "kind": "mlb",
-      "warProj": -0.15,
+      "warProj": -0.13,
       "controlLeft": 6,
       "value": 0.0,
       "contractSource": "cots"
@@ -60656,7 +60656,7 @@
       "mlbam": 692285,
       "name": "Luis Guerrero",
       "kind": "mlb",
-      "warProj": -0.06,
+      "warProj": -0.04,
       "controlLeft": 6,
       "value": 1217926.965789756,
       "contractSource": "cots",
@@ -61857,15 +61857,15 @@
    },
    {
     "teamId": 146,
-    "value": 11931396.311261408,
+    "value": 10478490.87305962,
     "players": [
      {
       "mlbam": 665923,
       "name": "Esteury Ruiz",
       "kind": "mlb",
-      "warProj": 0.76,
+      "warProj": 0.53,
       "controlLeft": 4,
-      "value": 11931396.311261408,
+      "value": 10478490.87305962,
       "contractSource": "cots",
       "gradBlendW": 0.3
      }
@@ -64066,7 +64066,7 @@
       "mlbam": 672642,
       "name": "Steward Berroa",
       "kind": "mlb",
-      "warProj": -0.04,
+      "warProj": -0.03,
       "controlLeft": 5,
       "value": 0.0
      }
@@ -66162,15 +66162,15 @@
    },
    {
     "teamId": 158,
-    "value": 1710618.2970276508,
+    "value": -37414.52905930579,
     "players": [
      {
       "mlbam": 621121,
       "name": "Lance McCullers Jr.",
       "kind": "mlb",
-      "warProj": 1.21,
+      "warProj": 0.85,
       "controlLeft": 1,
-      "value": -2991178.532608696
+      "value": -4739211.358695652
      },
      {
       "mlbam": 676467,
@@ -66303,15 +66303,15 @@
   "sides": [
    {
     "teamId": 119,
-    "value": 6073135.308608289,
+    "value": 5127210.909302735,
     "players": [
      {
       "mlbam": 678020,
       "name": "Seth Halvorsen",
       "kind": "mlb",
-      "warProj": 0.35,
+      "warProj": 0.24,
       "controlLeft": 5,
-      "value": 6073135.308608289,
+      "value": 5127210.909302735,
       "contractSource": "cots",
       "gradBlendW": 0.45
      }
@@ -66452,15 +66452,15 @@
    },
    {
     "teamId": 120,
-    "value": 43710639.77465475,
+    "value": 40690236.59073871,
     "players": [
      {
       "mlbam": 813349,
       "name": "Connelly Early",
       "kind": "mlb",
-      "warProj": 1.27,
+      "warProj": 0.89,
       "controlLeft": 6,
-      "value": 43710639.77465475,
+      "value": 40690236.59073871,
       "gradBlendW": 0.6
      }
     ]

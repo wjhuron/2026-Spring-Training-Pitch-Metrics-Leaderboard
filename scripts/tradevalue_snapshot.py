@@ -192,6 +192,26 @@ def load_boards(idmap_fg_to_mlbam):
 
 
 _STEAMER = None
+_IL_HIST = None
+
+
+def il_kind_at(mlbam, ref_date):
+    """IL stint kind ('10'/'15'/'60') if on an MLB IL at ref_date, else None.
+
+    From tradevalue_ilhist.py; stints with no recorded activation cap at
+    Nov 30 of the placement year (offseason roll-offs never post one).
+    """
+    global _IL_HIST
+    if _IL_HIST is None:
+        path = DATA / "tradevalue_il_hist.json"
+        _IL_HIST = ({int(k): v for k, v in
+                     json.loads(path.read_text())["episodes"].items()}
+                    if path.exists() else {})
+    for ep in _IL_HIST.get(mlbam, []):
+        off = ep["off"] or (ep["on"][:4] + "-11-30")
+        if ep["on"] <= ref_date < off:
+            return ep["kind"]
+    return None
 
 
 # fitted preseason-system weights (sweep 2026-07-31): pooled optimum 0.80
@@ -349,6 +369,11 @@ def value_mlb_at(mlbam, trade_date, season, people, warhist, hist_rec=None):
     control_left = max(1, min(7, debut_year + 6 - season + 1))
     st = load_steamer().get((season, mlbam))
     war1 = st if st is not None else marcel(hist, season, age)
+    # fitted IL discount, all years: corpus projections are preseason and
+    # injury-blind, exactly the basis the discount was fit on
+    il_kind = il_kind_at(mlbam, trade_date)
+    if il_kind:
+        war1 *= 1 - CONFIG["ilDiscount"].get(il_kind, 0.0)
     if hist_rec is not None:
         return value_mlb_contract(hist_rec, war1, age, trade_date, season,
                                   bool(person.get("pitcher")))

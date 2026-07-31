@@ -45,11 +45,13 @@ OUT_PATH = BASE / "data" / "tradevalue_market_fit.json"
 # a group stays iff LOSO mean-of-medians improves AND it wins >=6/10
 # held-out seasons vs the set without it.
 FEATURES = ["prospect", "rental", "star", "rentalDeadline", "relieverDl",
-            "gradW", "rlvRentalDl", "rlvCtrlDl", "defFrac", "catcher"]
+            "gradW", "rlvRentalDl", "rlvCtrlDl", "defFrac", "catcher",
+            "onIL"]
 F0 = ["prospect", "rental", "star", "rentalDeadline", "relieverDl", "gradW"]
 GROUPS = [("A relieverSplit", ["rlvRentalDl", "rlvCtrlDl"], ["relieverDl"]),
           ("B defFrac", ["defFrac"], []),
-          ("C catcher", ["catcher"], [])]
+          ("C catcher", ["catcher"], []),
+          ("D onIL", ["onIL"], [])]
 MIN_SIDE = 0.5e6
 Y_CLIP = math.log(10)
 BAND = math.log(1.5)
@@ -71,6 +73,27 @@ def is_reliever(mlbam, season, ctx):
         rec = hist.get(season - back)
         if rec and rec.get("gPit", 0) >= 8:
             return rec["gsPit"] / rec["gPit"] < 0.3
+    return False
+
+
+_IL = None
+
+
+def on_il_at(mlbam, trade_date):
+    """On a 10/15/60-day MLB IL on the trade date (tradevalue_ilhist.py)."""
+    global _IL
+    if _IL is None:
+        import json as _j
+        path = BASE / "data" / "tradevalue_il_hist.json"
+        _IL = ({int(k): v for k, v in
+                _j.loads(path.read_text())["episodes"].items()}
+               if path.exists() else {})
+    for ep in _IL.get(mlbam, []):
+        # un-closed stints cap at Nov 30 of the placement year (offseason
+        # roll-offs never post an activation transaction)
+        off = ep["off"] or (ep["on"][:4] + "-11-30")
+        if ep["on"] <= trade_date < off:
+            return True
     return False
 
 
@@ -145,6 +168,7 @@ def value_and_featurize(trades, ctx):
                 x[8] = (def_frac(p["mlbam"], tr["season"], ctx)
                         if is_mlb and not person.get("pitcher") else 0.0)
                 x[9] = pos == "C"
+                x[10] = is_mlb and on_il_at(p["mlbam"], tr["date"])
                 v_tot += v
                 f_tot += v * x
             vals.append(v_tot)
