@@ -8,7 +8,7 @@ Usage:
   python3 scripts/catch_prob.py --dist 56 --time 3.6
   python3 scripts/catch_prob.py --dist 91 --time 5.2 --wall --angle 105
   python3 scripts/catch_prob.py --dist 42 --time 3.2 --hang 2.8 --plate 0.44
-  python3 scripts/catch_prob.py --dist 91 --time 5.2 --park CLE --hitdist 365 --dir rfgap
+  python3 scripts/catch_prob.py --dist 91 --time 5.2 --park CLE --hitdist 365
   python3 scripts/catch_prob.py                                # interactive prompts
 
 Inputs:
@@ -23,14 +23,14 @@ Inputs:
            37.6/velo if --velo (mph) given, else --flight (default 0.39s).
   --plate  plate time from the card, seconds (pitch release to plate).
   --wall   force the wall flag on (ball landing near the outfield wall).
-  --park / --hitdist / --dir
-           auto wall assessment: park abbrev (STL, NYM, ...), projected hit
-           distance from the hitter card, and wall sector (lf, lfgap, cf,
-           rfgap, rf). If the ball lands more than 25 ft short of the wall
-           marker, no-wall is assessed confidently (official wall rate
-           0.2-4% there). Any closer and the wall status is genuinely
-           ambiguous (even balls AT the marker are only ~83% official wall
-           plays), so BOTH scenarios are printed: judge from the play.
+  --park / --hitdist
+           auto wall assessment: park abbrev (STL, NYM, ...) and projected
+           hit distance from the hitter card. Balls landing more than
+           20 ft short of the park's SHORTEST wall are confidently no-wall
+           (zero leaked wall plays in a 2,809-play validation). Any closer
+           and the wall status is genuinely ambiguous (even balls AT the
+           marker are only ~83% official wall plays), so BOTH scenarios
+           are printed: judge from the play.
   --back   set the back flag directly (otherwise inferred from --angle).
   --angle  angle to ball landing, degrees. Going back = |angle| >= 150
            (within 30 degrees of straight behind; boundary verified
@@ -64,7 +64,6 @@ PARKS = {
     'TB':  [315, 370, 404, 370, 322], 'TEX': [329, 372, 407, 374, 326],
     'TOR': [328, 368, 400, 359, 328], 'WSH': [336, 377, 402, 370, 335],
 }
-DIRS = {'lf': 0, 'lfgap': 1, 'cf': 2, 'rfgap': 3, 'rf': 4}
 # LOO sweep on 4000 informative 2026 plays: MAE flat at 0.0243-0.0252 for
 # K in 1-10, degrades above (0.0269 at 40, 0.0305 at 80). Any K in 1-10 is
 # equivalent; 5 is a convention from the middle of the flat region.
@@ -220,7 +219,6 @@ def main():
     ap.add_argument('--wall', action='store_true')
     ap.add_argument('--park', type=str, help='team abbrev (STL, NYM, ...) for wall assessment')
     ap.add_argument('--hitdist', type=float, help='projected hit distance ft from the hitter card')
-    ap.add_argument('--dir', type=str, help='wall sector: lf, lfgap, cf, rfgap, rf')
     ap.add_argument('--angle', type=float)
     args = ap.parse_args()
 
@@ -291,16 +289,21 @@ def main():
     wall_note = ''
     if args.wall:
         scenarios = [1]
-    elif args.park and args.hitdist is not None and args.dir:
-        wd = PARKS[args.park.upper()][DIRS[args.dir.lower().replace(' ', '')]]
+    elif args.park and args.hitdist is not None:
+        # park's shortest wall, threshold 20: zero leaked wall plays in a
+        # 2,809-play validation (sector and position variants leak or
+        # classify less)
+        wd = min(PARKS[args.park.upper()])
         short = wd - args.hitdist
-        if short > 25:
+        if short > 20:
             scenarios = [0]
-            wall_note = f'{short:.0f} ft short of the {wd} ft wall: no wall'
+            wall_note = (f'{short:.0f} ft short of the shortest wall '
+                         f'({wd} ft): no wall')
         else:
             scenarios = [0, 1]
-            wall_note = (f'{short:.0f} ft short of the {wd} ft wall: wall '
-                         'status ambiguous, both shown; judge from the play')
+            wall_note = (f'{short:.0f} ft short of the shortest wall '
+                         f'({wd} ft): wall status ambiguous, both shown; '
+                         'judge from the play')
 
     cells, meta = load_surface()
     results = []

@@ -267,17 +267,19 @@
     if (wallSel === 'auto') {
       var park = document.getElementById('cp-park').value;
       var hitd = parseFloat(document.getElementById('cp-hitdist').value);
-      var dir = document.getElementById('cp-dir').value;
-      if (park && dir !== '' && !isNaN(hitd)) {
-        var wd = PARKS[park][parseInt(dir, 10)];
+      if (park && !isNaN(hitd)) {
+        // park's shortest wall, threshold 20: zero leaked wall plays in
+        // 2,809-play validation (sector- and position-based variants
+        // either leak or classify less)
+        var wd = Math.min.apply(null, PARKS[park]);
         var short = Math.round(wd - hitd);
-        if (short > 25) {
+        if (short > 20) {
           scenarios = ['0'];
-          wallNote = short + ' ft short of the ' + wd + ' ft wall: no wall';
+          wallNote = short + ' ft short of the shortest wall (' + wd + ' ft): no wall';
         } else {
           scenarios = ['0', '1'];
-          wallNote = (short < 0 ? 'ball at/over the ' + wd + ' ft wall'
-                     : short + ' ft short of the ' + wd + ' ft wall') +
+          wallNote = (short < 0 ? 'ball at/over the shortest wall (' + wd + ' ft)'
+                     : short + ' ft short of the shortest wall (' + wd + ' ft)') +
                      ': wall status ambiguous, both shown; judge from the play';
         }
       } else {
@@ -317,7 +319,7 @@
   }
 
   ['cp-dist', 'cp-time', 'cp-hang', 'cp-plate', 'cp-wall', 'cp-angle',
-   'cp-park', 'cp-hitdist', 'cp-dir'].forEach(function (id) {
+   'cp-park', 'cp-hitdist'].forEach(function (id) {
     document.getElementById(id).addEventListener('input', update);
   });
 
@@ -326,7 +328,6 @@
       document.getElementById(id).value = '';
     });
     document.getElementById('cp-park').value = '';
-    document.getElementById('cp-dir').value = '';
     document.getElementById('cp-wall').value = 'auto';
     document.getElementById('cp-result').style.display = 'none';
     showError('');

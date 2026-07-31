@@ -89,24 +89,12 @@
         <div class="catch-field">
           <label for="cp-park">Park</label>
           <select id="cp-park"><option value="" selected></option></select>
-          <div class="catch-hint">with Hit Distance and Direction, sets the wall flag automatically</div>
+          <div class="catch-hint">with Hit Distance, assesses the wall automatically</div>
         </div>
         <div class="catch-field">
           <label for="cp-hitdist">Hit Distance</label>
           <input id="cp-hitdist" type="number" min="0" max="500" step="1">
           <div class="catch-hint">feet; projected landing distance from the hitter card</div>
-        </div>
-        <div class="catch-field">
-          <label for="cp-dir">Direction</label>
-          <select id="cp-dir">
-            <option value="" selected></option>
-            <option value="0">LF Line</option>
-            <option value="1">LF Gap</option>
-            <option value="2">CF</option>
-            <option value="3">RF Gap</option>
-            <option value="4">RF Line</option>
-          </select>
-          <div class="catch-hint">which wall sector the ball headed toward</div>
         </div>
         <div class="catch-field">
           <label for="cp-wall">Near the Wall</label>
@@ -115,7 +103,7 @@
             <option value="0">No</option>
             <option value="1">Yes</option>
           </select>
-          <div class="catch-hint">auto: balls landing 25+ ft short of the wall are confidently no-wall; any closer and BOTH scenarios are shown (wall status is not reliably determinable from distance alone), pick from the play or override here</div>
+          <div class="catch-hint">auto: balls landing 20+ ft short of the park's SHORTEST wall are confidently no-wall (zero leaked wall plays in validation); any closer and BOTH scenarios are shown, pick from the play or override here</div>
         </div>
       </div>
       <div style="margin-top: 14px; text-align: right;">
