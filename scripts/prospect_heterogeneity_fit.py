@@ -209,10 +209,39 @@ def main():
         ranges = {f: [float(np.percentile([d[f] for d in data], 1)),
                       float(np.percentile([d[f] for d in data], 99))]
                   for f in stable}
+        # FIT-ERA cell feature means, pooled across cohorts: the demeaning
+        # basis the engine must use. Demeaning against the LIVE board's cell
+        # means broke when FG's tier composition drifted (2026 FV50-hitter
+        # mean ETA gap 2.64 yrs vs 1.3-1.5 in every fit cohort): near-ETA
+        # prospects collected boosts beyond fitted support while the dollar
+        # base still reflects fit-era composition. ETA is stored as an
+        # offset from the list year (absolute ETAs don't transport).
+        cell_feats = {}
+        by_cell = _dd(list)
+        for r in rows:
+            by_cell[(r["fv"], r["pitcher"])].append(r)
+        for (fv, pitcher), members in by_cell.items():
+            if len(members) < 8:
+                continue
+            etas = [m["eta"] - m["cohort"] for m in members if m["eta"]]
+            ages = [m["age"] for m in members if m["age"]]
+            ranks = [m["rank"] for m in members if m["rank"]]
+            cell_feats[f"{fv}|{'P' if pitcher else 'H'}"] = {
+                "etaOffset": float(np.mean(etas)) if etas else None,
+                "age": float(np.mean(ages)) if ages else None,
+                "risk": float(np.mean([m["risk"] for m in members])),
+                "rank": float(np.mean(ranks)) if ranks else None,
+                "hasRank": float(np.mean([1.0 * bool(m["rank"])
+                                          for m in members])),
+                "posSS": float(np.mean([m["posSS"] for m in members])),
+                "posC": float(np.mean([m["posC"] for m in members])),
+                "n": len(members),
+            }
         artifact = {
             "coefs": {f: float(b) for f, b in zip(stable, beta)},
             "form": "relative",   # m = max(0, 1 + sum(coef * feature))
             "featureRanges": ranges,
+            "cellFeatureMeans": cell_feats,
             "fitNote": "relative-space refit: y = (realized - cellMean)/"
                        "cellMean, cells mean>=0.5; LOSO-validated 2017-2021",
         }
