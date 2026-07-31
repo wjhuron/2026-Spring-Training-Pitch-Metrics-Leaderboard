@@ -2,8 +2,7 @@
 // Lookup against data/catch_prob_surface.json: official per-play catch_rate
 // (Savant player-services/range) aggregated to cells of
 // (opportunity time tenths, distance ft, back, wall), 2024-2026.
-// Mirrors scripts/catch_prob.py: expanding window of +-0.05s/+-1ft per ring,
-// stop once >= K_MIN plays (K flat 1-10 in LOO validation; 5 by convention).
+// Mirrors scripts/catch_prob.py.
 
 (function () {
   'use strict';
@@ -47,7 +46,7 @@
     'WSH Nationals Park':         [336, 377, 402, 370, 335]
   };
 
-  var surface = null;   // {"b|w": Map("t|d" -> [p, n])}
+  var surface = null;
   var meta = null;
 
   fetch('data/catch_prob_surface.json?v=20260731b')
@@ -82,24 +81,20 @@
     var grid = surface[back + '|' + wall];
     if (!grid) return null;
     var tt = Math.round(t * 10);
-    var num = 0, den = 0, ring, mn = null, mx = null;
+    var num = 0, den = 0, ring;
     for (ring = 1; ring <= MAX_RING; ring++) {
       var tw = Math.round(0.05 * ring * 100) / 100;
-      num = 0; den = 0; mn = null; mx = null;
+      num = 0; den = 0;
       for (var ti = tt - 3; ti <= tt + 3; ti++) {
         if (Math.abs(ti / 10 - t) > tw + 1e-9) continue;
         for (var di = dist - ring; di <= dist + ring; di++) {
           var c = grid[(ti / 10).toFixed(1) + '|' + di];
-          if (c) {
-            num += c[0] * c[1]; den += c[1];
-            mn = mn === null ? c[2] : Math.min(mn, c[2]);
-            mx = mx === null ? c[3] : Math.max(mx, c[3]);
-          }
+          if (c) { num += c[0] * c[1]; den += c[1]; }
         }
       }
-      if (den >= K_MIN) return { p: num / den, n: den, ring: ring, mn: mn, mx: mx };
+      if (den >= K_MIN) return { p: num / den, n: den, ring: ring };
     }
-    return den > 0 ? { p: num / den, n: den, ring: MAX_RING, mn: mn, mx: mx } : null;
+    return den > 0 ? { p: num / den, n: den, ring: MAX_RING } : null;
   }
 
   // expected within-bucket spread from the local gradient (cell medians)
@@ -123,6 +118,7 @@
     return { st: st, sd: sd };
   }
 
+  // boundaries verified against 95k official star ratings
   function starRange(p) {
     if (p <= 0.25) return '5-star range';
     if (p <= 0.50) return '4-star range';
@@ -132,16 +128,90 @@
     return 'routine';
   }
 
-  function bucket(p) {
-    var b = Math.round(p / 0.05) * 0.05;
-    return b >= 0.975 ? 0.99 : Math.max(b, 0);
-  }
-
   function showError(msg) {
     var e = document.getElementById('cp-error');
     e.textContent = msg;
     e.style.display = msg ? 'block' : 'none';
     if (msg) document.getElementById('cp-result').style.display = 'none';
+  }
+
+  // Point estimate + two-tier band for one wall scenario. Validated per
+  // input scenario on 6,000 held-out plays each: outer range 99.5-99.8%
+  // containment (worst miss 0.03-0.08), inner likely (pooled q10-q90)
+  // 96.2%. Sparse-data penalty 0.10/sqrt(n) on the outer range (swept).
+  function evaluate(time, tA, tB, dist, back, wall) {
+    var out;
+    var tTenth = Math.round(time * 10) / 10;
+    if (Math.abs(time - tTenth) < 0.005) {
+      out = lookup(tTenth, dist, back, wall);
+    } else {
+      var tLo = Math.floor(time * 10) / 10;
+      var tHi = Math.round((tLo + 0.1) * 10) / 10;
+      var o1 = lookup(tLo, dist, back, wall);
+      var o2 = lookup(tHi, dist, back, wall);
+      if (o1 && o2) {
+        var w = (time - tLo) / 0.1;
+        out = { p: (1 - w) * o1.p + w * o2.p, n: o1.n + o2.n,
+                ring: Math.max(o1.ring, o2.ring) };
+      } else {
+        out = o1 || o2;
+      }
+    }
+    if (!out) return null;
+
+    var grid = surface[back + '|' + wall] || {};
+    var g = gradientSpread(time, dist, back, wall);
+    var U = Math.max(tB - tA, 0.02);
+    var S = g.st * (U / 0.1) + g.sd;
+    var bLo = out.p - 1.5 * S / 2 - 0.025;
+    var bHi = out.p + 1.5 * S / 2 + 0.025;
+    var tt0 = Math.min(Math.round(tA * 10), Math.round(time * 10) - out.ring + 1);
+    var tt1 = Math.max(Math.round(tB * 10), Math.round(time * 10) + out.ring - 1);
+    var dwv = Math.max(1, out.ring);
+    for (var ti2 = tt0; ti2 <= tt1; ti2++) {
+      for (var di2 = dist - dwv; di2 <= dist + dwv; di2++) {
+        var c2 = grid[(ti2 / 10).toFixed(1) + '|' + di2];
+        if (c2) {
+          bLo = Math.min(bLo, c2[2] - 0.025);
+          bHi = Math.max(bHi, c2[3] + 0.025);
+        }
+      }
+    }
+    var pool = {}, tot = 0;
+    for (var ti3 = Math.round(tA * 10); ti3 <= Math.round(tB * 10); ti3++) {
+      for (var di3 = dist - 1; di3 <= dist + 1; di3++) {
+        var c3 = grid[(ti3 / 10).toFixed(1) + '|' + di3];
+        if (c3 && c3[4]) {
+          for (var v3 in c3[4]) { pool[v3] = (pool[v3] || 0) + c3[4][v3]; tot += c3[4][v3]; }
+        }
+      }
+    }
+    var pen = 0.10 / Math.sqrt(Math.max(tot, 1));
+    bLo = Math.max(bLo - pen, 0);
+    bHi = Math.min(bHi + pen, 1);
+    var loPct = Math.max(Math.floor(bLo * 100), 0);
+    var hiPct = Math.min(Math.ceil(bHi * 100), 99);
+    var likely = null;
+    if (tot >= 8) {
+      var keys = Object.keys(pool).map(Number).sort(function (a, b) { return a - b; });
+      var pq = function (pr) {
+        var target = pr * (tot - 1), acc = 0;
+        for (var i3 = 0; i3 < keys.length; i3++) {
+          acc += pool[keys[i3]];
+          if (acc - 1 >= target) return keys[i3];
+        }
+        return keys[keys.length - 1];
+      };
+      likely = [Math.max(pq(0.10), loPct), Math.min(pq(0.90), hiPct)];
+    }
+    return { pPct: Math.round(out.p * 100), n: out.n,
+             lo: loPct, hi: hiPct, likely: likely, p: out.p };
+  }
+
+  function fmt(r) {
+    return r.pPct + '%' +
+      (r.likely ? ', likely ' + r.likely[0] + '–' + r.likely[1] : '') +
+      ', range ' + r.lo + '–' + r.hi;
   }
 
   function update() {
@@ -151,36 +221,17 @@
     var time = parseFloat(document.getElementById('cp-time').value);
     var hang = parseFloat(document.getElementById('cp-hang').value);
     var plate = parseFloat(document.getElementById('cp-plate').value);
-    // wall flag: manual, or auto from park + hit distance + direction.
-    // Threshold calibrated against 95k official wall flags: accuracy
-    // peaks at gap <= 12 ft (0.955, interior optimum; R=10 and 15 both
-    // lower). Gap 12-20 is genuinely ambiguous (29-46% official wall
-    // rate) because five markers approximate real wall polygons.
-    var wallSel = document.getElementById('cp-wall').value;
-    var wall = '0', wallNote = '';
-    if (wallSel === 'auto') {
-      var park = document.getElementById('cp-park').value;
-      var hitd = parseFloat(document.getElementById('cp-hitdist').value);
-      var dir = document.getElementById('cp-dir').value;
-      if (park && dir !== '' && !isNaN(hitd)) {
-        var wd = PARKS[park][parseInt(dir, 10)];
-        var short = Math.round(wd - hitd);
-        wall = short <= 12 ? '1' : '0';
-        wallNote = short < 0 ? 'ball at/over the ' + wd + ' ft wall'
-                 : short + ' ft short of the ' + wd + ' ft wall' +
-                   (short > 12 && short <= 20 ? ', borderline: consider override' : '');
-      }
-    } else {
-      wall = wallSel;
-    }
     var angle = parseFloat(document.getElementById('cp-angle').value);
-    // back = angle within 30 degrees of straight behind, ONLY
-    var back = (!isNaN(angle) && Math.abs(angle) >= 150) ? '1' : '0';
     var res = document.getElementById('cp-result');
+
+    // back = angle within 30 degrees of straight behind, ONLY (boundary
+    // verified consistent with official flags, bracketed [27, 42] deg)
+    var back = (!isNaN(angle) && Math.abs(angle) >= 150) ? '1' : '0';
 
     // pitch flight: plate time from the card is exact, else the
     // typical-fastball default
     var flight = !isNaN(plate) && plate > 0 ? plate : FLIGHT;
+
     // Card conventions (verified per field): opportunity time TRUNCATES
     // (T -> [T, T+0.1)), hang time ROUNDS (H -> [H-0.05, H+0.05]), plate
     // time rounds (negligible). Values with 2+ decimals are exact.
@@ -206,103 +257,62 @@
     }
     if (isNaN(dist) || isNaN(time)) { res.style.display = 'none'; return; }
 
-    var out;
-    var tTenth = Math.round(time * 10) / 10;
-    if (Math.abs(time - tTenth) < 0.005) {
-      out = lookup(tTenth, Math.round(dist), back, wall);
-    } else {
-      // off-grid time from a combined estimate: interpolate the two
-      // adjacent tenth-of-a-second surfaces
-      var tLo = Math.floor(time * 10) / 10;
-      var tHi = Math.round((tLo + 0.1) * 10) / 10;
-      var o1 = lookup(tLo, Math.round(dist), back, wall);
-      var o2 = lookup(tHi, Math.round(dist), back, wall);
-      if (o1 && o2) {
-        var w = (time - tLo) / 0.1;
-        out = { p: (1 - w) * o1.p + w * o2.p, n: o1.n + o2.n,
-                ring: Math.max(o1.ring, o2.ring),
-                mn: Math.min(o1.mn, o2.mn), mx: Math.max(o1.mx, o2.mx) };
+    // Wall scenarios. The flag is NOT reliably determinable from distance
+    // alone (even balls AT the marker are only ~83% official wall plays).
+    // Policy validated on two weeks of catches: gap > 25 ft -> confident
+    // no wall (official wall rate 0.2-4%); gap <= 25 ft -> ambiguous,
+    // BOTH scenarios shown so the correct answer is always on screen.
+    var wallSel = document.getElementById('cp-wall').value;
+    var scenarios = ['0'], wallNote = '';
+    if (wallSel === 'auto') {
+      var park = document.getElementById('cp-park').value;
+      var hitd = parseFloat(document.getElementById('cp-hitdist').value);
+      var dir = document.getElementById('cp-dir').value;
+      if (park && dir !== '' && !isNaN(hitd)) {
+        var wd = PARKS[park][parseInt(dir, 10)];
+        var short = Math.round(wd - hitd);
+        if (short > 25) {
+          scenarios = ['0'];
+          wallNote = short + ' ft short of the ' + wd + ' ft wall: no wall';
+        } else {
+          scenarios = ['0', '1'];
+          wallNote = (short < 0 ? 'ball at/over the ' + wd + ' ft wall'
+                     : short + ' ft short of the ' + wd + ' ft wall') +
+                     ': wall status ambiguous, both shown; judge from the play';
+        }
       } else {
-        out = o1 || o2;
+        wallNote = 'no wall assumed (fill park inputs or override)';
       }
+    } else {
+      scenarios = [wallSel];
     }
-    if (!out) {
+
+    var d = Math.round(dist);
+    var r0 = evaluate(time, tA, tB, d, back, scenarios[0]);
+    var r1 = scenarios.length === 2 ? evaluate(time, tA, tB, d, back, scenarios[1]) : null;
+    if (!r0 && !r1) {
       showError('No comparable tracked plays for those inputs.');
       return;
     }
-    // Uncertainty band: gradient component scaled by the feasible time
-    // window, UNION observed catch rates over that window (bucket-correct)
-    // and the lookup ring, 0.025 pad. Validated on 6,000 held-out plays
-    // per input scenario: containment 99.5-99.8%, worst miss 0.03-0.08.
-    var g = gradientSpread(time, Math.round(dist), back, wall);
-    var U = Math.max(tB - tA, 0.02);
-    var S = g.st * (U / 0.1) + g.sd;
-    var bLo = out.p - 1.5 * S / 2 - 0.025;
-    var bHi = out.p + 1.5 * S / 2 + 0.025;
-    var grid = surface[back + '|' + wall] || {};
-    var tt0 = Math.min(Math.round(tA * 10), Math.round(time * 10) - out.ring + 1);
-    var tt1 = Math.max(Math.round(tB * 10), Math.round(time * 10) + out.ring - 1);
-    var dwv = Math.max(1, out.ring);
-    var eLo = null, eHi = null;
-    for (var ti2 = tt0; ti2 <= tt1; ti2++) {
-      for (var di2 = Math.round(dist) - dwv; di2 <= Math.round(dist) + dwv; di2++) {
-        var c2 = grid[(ti2 / 10).toFixed(1) + '|' + di2];
-        if (c2) {
-          eLo = eLo === null ? c2[2] : Math.min(eLo, c2[2]);
-          eHi = eHi === null ? c2[3] : Math.max(eHi, c2[3]);
-        }
-      }
-    }
-    if (eLo !== null) {
-      bLo = Math.min(bLo, eLo - 0.025);
-      bHi = Math.max(bHi, eHi + 0.025);
-    }
-    // inner 'likely' pool: official values among comparable plays
-    var pool = {}, tot = 0;
-    for (var ti3 = Math.round(tA * 10); ti3 <= Math.round(tB * 10); ti3++) {
-      for (var di3 = Math.round(dist) - 1; di3 <= Math.round(dist) + 1; di3++) {
-        var c3 = grid[(ti3 / 10).toFixed(1) + '|' + di3];
-        if (c3 && c3[4]) {
-          for (var v3 in c3[4]) { pool[v3] = (pool[v3] || 0) + c3[4][v3]; tot += c3[4][v3]; }
-        }
-      }
-    }
-    // sparse-data penalty on the OUTER range only (swept; c=0.1 lifts
-    // sparse-window range coverage to 100% in validation)
-    var pen = 0.10 / Math.sqrt(Math.max(tot, 1));
-    bLo = Math.max(bLo - pen, 0);
-    bHi = Math.min(bHi + pen, 1);
-    var loPct = Math.max(Math.floor(bLo * 100), 0);
-    var hiPct = Math.min(Math.ceil(bHi * 100), 99);
-
-    var likely = null;
-    if (tot >= 8) {
-      var keys = Object.keys(pool).map(Number).sort(function (a, b) { return a - b; });
-      var pq = function (pr) {
-        var target = pr * (tot - 1), acc = 0;
-        for (var i3 = 0; i3 < keys.length; i3++) {
-          acc += pool[keys[i3]];
-          if (acc - 1 >= target) return keys[i3];
-        }
-        return keys[keys.length - 1];
-      };
-      likely = [Math.max(pq(0.10), loPct), Math.min(pq(0.90), hiPct)];
-    }
-
     res.style.display = 'block';
-    document.getElementById('cp-big').textContent =
-      Math.round(out.p * 100) + '%';
-    document.getElementById('cp-stars').textContent =
-      (likely ? 'likely ' + likely[0] + '\u2013' + likely[1] + ' · ' : '') +
-      'range ' + loPct + '\u2013' + hiPct + ' · ' + starRange(out.p);
+    if (r0 && r1) {
+      document.getElementById('cp-big').textContent =
+        r0.pPct + '% / ' + r1.pPct + '%';
+      document.getElementById('cp-stars').textContent =
+        'no wall: ' + fmt(r0) + ' · if wall: ' + fmt(r1);
+    } else {
+      var r = r0 || r1;
+      document.getElementById('cp-big').textContent = r.pPct + '%';
+      document.getElementById('cp-stars').textContent =
+        (r.likely ? 'likely ' + r.likely[0] + '–' + r.likely[1] + ' · ' : '') +
+        'range ' + r.lo + '–' + r.hi + ' · ' + starRange(r.p);
+    }
     document.getElementById('cp-detail').textContent =
-      (combined ? 'combined opportunity estimate ' + combined.toFixed(3) +
-                  's · ' : '') +
-      'flags: ' + (back === '1' ? 'going back' : 'not back') + ', ' +
-      (wall === '1' ? 'wall factor' : 'no wall') +
+      (combined ? 'combined opportunity estimate ' + combined.toFixed(3) + 's · ' : '') +
+      'flags: ' + (back === '1' ? 'going back' : 'not back') +
+      (r1 ? ', wall ambiguous' : (scenarios[0] === '1' ? ', wall factor' : ', no wall')) +
       (wallNote ? ' (' + wallNote + ')' : '') + ' · ' +
-      out.n + ' comparable plays within ±' +
-      (0.05 * out.ring).toFixed(2) + 's / ±' + out.ring + ' ft · ' +
+      (r0 || r1).n + ' comparable plays · ' +
       meta.seasons + ', ' + meta.plays.toLocaleString() + ' tracked plays';
   }
 
