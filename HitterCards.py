@@ -1452,9 +1452,9 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                               _panel_w, _spray_panel_h])
         _ax_r = fig.add_axes([spray_axes_left + _panel_w + _panel_gap,
                               spray_axes_bottom, _panel_w, _spray_panel_h])
-        # LHB panel first — the majority side for nearly every switch hitter
-        spray_panels = [(_ax_l, 'L', _sacq_full['L'][1], _sacq_full['L'][2]),
-                        (_ax_r, 'R', _sacq_full['R'][1], _sacq_full['R'][2])]
+        # RHH panel on the left, LHH on the right (2026-08-03, per Wally)
+        spray_panels = [(_ax_l, 'R', _sacq_full['R'][1], _sacq_full['R'][2]),
+                        (_ax_r, 'L', _sacq_full['L'][1], _sacq_full['L'][2])]
         ax_spray = _ax_l          # annotation/legend anchors keep working
     else:
         ax_spray = fig.add_axes([spray_axes_left, spray_axes_bottom,
@@ -1700,8 +1700,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         if is_switch:
             _pts2 = [q for q in bip_pts if q[6] == _s2]
             _med2 = _median_of(_pts2)
-            _hdr2 = (f"AS LHB (VS RHP)  ·  {len(_pts2)} BIP" if _s2 == 'L'
-                     else f"AS RHB (VS LHP)  ·  {len(_pts2)} BIP")
+            _hdr2 = (f"AS LHH (VS RHP)  ·  {len(_pts2)} BIP" if _s2 == 'L'
+                     else f"AS RHH (VS LHP)  ·  {len(_pts2)} BIP")
         else:
             _pts2 = bip_pts
             _med2 = (med_spray, med_la_real)
