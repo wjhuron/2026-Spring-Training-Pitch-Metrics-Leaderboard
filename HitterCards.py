@@ -382,7 +382,49 @@ def load_pitch_data(path=_PICKLE_PATH,
             print(f"                  python3 process_data.py    (full pipeline)")
 
     with open(path, 'rb') as f:
-        return pickle.load(f)
+        pitches = pickle.load(f)
+    _apply_runexp_currency(pitches)
+    return pitches
+
+
+def _apply_runexp_currency(pitches):
+    """Rescale MiLB RunExp into MLB run currency, in place.
+
+    The pickle stores RunExp exactly as Statcast served it, and Statcast
+    builds delta_run_exp on each league's own run-expectancy matrix — so
+    ROC/AAA values are ~1.25x MLB for the identical event. process_data
+    corrects this in memory for the site and never writes it back, so any
+    script reading the pickle inherits the raw MiLB values; here that fed
+    both PitchRV/100 and (via _compute_pitch_xrv's non-BIP fallthrough)
+    xPitchRV/100 on every ROC hitter card.
+
+    Done once at load, before any consumer, mirroring process_data. Level
+    comes from the pitch's own `_source`, which the pickle carries, so no
+    inference is needed (the pitcher-card path reads worksheets instead,
+    which have no _source, and has to detect level from bat tracking).
+    """
+    try:
+        from pipeline_utils import compute_runexp_scale, runexp_factor
+    except ImportError:
+        return
+    scale = compute_runexp_scale(pitches)
+    if not scale:
+        return
+    n_fixed = 0
+    for p in pitches:
+        sc = scale.get(p.get('_source'))
+        if not sc:
+            continue
+        v = sf(p.get('RunExp'))
+        if v is None:
+            continue
+        f = runexp_factor(sc, p.get('Description'), p.get('Count'))
+        if f:
+            p['RunExp'] = v / f
+            n_fixed += 1
+    if n_fixed:
+        print(f"  RunExp -> MLB currency: {n_fixed} MiLB pitches rescaled "
+              + ", ".join(f"{s} /{d['global']:.3f}" for s, d in sorted(scale.items())))
 
 
 def load_hitter_leaderboard(path=_HITTER_LB_PATH):
