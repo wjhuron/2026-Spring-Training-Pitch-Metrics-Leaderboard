@@ -1847,10 +1847,6 @@ def render_card(config, pitches, output_file):
     # pitches carry no per-pitch xwOBA (the Tier-2 fill is pipeline-only).
     xwc_by_pt = {pt: d.get('xwOBAcon') for pt, d in pitch_lb.items()}
     stuff_by_pt = {pt: d.get('stuffScore') for pt, d in pitch_lb.items()}
-    # Low-model-support daggers (season cards only): the pitch sits far from
-    # the Stuff+ model's training data (worst ~1.5% of units league-wide), so
-    # its per-type Stuff+ is an extrapolation — marked with a superscript †.
-    stuff_lowsup_by_pt = {pt: bool(d.get('stuffScore_lowSupport')) for pt, d in pitch_lb.items()}
     pitching_by_pt = {pt: d.get('pitchingScore') for pt, d in pitch_lb.items()}
     # RV columns: season cards default to the actual + expected per-100 pair
     # (PitchRV/100 + xPitchRV/100); --rv-mode totals swaps in the cumulative
@@ -1963,8 +1959,7 @@ def render_card(config, pitches, output_file):
             fmt_fi(sum(relzs)/len(relzs)) if relzs else '—',fmt_fi(sum(relxs)/len(relxs)) if relxs else '—',
             fmt_fi(sum(exts)/len(exts)) if exts else '—',
             f"{sum(armangles)/len(armangles):.1f}°" if armangles else '—',
-            ((f"{int(round(stuff_by_pt[pt]))}" +
-              ('†' if is_season and stuff_lowsup_by_pt.get(pt) else ''))
+            (f"{int(round(stuff_by_pt[pt]))}"
              if stuff_by_pt.get(pt) is not None else '—'),
             (f"{int(round(locplus_by_pt[pt]))}" if locplus_by_pt.get(pt) is not None else '—'),
             (f"{int(round(pitching_by_pt[pt]))}" if pitching_by_pt.get(pt) is not None else '—'),
@@ -2391,9 +2386,6 @@ def render_card(config, pitches, output_file):
                     'Per-pitch Stuff+ and Loc+ graded vs same pitch type (100 = average for that type)\n'
                     'Overall Stuff+ = pitch-weighted average of per-pitch grades\n'
                     'Faded values: sample too small to grade; they color in as pitches accumulate')
-        if any(stuff_lowsup_by_pt.get(_pt) and stuff_by_pt.get(_pt) is not None
-               for _pt, _ in pitch_stats):
-            _sp_note += '\n† = low model support (unusual pitch profile, score less certain)'
         fig.text(_sp_x, b - _below_off, _sp_note,
                  fontsize=8, color=TEXT_MUTED, va='top', ha='left', fontfamily='IBM Plex Sans', fontweight='bold', linespacing=1.5)
 
@@ -2990,10 +2982,10 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "ROC"
+    team            = ""
     start_date      = None    # Set to None for full season
-    end_date        = None              # Set to a date for date range, or None for single day
-    filter_pitchers = "Williams, Trevor"                 # Semicolon-separated "Last, First" names, or "" for all
+    end_date        = None             # Set to a date for date range, or None for single day
+    filter_pitchers = "Griffin, Foster"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR
@@ -3177,7 +3169,6 @@ def main():
                         'rv100': _r.get('rv100'), 'runValue': _r.get('runValue'),
                         'xwOBAcon': _r.get('xwOBAcon'),
                         'stuffScore': _r.get('stuffScore'), 'stuffScore_pctl': _r.get('stuffScore_pctl'),
-                        'stuffScore_lowSupport': _r.get('stuffScore_lowSupport'),
                         'pitchingScore': _r.get('pitchingScore'),
                         'xrvoe100': _r.get('xrvoe100'),
                     }
@@ -3469,7 +3460,7 @@ def main():
             'overall_avgs': overall_avgs,
             'pitcher_league_avgs': overall_avgs,
             # mvn_models stays empty for daily → is_season False → daily layout
-            # (RelZ/RelX kept, no RV pair, † off). Stuff+/Loc+/nVAA/nHAA come
+            # (RelZ/RelX kept, no RV pair). Stuff+/Loc+/nVAA/nHAA come
             # from the computed context maps below regardless.
             'mvn_models': mvn_models if is_multi_game else {},
             'pctl_row': pctl_row,
