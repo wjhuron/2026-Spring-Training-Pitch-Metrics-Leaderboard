@@ -82,10 +82,23 @@ MIN_FEATS = 12
 # spin axis adds the seam-shifted-wake/gyro info movement can't see. Tilt
 # and spin get half weight since movement already encodes most of them.
 MIX_W = 1 / 3        # share of the pitcher distance that comes from the mix
+                     # (--mix-w overrides; 1.0 = arsenal-only comps)
 MIX_CORE = ('velo', 'ivb', 'hb')                 # required dims, weight 1
 MIX_SOFT = (('tilt', 0.5), ('spin', 0.5))        # optional dims, half weight
+# Per-pitch-type OUTCOME dims for the pair cost (--mix-outcomes): a pitch
+# matches better when it also gets similar results — whiff (per swing),
+# zone rate, GB rate on that pitch. Half weight like tilt/spin — a
+# CONVENTION, not a measured optimum (no validation objective exists for
+# a similarity definition). Denominator floors below are conventions too.
+MIX_OUTCOME = (('whiff', 0.5), ('zone', 0.5), ('gb', 0.5))
+MIX_OUT_MIN = {'whiff': 15, 'zone': 25, 'gb': 10}   # swings / pitches / BIP
+USE_MIX_OUTCOMES = False
 MIX_MIN_USAGE = 0.03                             # drop show-me pitches
 TILT_WRAP = 720                                  # tilt is minutes past 12:00
+
+
+def active_soft():
+    return MIX_SOFT + (MIX_OUTCOME if USE_MIX_OUTCOMES else ())
 
 
 def tilt_minutes(s):
@@ -136,7 +149,7 @@ def mix_zstats(pool):
     """
     out = {}
     entries = [p for r in pool for p in (r.get('arsenal') or [])]
-    for d in MIX_CORE + tuple(k for k, _ in MIX_SOFT):
+    for d in MIX_CORE + tuple(k for k, _ in active_soft()):
         vals = [e[d] for e in entries if e.get(d) is not None]
         if not vals:
             out[d] = (0.0, 1.0)
@@ -170,7 +183,7 @@ def arsenal_dist(A, B, mz):
             if len(cs) < len(MIX_CORE):
                 continue
             num, den = sum(cs), float(len(cs))
-            for d, w in MIX_SOFT:
+            for d, w in active_soft():
                 va, vb = a.get(d), b.get(d)
                 if va is None or vb is None:
                     continue
@@ -202,12 +215,15 @@ def dist(a, b, feats, stats, mix=None):
             continue
         m, s = stats[f]
         ds.append((abs((va - m) / s - (vb - m) / s), f))
-    if len(ds) < MIN_FEATS:
-        return None, ds, None
-    d = sum(dd for dd, _ in ds) / len(ds)
     md = None
     if mix is not None and a.get('arsenal') and b.get('arsenal'):
         md = arsenal_dist(a['arsenal'], b['arsenal'], mix)
+    if MIX_W >= 1:
+        # arsenal-only mode: the fingerprint is narrative context, not distance
+        return (md, ds, md) if md is not None else (None, ds, None)
+    if len(ds) < MIN_FEATS:
+        return None, ds, None
+    d = sum(dd for dd, _ in ds) / len(ds)
     if md is not None:
         d = (1 - MIX_W) * d + MIX_W * md
     return d, ds, md
@@ -231,6 +247,8 @@ def why_parts(t, comp, ds, feats, stats, nice):
     shared.sort(reverse=True)
     tr = ', '.join(f"{nice[f]} {'high' if zz > 0 else 'low'}"
                    for _, f, zz in shared[:4]) or 'league-average across the board'
+    if not ds:
+        return tr, ''
     gap_d, gap_f = max(ds, key=lambda x: x[0])[0], max(ds, key=lambda x: x[0])[1]
     fmt = lambda v: f'{v:.4g}' if isinstance(v, float) else v
     gap = (f"{nice[gap_f]} (Δz {gap_d:.1f}: "
@@ -313,10 +331,12 @@ def in_level(team, level):
 
 
 def _mk_arsenal(entries):
-    """entries: [(usage, velo, ivb, hb_armside, tilt_armside, spin)] ->
-    cleaned, renormalized list. Core dims required; tilt/spin optional."""
-    keep = [dict(usage=u, velo=v, ivb=iv, hb=hb, tilt=ti, spin=sp)
-            for u, v, iv, hb, ti, sp in entries
+    """entries: [(usage, velo, ivb, hb_armside, tilt_armside, spin,
+    whiff, zone, gb)] -> cleaned, renormalized list. Core dims required;
+    tilt/spin (and the per-type outcome rates) optional."""
+    keep = [dict(usage=u, velo=v, ivb=iv, hb=hb, tilt=ti, spin=sp,
+                 whiff=wh, zone=zn, gb=gb)
+            for u, v, iv, hb, ti, sp, wh, zn, gb in entries
             if u and u >= MIX_MIN_USAGE and v is not None
             and iv is not None and hb is not None]
     tot = sum(p['usage'] for p in keep)
@@ -345,9 +365,18 @@ def load_arsenals():
         ti = tilt_minutes(r.get('releaseTiltMinutes'))
         if ti is not None and lefty:
             ti = mirror_tilt(ti)
+        # per-type outcome rates, gated by their denominator floors
+        # (swStrPct in the pitch leaderboard is whiffs/swings)
+        wh = (sf(r.get('swStrPct'))
+              if (sf(r.get('nSwings')) or 0) >= MIX_OUT_MIN['whiff'] else None)
+        zn = (sf(r.get('izPct'))
+              if (sf(r.get('count')) or 0) >= MIX_OUT_MIN['zone'] else None)
+        gb = (sf(r.get('gbPct'))
+              if (sf(r.get('nBip')) or 0) >= MIX_OUT_MIN['gb'] else None)
         grouped[(r['pitcher'], r['team'])].append(
             (sf(r.get('usagePct')), sf(r.get('velocity')),
-             sf(r.get('indVertBrk')), hb, ti, sf(r.get('spinRate'))))
+             sf(r.get('indVertBrk')), hb, ti, sf(r.get('spinRate')),
+             wh, zn, gb))
     return {k: _mk_arsenal(v) for k, v in grouped.items()}
 
 
@@ -607,6 +636,14 @@ def window_pitchers(start, end=None, pitches=None):
                 a['wh'] += 1
                 if in_z:
                     a['izwh'] += 1
+        if pt and pt not in ('EP', 'PO'):
+            # per-type outcome counters for the arsenal's whiff/zone dims
+            if in_z:
+                a[f'mix_{pt}_iz'] += 1
+            if is_swing:
+                a[f'mix_{pt}_sw'] += 1
+                if desc == 'Swinging Strike':
+                    a[f'mix_{pt}_wh'] += 1
         ev = p.get('Event')
         if ev and ev not in NON_PA_EVENTS and ev != 'Intent Walk':
             a['tbf'] += 1
@@ -619,8 +656,12 @@ def window_pitchers(start, end=None, pitches=None):
             a['bip'] += 1
             if bb_type == 'ground_ball':
                 a['gb'] += 1
+                if pt and pt not in ('EP', 'PO'):
+                    a[f'mix_{pt}_gb'] += 1
             if bb_type == 'popup':
                 a['pu'] += 1
+            if pt and pt not in ('EP', 'PO'):
+                a[f'mix_{pt}_bip'] += 1
             ev_f = sf(p.get('ExitVelo'))
             if ev_f is not None:
                 a['ev_sum'] += ev_f; a['ev_n'] += 1
@@ -657,8 +698,17 @@ def window_pitchers(start, end=None, pitches=None):
                 ti = (th / (2 * math.pi) * TILT_WRAP) % TILT_WRAP
                 if lefty:
                     ti = mirror_tilt(ti)
-            entries.append((a[f'mix_{pt}_n'] / n_typed if n_typed else 0,
-                            means['v'], means['iv'], hb, ti, means['sp']))
+            n_pt, sw_pt = a[f'mix_{pt}_n'], a[f'mix_{pt}_sw']
+            bip_pt = a[f'mix_{pt}_bip']
+            wh = (a[f'mix_{pt}_wh'] / sw_pt
+                  if sw_pt >= MIX_OUT_MIN['whiff'] else None)
+            zn = (a[f'mix_{pt}_iz'] / n_pt
+                  if n_pt >= MIX_OUT_MIN['zone'] else None)
+            gbr = (a[f'mix_{pt}_gb'] / bip_pt
+                   if bip_pt >= MIX_OUT_MIN['gb'] else None)
+            entries.append((n_pt / n_typed if n_typed else 0,
+                            means['v'], means['iv'], hb, ti, means['sp'],
+                            wh, zn, gbr))
         out.append(dict(
             arsenal=_mk_arsenal(entries),
             # no outs-recorded field in the cache; IP estimated at 4.3 TBF/inning
@@ -780,6 +830,7 @@ def run_role(role, args):
 
 
 def main():
+    global MIX_W, USE_MIX_OUTCOMES
     if len(sys.argv) == 1:
         interactive()
         return
@@ -806,9 +857,20 @@ def main():
                     help='batch mode: min PA to include a hitter target')
     ap.add_argument('--min-ip', type=float, default=25,
                     help='batch mode: min IP to include a pitcher target')
+    ap.add_argument('--mix-w', type=float, default=None,
+                    help='arsenal share of the pitcher distance '
+                         f'(default {MIX_W:.2f}; 1.0 = arsenal-only comps, '
+                         'fingerprint kept for narrative only)')
+    ap.add_argument('--mix-outcomes', action='store_true',
+                    help='add per-pitch-type outcome dims (whiff/swing, '
+                         'zone rate, GB rate) to the arsenal pair cost at '
+                         'half weight')
     ap.add_argument('--csv', default=None,
                     help='write top-3 comps + reasons to this CSV path')
     args = ap.parse_args()
+    if args.mix_w is not None:
+        MIX_W = args.mix_w
+    USE_MIX_OUTCOMES = args.mix_outcomes
 
     if args.team:
         args.player = None
@@ -855,7 +917,15 @@ def interactive():
     exclude    = ""         # batch mode: semicolon-separated names to skip
     min_pa     = 100        # batch mode: min PA to include a hitter
     min_ip     = 25         # batch mode: min IP to include a pitcher
+    mix_w      = None       # arsenal share of distance (None = default 1/3;
+                            #   1.0 = arsenal-only comps)
+    mix_outcomes = False    # add per-type whiff/zone/GB dims to the pair cost
     csv_path   = "~/Downloads/roc_comps.csv"   # "" = no CSV
+
+    global MIX_W, USE_MIX_OUTCOMES
+    if mix_w is not None:
+        MIX_W = mix_w
+    USE_MIX_OUTCOMES = mix_outcomes
 
     args = argparse.Namespace(player=player or None, player_team=None,
                               team=None if player else team, tab=tab,
