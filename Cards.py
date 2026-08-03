@@ -155,6 +155,80 @@ MLB_ID_CACHE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ml
 OUTPUT_DIR = os.path.join(os.path.expanduser('~'), 'Downloads', '')
 METADATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'metadata_rs.json')
 
+
+def _apply_runexp_currency(rows):
+    """Rescale MiLB-sourced RunExp into MLB run currency, in place.
+
+    Statcast builds delta_run_exp on each league's own run-expectancy matrix,
+    so the identical event carries ~1.25x the magnitude at AAA/ROC. process_data
+    corrects this for the site, but the correction is never written back to the
+    sheets, so every card built straight from a worksheet inherited the raw
+    MiLB values — inflating PitchRV/xPitchRV (and, through xRV/100, Pitcher+)
+    on ROC/AAA and cross-level cards.
+
+    LEVEL comes from bat tracking, not from a team label: BatSpeed/SwingLength
+    are MLB-only, so a game with any tracked swing is MLB and everything else
+    is MiLB. That matters because a cross-level card (--all-levels, or a
+    scratch tab holding a full MLB+AAA season) mixes both currencies inside
+    one pitcher, and its team columns cannot be trusted to say which is which.
+    The ROC-vs-AAA factor set is picked off BTeam, which only chooses between
+    two factors within ~2% of each other.
+
+    Factors come from metadata (published by the pipeline run) rather than
+    being re-derived here: deriving them needs an MLB reference set that a
+    single card's pitches don't contain.
+    """
+    from pipeline_utils import runexp_factor, runexp_scale_from_json
+    try:
+        with open(METADATA_PATH) as f:
+            scale = runexp_scale_from_json(json.load(f).get('runexpScale'))
+    except (OSError, ValueError):
+        scale = None
+    if not scale:
+        print("  [WARN] metadata has no runexpScale — MiLB RunExp stays in "
+              "MiLB currency (RV/xRV/Pitcher+ will read high on ROC/AAA "
+              "pitches). Re-run process_data.py to publish it.")
+        return
+
+    # Keyed per PITCHER-date, not per tab-date: a scratch tab pools arms who
+    # pitched at different levels on the same day (24 such dates in the NEW
+    # tab), so a tab-wide date key would inherit one MLB arm's bat tracking
+    # and silently skip the correction for everyone else that day.
+    SWINGS = ('Swinging Strike', 'Foul', 'In Play')
+    mlb_outings, swings_seen, mlb_dates = set(), set(), set()
+    for r in rows:
+        key = (r.get('Pitcher'), r.get('Game Date'))
+        if any(str(r.get('Description', '')).startswith(s) for s in SWINGS):
+            swings_seen.add(key)
+        if str(r.get('BatSpeed', '')).strip():
+            mlb_outings.add(key)
+            mlb_dates.add((r.get('_card_team'), r.get('Game Date')))
+
+    n_fixed = 0
+    for r in rows:
+        key = (r.get('Pitcher'), r.get('Game Date'))
+        if key in mlb_outings:
+            continue
+        # No swing in the outing means no bat tracking could appear either
+        # way (a one-batter called-strike inning), so fall back to whether
+        # anything else on that tab-date was tracked.
+        if key not in swings_seen and (r.get('_card_team'), r.get('Game Date')) in mlb_dates:
+            continue
+        src = r.get('BTeam') if r.get('BTeam') in scale else None
+        sc = scale.get(src) or scale.get('AAA') or scale.get('ROC')
+        if not sc:
+            continue
+        v = sf(r.get('RunExp'))
+        if v is None:
+            continue
+        f = runexp_factor(sc, r.get('Description'), r.get('Count'))
+        if f:
+            r['RunExp'] = v / f
+            n_fixed += 1
+    if n_fixed:
+        print(f"  RunExp -> MLB currency: {n_fixed} MiLB pitches rescaled "
+              f"({len(mlb_outings)} MLB outings left as-is)")
+
 # Guts constants for xRV computation. Read live from metadata_rs.json so the
 # values match whatever process_data.py used on its last run; otherwise a
 # Cards-vs-leaderboard mismatch creeps back in as FanGraphs updates Guts.
@@ -2990,7 +3064,7 @@ def main():
     team            = ""
     start_date      = None    # Set to None for full season
     end_date        = None             # Set to a date for date range, or None for single day
-    filter_pitchers = "May, Dustin"                 # Semicolon-separated "Last, First" names, or "" for all
+    filter_pitchers = "Zeferjahn, Ryan"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR
@@ -3204,6 +3278,8 @@ def main():
             r['_card_team'] = t      # tag source team for per-team boxscore fetch
         all_rows.extend(t_rows)
         print(f"  {t}: {len(t_rows)} rows")
+
+    _apply_runexp_currency(all_rows)
 
     # Filter by date range (and optionally by pitcher name)
     pitches_by_pitcher = defaultdict(list)

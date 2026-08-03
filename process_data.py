@@ -87,7 +87,8 @@ def _bip_woba_value(event):
 # compute_runexp_scale / runexp_factor moved to pipeline_utils
 # (2026-07-28) so train_stuff_v11 can apply the same MiLB RunExp
 # currency correction without importing this module.
-from pipeline_utils import compute_runexp_scale, runexp_factor
+from pipeline_utils import (compute_runexp_scale, runexp_factor,
+                            runexp_scale_to_json)
 
 
 def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
@@ -3430,6 +3431,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
         'totalPitchers': len(pitcher_lb_mlb),
         'totalHitters': len(hitter_lb_mlb),
         'rocTeams': sorted(AAA_TEAMS),
+        # Published so direct readers of the pitch data (Cards.py) apply the
+        # SAME MiLB->MLB RunExp factors this run used. Re-deriving them needs
+        # an MLB reference set a single card doesn't have.
+        'runexpScale': runexp_scale_to_json(_re_scale),
         'leagueAverages': league_avgs,
         'pitcherLeagueAverages': pitcher_league_avgs,
         'hitterLeagueAverages': hitter_league_avgs,

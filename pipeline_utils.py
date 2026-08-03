@@ -453,6 +453,43 @@ def compute_runexp_scale(all_pitches, min_cell=30, min_mag=0.005):
     return out
 
 
+def runexp_scale_to_json(scale):
+    """compute_runexp_scale() output -> JSON-safe blob.
+
+    The cell factors are keyed by a (Description, Count) TUPLE, which JSON
+    cannot represent, so they are flattened to "desc\tcount". Published in
+    metadata so consumers that read the pitch data directly (Cards.py, any
+    pickle reader) can apply the SAME factors the site used instead of
+    re-deriving them — re-deriving needs an MLB reference set, which a
+    single card's pitches don't have.
+    """
+    if not scale:
+        return {}
+    return {src: {'cell': {f'{d}\t{c}': f for (d, c), f in s['cell'].items()},
+                  'desc': dict(s['desc']),
+                  'global': s['global']}
+            for src, s in scale.items()}
+
+
+def runexp_scale_from_json(blob):
+    """Inverse of runexp_scale_to_json(); {} when missing or malformed."""
+    if not blob:
+        return {}
+    out = {}
+    for src, s in blob.items():
+        try:
+            cell = {}
+            for k, f in (s.get('cell') or {}).items():
+                d, _, c = k.partition('\t')
+                cell[(d, c)] = f
+            out[src] = {'cell': cell,
+                        'desc': dict(s.get('desc') or {}),
+                        'global': s.get('global') or 1.0}
+        except (AttributeError, TypeError):
+            continue
+    return out
+
+
 def runexp_factor(scale_for_source, description, count):
     """cell -> desc -> global fallback. `scale_for_source` is one entry of
     compute_runexp_scale()'s output."""
