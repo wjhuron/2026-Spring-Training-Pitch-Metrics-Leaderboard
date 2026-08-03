@@ -60,19 +60,28 @@ NICE_H = {'avgEVAll': 'EV', 'hardHitPct': 'HardHit%',
           'kPct': 'K%', 'bbPct': 'BB%',
           'batSpeed': 'BatSpd', 'swingLength': 'SwLen', 'attackAngle': 'AttackAng'}
 
+# Pitcher fingerprint — REVISED 2026-08-03 (scripts/comps_validation.py +
+# comps_feature_selection.py + comps_variant_eval.py). Dropped from the
+# original 17: bbPct (split-half r .37, in/out flat on the sweep) and the
+# contact-quality block avgEVAgainst/hardHitPct/barrelPctAgainst/xwOBAcon
+# (r .10-.34 — noisier than BB%). Added stuffScore/locPlus (per-pitch atom
+# means; r .90/.65). Head-to-head vs the shipped 17 on the kNN predictive
+# objective: +.061 interleaved split, -.011 temporal (within noise), best
+# cross-split mean of every fixed variant. Greedy-selected sets were
+# rejected: none transferred across splits.
 FEATS_P = ['fbVelo', 'extension', 'armAngle', 'vaa', 'haa',
-           'kPct', 'bbPct', 'swStrPct', 'izWhiffPct',
-           'chasePct', 'izPct',
-           'gbPct', 'puPct', 'avgEVAgainst', 'hardHitPct',
-           'barrelPctAgainst', 'xwOBAcon']
+           'kPct', 'swStrPct', 'izWhiffPct',
+           'chasePct', 'izPct', 'gbPct', 'puPct',
+           'stuffScore', 'locPlus']
 NICE_P = {'fbVelo': 'FBVelo', 'extension': 'Ext', 'armAngle': 'ArmAng',
-          'vaa': 'VAA', 'haa': '|HAA|', 'kPct': 'K%', 'bbPct': 'BB%',
+          'vaa': 'VAA', 'haa': '|HAA|', 'kPct': 'K%',
           'swStrPct': 'SwStr%', 'izWhiffPct': 'IZWhiff%',
           'chasePct': 'Chase%', 'izPct': 'IZ%', 'gbPct': 'GB%', 'puPct': 'PU%',
-          'avgEVAgainst': 'EV', 'hardHitPct': 'HardHit%',
-          'barrelPctAgainst': 'Barrel%', 'xwOBAcon': 'xwOBAcon'}
+          'stuffScore': 'Stuff+', 'locPlus': 'Loc+'}
 
-MIN_FEATS = 12
+# 11 = one-feature slack on the 14-feat pitcher set (grade atoms are absent
+# for ungraded scratch-tab pitches); hitters (18 feats) are unaffected.
+MIN_FEATS = 11
 # Pitch-mix component (pitchers): arsenals are compared TAG-BLIND — every
 # pitch is just (usage, velo, IVB, HB[arm-side], spin tilt, spin rate) and
 # usage mass is matched to the metrically nearest shapes in the other arsenal
@@ -85,14 +94,41 @@ MIX_W = 1 / 3        # share of the pitcher distance that comes from the mix
                      # (--mix-w overrides; 1.0 = arsenal-only comps)
 MIX_CORE = ('velo', 'ivb', 'hb')                 # required dims, weight 1
 MIX_SOFT = (('tilt', 0.5), ('spin', 0.5))        # optional dims, half weight
-# Per-pitch-type OUTCOME dims for the pair cost (--mix-outcomes): a pitch
-# matches better when it also gets similar results — whiff (per swing),
-# zone rate, GB rate on that pitch. Half weight like tilt/spin — a
-# CONVENTION, not a measured optimum (no validation objective exists for
-# a similarity definition). Denominator floors below are conventions too.
-MIX_OUTCOME = (('whiff', 0.5), ('zone', 0.5), ('gb', 0.5))
+# Per-pitch-type OUTCOME dims for the pair cost: a pitch matches better when
+# it also gets similar results — whiff (per swing), zone rate, GB rate on
+# that pitch. Weight 1.5 is a MEASURED interior optimum (comps_validation
+# addendum, arsenal-only kNN objective: peak at 1.5 on both 2026 splits,
+# falling by 2.0; the 2025 shape+whiff replicate rises monotonically through
+# its grid in agreement). ON by default since 2026-08-03 (--no-mix-outcomes
+# reverts). Denominator floors remain conventions.
+MIX_OUTCOME = (('whiff', 1.5), ('zone', 1.5), ('gb', 1.5))
 MIX_OUT_MIN = {'whiff': 15, 'zone': 25, 'gb': 10}   # swings / pitches / BIP
-USE_MIX_OUTCOMES = False
+USE_MIX_OUTCOMES = True
+
+# AAA -> MLB level offsets for the outcome dims (scripts/comps_validation.py:
+# league per-type rates, AAA minus MLB; e.g. 2026 FF whiff +2.7pts, SI GB
+# +9.3pts). Rates earned vs AAA hitters have the AAA-share of the offset
+# subtracted so every arsenal speaks the MLB scale. A pitch is AAA-level when
+# either side carries an AAA code (cache: PTeam ROC/AAA; scratch tabs: BTeam).
+_AAA_OFF_PATH = os.path.join(ROOT, 'data', 'aaa_outcome_offsets.json')
+_AAA_OFFSETS = None
+
+
+def aaa_offset(pt, dim):
+    global _AAA_OFFSETS
+    if _AAA_OFFSETS is None:
+        try:
+            _AAA_OFFSETS = json.load(open(_AAA_OFF_PATH)).get('offsets', {})
+        except (OSError, ValueError):
+            print(f'  WARNING: {_AAA_OFF_PATH} missing — AAA-earned outcome '
+                  'dims left on the AAA scale (run scripts/comps_validation.py)')
+            _AAA_OFFSETS = {}
+    return (_AAA_OFFSETS.get(pt) or {}).get(dim, 0.0)
+
+
+def is_aaa_pitch(p):
+    return (p.get('PTeam') in AAA_TEAMS or p.get('BTeam') in AAA_TEAMS
+            or p.get('_lvl') == 'aaa')
 MIX_MIN_USAGE = 0.03                             # drop show-me pitches
 TILT_WRAP = 720                                  # tilt is minutes past 12:00
 
@@ -366,13 +402,23 @@ def load_arsenals():
         if ti is not None and lefty:
             ti = mirror_tilt(ti)
         # per-type outcome rates, gated by their denominator floors
-        # (swStrPct in the pitch leaderboard is whiffs/swings)
-        wh = (sf(r.get('swStrPct'))
-              if (sf(r.get('nSwings')) or 0) >= MIX_OUT_MIN['whiff'] else None)
-        zn = (sf(r.get('izPct'))
-              if (sf(r.get('count')) or 0) >= MIX_OUT_MIN['zone'] else None)
-        gb = (sf(r.get('gbPct'))
-              if (sf(r.get('nBip')) or 0) >= MIX_OUT_MIN['gb'] else None)
+        # (swStrPct in the pitch leaderboard is whiffs/swings). ROC/AAA rows
+        # earned their rates vs AAA hitters -> shift onto the MLB scale.
+        pt_key = r.get('pitchType')
+        is_aaa_row = r.get('team') in AAA_TEAMS
+        def _lvl(v, dim):
+            if v is None or not is_aaa_row:
+                return v
+            return v - aaa_offset(pt_key, dim)
+        wh = _lvl(sf(r.get('swStrPct'))
+                  if (sf(r.get('nSwings')) or 0) >= MIX_OUT_MIN['whiff'] else None,
+                  'whiff')
+        zn = _lvl(sf(r.get('izPct'))
+                  if (sf(r.get('count')) or 0) >= MIX_OUT_MIN['zone'] else None,
+                  'zone')
+        gb = _lvl(sf(r.get('gbPct'))
+                  if (sf(r.get('nBip')) or 0) >= MIX_OUT_MIN['gb'] else None,
+                  'gb')
         grouped[(r['pitcher'], r['team'])].append(
             (sf(r.get('usagePct')), sf(r.get('velocity')),
              sf(r.get('indVertBrk')), hb, ti, sf(r.get('spinRate')),
@@ -595,6 +641,12 @@ def window_pitchers(start, end=None, pitches=None):
             a['ext_sum'] += ext; a['ext_n'] += 1
         if ang is not None:
             a['ang_sum'] += ang; a['ang_n'] += 1
+        # grade-atom means (coherent canon: displayed grades = mean of the
+        # sheet's int atoms) — fingerprint features since the 2026-08-03 audit
+        for fld, key in (('Stuff+', 'stuff'), ('Loc+', 'loc')):
+            v = sf(p.get(fld))
+            if v is not None:
+                a[f'{key}_sum'] += v; a[f'{key}_n'] += 1
         pt = p.get('Pitch Type')
         if pt and pt not in ('EP', 'PO'):
             ptypes[(h, t)].add(pt)
@@ -637,11 +689,18 @@ def window_pitchers(start, end=None, pitches=None):
                 if in_z:
                     a['izwh'] += 1
         if pt and pt not in ('EP', 'PO'):
-            # per-type outcome counters for the arsenal's whiff/zone dims
+            # per-type outcome counters for the arsenal's whiff/zone dims;
+            # AAA-level denominators tracked so AAA-earned rates can be
+            # shifted onto the MLB scale (aaa_outcome_offsets.json)
+            aaa_p = is_aaa_pitch(p)
+            if aaa_p:
+                a[f'mix_{pt}_n_aaa'] += 1
             if in_z:
                 a[f'mix_{pt}_iz'] += 1
             if is_swing:
                 a[f'mix_{pt}_sw'] += 1
+                if aaa_p:
+                    a[f'mix_{pt}_sw_aaa'] += 1
                 if desc == 'Swinging Strike':
                     a[f'mix_{pt}_wh'] += 1
         ev = p.get('Event')
@@ -662,6 +721,8 @@ def window_pitchers(start, end=None, pitches=None):
                 a['pu'] += 1
             if pt and pt not in ('EP', 'PO'):
                 a[f'mix_{pt}_bip'] += 1
+                if is_aaa_pitch(p):
+                    a[f'mix_{pt}_bip_aaa'] += 1
             ev_f = sf(p.get('ExitVelo'))
             if ev_f is not None:
                 a['ev_sum'] += ev_f; a['ev_n'] += 1
@@ -706,6 +767,13 @@ def window_pitchers(start, end=None, pitches=None):
                   if n_pt >= MIX_OUT_MIN['zone'] else None)
             gbr = (a[f'mix_{pt}_gb'] / bip_pt
                    if bip_pt >= MIX_OUT_MIN['gb'] else None)
+            # AAA-share level shift: rate - (aaa_den/den) * (AAA - MLB) mean
+            if wh is not None and a[f'mix_{pt}_sw_aaa']:
+                wh -= a[f'mix_{pt}_sw_aaa'] / sw_pt * aaa_offset(pt, 'whiff')
+            if zn is not None and a[f'mix_{pt}_n_aaa']:
+                zn -= a[f'mix_{pt}_n_aaa'] / n_pt * aaa_offset(pt, 'zone')
+            if gbr is not None and a[f'mix_{pt}_bip_aaa']:
+                gbr -= a[f'mix_{pt}_bip_aaa'] / bip_pt * aaa_offset(pt, 'gb')
             entries.append((n_pt / n_typed if n_typed else 0,
                             means['v'], means['iv'], hb, ti, means['sp'],
                             wh, zn, gbr))
@@ -719,6 +787,8 @@ def window_pitchers(start, end=None, pitches=None):
             haa=abs(haa) if haa is not None else None,
             extension=a['ext_sum'] / a['ext_n'] if a['ext_n'] else None,
             armAngle=a['ang_sum'] / a['ang_n'] if a['ang_n'] else None,
+            stuffScore=a['stuff_sum'] / a['stuff_n'] if a['stuff_n'] else None,
+            locPlus=a['loc_sum'] / a['loc_n'] if a['loc_n'] else None,
             kPct=a['k'] / tbf, bbPct=a['bb'] / tbf,
             swStrPct=a['wh'] / a['pitches'],
             izWhiffPct=a['izwh'] / a['izsw'] if a['izsw'] else None,
@@ -861,10 +931,11 @@ def main():
                     help='arsenal share of the pitcher distance '
                          f'(default {MIX_W:.2f}; 1.0 = arsenal-only comps, '
                          'fingerprint kept for narrative only)')
-    ap.add_argument('--mix-outcomes', action='store_true',
-                    help='add per-pitch-type outcome dims (whiff/swing, '
-                         'zone rate, GB rate) to the arsenal pair cost at '
-                         'half weight')
+    ap.add_argument('--mix-outcomes', action=argparse.BooleanOptionalAction,
+                    default=True,
+                    help='per-pitch-type outcome dims (whiff/swing, zone '
+                         'rate, GB rate) in the arsenal pair cost at the '
+                         'validated weight 1.5 (--no-mix-outcomes disables)')
     ap.add_argument('--csv', default=None,
                     help='write top-3 comps + reasons to this CSV path')
     args = ap.parse_args()
@@ -919,7 +990,7 @@ def interactive():
     min_ip     = 25         # batch mode: min IP to include a pitcher
     mix_w      = None       # arsenal share of distance (None = default 1/3;
                             #   1.0 = arsenal-only comps)
-    mix_outcomes = False    # add per-type whiff/zone/GB dims to the pair cost
+    mix_outcomes = True     # per-type whiff/zone/GB dims in the pair cost
     csv_path   = "~/Downloads/roc_comps.csv"   # "" = no CSV
 
     global MIX_W, USE_MIX_OUTCOMES
