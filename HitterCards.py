@@ -795,6 +795,10 @@ BUBBLE_COLUMNS = [
     # (contact axis covered by Z-Contact% + K%). Both stay in page tables.
     ('QUALITY OF CONTACT', [
         ('xwOBAcon',    'xwOBAcon',     'xwOBAcon_pctl',     '3dec'),
+        # BABIP directly under xwOBAcon (2026-08-03, per Wally): the pair
+        # reads realized-vs-expected on contact — mismatched tints flag
+        # batted-ball fortune. Hitter side is uninverted: high BABIP = red.
+        ('BABIP',       'babip',        'babip_pctl',        '3dec'),
         ('Max EV',      'maxEV',        'maxEV_pctl',        'mph'),
         ('Hard-Hit%',   'hardHitPct',   'hardHitPct_pctl',   'pct1'),
         ('Barrel%',     'barrelPct',    'barrelPct_pctl',    'pct1'),
@@ -2521,8 +2525,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 # ─────────────────────────────────────────────────────────────────────
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team           = "WSH"                   # Team filter (e.g., "NYY"), or None for all teams
-    filter_hitters = ""       # Semicolon-separated "Last, First" names, or "" for all
+    team           = None                   # Team filter (e.g., "NYY"), or None for all teams
+    filter_hitters = "Rutschman, Adley; Basallo, Samuel"       # Semicolon-separated "Last, First" names, or "" for all
     year_label     = "2026 Season"        # Display label on the card
     output_dir     = OUTPUT_DIR
 

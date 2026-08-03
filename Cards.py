@@ -881,6 +881,11 @@ BUBBLE_COLUMNS = [
     ]),
     ('CONTACT MGMT', [
         ('xwOBAcon',   'xwOBAcon',         'xwOBAcon_pctl',         '3dec'),
+        # BABIP directly under xwOBAcon (2026-08-03, per Wally): the pair
+        # reads realized-vs-expected on contact — a BABIP tint that fights
+        # the xwOBAcon tint flags batted-ball fortune at a glance. Pctl is
+        # pipeline-inverted (PITCHER_INVERT_PCTL): lower BABIP = red.
+        ('BABIP',      'babip',            'babip_pctl',            '3dec'),
         ('Hard-Hit%',  'hardHitPct',       'hardHitPct_pctl',       'pct1'),
         ('Barrel%',    'barrelPctAgainst', 'barrelPctAgainst_pctl', 'pct1'),
         ('GB%',        'gbPct',            'gbPct_pctl',            'pct1'),
@@ -2434,11 +2439,11 @@ def render_card(config, pitches, output_file):
 
 # Pitcher-level stats whose percentile is inverted (lower = better for the
 # pitcher). Mirrors PITCHER_ALL_INVERT in process_data for the bubble stats.
-_SCRATCH_INVERT_PITCHER = {'bbPct', 'xwOBA', 'xwOBAcon', 'hardHitPct', 'barrelPctAgainst'}
+_SCRATCH_INVERT_PITCHER = {'bbPct', 'xwOBA', 'xwOBAcon', 'hardHitPct', 'barrelPctAgainst', 'babip'}
 # Bubble-panel stats we compute and rank (everything BUBBLE_COLUMNS reads).
 _SCRATCH_POOL_STATS = ['xRv100', 'xwOBA', 'kPct', 'bbPct', 'kbbPct',
                        'swStrPct', 'chasePct', 'izWhiffPct', 'twoStrikeWhiffPct',
-                       'xwOBAcon', 'hardHitPct', 'barrelPctAgainst', 'gbPct',
+                       'xwOBAcon', 'hardHitPct', 'barrelPctAgainst', 'gbPct', 'babip',
                        'fbVelo', 'stuffScore', 'locPlus', 'pitchingScore',
                        'izPct', 'fpsPct']
 
@@ -2985,7 +2990,7 @@ def main():
     team            = ""
     start_date      = None    # Set to None for full season
     end_date        = None             # Set to a date for date range, or None for single day
-    filter_pitchers = "Griffin, Foster"                 # Semicolon-separated "Last, First" names, or "" for all
+    filter_pitchers = "May, Dustin"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR
