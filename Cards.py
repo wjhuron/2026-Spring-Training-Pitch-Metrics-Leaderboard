@@ -2725,10 +2725,19 @@ def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
     ctx['pitcher_pools'], ctx['pitch_pools'] = {}, {}
     try:
         with open(os.path.join(_data_dir, 'pitcher_leaderboard_rs.json')) as f:
-            _prows = _scratch_mlb_pool_rows(json.load(f))
+            _raw_prows = json.load(f)
+        _prows = _scratch_mlb_pool_rows(_raw_prows)
         for s in _SCRATCH_POOL_STATS:
             vals = [r.get(s) for r in _prows]
             ctx['pitcher_pools'][s] = sorted(v for v in vals if v is not None)
+        # Pitcher+ percentile pool — the pipeline's own convention (qualified
+        # MLB baseline rows, apply_pitcher_plus), NOT the all-MLB pool the
+        # bubble stats rank in.
+        from pipeline_pitcherplus import _is_baseline as _pp_is_baseline
+        ctx['pitcher_plus_pool'] = sorted(
+            v for v in (r.get('pitcherPlus') for r in _raw_prows
+                        if _pp_is_baseline(r, ('ROC', 'AAA')))
+            if v is not None)
         # Pitching+ blend scale (overall + per type) from the same MLB pools,
         # so scratch pitchers score on the exact league standardization.
         ctx['pitching_scale'] = _pitching_scale(_prows)
@@ -2749,11 +2758,28 @@ def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
 
     # nVAA / nHAA regressions from metadata.
     ctx['vaa_reg'], ctx['haa_reg'] = {}, {}
+    ctx['pitcher_plus_base'] = None
     if os.path.exists(METADATA_PATH):
         with open(METADATA_PATH) as f:
             _m = json.load(f)
         ctx['vaa_reg'] = _m.get('vaaRegressions') or {}
         ctx['haa_reg'] = _m.get('haaRegressions') or {}
+        # Pitcher+ (mu, sigma) baseline published by pipeline_pitcherplus —
+        # reshaped into the {key: (mu, sd), '_composite': (mu, sd)} form
+        # score_row consumes, so scratch pitchers score on the exact league
+        # standardization the leaderboard used.
+        try:
+            from pipeline_pitcherplus import COMPONENTS as _PP_COMPONENTS
+            _ppb = _m.get('pitcherPlusBaseline') or {}
+            _base = {c['key']: (c['mu'], c['sd'])
+                     for c in _ppb.get('components', [])}
+            _base['_composite'] = (_ppb['composite']['mu'],
+                                   _ppb['composite']['sd'])
+            if all(k in _base for k, _w, _k2 in _PP_COMPONENTS):
+                ctx['pitcher_plus_base'] = _base
+        except (KeyError, TypeError):
+            print("  WARNING: metadata pitcherPlusBaseline missing/unreadable "
+                  "— scratch cards will show Pitcher+ as —")
 
     print(f"  [scratch] League context ready ({time_module.time()-t0:.0f}s)")
     return ctx
@@ -2809,7 +2835,9 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
         if p_c is not None:
             P = int(round(p_c))
         elif S is not None and L is not None:
-            P = int(round(0.7 * S + 0.3 * L))
+            # Canon blend (train_stuff_v11.PITCHING_W_STUFF, re-derived
+            # 2026-07-25) — keep in lockstep with _pitching_score.
+            P = int(round(0.8 * S + 0.2 * L))
         else:
             P = None
         return S, L, P
@@ -2828,6 +2856,18 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
     for s in _SCRATCH_POOL_STATS:
         row[s + '_pctl'] = _rank_in_mlb_pool(row.get(s), ctx['pitcher_pools'].get(s) or [],
                                              invert=(s in _SCRATCH_INVERT_PITCHER))
+
+    # Pitcher+ — the six-component shrunk-z composite, scored on the
+    # published season baseline (metadata pitcherPlusBaseline) exactly as
+    # apply_pitcher_plus scores leaderboard rows, then ranked in the
+    # qualified-MLB pool that column ships with. All six components
+    # (stuffScore, locPlus, kPct, izWhiffPct, xRv100, gbPct) are already in
+    # `row`; a missing one shrinks to league average inside score_row.
+    if ctx.get('pitcher_plus_base'):
+        from pipeline_pitcherplus import score_row as _pp_score_row
+        row['pitcherPlus'] = _pp_score_row(row, ctx['pitcher_plus_base'])
+        row['pitcherPlus_pctl'] = _rank_in_mlb_pool(
+            row.get('pitcherPlus'), ctx.get('pitcher_plus_pool') or [])
 
     # Per-pitch-type rows (nVAA/nHAA, velo, RV rates, Stuff+, Loc+).
     by_pt = defaultdict(list)
@@ -2955,6 +2995,7 @@ def main():
     end_date        = None              # Set to a date for date range, or None for single day
     filter_pitchers = "Williams, Trevor"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
+    display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR
 
     # ── CLI overrides (optional — values above are used if no args passed) ──
@@ -2972,6 +3013,11 @@ def main():
     parser.add_argument('--pitch-qual', type=int, default=None,
                         help='Min pitches for a pitch type\'s RV COLORING '
                              f'(default {CARD_COLOR_MIN_PITCHES}; values always render)')
+    parser.add_argument('--display-team', default=None,
+                        help='Team label shown in the card header (display '
+                             'only — does not change which tab/team the '
+                             'pitches are read from). Useful for scratch-tab '
+                             'pulls, e.g. --team NEW --display-team WSH.')
     parser.add_argument('--tab', default=None,
                         help='Read pitches from this scratch tab in the NLE2026 '
                              'workbook (e.g. Sheet2) instead of a team tab. '
@@ -2994,6 +3040,7 @@ def main():
     if args.end is not None: end_date = args.end
     if args.pitchers is not None: filter_pitchers = args.pitchers
     if args.game_pk is not None: game_pk = args.game_pk
+    if args.display_team is not None: display_team = args.display_team
     if args.output_dir is not None: output_dir = args.output_dir
     rv_mode = args.rv_mode
     pitch_qual = args.pitch_qual
@@ -3409,7 +3456,9 @@ def main():
         config = {
             'display_name': display_name,
             'hand': hand,
-            'team': eff_team,
+            # display_team overrides the header label only; every data lookup
+            # above stays keyed on eff_team (the tab/leaderboard identity).
+            'team': display_team or eff_team,
             'age': age,
             'game_date': display_date,
             'stat_headers': stat_headers,
