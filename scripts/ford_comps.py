@@ -36,6 +36,8 @@ Usage examples:
   python3 scripts/ford_comps.py --pitcher "Kolek, Bryce" --level mlb
   python3 scripts/ford_comps.py --team ROC --role both
   python3 scripts/ford_comps.py --team ROC --exclude "Jordan, Levi;Wallace, Cayden"
+  python3 scripts/ford_comps.py --pitcher "Cruz, Yovanny" --tab NEW   scratch-tab
+      (NLE2026) pitches as the target's complete MLB+MiLB line
 """
 import os, sys, csv, json, pickle, math, argparse
 from collections import defaultdict
@@ -412,11 +414,42 @@ def _load_cache(start, end):
         yield p
 
 
-def window_hitters(start, end=None):
-    """Recompute the hitter fingerprint from the pitch cache for the window."""
+_NLE2026 = '1BypxxlWgQAltETOLqccOYigeo8nXX-FIuVv6rhT4anA'
+
+
+def load_tab_pitches(tab, role, start=None, end=None):
+    """Pitches from a scratch tab of the NLE2026 workbook (e.g. NEW).
+
+    Scratch tabs hold player_id pulls — a player's COMPLETE data (MLB +
+    other-org MiLB), which never reaches the pipeline cache or leaderboards.
+    Rows are normalized like Cards.py scratch mode (blank -> None, Barrel
+    recompute fallback, InZone recompute — the tab has no InZone column) and
+    re-teamed to the tab name so each player aggregates to ONE combined row."""
+    import gspread
+    from pipeline_utils import compute_in_zone, is_barrel
+    ws = gspread.service_account().open_by_key(_NLE2026).worksheet(tab)
+    out = []
+    for r in ws.get_all_records():
+        d = r.get('Game Date') or ''
+        if (start and d < start) or (end and d > end):
+            continue
+        p = {k: (None if v == '' else v) for k, v in r.items()}
+        if not p.get('Barrel'):
+            p['Barrel'] = ('6' if is_barrel(sf(p.get('ExitVelo')),
+                                            sf(p.get('LaunchAngle'))) else '')
+        p['InZone'] = compute_in_zone(p)
+        p['BTeam' if role == 'hitter' else 'PTeam'] = tab
+        out.append(p)
+    print(f"(tab {tab}: {len(out)} pitches loaded)")
+    return out
+
+
+def window_hitters(start, end=None, pitches=None):
+    """Recompute the hitter fingerprint from the pitch cache for the window
+    (or from an explicit pitch list, e.g. a scratch tab)."""
     agg = defaultdict(lambda: defaultdict(float))
     bsides = defaultdict(lambda: defaultdict(int))
-    for p in _load_cache(start, end):
+    for p in (pitches if pitches is not None else _load_cache(start, end)):
         h, t = p.get('Batter'), p.get('BTeam')
         if not h or not t:
             continue
@@ -509,8 +542,9 @@ def window_hitters(start, end=None):
     return out
 
 
-def window_pitchers(start, end=None):
-    """Recompute the pitcher fingerprint from the pitch cache for the window.
+def window_pitchers(start, end=None, pitches=None):
+    """Recompute the pitcher fingerprint from the pitch cache for the window
+    (or from an explicit pitch list, e.g. a scratch tab).
 
     fbVelo / VAA / HAA come from the pitcher's primary fastball (the more-used
     of FF/SI in the window), matching the season leaderboard's FB framing.
@@ -518,7 +552,7 @@ def window_pitchers(start, end=None):
     agg = defaultdict(lambda: defaultdict(float))
     throws = {}
     ptypes = defaultdict(set)
-    for p in _load_cache(start, end):
+    for p in (pitches if pitches is not None else _load_cache(start, end)):
         h, t = p.get('Pitcher'), p.get('PTeam')
         if not h or not t:
             continue
@@ -649,13 +683,21 @@ def window_pitchers(start, end=None):
     return out
 
 
-def get_rows(role, start=None, end=None):
-    """Rows + feats + windowed flag for a role and optional date range."""
+def get_rows(role, start=None, end=None, tab=None):
+    """Rows + feats + windowed flag for a role and optional date range.
+
+    tab mode: targets are recomputed from the scratch tab's pitches (one
+    combined row per player, team = tab name) and the POOL is recomputed from
+    the pitch cache over the same window, so target and pool features share
+    identical definitions (comping tab-computed features against
+    leaderboard-computed ones would mix conventions)."""
     feats = FEATS_H if role == 'hitter' else FEATS_P
+    fn = window_hitters if role == 'hitter' else window_pitchers
+    if tab:
+        tab_rows = fn(None, None, pitches=load_tab_pitches(tab, role, start, end))
+        return fn(start or '2026-01-01', end) + tab_rows, feats, True
     if start or end:
-        rows = (window_hitters(start or '2026-01-01', end) if role == 'hitter'
-                else window_pitchers(start or '2026-01-01', end))
-        return rows, feats, True
+        return fn(start or '2026-01-01', end), feats, True
     return load_season(role), feats, False
 
 
@@ -677,17 +719,26 @@ def run_role(role, args):
     nice = NICE_H if role == 'hitter' else NICE_P
     nl, small = NL[role], SMALL_FLAG[role]
     args.level = (args.level or 'both').lower()
-    rows, feats, windowed = get_rows(role, args.start, args.end)
-    pool_min = (WINDOW_POOL_MIN if windowed else SEASON_POOL_MIN)[role]
-    # comp pool is ALWAYS MLB-only: never comp a ROC player to another ROC player
+    tab = getattr(args, 'tab', None)
+    rows, feats, windowed = get_rows(role, args.start, args.end, tab=tab)
+    # Window floors only when an actual date range shrank the samples; a tab
+    # run over the full season keeps the season pool floors.
+    pool_min = (WINDOW_POOL_MIN if (args.start or args.end)
+                else SEASON_POOL_MIN)[role]
+    # comp pool is ALWAYS MLB-only: never comp a ROC player to another ROC
+    # player, and tab rows are targets, never comp candidates
     mlb_pool = [r for r in rows if r['pa'] >= pool_min
-                and r['team'] not in AAA_TEAMS]
+                and r['team'] not in AAA_TEAMS and r['team'] != tab]
     stats = zstats(mlb_pool, feats)          # z-scales from the MLB pool
     mix = mix_zstats(mlb_pool) if role == 'pitcher' else None
-    rlab = range_label(args.start, args.end)
+    rlab = range_label(args.start, args.end) + (f' [tab {tab}]' if tab else '')
     meta = dict(role=role, window=rlab)
 
     def pool_for(t):
+        if t['team'] == tab:
+            # tab target = a player's COMPLETE data; his partial cache rows
+            # (old-team MLB stints) must not surface as his own comps
+            return [r for r in mlb_pool if r['name'] != t['name']]
         return [r for r in mlb_pool
                 if (r['name'], r['team']) != (t['name'], t['team'])]
 
@@ -712,6 +763,10 @@ def run_role(role, args):
                and in_level(r['team'], args.level)]
     if args.player_team:
         matches = [r for r in matches if r['team'] == args.player_team]
+    elif tab:
+        # tab mode: the tab row IS the complete line — skip the partial
+        # cache stints unless a --player-team explicitly asks for one
+        matches = [r for r in matches if r['team'] == tab]
     if not matches:
         print(f"\n({name} not found as a {role} at level '{args.level}' — {rlab}"
               f"{' (below window sample floors?)' if windowed else ''})")
@@ -739,6 +794,12 @@ def main():
                     help="which of the TARGET's stat lines to use (pool is always MLB)")
     ap.add_argument('--start', default=None, help='date window start (recomputed from cache)')
     ap.add_argument('--end', default=None, help='date window end (inclusive)')
+    ap.add_argument('--tab', default=None,
+                    help='scratch tab in the NLE2026 workbook (e.g. NEW): use '
+                         "the tab's pitches as the target's COMPLETE data "
+                         '(MLB + other-org MiLB); pool recomputed from the '
+                         'cache. Combine with --pitcher/--hitter, or with '
+                         '--team <tab> to batch every player on the tab.')
     ap.add_argument('--team', default=None, help='batch mode: all players of this team')
     ap.add_argument('--exclude', default='', help='batch mode: semicolon-separated names to skip')
     ap.add_argument('--min-pa', type=int, default=100,
@@ -785,8 +846,10 @@ def interactive():
     role       = "both"     # "hitter", "pitcher", or "both"
     player     = ""         # "Last, First" for one player, or "" for whole team
     team       = "ROC"      # batch mode: team whose players get comped
-    level      = "both"    # which of the TARGET's stat lines to use: "mlb",
+    level      = "both"     # which of the TARGET's stat lines to use: "mlb",
                             #   "aaa", or "both" (comp pool is ALWAYS MLB-only)
+    tab        = None       # scratch tab (NLE2026 workbook) as the target's
+                            #   complete data, or None for pipeline data only
     start_date = None       # "yyyy-mm-dd", or None for full season
     end_date   = None       # "yyyy-mm-dd", or None for through today
     exclude    = ""         # batch mode: semicolon-separated names to skip
@@ -795,7 +858,7 @@ def interactive():
     csv_path   = "~/Downloads/roc_comps.csv"   # "" = no CSV
 
     args = argparse.Namespace(player=player or None, player_team=None,
-                              team=None if player else team,
+                              team=None if player else team, tab=tab,
                               level=level, start=start_date, end=end_date,
                               exclude=exclude, min_pa=min_pa, min_ip=min_ip)
     for r in (['hitter', 'pitcher'] if role == 'both' else [role]):
