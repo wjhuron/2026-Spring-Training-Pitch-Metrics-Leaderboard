@@ -49,6 +49,71 @@ def _cell(val):
     return int(round(val)) if val is not None else ''
 
 
+def _status(exc):
+    """HTTP status from a gspread APIError, or None."""
+    resp = getattr(exc, 'response', None)
+    code = getattr(resp, 'status_code', None)
+    if code:
+        return int(code)
+    for c in (429, 500, 502, 503, 504):
+        if f'[{c}]' in str(exc):
+            return c
+    return None
+
+
+def _retry(fn, what, attempts=5):
+    """Run a Sheets call, retrying the transient failures.
+
+    429 (quota) waits out the per-minute window; 5xx are Google-side
+    hiccups (a 500 on open_by_key killed the 2026-08-03 19:23 run after
+    one workbook) and back off exponentially. Anything else raises at
+    once: a schema or auth error should not be retried.
+    """
+    for attempt in range(attempts):
+        try:
+            return fn()
+        except Exception as e:
+            code = _status(e)
+            last = attempt == attempts - 1
+            if code == 429 and not last:
+                print(f"  [quota] {what}: waiting 70s ...")
+                time.sleep(70)
+            elif code in (500, 502, 503, 504) and not last:
+                wait = 5 * 2 ** attempt
+                print(f"  [{code}] {what}: retrying in {wait}s ...")
+                time.sleep(wait)
+            else:
+                raise
+
+
+def _write_tab(ws, name, stuff, loc):
+    """Overwrite one tab's grade columns; returns (rows, n_stuff, n_loc)
+    or None when the tab isn't on the migrated schema / has no data."""
+    tab = ws.title
+    header = _retry(lambda: ws.row_values(1), f'{name}/{tab} header')
+    if len(header) < 26 or header[23:26] != HEADER_SLICE:
+        print(f"  {name}/{tab}: not on migrated schema — skip")
+        return None
+    n_rows = len(_retry(lambda: ws.col_values(1), f'{name}/{tab} rows'))
+    if n_rows < 2:                              # data through last used row
+        return None
+    values, ns, nl = [], 0, 0
+    for r in range(2, n_rows + 1):
+        key = f'{tab}\t{r}'
+        sv, lv = stuff.get(key), loc.get(key)
+        ns += sv is not None
+        nl += lv is not None
+        sc, lc = _cell(sv), _cell(lv)
+        # Pitching+ cell = blend of the two VISIBLE integer cells
+        # (auditable in-sheet: =ROUND(0.7*X+0.3*Y,0))
+        pc = int(round(0.7 * sc + 0.3 * lc)) if (sc != '' and lc != '') else ''
+        values.append([sc, lc, pc])
+    rng = GRADE_COL_RANGE.format(first=2, last=n_rows)
+    _retry(lambda: ws.update(rng, values, value_input_option='USER_ENTERED'),
+           f'{name}/{tab} write')
+    return len(values), ns, nl
+
+
 def main():
     stuff = _load(STUFF_DUMP, 'Stuff+')
     loc = _load(LOC_DUMP, 'Loc+')
@@ -58,46 +123,40 @@ def main():
 
     gc = _gspread_client()
     total_rows = total_stuff = total_loc = 0
+    failed = []
     for name, wid in DIVISION_WORKBOOK_IDS.items():
-        sh = gc.open_by_key(wid)
-        for ws in sh.worksheets():
-            header = ws.row_values(1)
-            if len(header) < 26 or header[23:26] != HEADER_SLICE:
-                print(f"  {name}/{ws.title}: not on migrated schema — skip")
+        # Each workbook and tab is isolated: one that dies mid-run must
+        # not cost the others their writes (every write is a full-column
+        # overwrite, so a partial pass is always safe to repeat).
+        try:
+            sh = _retry(lambda: gc.open_by_key(wid), f'{name} open')
+            sheets = _retry(sh.worksheets, f'{name} worksheets')
+        except Exception as e:
+            print(f"  {name}: FAILED to open ({e}) — skipping workbook")
+            failed.append(name)
+            continue
+        for ws in sheets:
+            try:
+                res = _write_tab(ws, name, stuff, loc)
+            except Exception as e:
+                print(f"  {name}/{ws.title}: FAILED ({e}) — skipping tab")
+                failed.append(f'{name}/{ws.title}')
                 continue
-            n_rows = len(ws.col_values(1))          # data through last used row
-            if n_rows < 2:
+            if res is None:
                 continue
-            tab = ws.title
-            values, ns, nl = [], 0, 0
-            for r in range(2, n_rows + 1):
-                key = f'{tab}\t{r}'
-                sv, lv = stuff.get(key), loc.get(key)
-                ns += sv is not None
-                nl += lv is not None
-                sc, lc = _cell(sv), _cell(lv)
-                # Pitching+ cell = blend of the two VISIBLE integer cells
-                # (auditable in-sheet: =ROUND(0.7*X+0.3*Y,0))
-                pc = int(round(0.7 * sc + 0.3 * lc)) if (sc != '' and lc != '') else ''
-                values.append([sc, lc, pc])
-            rng = GRADE_COL_RANGE.format(first=2, last=n_rows)
-            for attempt in range(4):
-                try:
-                    ws.update(rng, values, value_input_option='USER_ENTERED')
-                    break
-                except Exception as e:
-                    if '429' in str(e) and attempt < 3:
-                        print(f"  [quota] {tab}: waiting 70s ...")
-                        time.sleep(70)
-                    else:
-                        raise
-            print(f"  {name}/{tab}: {len(values)} rows written "
+            rows, ns, nl = res
+            print(f"  {name}/{ws.title}: {rows} rows written "
                   f"(Stuff+ {ns}, Loc+ {nl})")
-            total_rows += len(values); total_stuff += ns; total_loc += nl
+            total_rows += rows; total_stuff += ns; total_loc += nl
             time.sleep(1.2)
         time.sleep(1.0)
     print(f"\nwrote {total_rows} rows across all tabs "
           f"({total_stuff} Stuff+ grades, {total_loc} Loc+ grades)")
+    if failed:
+        # Non-zero so the run annotates truthfully, but only after every
+        # other workbook has had its chance.
+        print(f"FAILED after retries: {', '.join(failed)}")
+        sys.exit(1)
 
 
 if __name__ == '__main__':
