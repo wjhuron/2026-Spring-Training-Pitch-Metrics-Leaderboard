@@ -1411,8 +1411,9 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     # Per-hand lookups so a switch hitter's BIP are each scored by their actual
     # side (matching process_data.compute_xwobasp). The overlay zones above stay
     # in the single `bats` orientation — that's a visual-axis choice only.
-    sacq_lookups = {'L': build_sacq_lookup(metadata, 'L')[0],
-                    'R': build_sacq_lookup(metadata, 'R')[0]}
+    _sacq_full = {'L': build_sacq_lookup(metadata, 'L'),
+                  'R': build_sacq_lookup(metadata, 'R')}
+    sacq_lookups = {s2: t[0] for s2, t in _sacq_full.items()}
     # Shift the entire LA × Spray block so the title's TOP edge (not its
     # center) sits at the top of the headline stats strip cells. The title
     # text is drawn with va='center' so the center sits ~0.0070 figrel
@@ -1430,88 +1431,48 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     spray_axes_bottom = 0.295 - _LA_SHIFT
                                         # the legend block can breathe
     spray_axes_top = 0.910 - _LA_SHIFT
-    ax_spray = fig.add_axes([spray_axes_left, spray_axes_bottom,
-                              spray_axes_right - spray_axes_left,
-                              spray_axes_top - spray_axes_bottom])
-    ax_spray.set_facecolor(BG)
-    ax_spray.set_xlim(-50, 50); ax_spray.set_ylim(-20, 60)
-
-    # Heatmap zones
-    if bats == 'L':
-        bounds = {'pull': (30, 50), 'pull_side': (15, 30), 'center_pull': (0, 15),
-                  'center_oppo': (-15, 0), 'oppo_side': (-30, -15), 'oppo': (-50, -30)}
+    # Switch hitters get two half-width panels (one per batting side).
+    # A single panel is wrong twice over for them: the wOBAcon overlay can
+    # only be oriented for one side (an 'S' hitter fell into the RHB
+    # branch, valuing his majority-LHB pulls as oppo), and the two swings
+    # pull to opposite fields on the shared axis. Mirrors the pitcher
+    # card's VS RHH / VS LHH plates. Side detection is data-driven (both
+    # sides >= 10%% of pitches), so an S-listed hitter who has abandoned a
+    # side keeps the single full-width panel.
+    from collections import Counter as _SideCounter
+    _side_counts = _SideCounter(p.get('Bats') for p in hitter_pitches
+                                if p.get('Bats') in ('L', 'R'))
+    is_switch = (len(_side_counts) == 2 and
+                 min(_side_counts.values()) >= 0.10 * sum(_side_counts.values()))
+    _spray_panel_h = spray_axes_top - spray_axes_bottom
+    if is_switch:
+        _panel_gap = 0.014
+        _panel_w = (spray_axes_right - spray_axes_left - _panel_gap) / 2
+        _ax_l = fig.add_axes([spray_axes_left, spray_axes_bottom,
+                              _panel_w, _spray_panel_h])
+        _ax_r = fig.add_axes([spray_axes_left + _panel_w + _panel_gap,
+                              spray_axes_bottom, _panel_w, _spray_panel_h])
+        # LHB panel first — the majority side for nearly every switch hitter
+        spray_panels = [(_ax_l, 'L', _sacq_full['L'][1], _sacq_full['L'][2]),
+                        (_ax_r, 'R', _sacq_full['R'][1], _sacq_full['R'][2])]
+        ax_spray = _ax_l          # annotation/legend anchors keep working
     else:
-        bounds = {'pull': (-50, -30), 'pull_side': (-30, -15), 'center_pull': (-15, 0),
-                  'center_oppo': (0, 15), 'oppo_side': (15, 30), 'oppo': (30, 50)}
+        ax_spray = fig.add_axes([spray_axes_left, spray_axes_bottom,
+                                  spray_axes_right - spray_axes_left,
+                                  _spray_panel_h])
+        spray_panels = [(ax_spray, bats if bats in ('L', 'R') else 'R',
+                         hand_zones, pool_zones)]
+    for _axp, _s2, _hz2, _pz2 in spray_panels:
+        _axp.set_facecolor(BG)
+        _axp.set_xlim(-50, 50); _axp.set_ylim(-20, 60)
+
     LA_RANGES = LA_BINS
     # Damage-view threshold: zones at/above the cmap's yellow anchor count as
     # "damage" (kept warm); cooler zones are left unpainted in the damage view.
     _DAMAGE_THRESH = 0.55
-    # Choose value: hand-specific if qualified, else pooled
-    for (sd, lb), z_hand in hand_zones.items():
-        z_pool = pool_zones.get((sd, lb))
-        z = z_hand if z_hand.get('count', 0) >= 20 else z_pool
-        if not z: continue
-        v = z.get('wobacon') if z.get('wobacon') is not None else z.get('woba')
-        if v is None: continue
-        if sd not in bounds: continue
-        bx = bounds[sd]
-        if lb >= len(LA_RANGES): continue
-        ly = LA_RANGES[lb]
-        lo = max(-20, ly[0]); hi = min(60, ly[1])
-        if la_view == 'damage':
-            # Damage view: only warm (>= yellow-anchor) zones, softened into a
-            # background layer; cooler zones left unpainted.
-            if v < _DAMAGE_THRESH:
-                continue
-            col = WOBA_CMAP(min(1.0, v / 1.0))
-            alpha = 0.14 if z.get('count', 0) < 20 else 0.40
-        else:
-            col = WOBA_CMAP(min(1.0, v / 1.0))
-            alpha = 0.22 if z.get('count', 0) < 20 else 0.70
-        ax_spray.add_patch(Rectangle((min(bx), lo), abs(bx[1] - bx[0]), hi - lo,
-                                       facecolor=col, alpha=alpha,
-                                       edgecolor=GRID_COLOR, linewidth=0.3))
-    for (sd, lb), z in pool_zones.items():
-        if (sd, lb) in hand_zones: continue
-        v = z.get('wobacon') if z.get('wobacon') is not None else z.get('woba')
-        if v is None: continue
-        if sd not in bounds: continue
-        bx = bounds[sd]
-        if lb >= len(LA_RANGES): continue
-        ly = LA_RANGES[lb]
-        lo = max(-20, ly[0]); hi = min(60, ly[1])
-        if la_view == 'damage':
-            # Damage view: only warm (>= yellow-anchor) zones, softened into a
-            # background layer; cooler zones left unpainted.
-            if v < _DAMAGE_THRESH:
-                continue
-            col = WOBA_CMAP(min(1.0, v / 1.0))
-            alpha = 0.14 if z.get('count', 0) < 20 else 0.40
-        else:
-            col = WOBA_CMAP(min(1.0, v / 1.0))
-            alpha = 0.22 if z.get('count', 0) < 20 else 0.70
-        ax_spray.add_patch(Rectangle((min(bx), lo), abs(bx[1] - bx[0]), hi - lo,
-                                       facecolor=col, alpha=alpha,
-                                       edgecolor=GRID_COLOR, linewidth=0.3))
-
-    # ── Zone-boundary grid overlay ──
-    # Uniform separators at the true spray/LA zone edges, drawn on top of
-    # the fills but below the BIP scatter, so the zone splits read clearly
-    # even between similarly-colored adjacent zones. Replaces the old
-    # tick-spaced ax.grid() (which drew lines that didn't match the zone
-    # edges). _GRID_LW = line width (pt), _GRID_ALPHA = opacity.
-    _GRID_LW, _GRID_ALPHA = 1.0, 0.75
-    _vx = sorted({e for b in bounds.values() for e in b})   # spray edges
-    for _x in _vx:
-        if -50 < _x < 50:
-            ax_spray.axvline(_x, color=GRID_COLOR, linewidth=_GRID_LW,
-                             alpha=_GRID_ALPHA, zorder=2)
-    _hy = sorted({e for rng in LA_BINS for e in rng})       # LA edges
-    for _y in _hy:
-        if -20 < _y < 60:
-            ax_spray.axhline(_y, color=GRID_COLOR, linewidth=_GRID_LW,
-                             alpha=_GRID_ALPHA, zorder=2)
+    # Zone overlay / grid / scatter / median all render per panel inside
+    # _draw_spray_panel below (once for a one-sided hitter, twice for a
+    # switch hitter — each side with its own orientation + zone values).
 
     # BIP scatter — capture Event so we can outline hits / extra-base hits
     bip_pts = []
@@ -1526,7 +1487,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         event = p.get('Event', '') or ''
         _bcol = str(p.get('Barrel', '')).strip()
         _brl = (_bcol == '6') if _bcol else bool(is_barrel(ev, la))
-        bip_pts.append((ang, max(-20, min(60, la)), ev, la, event, _brl))
+        _pside = p.get('Bats') if p.get('Bats') in ('L', 'R') else None
+        bip_pts.append((ang, max(-20, min(60, la)), ev, la, event, _brl, _pside))
 
     # Outcome-based dot coloring (replaces the old EV gradient). Warm-paper
     # palette: gray for non-hits, amber for singles, purple for doubles,
@@ -1571,53 +1533,143 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         if ev < 105: return 430
         return 540
 
-    if la_view == 'damage':
-        # DAMAGE VIEW: three contact tiers — barrel (crimson), hard-hit 95+
-        # non-barrel (amber), everything else gray. Cream halo + dark ring so
-        # each dot reads on any zone; better tiers drawn on top.
-        _BARREL_RED  = (0.659, 0.149, 0.118, 0.96)
-        _HARDHIT_AMB = (0.878, 0.529, 0.118, 0.93)
-        _OTHER_GRAY  = (0.43, 0.40, 0.35, 0.38)
-        def _tier(ev, brl):
-            if brl:
-                return 2
-            if ev is not None and ev >= 95.0:
-                return 1
-            return 0
-        _TIER_STYLE = {2: (_BARREL_RED, 5), 1: (_HARDHIT_AMB, 4), 0: (_OTHER_GRAY, 3)}
-        from matplotlib.patheffects import withStroke
-        for x, y, ev, _real, event, _brl in sorted(bip_pts, key=lambda r: _tier(r[2], r[5])):
-            _c, _z = _TIER_STYLE[_tier(ev, _brl)]
-            ax_spray.scatter([x], [y], s=ev_size(ev), c=[_c],
-                              edgecolors='#f0e8d8', linewidths=1.1, zorder=_z,
-                              path_effects=[withStroke(linewidth=1.9, foreground='#1a1612')])
-        # Quality-contact concentration ellipse (barrels + hard-hit 95+), ~68%
-        # coverage, outline only — summarizes where the good contact clusters.
-        from matplotlib.patches import Ellipse as _Ellipse
-        _qx = [q[0] for q in bip_pts if q[5] or (q[2] is not None and q[2] >= 95)]
-        _qy = [q[1] for q in bip_pts if q[5] or (q[2] is not None and q[2] >= 95)]
-        if len(_qx) >= 6:
-            _cvm = np.cov(_qx, _qy)
-            _vals, _vecs = np.linalg.eigh(_cvm)
-            _o = _vals.argsort()[::-1]
-            _vals, _vecs = _vals[_o], _vecs[:, _o]
-            if _vals[0] > 0 and _vals[1] > 0:
-                _th = np.degrees(np.arctan2(_vecs[1, 0], _vecs[0, 0]))
-                _w, _h = 2.0 * 1.51 * np.sqrt(_vals)   # 1.51 sigma ~ 68% coverage
-                ax_spray.add_patch(_Ellipse((np.mean(_qx), np.mean(_qy)), _w, _h,
-                                             angle=_th, facecolor='none',
-                                             edgecolor='#9a3b1e', linewidth=2.0,
-                                             linestyle=(0, (5, 3)), zorder=2.6))
-    else:
-        # OUTCOME VIEW: outs first (back), then hits by weight so the most
-        # distinctive markers sit on top and never get obscured.
-        _OUTCOME_Z = {'Out': 0, '1B': 1, '2B': 2, '3B': 3, 'HR': 4}
-        for x, y, ev, _real, event, _brl in sorted(bip_pts,
-                                              key=lambda r: _OUTCOME_Z[_outcome_category(r[4])]):
-            cat = _outcome_category(event)
-            ax_spray.scatter([x], [y], s=ev_size(ev), c=[outcome_color(event)],
-                              edgecolors='#1a1612', linewidths=0.6,
-                              zorder=3 + _OUTCOME_Z[cat])
+    def _draw_spray_panel(ax, side, pts, hand_zones_p, pool_zones_p,
+                          med_pair, first_panel=True, header=None):
+        """One LA x Spray panel: zone overlay + grid + BIP scatter + median
+        marker + axis styling, oriented and valued for `side`. Called once
+        for a one-sided hitter, once per side for a switch hitter."""
+        if side == 'L':
+            bounds = {'pull': (30, 50), 'pull_side': (15, 30), 'center_pull': (0, 15),
+                      'center_oppo': (-15, 0), 'oppo_side': (-30, -15), 'oppo': (-50, -30)}
+        else:
+            bounds = {'pull': (-50, -30), 'pull_side': (-30, -15), 'center_pull': (-15, 0),
+                      'center_oppo': (0, 15), 'oppo_side': (15, 30), 'oppo': (30, 50)}
+        # Zone fills — hand-specific value if qualified, else pooled
+        def _paint(sd, lb, z):
+            v = z.get('wobacon') if z.get('wobacon') is not None else z.get('woba')
+            if v is None or sd not in bounds or lb >= len(LA_RANGES):
+                return
+            bx = bounds[sd]
+            ly = LA_RANGES[lb]
+            lo = max(-20, ly[0]); hi = min(60, ly[1])
+            if la_view == 'damage':
+                if v < _DAMAGE_THRESH:
+                    return
+                col = WOBA_CMAP(min(1.0, v / 1.0))
+                alpha = 0.14 if z.get('count', 0) < 20 else 0.40
+            else:
+                col = WOBA_CMAP(min(1.0, v / 1.0))
+                alpha = 0.22 if z.get('count', 0) < 20 else 0.70
+            ax.add_patch(Rectangle((min(bx), lo), abs(bx[1] - bx[0]), hi - lo,
+                                    facecolor=col, alpha=alpha,
+                                    edgecolor=GRID_COLOR, linewidth=0.3))
+        for (sd, lb), z_hand in hand_zones_p.items():
+            z_pool = pool_zones_p.get((sd, lb))
+            z = z_hand if z_hand.get('count', 0) >= 20 else z_pool
+            if z:
+                _paint(sd, lb, z)
+        for (sd, lb), z in pool_zones_p.items():
+            if (sd, lb) not in hand_zones_p:
+                _paint(sd, lb, z)
+
+        # Zone-boundary grid overlay (matches the true zone edges)
+        _GRID_LW, _GRID_ALPHA = 1.0, 0.75
+        for _x in sorted({e for b in bounds.values() for e in b}):
+            if -50 < _x < 50:
+                ax.axvline(_x, color=GRID_COLOR, linewidth=_GRID_LW,
+                           alpha=_GRID_ALPHA, zorder=2)
+        for _y in sorted({e for rng in LA_BINS for e in rng}):
+            if -20 < _y < 60:
+                ax.axhline(_y, color=GRID_COLOR, linewidth=_GRID_LW,
+                           alpha=_GRID_ALPHA, zorder=2)
+
+        if la_view == 'damage':
+            # DAMAGE VIEW: three contact tiers — barrel (crimson), hard-hit
+            # 95+ non-barrel (amber), everything else gray.
+            _BARREL_RED  = (0.659, 0.149, 0.118, 0.96)
+            _HARDHIT_AMB = (0.878, 0.529, 0.118, 0.93)
+            _OTHER_GRAY  = (0.43, 0.40, 0.35, 0.38)
+            def _tier(ev, brl):
+                if brl:
+                    return 2
+                if ev is not None and ev >= 95.0:
+                    return 1
+                return 0
+            _TIER_STYLE = {2: (_BARREL_RED, 5), 1: (_HARDHIT_AMB, 4), 0: (_OTHER_GRAY, 3)}
+            from matplotlib.patheffects import withStroke
+            for x, y, ev, _real, event, _brl, _ps in sorted(pts, key=lambda r: _tier(r[2], r[5])):
+                _c, _z = _TIER_STYLE[_tier(ev, _brl)]
+                ax.scatter([x], [y], s=ev_size(ev), c=[_c],
+                           edgecolors='#f0e8d8', linewidths=1.1, zorder=_z,
+                           path_effects=[withStroke(linewidth=1.9, foreground='#1a1612')])
+            # Quality-contact concentration ellipse (barrels + hard-hit 95+)
+            from matplotlib.patches import Ellipse as _Ellipse
+            _qx = [q[0] for q in pts if q[5] or (q[2] is not None and q[2] >= 95)]
+            _qy = [q[1] for q in pts if q[5] or (q[2] is not None and q[2] >= 95)]
+            if len(_qx) >= 6:
+                _cvm = np.cov(_qx, _qy)
+                _vals, _vecs = np.linalg.eigh(_cvm)
+                _o = _vals.argsort()[::-1]
+                _vals, _vecs = _vals[_o], _vecs[:, _o]
+                if _vals[0] > 0 and _vals[1] > 0:
+                    _th = np.degrees(np.arctan2(_vecs[1, 0], _vecs[0, 0]))
+                    _w, _h = 2.0 * 1.51 * np.sqrt(_vals)   # 1.51 sigma ~ 68%
+                    ax.add_patch(_Ellipse((np.mean(_qx), np.mean(_qy)), _w, _h,
+                                          angle=_th, facecolor='none',
+                                          edgecolor='#9a3b1e', linewidth=2.0,
+                                          linestyle=(0, (5, 3)), zorder=2.6))
+        else:
+            # OUTCOME VIEW: outs first (back), then hits by weight
+            _OUTCOME_Z = {'Out': 0, '1B': 1, '2B': 2, '3B': 3, 'HR': 4}
+            for x, y, ev, _real, event, _brl, _ps in sorted(pts,
+                                                  key=lambda r: _OUTCOME_Z[_outcome_category(r[4])]):
+                cat = _outcome_category(event)
+                ax.scatter([x], [y], s=ev_size(ev), c=[outcome_color(event)],
+                           edgecolors='#1a1612', linewidths=0.6,
+                           zorder=3 + _OUTCOME_Z[cat])
+
+        # Median placement marker
+        _ms, _ml = med_pair
+        if _ms is not None and _ml is not None:
+            _mlp = max(-20, min(60, _ml))
+            ax.scatter([_ms], [_mlp], s=420 if first_panel or not is_switch else 300,
+                       c='white', zorder=10, alpha=0.95,
+                       edgecolors='black', linewidths=0.5)
+            ax.scatter([_ms], [_mlp], s=240 if first_panel or not is_switch else 170,
+                       c=MARKER_ACCENT, edgecolors='black',
+                       linewidths=2, zorder=11)
+
+        # Axis styling — orientation labels follow the panel's side
+        ax.set_xticks([-30, -15, 0, 15, 30] if is_switch
+                      else [-50, -30, -15, 0, 15, 30, 50])
+        ax.set_yticks(range(-20, 61, 10))
+        ax.tick_params(colors=TICK_COLOR, labelsize=8)
+        for sp in ax.spines.values():
+            sp.set_color(SPINE_COLOR)
+        ax.grid(False)
+        leftL = ('Oppo' if side == 'L' else 'Pull')
+        rightL = ('Pull' if side == 'L' else 'Oppo')
+        ax.set_xlabel(f'{leftL}   •   Spray Angle   •   {rightL}',
+                      color=TEXT_MUTED, fontsize=10, fontfamily='IBM Plex Sans')
+        if first_panel:
+            ax.set_ylabel('Launch Angle', color=TEXT_MUTED, fontsize=10,
+                          fontfamily='IBM Plex Sans')
+        else:
+            ax.set_yticklabels([])
+        if header:
+            ax.set_title(header, color=TEXT_MUTED, fontsize=12,
+                         fontweight='700', fontfamily='IBM Plex Sans', pad=5)
+
+    def _median_of(pts):
+        if not pts:
+            return (None, None)
+        ss = sorted(q[0] for q in pts)
+        ls = sorted(q[3] for q in pts)
+        n2 = len(pts)
+        m2 = n2 // 2
+        if n2 % 2 == 0:
+            return ((ss[m2 - 1] + ss[m2]) / 2, (ls[m2 - 1] + ls[m2]) / 2)
+        return (ss[m2], ls[m2])
 
     # Median placement marker — prefer the values stored on the leaderboard
     # row (h_row['medLA'] and h_row['medSpray']). Those are computed by the
@@ -1640,23 +1692,32 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
             pickle_la = sorted_las[mid]
         if med_spray is None:    med_spray = pickle_spray
         if med_la_real is None:  med_la_real = pickle_la
-    if med_spray is not None and med_la_real is not None:
-        med_la_plot = max(-20, min(60, med_la_real))
-        # Outer white halo + purple inner dot — matches the legend swatch.
-        ax_spray.scatter([med_spray], [med_la_plot], s=420,
-                          c='white', zorder=10, alpha=0.95,
-                          edgecolors='black', linewidths=0.5)
-        ax_spray.scatter([med_spray], [med_la_plot], s=240,
-                          c=MARKER_ACCENT, edgecolors='black',
-                          linewidths=2, zorder=11)
+    # Render the panel(s). Switch hitters: each side gets its own BIP, its
+    # own hand-oriented + hand-valued overlay, its own median marker
+    # (leaderboard medSpray/medLA mix mirrored sprays for an S hitter, so
+    # per-side medians are recomputed from the panel's own points).
+    for _pi, (_axp, _s2, _hz2, _pz2) in enumerate(spray_panels):
+        if is_switch:
+            _pts2 = [q for q in bip_pts if q[6] == _s2]
+            _med2 = _median_of(_pts2)
+            _hdr2 = (f"AS LHB (VS RHP)  ·  {len(_pts2)} BIP" if _s2 == 'L'
+                     else f"AS RHB (VS LHP)  ·  {len(_pts2)} BIP")
+        else:
+            _pts2 = bip_pts
+            _med2 = (med_spray, med_la_real)
+            _hdr2 = None
+        _draw_spray_panel(_axp, _s2, _pts2, _hz2, _pz2, _med2,
+                          first_panel=(_pi == 0), header=_hdr2)
 
-    # xwOBAsp (hitter overall, hand-specific zones with pooled fallback)
+    # xwOBAsp (hitter overall, hand-specific zones with pooled fallback).
+    # Each BIP is scored by its ACTUAL side — matters for switch hitters.
     xwobasp_sum = 0; xwobasp_n = 0; total_bip = 0
-    for ang, _yc, _ev, la_r, _event, _brl in bip_pts:
+    for ang, _yc, _ev, la_r, _event, _brl, _ps in bip_pts:
         total_bip += 1
-        sd = spray_direction(ang, bats)
+        _b2 = _ps if (_ps and is_switch) else bats
+        sd = spray_direction(ang, _b2)
         lb = la_bin_idx(la_r) if la_r is not None else None
-        v = sacq_lookup(sd, lb)
+        v = (sacq_lookups[_b2] if is_switch and _ps else sacq_lookup)(sd, lb)
         if v is not None:
             xwobasp_sum += v
             xwobasp_n += 1
@@ -1722,7 +1783,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         right += 0.005  # tiny gap before bipnote
         _place_text(right, l1_y, bipnote, 11, TEXT_FAINT, '600')
 
-    if med_spray is not None and med_la_real is not None:
+    if not is_switch and med_spray is not None and med_la_real is not None:
         sd = ('Pull' if med_spray > 0 else 'Oppo') if bats == 'L' else \
              ('Pull' if med_spray < 0 else 'Oppo')
         l2_y = 0.930 - _LA_SHIFT
@@ -1748,20 +1809,6 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         _place_text2(right, l2_y, f"{med_la_real:.1f}° LA",
                        14, pctl_color, '800')
 
-    # Spray axes styling
-    ax_spray.set_xticks([-50, -30, -15, 0, 15, 30, 50])
-    ax_spray.set_yticks(range(-20, 61, 10))
-    ax_spray.tick_params(colors=TICK_COLOR, labelsize=8)
-    for s in ax_spray.spines.values(): s.set_color(SPINE_COLOR)
-    ax_spray.grid(False)  # zone-edge overlay (above) is the only grid now
-    leftL = ('Oppo' if bats == 'L' else 'Pull')
-    rightL = ('Pull' if bats == 'L' else 'Oppo')
-    # Title-case throughout — matches the card's typographic voice.
-    # Bullet separators avoid the ←→ font-fallback warnings.
-    ax_spray.set_xlabel(f'{leftL}   •   Spray Angle   •   {rightL}',
-                         color=TEXT_MUTED, fontsize=10, fontfamily='IBM Plex Sans')
-    ax_spray.set_ylabel('Launch Angle', color=TEXT_MUTED, fontsize=10,
-                         fontfamily='IBM Plex Sans')
     # Section title (centered ABOVE the annotation block, matches hitter page)
     # Editorial-style title: letterspaced uppercase, off-white, with thin
     # underline rule. Same treatment used for all section titles below.
