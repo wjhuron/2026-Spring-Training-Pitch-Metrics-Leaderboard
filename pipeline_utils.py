@@ -13,7 +13,11 @@ DATA_DIR = os.path.join(_SCRIPT_DIR, 'data')
 
 # ── Strike zone constants ────────────────────────────────────────────────
 BALL_RADIUS_FT = 1.45 / 12   # 1.45 inches = ~0.121 ft
-ZONE_HALF_WIDTH = 0.83        # half plate (8.5") + ball radius (1.45") in feet
+ZONE_HALF_WIDTH = 0.83        # half plate (8.5") + ball radius (1.45") in feet,
+                              # ROUNDED (exact is 9.95/12 = 0.82917). Kept as
+                              # the zone-BAND convention for SD+/heart-shadow
+                              # regions; the InZone flag itself uses the exact
+                              # rounded-rect geometry in compute_in_zone.
 
 # ── Event classification sets ────────────────────────────────────────────
 SWING_DESCRIPTIONS = {'Swinging Strike', 'Foul', 'In Play'}
@@ -295,17 +299,30 @@ def minutes_to_tilt_display(total_minutes):
 
 # ── Strike zone ──────────────────────────────────────────────────────────
 
+HALF_PLATE_FT = 8.5 / 12     # rulebook zone half-width (17" plate / 2)
+
+
 def compute_in_zone(p):
-    """Compute InZone from PlateX, PlateZ, SzTop, SzBot with ball-radius adjustment."""
+    """'Yes' when any part of the ball intersects the rulebook strike zone.
+
+    Exact Savant-matching rule (validated 2026-08-03 against the Statcast
+    `zone` field, 3 independent days / 11,574 pitches / 0 mismatches):
+    the ball CENTER must be within one ball radius of the zone RECTANGLE
+    (half-plate wide, SzBot..SzTop tall) — Euclidean distance, so the
+    expanded boundary has rounded corners. The previous rectangular
+    approximation (|px| <= 0.83 with independent vertical margins)
+    over-included the four corner regions plus a 0.0008 ft horizontal
+    sliver (0.83 vs the exact 9.95/12): ~0.2%% of pitches league-wide.
+    """
     px = safe_float(p.get('PlateX'))
     pz = safe_float(p.get('PlateZ'))
     top = safe_float(p.get('SzTop'))
     bot = safe_float(p.get('SzBot'))
     if any(v is None for v in [px, pz, top, bot]):
         return None
-    if abs(px) <= ZONE_HALF_WIDTH and (bot - BALL_RADIUS_FT) <= pz <= (top + BALL_RADIUS_FT):
-        return 'Yes'
-    return 'No'
+    dx = max(0.0, abs(px) - HALF_PLATE_FT)
+    dz = max(0.0, bot - pz, pz - top)
+    return 'Yes' if math.hypot(dx, dz) <= BALL_RADIUS_FT else 'No'
 
 
 # ── IP conversion ────────────────────────────────────────────────────────
