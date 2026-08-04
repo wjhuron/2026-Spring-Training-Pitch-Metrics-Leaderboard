@@ -521,6 +521,20 @@ def main():
                and (p.get('Pitcher'), p.get('PTeam')) not in _ep]
     roc_pitches = [p for p in D if p.get('_source') in ('ROC', 'AAA')
                    and (p.get('Pitcher'), p.get('PTeam')) not in _ep]
+    # Scoring-only rows (the NEW tab — arms new to the org) live in their own
+    # cache so the shared pickle stays exactly what generate_micro_data sees.
+    # They join roc_pitches, which is a SCORE-ONLY list: build_df sets
+    # target_xrv=None for it, so nothing here can enter training, the
+    # standardization pools, or the support manifold. Their only effect is a
+    # per-pitch grade in the dump, which the Sheets write-back then puts in
+    # the NEW tab's Stuff+ column.
+    _so_path = os.path.join(os.path.dirname(PKL), 'scoring_only_rs_cache.pkl')
+    if os.path.exists(_so_path):
+        with open(_so_path, 'rb') as _f:
+            _so = pickle.load(_f)
+        _so = [p for p in _so if (p.get('Pitcher'), p.get('PTeam')) not in _ep]
+        roc_pitches += _so
+        print(f'  + {len(_so)} scoring-only pitches from {_so_path}')
     # MiLB RunExp currency correction (2026-07-28). Statcast's delta_run_exp
     # is built on each league's own RE matrix, so ROC/AAA RunExp in the raw
     # cache is MiLB-denominated (~1.27x MLB for the identical event).
