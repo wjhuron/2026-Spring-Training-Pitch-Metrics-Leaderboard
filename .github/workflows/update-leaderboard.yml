@@ -38,6 +38,10 @@ jobs:
       - name: Fetch data and build leaderboard
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          # Lets fg_overrides fall back to the encrypted release copy when
+          # FanGraphs blocks the runner, instead of ending up with no cache
+          # at all. Without this the fallback dies on a missing key.
+          STUFF_DATA_KEY: ${{ secrets.STUFF_DATA_KEY }}
         run: python3 process_data.py
 
       # Stuff+ is an offline-trained model (needs xgboost), so it runs here
@@ -214,8 +218,15 @@ jobs:
             -in data/all_pitches_rs_cache.pkl -out data/all_pitches_rs_cache.pkl.enc
           # Same treatment for the FG override cache: the repo is public and
           # this is a third party's leaderboard data, so it ships encrypted.
-          openssl enc -aes-256-cbc -pbkdf2 -pass env:STUFF_DATA_KEY \
-            -in data/fg_overrides.json -out data/fg_overrides.json.enc
+          # It is gitignored AND only written when the FanGraphs fetch
+          # succeeds, so on a run where FanGraphs blocks the runner the file
+          # simply does not exist — that must not fail the whole pipeline.
+          if [ -f data/fg_overrides.json ]; then
+            openssl enc -aes-256-cbc -pbkdf2 -pass env:STUFF_DATA_KEY \
+              -in data/fg_overrides.json -out data/fg_overrides.json.enc
+          else
+            echo "::warning::data/fg_overrides.json absent (FanGraphs fetch failed) — skipping its release upload"
+          fi
 
       - name: Publish pickle to "latest-data" release
         if: success()
@@ -229,15 +240,27 @@ jobs:
             - all_pitches_rs_cache.pkl.enc — pitch-level cache;
               HitterCards.py downloads it when the local pickle is stale.
             - fg_overrides.json.enc — the FanGraphs override cache as CI
-              fetched it. FanGraphs' Cloudflare bot scoring challenges
-              some client IPs while letting GitHub's runners through, and
-              the cache is gitignored, so a blocked machine has no other
+              last fetched it. The cache is gitignored, so a machine that
+              FanGraphs' Cloudflare bot scoring challenges has no other
               route to fresh values; fg_overrides.refresh_if_stale falls
-              back to this copy when the direct fetch fails.
+              back to this copy when the direct fetch fails. Only uploaded
+              on runs where the fetch actually succeeded, so it holds the
+              last known good values rather than being overwritten by a
+              blocked run.
 
             Updated: ${{ github.event.repository.updated_at }}
-          files: |
-            data/all_pitches_rs_cache.pkl.enc
-            data/fg_overrides.json.enc
+          files: data/all_pitches_rs_cache.pkl.enc
           fail_on_unmatched_files: true
+          make_latest: false
+
+      # Separate step, and deliberately NOT fatal: the FG cache exists only
+      # when the FanGraphs fetch succeeded. Bundling it with the pickle above
+      # meant a blocked FanGraphs run failed the entire pipeline.
+      - name: Publish FG override cache (only when freshly fetched)
+        if: success() && hashFiles('data/fg_overrides.json.enc') != ''
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: latest-data
+          files: data/fg_overrides.json.enc
+          fail_on_unmatched_files: false
           make_latest: false
