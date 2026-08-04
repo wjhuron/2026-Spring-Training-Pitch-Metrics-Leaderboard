@@ -744,6 +744,31 @@ const Leaderboard = {
 
     tbody.appendChild(fragment);
 
+    // Warm the pitch-detail shards for the rows now on screen. Details are
+    // fetched per pitcher rather than shipped in the payload, so without this
+    // the first click on any player stalls on the network; ~50 rows is about
+    // 500 KB and it runs at idle/low priority. Hover below covers rows the
+    // user reaches by search or paging before this finishes.
+    if (typeof DataStore !== 'undefined' && DataStore.prefetchPitchDetails) {
+      var _pfKeys = [];
+      for (var pi = 0; pi < pageData.length; pi++) {
+        var _r = pageData[pi];
+        if (_r.pitcher && !_r._isTeamRow) _pfKeys.push(_r.pitcher + '|' + _r.team);
+      }
+      DataStore.prefetchPitchDetails(_pfKeys);
+    }
+
+    if (tbody._delegatedHover) {
+      tbody.removeEventListener('mouseover', tbody._delegatedHover);
+    }
+    tbody._delegatedHover = function (e) {
+      var tr = e.target.closest && e.target.closest('tr.clickable-row');
+      if (!tr || !tr._rowData || tr._rowData._isTeamRow) return;
+      if (!tr._rowData.pitcher) return;
+      DataStore.prefetchPitchDetails([tr._rowData.pitcher + '|' + tr._rowData.team]);
+    };
+    tbody.addEventListener('mouseover', tbody._delegatedHover);
+
     if (tbody._delegatedClick) {
       tbody.removeEventListener('click', tbody._delegatedClick);
     }

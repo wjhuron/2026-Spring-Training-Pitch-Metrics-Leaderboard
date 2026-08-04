@@ -92,9 +92,40 @@ const DataStore = {
     })).then(function () { self.updateGlobals(); });
   },
 
-  _fetchGz: function (name) {
+  /**
+   * Warm the shard cache for keys the user is likely to click next, so opening
+   * a player page costs no network. Sharding otherwise turns a formerly
+   * in-memory lookup into a 175-800 ms stall on every open, which is worse
+   * than the payload win is good — browsing players is the main thing people
+   * do here. Fire-and-forget and low priority: this must never compete with
+   * data_core/data_heavy or with an ensurePitchDetails the user is waiting on.
+   * @param {string[]} keys
+   */
+  prefetchPitchDetails: function (keys) {
+    var self = this;
+    var idx = (this.metadata && this.metadata.pitchDetailsIndex) || {};
+    var todo = keys.filter(function (k) {
+      return k && idx[k] && !self.rs.pitchDetails[k] && !self._shardPromises[k];
+    });
+    if (!todo.length) return;
+    var run = function () {
+      todo.forEach(function (key) {
+        if (self.rs.pitchDetails[key] || self._shardPromises[key]) return;
+        var p = self._fetchGz('pitchdetails/' + idx[key] + '.json.gz', 'low')
+          .then(function (pitches) { self.rs.pitchDetails[key] = pitches; })
+          .catch(function () { delete self._shardPromises[key]; });
+        self._shardPromises[key] = p;
+      });
+    };
+    // Idle so a prefetch never delays first paint or the heavy prefetch.
+    if (typeof requestIdleCallback === 'function') requestIdleCallback(run, { timeout: 2000 });
+    else setTimeout(run, 300);
+  },
+
+  _fetchGz: function (name, priority) {
     var url = 'data/' + name + (DATA_VERSION ? ('?v=' + DATA_VERSION) : '');
-    return fetch(url).then(function (resp) {
+    var opts = priority ? { priority: priority } : undefined;
+    return fetch(url, opts).then(function (resp) {
       if (!resp.ok) throw new Error('Data fetch failed: HTTP ' + resp.status + ' (' + name + ')');
       if (!resp.body) throw new Error('Data fetch returned no body stream (' + name + ')');
       var inflated = resp.body.pipeThrough(new DecompressionStream('gzip'));
