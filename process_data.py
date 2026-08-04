@@ -28,7 +28,7 @@ from pipeline_utils import (
 from pipeline_fetch import (
     fetch_guts_constants, fetch_sprint_speed, fetch_park_factors,
     fetch_hitter_positions,
-    read_pitches_from_sheet, read_all_pitches_from_sheets,
+    read_pitches_from_sheet, read_all_pitches_from_sheets, read_new_tab_pitches,
     lookup_mlb_id, load_mlb_id_cache, save_mlb_id_cache, fetch_canonical_last_first,
     fetch_and_aggregate_boxscores, fetch_and_aggregate_milb_boxscores,
     SPREADSHEET_IDS, SERVICE_ACCOUNT_FILE,
@@ -1224,7 +1224,28 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
     }
 
 
-def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
+def _scoring_only_groups(scoring_only):
+    """Group scoring-only pitches for the Loc+ scorer.
+
+    Keyed to team 'AAA' on purpose: pipeline_locplus normalizes with
+    `pool_filter=lambda k: k[1] not in AAA_TEAMS`, so this keeps them out of
+    the league anchor pool without touching pipeline_locplus. Nothing in
+    pitcher_groups/pitch_groups uses an AAA team key (the AAA tab's pitchers
+    are opponents, excluded by _roc_hitter_pitch), so there is no collision.
+    """
+    by_pitcher, by_type = defaultdict(list), defaultdict(list)
+    for p in scoring_only or []:
+        pitcher, throws = p.get('Pitcher'), p.get('Throws')
+        if not pitcher:
+            continue
+        by_pitcher[(pitcher, 'AAA', throws)].append(p)
+        if p.get('Pitch Type'):
+            by_type[(pitcher, 'AAA', p['Pitch Type'], throws)].append(p)
+    return dict(by_pitcher), dict(by_type)
+
+
+def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
+                      scoring_only=None):
     """Process a set of pitches into all leaderboard outputs.
 
     Args:
@@ -1232,6 +1253,11 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
         label: 'ST' or 'RS' (for logging)
         mlb_id_cache: shared MLB ID cache dict (mutated in place)
         mlb_id_cache_path: path to MLB ID cache file
+        scoring_only: pitch dicts to GRADE but never publish (the NEW tab).
+            They never enter all_pitches, so no leaderboard, micro record,
+            league baseline, embedded payload or cached pickle can see them.
+            They reach exactly two places: the Loc+ scorer (for the grade
+            dump) and their own side cache for the Stuff+ scorer.
 
     Returns a dict with all outputs: pitcher_leaderboard, pitch_leaderboard,
     hitter_leaderboard, hitter_pitch_leaderboard, metadata, micro_data,
@@ -1298,7 +1324,11 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
               f"(excluded from all pitcher-facing views)")
 
     # --- Recompute InZone from PlateX/PlateZ/SzTop/SzBot with ball-radius adjustment ---
-    for p in all_pitches:
+    # Scoring-only rows get the same in-place normalizations (InZone, CF remap,
+    # RunExp currency) so they are graded against the same conventions as
+    # everything else. They are kept in their own list throughout.
+    scoring_only = scoring_only or []
+    for p in all_pitches + scoring_only:
         p['InZone'] = compute_in_zone(p)
 
     # --- MiLB RunExp currency correction (2026-07-25) ---
@@ -1317,10 +1347,13 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     # Corrected in place, once, before any consumer reads RunExp, so pitcher
     # RV/xRV, hitter xRV, the SD+/CT+ weight tables and Loc+'s count values all
     # inherit it consistently rather than each needing its own guard.
-    _re_scale = compute_runexp_scale(all_pitches)
+    # Derived over all_pitches + scoring_only so the NEW source gets its own
+    # factor. Per-source and measured against the MLB reference, so adding a
+    # source cannot move the ROC/AAA factors.
+    _re_scale = compute_runexp_scale(all_pitches + scoring_only)
     if _re_scale:
         _n_fixed = 0
-        for p in all_pitches:
+        for p in all_pitches + scoring_only:
             sc = _re_scale.get(p.get('_source'))
             if not sc:
                 continue
@@ -1454,7 +1487,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     }
     cf_to_ff = 0
     cf_to_fc = 0
-    for p in all_pitches:
+    for p in all_pitches + scoring_only:
         if p.get('Pitch Type') == 'CF':
             pitcher = p.get('Pitcher', '')
             if pitcher in CF_TO_FC_PITCHERS:
@@ -2402,8 +2435,20 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     # in hitter-side league tables (SD+/CT+/xwOBAsp) — those measure hitters.
     _loc_baseline = [p for p in all_pitches
                      if (p.get('Pitcher'), p.get('PTeam')) not in ep_pitchers]
+    # Scoring-only NEW-tab rows ride along here and NOWHERE else. They are
+    # appended to the first argument so the per-pitch grade dump covers them
+    # (that dump iterates the pitch list, not the groups), and their groups are
+    # merged in so score_pitch actually runs on them. Neither can contaminate:
+    # the baseline surfaces filter on _source == 'MLB' (is_eligible_baseline),
+    # and the anchor pool filters on team not in AAA_TEAMS, which is why
+    # _scoring_only_groups keys them to 'AAA'. Their results keys therefore
+    # match no leaderboard row and are silently dropped below.
+    _loc_pitches = _loc_baseline + (scoring_only or [])
+    _so_pitcher_groups, _so_pitch_groups = _scoring_only_groups(scoring_only)
     loc_results, pitch_loc_results, loc_weights = compute_loc_plus(
-        _loc_baseline, pitcher_groups, pitch_groups,
+        _loc_pitches,
+        {**pitcher_groups, **_so_pitcher_groups},
+        {**pitch_groups, **_so_pitch_groups},
         lg_woba=GUTS_EXTRA.get('lgWOBA') if GUTS_EXTRA else None,
         woba_scale=GUTS_EXTRA.get('wOBAScale') if GUTS_EXTRA else None,
         # Per-pitch Loc+ grades for the Sheets write-back
@@ -3490,6 +3535,17 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
     with open(cache_path, 'wb') as f:
         pickle.dump(all_pitches, f)
     print(f"  Cached {len(all_pitches)} pitches to {cache_path}")
+
+    # Scoring-only rows go to their OWN cache, never the shared one. Keeping
+    # them out preserves the fidelity contract above (the shared cache stays
+    # exactly what generate_micro_data sees) and means every existing pickle
+    # consumer — Cards, HitterCards, refresh_micro_grades, the scripts/ tools —
+    # is untouched by this feature. Only train_stuff_v11 opts in.
+    if scoring_only:
+        so_path = os.path.join(DATA_DIR, f'scoring_only_{label.lower()}_cache.pkl')
+        with open(so_path, 'wb') as f:
+            pickle.dump(scoring_only, f)
+        print(f"  Cached {len(scoring_only)} scoring-only pitches to {so_path}")
 
     # --- Generate micro-aggregate data ---
     # Grade-atom sources: the Loc+ dump was written earlier THIS run (fresh);
@@ -4613,11 +4669,36 @@ def main():
     global WOBA_WEIGHTS, FIP_CONSTANT, GUTS_EXTRA, PARK_FACTORS
     os.makedirs(DATA_DIR, exist_ok=True)
 
+    # FanGraphs sits behind Cloudflare bot scoring that intermittently
+    # challenges even CI runners (2026-08-04: the 13:57 run fetched all three
+    # endpoints fine, the 16:45 run got 403s on every one). Degrading quietly
+    # is the dangerous option: the fallbacks are 2025 wOBA weights and neutral
+    # park factors, which produce numbers that LOOK normal, and on 2026-08-04
+    # they shipped to the live site — wRC+ moved a mean of 3.4 points and up
+    # to 31, with every park adjustment silently gone (verified: 647/647
+    # hitters matched a no-park recompute).
+    #
+    # Both fetches sit at the top of main(), before Sheets is read or any file
+    # is written, so raising here leaves the previous, correct data in place
+    # rather than overwriting it with degraded values. The block is
+    # intermittent, so the fix is usually just to re-run.
+    #
+    # ALLOW_FG_FALLBACK=1 opts back into degrade-and-continue for local work
+    # where approximate constants are fine.
+    allow_fallback = os.environ.get('ALLOW_FG_FALLBACK') == '1'
+
     # Fetch live wOBA weights and FIP constant from FanGraphs
     print("Fetching FanGraphs Guts constants...")
     try:
         WOBA_WEIGHTS, FIP_CONSTANT, GUTS_EXTRA = fetch_guts_constants(2026)
     except Exception as e:
+        if not allow_fallback:
+            raise RuntimeError(
+                f"FanGraphs Guts fetch failed ({e}). Refusing to build with "
+                f"the 2025 fallback weights: that silently ships wrong wOBA, "
+                f"wRC+ and FIP. The block is intermittent — re-run. Set "
+                f"ALLOW_FG_FALLBACK=1 to accept degraded constants."
+            ) from e
         print(f"\n  *** WARNING: Could not fetch Guts data ({e}) ***")
         print(f"  *** Using 2025 FALLBACK values — wOBA weights may be inaccurate! ***\n")
         WOBA_WEIGHTS = WOBA_WEIGHTS_FALLBACK.copy()
@@ -4633,8 +4714,23 @@ def main():
     try:
         PARK_FACTORS = fetch_park_factors(2026)
     except Exception as e:
+        if not allow_fallback:
+            raise RuntimeError(
+                f"FanGraphs park factor fetch failed ({e}). Refusing to build "
+                f"with every park neutral: wRC+ and xwRC+ would ship with no "
+                f"park adjustment at all. The block is intermittent — re-run. "
+                f"Set ALLOW_FG_FALLBACK=1 to accept 1.0 everywhere."
+            ) from e
         print(f"  WARNING: Could not fetch park factors ({e}), defaulting to 1.0")
         PARK_FACTORS = {}
+    if PARK_FACTORS is not None and 0 < len(PARK_FACTORS) < 30 and not allow_fallback:
+        # A partial scrape is the same silent-degradation trap: the teams that
+        # came back get adjusted, the rest quietly default to 1.0.
+        raise RuntimeError(
+            f"FanGraphs park factors returned only {len(PARK_FACTORS)}/30 "
+            f"teams. Refusing to build: the missing teams would silently "
+            f"default to 1.0. Re-run, or set ALLOW_FG_FALLBACK=1 to accept."
+        )
 
     # Read Regular Season data from the six 2026 division workbooks (Sheets, on
     # the huronalytics account). Pitcher2026 appends here and retagging happens
@@ -4655,6 +4751,29 @@ def main():
     if _name_fixed:
         print(f"  Normalized {_name_fixed} whitespace-padded player names")
 
+    # NEW tab — scoring only. Read separately (never merged into rs_pitches)
+    # so it cannot reach a leaderboard or the site; it exists purely so the
+    # tab's Stuff+/Loc+ columns get filled for arms new to the org.
+    print("\n=== Reading NEW tab (scoring only) ===")
+    try:
+        new_tab_pitches = read_new_tab_pitches()
+    except Exception as e:
+        print(f"  WARNING: could not read the NEW tab ({e}) — its grade "
+              f"columns will stay blank this run")
+        new_tab_pitches = []
+    if new_tab_pitches:
+        # The tab re-lists each player's MLB pitches (Bird has 548 rows that
+        # are already in the NYY tab). Those are graded under their real team
+        # tab, so drop them here: one PitchID must not be graded twice on two
+        # different level baselines.
+        _rs_ids = {p.get('PitchID') for p in rs_pitches if p.get('PitchID')}
+        _before = len(new_tab_pitches)
+        new_tab_pitches = [p for p in new_tab_pitches
+                           if p.get('PitchID') and p['PitchID'] not in _rs_ids]
+        print(f"  {len(new_tab_pitches)} scoring-only pitches "
+              f"({_before - len(new_tab_pitches)} dropped as duplicates of "
+              f"rows already read from a team/ROC/AAA tab)")
+
     # Shared MLB ID cache
     mlb_id_cache_path = os.path.join(DATA_DIR, 'mlb_id_cache.json')
     mlb_id_cache = load_mlb_id_cache(mlb_id_cache_path)
@@ -4663,7 +4782,9 @@ def main():
     print("\n" + "=" * 60)
     print("=== Processing Regular Season ===")
     print("=" * 60)
-    rs_result = process_game_type(rs_pitches, 'RS', mlb_id_cache, mlb_id_cache_path)
+    rs_result = process_game_type(rs_pitches, 'RS', mlb_id_cache,
+                                  mlb_id_cache_path,
+                                  scoring_only=new_tab_pitches)
 
     # Save shared MLB ID cache
     save_mlb_id_cache(mlb_id_cache, mlb_id_cache_path)
