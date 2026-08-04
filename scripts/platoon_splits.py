@@ -821,13 +821,22 @@ def main():
     with open(os.path.join(DATA_DIR, 'metadata_rs.json')) as f:
         metadata = json.load(f)
 
-    try:
-        from pipeline_fetch import fetch_guts_constants
-        woba_weights, _fip, _extra = fetch_guts_constants(2026)
-        print("  Fetched live FanGraphs Guts wOBA weights")
-    except Exception as e:                                       # noqa: BLE001
-        print(f"  Guts fetch failed ({e}); using the pinned 2026 weights")
-        woba_weights = WOBA_WEIGHTS_FALLBACK
+    # Prefer the weights the pipeline shipped in metadata (2026-08-04): that is
+    # the set the leaderboard was actually built with, so reading it keeps this
+    # script in step with the site across a season rollover without anyone
+    # remembering to edit a constant. Fall back to a live scrape, then to the
+    # pinned set. Verified 2026-08-04: all three agree exactly.
+    woba_weights = metadata.get('wobaWeights')
+    if woba_weights and set(WOBA_WEIGHTS_FALLBACK) <= set(woba_weights):
+        print(f"  Using the wOBA weights shipped in metadata: {woba_weights}")
+    else:
+        try:
+            from pipeline_fetch import fetch_guts_constants
+            woba_weights, _fip, _extra = fetch_guts_constants(2026)
+            print("  Fetched live FanGraphs Guts wOBA weights")
+        except Exception as e:                                   # noqa: BLE001
+            print(f"  Guts fetch failed ({e}); using the pinned 2026 weights")
+            woba_weights = WOBA_WEIGHTS_FALLBACK
 
     print("\n=== Loading pitch data ===")
     pitches, new_rows = load_pitches(use_new_tab=not args.no_new_tab)
