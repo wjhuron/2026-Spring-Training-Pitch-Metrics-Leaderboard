@@ -114,6 +114,15 @@ POOL_MIN_TBF = 25              # split-sample floor for the pitcher pool
 WOBA_WEIGHTS_FALLBACK = {'BB': 0.698, 'HBP': 0.729, '1B': 0.889,
                          '2B': 1.259, '3B': 1.593, 'HR': 2.044}
 
+# The matching 2026 Guts league constants, read from a metadata_rs.json that
+# was generated on a run where the FanGraphs scrape SUCCEEDED. A run where it
+# fails writes process_data's 2025 fallbacks instead, and metadata carries no
+# marker saying which happened — so the fallback values are pinned here and
+# detected by equality below. Without that check this script would silently
+# inherit a degraded lgWOBA/wOBAScale into every xRV, SD+ and CT+ number.
+GUTS_2026 = {'lgWOBA': 0.3164, 'wOBAScale': 1.2342, 'lgRPA': 0.1188}
+GUTS_2025_FALLBACK = {'lgWOBA': 0.317, 'wOBAScale': 1.25, 'lgRPA': 0.119}
+
 FB_TYPES = {'FF', 'SI'}
 CF_TO_FC_PITCHERS = {'Ashcraft, Graham', 'Doval, Camilo', 'Fluharty, Mason',
                      'Funderburk, Kody', 'Jansen, Kenley', 'Maton, Phil'}
@@ -249,7 +258,12 @@ def preprocess(all_pitches, new_rows, metadata, woba_weights):
 class League:
     def __init__(self, all_pitches, ep_pitchers, metadata, woba_weights):
         self.woba_weights = woba_weights
-        guts = metadata['gutsConstants']
+        guts = dict(metadata['gutsConstants'])
+        if all(abs(guts.get(k, 0) - v) < 1e-9 for k, v in GUTS_2025_FALLBACK.items()):
+            print("  *** metadata gutsConstants are process_data's 2025 "
+                  "FALLBACKS — that run's FanGraphs scrape failed. Using the "
+                  "pinned 2026 constants instead. ***")
+            guts = dict(GUTS_2026)
         self.lg_woba = guts['lgWOBA']
         self.woba_scale = guts['wOBAScale']
         self.siera_constant = metadata['sieraConstant']
@@ -812,7 +826,7 @@ def main():
         woba_weights, _fip, _extra = fetch_guts_constants(2026)
         print("  Fetched live FanGraphs Guts wOBA weights")
     except Exception as e:                                       # noqa: BLE001
-        print(f"  Guts fetch failed ({e}); using 2025 fallback weights")
+        print(f"  Guts fetch failed ({e}); using the pinned 2026 weights")
         woba_weights = WOBA_WEIGHTS_FALLBACK
 
     print("\n=== Loading pitch data ===")
