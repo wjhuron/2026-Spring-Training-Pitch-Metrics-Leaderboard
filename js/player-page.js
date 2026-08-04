@@ -261,6 +261,24 @@ var PlayerPage = {
       return;
     }
 
+    // Pitch details are sharded per pitcher, so pull this one's shard before
+    // rendering — everything downstream reads window.PITCH_DETAILS
+    // synchronously. Resolves immediately once the shard is cached, so
+    // re-opening the same pitcher doesn't re-fetch.
+    if (pitcherData) {
+      var key = pitcherData.pitcher + '|' + pitcherData.team;
+      if (!(window.PITCH_DETAILS || {})[key] && DataStore.hasPitchDetails(key)) {
+        var self = this;
+        DataStore.ensurePitchDetails(key).then(function () {
+          self._openResolved(pitcherData, null);
+        });
+        return;
+      }
+    }
+    this._openResolved(pitcherData, hitterData);
+  },
+
+  _openResolved: function (pitcherData, hitterData) {
     var curHash = window.location.hash.replace(/^#/, '');
     if (curHash.indexOf('player=') === -1) {
       this._lastRoute = curHash;

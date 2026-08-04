@@ -36,6 +36,13 @@
       ]
     },
     {
+      "source": "/data/pitchdetails/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
+        { "key": "Content-Type", "value": "application/gzip" }
+      ]
+    },
+    {
       "source": "/data/tradevalue_data.json.gz",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },

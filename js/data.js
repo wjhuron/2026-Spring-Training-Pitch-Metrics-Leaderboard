@@ -32,17 +32,64 @@ const DataStore = {
    */
   // Two-stage load (2026-07-29). data_core.json.gz carries the leaderboard
   // tables + metadata (~5 MB gz) and renders the first table in well under a
-  // second; data_heavy.json.gz (microData + pitchDetails + swing locations,
-  // ~33 MB gz) prefetches in the background immediately after and powers
-  // client-side filters and player pages. Consumers that need heavy data
+  // second; data_heavy.json.gz (microData + hitter details + swing locations,
+  // ~18 MB gz) prefetches in the background immediately after and powers
+  // client-side filters and hitter pages. Consumers that need heavy data
   // gate on DataStore.heavyReady / DataStore.whenHeavy(cb) — with the
   // prefetch starting at once, those gates only bite in the first seconds.
+  // Pitch details left this chunk on 2026-08-03 and are fetched per pitcher
+  // via ensurePitchDetails; see the note above _shardPromises.
   heavyReady: false,
   _heavyCallbacks: [],
 
   whenHeavy: function (cb) {
     if (this.heavyReady) { cb(); return; }
     this._heavyCallbacks.push(cb);
+  },
+
+  // Pitch details are sharded one file per pitcher (2026-08-03) rather than
+  // riding in data_heavy, where they were 18.6 MB gz / 120.6 MB of JSON that
+  // every visitor parsed to read at most a handful of pitchers. Each shard is
+  // ~10 KB. window.PITCH_DETAILS keeps the same {'Name|TEAM': [...]} shape, so
+  // every existing read site works untouched — callers just have to await
+  // ensurePitchDetails first. Keyed by in-flight Promise so two overlapping
+  // asks for the same pitcher share one request.
+  _shardPromises: {},
+
+  hasPitchDetails: function (key) {
+    var idx = (this.metadata && this.metadata.pitchDetailsIndex) || {};
+    return Object.prototype.hasOwnProperty.call(idx, key);
+  },
+
+  /**
+   * Load pitch-detail shards for one or more 'Name|TEAM' keys.
+   * @param {string|string[]} keys
+   * @returns {Promise} resolves once window.PITCH_DETAILS has every key that
+   *   exists in the index; unknown keys resolve without erroring (the caller's
+   *   existing "no data" path handles them, same as a missing dict entry did).
+   */
+  ensurePitchDetails: function (keys) {
+    var self = this;
+    if (!Array.isArray(keys)) keys = [keys];
+    var idx = (this.metadata && this.metadata.pitchDetailsIndex) || {};
+    return Promise.all(keys.map(function (key) {
+      if (self.rs.pitchDetails[key]) return Promise.resolve();
+      var shardId = idx[key];
+      if (!shardId) return Promise.resolve();
+      if (self._shardPromises[key]) return self._shardPromises[key];
+      var p = self._fetchGz('pitchdetails/' + shardId + '.json.gz')
+        .then(function (pitches) {
+          self.rs.pitchDetails[key] = pitches;
+        })
+        .catch(function (e) {
+          // Leave the key absent so the caller's no-data path renders, and
+          // drop the memo so a later open can retry.
+          console.error('Pitch detail shard failed for ' + key + ':', e);
+          delete self._shardPromises[key];
+        });
+      self._shardPromises[key] = p;
+      return p;
+    })).then(function () { self.updateGlobals(); });
   },
 
   _fetchGz: function (name) {
@@ -86,7 +133,6 @@ const DataStore = {
     var self = this;
     this._fetchGz('data_heavy.json.gz').then(function (rd) {
       self.rs.microData = rd.microData || null;
-      self.rs.pitchDetails = rd.pitchDetails || {};
       self.rs.hitterPitchDetails = rd.hitterPitchDetails || {};
       self.rs.hitterSwingLocations = rd.hitterSwingLocations || {};
       self.updateGlobals();

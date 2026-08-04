@@ -4380,15 +4380,18 @@ def write_json_outputs(result, suffix):
 
 
 def write_embedded_js(rs_result):
-    """Write the site data payload as TWO gzip chunks (split 2026-07-29):
+    """Write the site data payload as two gzip chunks plus per-pitcher shards:
 
       data_core.json.gz   leaderboard tables + metadata — everything the
                           unfiltered tabs need. Small (~5 MB gz), fetched
                           first; the site renders its first table from this.
-      data_heavy.json.gz  microData + pitchDetails + hitterPitchDetails +
-                          hitterSwingLocations — powers client-side filters
-                          and player pages. Large (~33 MB gz), prefetched in
-                          the background immediately after core (js/data.js).
+      data_heavy.json.gz  microData + hitterPitchDetails + hitterSwingLocations
+                          — powers client-side filters and hitter pages.
+                          (~18 MB gz), prefetched in the background
+                          immediately after core (js/data.js).
+      pitchdetails/*.gz   one shard per pitcher (~10 KB each), fetched on
+                          demand when a player page, side panel, or compare
+                          chart actually needs that pitcher (2026-08-03).
 
     Rationale: the combined embed decompressed to ~254 MB and every visitor
     paid its JSON.parse on every visit even when cached; 84% of that weight
@@ -4414,6 +4417,52 @@ def write_embedded_js(rs_result):
         print(f"  Wrote {name} ({gz_mb:.1f} MB gz, {raw_mb:.1f} MB raw)")
         return gz_mb
 
+    def _write_pitch_detail_shards(details):
+        """Split pitchDetails into one gzipped file per pitcher and return the
+        {key: shard-id} index the client needs to find them.
+
+        pitchDetails was 18.6 MB gz / 120.6 MB of JSON inside data_heavy — 56%
+        of the wire weight and the single largest JSON.parse on the site — yet
+        every one of its read sites in js/ looks up exactly one 'Name|TEAM'
+        key. Shipping 1,000+ pitchers so a player page can read one was the
+        biggest waste in the payload. Sharded: median 10 KB, max 78 KB, fetched
+        on demand by DataStore.ensurePitchDetails.
+
+        Shards stay gzipped rather than plain .json so the repo stays size-
+        neutral (19 MB of shards replaces the 18.6 MB leaving data_heavy);
+        plain JSON would add ~120 MB per commit.
+
+        Shard ids are a hash of the key, so they're filename-safe (names carry
+        commas, spaces, and accents) and stable across runs.
+        """
+        import hashlib
+        import shutil
+
+        shard_dir = os.path.join(DATA_DIR, 'pitchdetails')
+        # Rewrite the directory wholesale so pitchers who left the dataset
+        # don't leave orphan shards behind for `git add data/` to keep.
+        if os.path.isdir(shard_dir):
+            shutil.rmtree(shard_dir)
+        os.makedirs(shard_dir)
+
+        index, total = {}, 0
+        for key, pitches in details.items():
+            shard_id = hashlib.sha1(key.encode('utf-8')).hexdigest()[:12]
+            payload = json.dumps(pitches, separators=(',', ':')).encode('utf-8')
+            with open(os.path.join(shard_dir, shard_id + '.json.gz'), 'wb') as f:
+                f.write(gzip.compress(payload, compresslevel=9, mtime=0))
+            index[key] = shard_id
+            total += len(payload)
+        shard_mb = sum(
+            os.path.getsize(os.path.join(shard_dir, n))
+            for n in os.listdir(shard_dir)) / 1048576
+        print(f"  Wrote {len(index)} pitch-detail shards "
+              f"({shard_mb:.1f} MB gz, {total / 1048576:.1f} MB raw)")
+        return index
+
+    pitch_detail_index = _write_pitch_detail_shards(
+        round_floats_inplace(rs_result['pitch_details']))
+
     # Keep _pctl keys on hitter pitch LB rows — needed by the player-page
     # Plate Discipline / Batted Ball tables to color category rows and
     # per-pitch sub-rows (the leaderboard's hitterPitch tab recomputes
@@ -4423,16 +4472,20 @@ def write_embedded_js(rs_result):
         {k: v for k, v in row.items() if not k.startswith('_')}
         for row in rs_result['hitter_pitch_leaderboard']]
 
+    # The shard index rides in metadata so it lands with data_core — the
+    # client needs it before it can resolve any player page.
+    metadata = dict(rs_result['metadata'])
+    metadata['pitchDetailsIndex'] = pitch_detail_index
+
     core_mb = _write_gz('data_core.json.gz', {
         'pitcherData': strip_internal(rs_result['pitcher_leaderboard']),
         'pitchData': strip_internal(rs_result['pitch_leaderboard']),
         'hitterData': strip_internal(rs_result['hitter_leaderboard']),
         'hitterPitchData': hitter_pitch_lb_slim,
-        'metadata': rs_result['metadata'],
+        'metadata': metadata,
     })
     heavy_mb = _write_gz('data_heavy.json.gz', {
         'microData': rs_result['micro_data'],
-        'pitchDetails': rs_result['pitch_details'],
         'hitterPitchDetails': rs_result['hitter_pitch_details'],
         'hitterSwingLocations': rs_result.get('hitter_swing_locations', {}),
     })

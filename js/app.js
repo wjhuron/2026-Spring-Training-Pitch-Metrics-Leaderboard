@@ -1107,7 +1107,11 @@
         buildHitterPanelTable(name, team);
       } else {
         if (chartContainer) chartContainer.style.display = '';
-        ScatterChart.render(name, team);
+        // Movement chart reads window.PITCH_DETAILS synchronously; pull this
+        // pitcher's shard first (no-op once cached).
+        DataStore.ensurePitchDetails(name + '|' + team).then(function () {
+          ScatterChart.render(name, team);
+        });
         buildPanelMetricsTable(name, team);
       }
     };
@@ -1348,7 +1352,10 @@
       if (list.length < 2) return;
       const modal = document.getElementById('compare-modal');
       modal.style.display = '';
-      ScatterChart.renderCompare(list);
+      // list is already 'Name|TEAM' keys — fetch every shard, then draw once.
+      DataStore.ensurePitchDetails(list).then(function () {
+        ScatterChart.renderCompare(list);
+      });
     });
 
     document.getElementById('compare-close').addEventListener('click', function () {

@@ -109,6 +109,41 @@ def check_gz_chunk(name, min_bytes, required_keys, row_probe):
         ok(f"{name}: {size:,} bytes, inflates to JSON ({n} {probe_desc})")
 
 
+def check_pitch_detail_shards():
+    """Pitch details ship as one gzipped shard per pitcher, indexed by
+    metadata.pitchDetailsIndex in data_core (2026-08-03). A missing shard
+    silently degrades a player page to its no-data state, so verify the index
+    and the directory agree rather than trusting them to stay in sync."""
+    name = 'pitch-detail shards'
+    shard_dir = os.path.join(DATA_DIR, 'pitchdetails')
+    if not os.path.isdir(shard_dir):
+        fail(f"{name}: data/pitchdetails/ missing")
+        return
+    try:
+        with gzip.open(os.path.join(DATA_DIR, 'data_core.json.gz'), 'rt', encoding='utf-8') as f:
+            index = json.load(f)['metadata'].get('pitchDetailsIndex', {})
+    except Exception as e:
+        fail(f"{name}: could not read the index out of data_core ({e})")
+        return
+
+    if len(index) < 100:
+        fail(f"{name}: index has only {len(index)} pitchers")
+        return
+
+    on_disk = {n[:-len('.json.gz')] for n in os.listdir(shard_dir) if n.endswith('.json.gz')}
+    missing = [k for k, sid in index.items() if sid not in on_disk]
+    orphans = on_disk - set(index.values())
+    if missing:
+        fail(f"{name}: {len(missing)} indexed pitchers have no shard "
+             f"(e.g. {missing[:3]})")
+    if orphans:
+        fail(f"{name}: {len(orphans)} shard files are not in the index")
+    if not missing and not orphans:
+        total = sum(os.path.getsize(os.path.join(shard_dir, n))
+                    for n in os.listdir(shard_dir))
+        ok(f"{name}: {len(index)} shards, {total:,} bytes, index matches disk")
+
+
 def main():
     print("=== Output validation ===")
 
@@ -126,8 +161,9 @@ def main():
                    ['pitcherData', 'pitchData', 'hitterData', 'hitterPitchData', 'metadata'],
                    ('pitcherData', len, 50, 'pitchers'))
     check_gz_chunk('data_heavy.json.gz', 5_000_000,
-                   ['microData', 'pitchDetails', 'hitterPitchDetails', 'hitterSwingLocations'],
+                   ['microData', 'hitterPitchDetails', 'hitterSwingLocations'],
                    ('microData', lambda m: len(m.get('pitchMicro', [])), 1000, 'pitch micro rows'))
+    check_pitch_detail_shards()
 
     print("Legacy artifacts:")
     for legacy in ('data_embedded.js', 'data_embedded.json.gz'):
