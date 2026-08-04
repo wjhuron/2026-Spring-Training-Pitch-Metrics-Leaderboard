@@ -105,8 +105,14 @@ def _write_tab(ws, name, stuff, loc):
         nl += lv is not None
         sc, lc = _cell(sv), _cell(lv)
         # Pitching+ cell = blend of the two VISIBLE integer cells
-        # (auditable in-sheet: =ROUND(0.7*X+0.3*Y,0))
-        pc = int(round(0.7 * sc + 0.3 * lc)) if (sc != '' and lc != '') else ''
+        # (auditable in-sheet: =ROUND(0.8*X+0.2*Y,0))
+        # 80/20 as of 2026-08-04, matching the shipped pitchingScore and
+        # Cards.py. This column had been left on the pre-2026-07-28 70/30
+        # weights, so the sheet — and therefore every FILTERED Pitching+ on
+        # the site, which averages these per-pitch atoms — disagreed with the
+        # unfiltered leaderboard value by about a point per 10 points of
+        # Stuff+/Loc+ gap.
+        pc = int(round(0.8 * sc + 0.2 * lc)) if (sc != '' and lc != '') else ''
         values.append([sc, lc, pc])
     rng = GRADE_COL_RANGE.format(first=2, last=n_rows)
     _retry(lambda: ws.update(rng, values, value_input_option='USER_ENTERED'),
