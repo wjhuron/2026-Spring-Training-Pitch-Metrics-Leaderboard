@@ -1,0 +1,41 @@
+{
+  "_README": [
+    "Manually entered FanGraphs constants, used ONLY when the live fetch fails.",
+    "FanGraphs sits behind Cloudflare bot scoring that challenges scripted",
+    "clients (and, since 2026-08-04, GitHub's runners too), but a logged-in",
+    "browser loads the pages fine — so these get read by eye and typed here.",
+    "",
+    "This file is COMMITTED on purpose: CI checks out the repo, so a gitignored",
+    "copy would never reach the pipeline.",
+    "",
+    "Precedence: live fetch wins. This is only consulted when the fetch raises,",
+    "so the pipeline self-heals the moment FanGraphs lets requests through again.",
+    "",
+    "guts     - https://www.fangraphs.com/tools/guts (Guts! table, current season row)",
+    "parkFactors - https://www.fangraphs.com/guts.aspx?type=pf&teamid=0&season=2026",
+    "           Use the 'Basic (5yr)' column, DIVIDED BY 100 (FG shows 101 -> 1.01).",
+    "           All 30 teams required; a partial set is refused, because the",
+    "           missing teams would silently fall back to neutral 1.0.",
+    "",
+    "Update enteredAt whenever you refresh the numbers — the pipeline prints it",
+    "so a stale hand-entry is visible in the log rather than silent."
+  ],
+  "season": 2026,
+  "enteredAt": "2026-08-04",
+  "source": "recovered from the 2026-08-04 13:57 pipeline run, which fetched FanGraphs successfully",
+
+  "guts": {
+    "wBB": 0.698,
+    "wHBP": 0.729,
+    "w1B": 0.889,
+    "w2B": 1.259,
+    "w3B": 1.593,
+    "wHR": 2.044,
+    "cFIP": 3.097,
+    "wOBAScale": 1.2342,
+    "lgWOBA": 0.3164,
+    "lgRPA": 0.1188
+  },
+
+  "parkFactors": {}
+}

@@ -4665,6 +4665,26 @@ def bump_asset_version(index_path=None):
             print(f"  No ?v= query params found in {name}")
 
 
+def _load_fg_manual(season):
+    """Hand-entered FanGraphs values from data/fg_manual.json, or {}.
+
+    Only consulted when the live fetch fails. Wrong-season entries are
+    ignored outright — stale constants from a prior year are the exact
+    failure this whole guard exists to prevent.
+    """
+    path = os.path.join(DATA_DIR, 'fg_manual.json')
+    try:
+        with open(path) as f:
+            blob = json.load(f)
+    except (OSError, ValueError):
+        return {}
+    if blob.get('season') != season:
+        print(f"  NOTE: {path} is for season {blob.get('season')}, not "
+              f"{season} — ignoring it")
+        return {}
+    return blob
+
+
 def main():
     global WOBA_WEIGHTS, FIP_CONSTANT, GUTS_EXTRA, PARK_FACTORS
     os.makedirs(DATA_DIR, exist_ok=True)
@@ -4687,24 +4707,45 @@ def main():
     # where approximate constants are fine.
     allow_fallback = os.environ.get('ALLOW_FG_FALLBACK') == '1'
 
+    # data/fg_manual.json — hand-entered current-season values, read only when
+    # the live fetch fails. A logged-in browser loads these pages fine even
+    # while scripted clients get challenged, so typing the numbers in beats
+    # both aborting forever and reverting to last year's constants. Committed
+    # (not gitignored) so CI sees it too.
+    manual = _load_fg_manual(2026)
+
     # Fetch live wOBA weights and FIP constant from FanGraphs
     print("Fetching FanGraphs Guts constants...")
     try:
         WOBA_WEIGHTS, FIP_CONSTANT, GUTS_EXTRA = fetch_guts_constants(2026)
     except Exception as e:
-        if not allow_fallback:
+        mg = (manual or {}).get('guts') or {}
+        if mg:
+            WOBA_WEIGHTS = {'BB': mg['wBB'], 'HBP': mg['wHBP'], '1B': mg['w1B'],
+                            '2B': mg['w2B'], '3B': mg['w3B'], 'HR': mg['wHR']}
+            FIP_CONSTANT = mg['cFIP']
+            GUTS_EXTRA = {'wOBAScale': mg['wOBAScale'],
+                          'lgWOBA': mg['lgWOBA'], 'lgRPA': mg['lgRPA']}
+            print(f"  Live fetch failed ({e})")
+            print(f"  -> using MANUAL Guts constants from data/fg_manual.json "
+                  f"(entered {manual.get('enteredAt', '?')})")
+        elif not allow_fallback:
             raise RuntimeError(
                 f"FanGraphs Guts fetch failed ({e}). Refusing to build with "
                 f"the 2025 fallback weights: that silently ships wrong wOBA, "
-                f"wRC+ and FIP. The block is intermittent — re-run. Set "
+                f"wRC+ and FIP. Either re-run (the block is intermittent), or "
+                f"fill in the 'guts' block of data/fg_manual.json by eye from "
+                f"https://www.fangraphs.com/tools/guts. Set "
                 f"ALLOW_FG_FALLBACK=1 to accept degraded constants."
             ) from e
-        print(f"\n  *** WARNING: Could not fetch Guts data ({e}) ***")
-        print(f"  *** Using 2025 FALLBACK values — wOBA weights may be inaccurate! ***\n")
-        WOBA_WEIGHTS = WOBA_WEIGHTS_FALLBACK.copy()
-        FIP_CONSTANT = FIP_CONSTANT_FALLBACK
-        # Fallback league-level constants (2025 season estimates)
-        GUTS_EXTRA = {'wOBAScale': 1.25, 'lgWOBA': 0.317, 'lgRPA': 0.119}
+        else:
+            # ALLOW_FG_FALLBACK=1 with no manual entry: last-year constants.
+            print(f"\n  *** WARNING: Could not fetch Guts data ({e}) ***")
+            print(f"  *** Using 2025 FALLBACK values — wOBA weights may be inaccurate! ***\n")
+            WOBA_WEIGHTS = WOBA_WEIGHTS_FALLBACK.copy()
+            FIP_CONSTANT = FIP_CONSTANT_FALLBACK
+            # Fallback league-level constants (2025 season estimates)
+            GUTS_EXTRA = {'wOBAScale': 1.25, 'lgWOBA': 0.317, 'lgRPA': 0.119}
 
     # Propagate wOBA weights to pipeline_compute module
     # WOBA_WEIGHTS passed explicitly to compute_expected_stats calls
@@ -4714,15 +4755,27 @@ def main():
     try:
         PARK_FACTORS = fetch_park_factors(2026)
     except Exception as e:
-        if not allow_fallback:
+        mp = (manual or {}).get('parkFactors') or {}
+        if len(mp) >= 30:
+            PARK_FACTORS = dict(mp)
+            print(f"  Live fetch failed ({e})")
+            print(f"  -> using MANUAL park factors from data/fg_manual.json "
+                  f"({len(PARK_FACTORS)} teams, entered "
+                  f"{manual.get('enteredAt', '?')})")
+        elif not allow_fallback:
             raise RuntimeError(
                 f"FanGraphs park factor fetch failed ({e}). Refusing to build "
                 f"with every park neutral: wRC+ and xwRC+ would ship with no "
-                f"park adjustment at all. The block is intermittent — re-run. "
+                f"park adjustment at all. Either re-run (the block is "
+                f"intermittent), or fill in all 30 teams under 'parkFactors' "
+                f"in data/fg_manual.json from "
+                f"https://www.fangraphs.com/guts.aspx?type=pf&teamid=0&season=2026 "
+                f"(Basic (5yr) column / 100). Currently {len(mp)}/30 entered. "
                 f"Set ALLOW_FG_FALLBACK=1 to accept 1.0 everywhere."
             ) from e
-        print(f"  WARNING: Could not fetch park factors ({e}), defaulting to 1.0")
-        PARK_FACTORS = {}
+        else:
+            print(f"  WARNING: Could not fetch park factors ({e}), defaulting to 1.0")
+            PARK_FACTORS = {}
     if PARK_FACTORS is not None and 0 < len(PARK_FACTORS) < 30 and not allow_fallback:
         # A partial scrape is the same silent-degradation trap: the teams that
         # came back get adjusted, the rest quietly default to 1.0.
