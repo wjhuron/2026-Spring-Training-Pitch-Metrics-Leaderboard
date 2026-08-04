@@ -266,6 +266,7 @@ class League:
             guts = dict(GUTS_2026)
         self.lg_woba = guts['lgWOBA']
         self.woba_scale = guts['wOBAScale']
+        self.lg_rpa = guts.get('lgRPA')     # wRC/wRC+ denominator
         self.siera_constant = metadata['sieraConstant']
         self.lg_xwobacon = metadata['hitterLeagueAverages']['xwOBAcon']
         self.reanchor = metadata['plusReanchor']

@@ -1,0 +1,147 @@
+{
+ "comparisons": {
+  "naiveLeagueMeanOffset": 0.0204,
+  "samePlayerBridge": [
+   {
+    "aaaXwobacon": 0.3129,
+    "hitter": "Chaparro, Andr\u00e9s",
+    "mlbXwobacon": 0.4558,
+    "nAAA": 101,
+    "nMLB": 61
+   },
+   {
+    "aaaXwobacon": 0.4227,
+    "hitter": "Crews, Dylan",
+    "mlbXwobacon": 0.3806,
+    "nAAA": 110,
+    "nMLB": 167
+   },
+   {
+    "aaaXwobacon": 0.4559,
+    "hitter": "House, Brady",
+    "mlbXwobacon": 0.4342,
+    "nAAA": 154,
+    "nMLB": 130
+   },
+   {
+    "aaaXwobacon": 0.2987,
+    "hitter": "Wiemer, Joey",
+    "mlbXwobacon": 0.4211,
+    "nAAA": 97,
+    "nMLB": 39
+   }
+  ]
+ },
+ "hitters": {
+  "Adams, Riley": {
+   "adjXwobacon": 0.0002,
+   "facedLoc": 135.85,
+   "facedStuff": 112.24,
+   "nBip": 101
+  },
+  "Chaparro, Andr\u00e9s": {
+   "adjXwobacon": 0.003,
+   "facedLoc": 139.5,
+   "facedStuff": 116.12,
+   "nBip": 101
+  },
+  "Crews, Dylan": {
+   "adjXwobacon": -0.0022,
+   "facedLoc": 133.52,
+   "facedStuff": 108.64,
+   "nBip": 105
+  },
+  "Ford, Harry": {
+   "adjXwobacon": -0.0003,
+   "facedLoc": 133.28,
+   "facedStuff": 112.43,
+   "nBip": 136
+  },
+  "Glasser, Phillip": {
+   "adjXwobacon": -0.0049,
+   "facedLoc": 125.64,
+   "facedStuff": 106.74,
+   "nBip": 214
+  },
+  "House, Brady": {
+   "adjXwobacon": -0.0034,
+   "facedLoc": 133.68,
+   "facedStuff": 106.21,
+   "nBip": 154
+  },
+  "Jordan, Levi": {
+   "adjXwobacon": -0.0034,
+   "facedLoc": 134.95,
+   "facedStuff": 105.7,
+   "nBip": 20
+  },
+  "King, Seaver": {
+   "adjXwobacon": -0.0061,
+   "facedLoc": 128.72,
+   "facedStuff": 103.21,
+   "nBip": 108
+  },
+  "Lipscomb, Trey": {
+   "adjXwobacon": -0.0029,
+   "facedLoc": 129.66,
+   "facedStuff": 108.9,
+   "nBip": 240
+  },
+  "Morales, Yohandy": {
+   "adjXwobacon": -0.0035,
+   "facedLoc": 129.97,
+   "facedStuff": 107.69,
+   "nBip": 227
+  },
+  "Ortiz, Abimelec": {
+   "adjXwobacon": -0.004,
+   "facedLoc": 132.87,
+   "facedStuff": 105.36,
+   "nBip": 237
+  },
+  "Pinckney, Andrew": {
+   "adjXwobacon": 0.0009,
+   "facedLoc": 140.61,
+   "facedStuff": 111.6,
+   "nBip": 220
+  },
+  "Wallace, Cayden": {
+   "adjXwobacon": -0.0056,
+   "facedLoc": 126.27,
+   "facedStuff": 105.2,
+   "nBip": 51
+  },
+  "Wiemer, Joey": {
+   "adjXwobacon": -0.0027,
+   "facedLoc": 138.82,
+   "facedStuff": 105.51,
+   "nBip": 98
+  }
+ },
+ "method": "opponent-quality adjustment: per-hitter mean Stuff+/Loc+ faced on batted balls, priced by a within-MLB-hitter sensitivity of xwOBA-on-contact to those grades",
+ "mlbBaseline": {
+  "locPlus": 134.106,
+  "nBip": 84726,
+  "stuffPlus": 112.684
+ },
+ "scope": "prices ONLY the pitch-quality channel of the level gap. Sequencing, defense, pitcher variety, park and ball are not included, so this is a floor on the true translation, not the translation.",
+ "season": 2026,
+ "sensitivity": {
+  "nBip": 80856,
+  "nHitters": 435,
+  "perLocPoint": -0.000219,
+  "perStuffPoint": -0.000515,
+  "seLoc": 3.7e-05,
+  "seStuff": 6.4e-05,
+  "splitHalf": [
+   [
+    -0.000533,
+    -0.000274
+   ],
+   [
+    -0.000498,
+    -0.000165
+   ]
+  ]
+ }
+}

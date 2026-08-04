@@ -1858,11 +1858,25 @@ def render_card(config, pitches, output_file):
                     else:
                         ax.scatter([px_val], [pz_val], c=[color], s=55, alpha=1.0, edgecolors='none', zorder=3)
 
-    ax_loc_l = fig.add_axes([LOC_L_X, LOC_BOTTOM, LOC_W, LOC_HEIGHT])
-    ax_loc_r = fig.add_axes([LOC_R_X, LOC_BOTTOM, LOC_W, LOC_HEIGHT])
-    draw_zone(ax_loc_l, 'R'); draw_zone(ax_loc_r, 'L')
-    fig.text(LOC_L_X+LOC_W/2, LOC_TITLE_Y, 'VS RHH', fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
-    fig.text(LOC_R_X+LOC_W/2, LOC_TITLE_Y, 'VS LHH', fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
+    # loc_hands restricts which zone panels are drawn. A platoon-split card
+    # holds pitches to one side only, so the other panel would render as an
+    # empty strike zone; a single hand draws one panel, centered across both
+    # slots. Default keeps the two-panel layout every existing caller expects.
+    _loc_hands = tuple(config.get('loc_hands') or ('R', 'L'))
+    _hand_title = {'R': 'VS RHH', 'L': 'VS LHH'}
+    if len(_loc_hands) == 1:
+        _h = _loc_hands[0]
+        _x = (LOC_L_X + LOC_R_X + LOC_W) / 2.0 - LOC_W / 2.0
+        draw_zone(fig.add_axes([_x, LOC_BOTTOM, LOC_W, LOC_HEIGHT]), _h)
+        fig.text(_x + LOC_W / 2, LOC_TITLE_Y, _hand_title[_h], fontsize=14,
+                 fontweight='bold', color=TEXT_SECONDARY,
+                 fontfamily='IBM Plex Sans', ha='center', va='center')
+    else:
+        ax_loc_l = fig.add_axes([LOC_L_X, LOC_BOTTOM, LOC_W, LOC_HEIGHT])
+        ax_loc_r = fig.add_axes([LOC_R_X, LOC_BOTTOM, LOC_W, LOC_HEIGHT])
+        draw_zone(ax_loc_l, 'R'); draw_zone(ax_loc_r, 'L')
+        fig.text(LOC_L_X+LOC_W/2, LOC_TITLE_Y, 'VS RHH', fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
+        fig.text(LOC_R_X+LOC_W/2, LOC_TITLE_Y, 'VS LHH', fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
 
     # Footnote — single-game only (old layout): W/B legend + ellipse minimum
     # stacked to the right of the location plots. Season panels carry no
@@ -3061,10 +3075,10 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = ""
+    team            = "ROC"
     start_date      = None    # Set to None for full season
     end_date        = None             # Set to a date for date range, or None for single day
-    filter_pitchers = "Zeferjahn, Ryan"                 # Semicolon-separated "Last, First" names, or "" for all
+    filter_pitchers = "Perales, Luis; Kent, Jackson; Sinclair, Jack; Tolman, Erik"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR
