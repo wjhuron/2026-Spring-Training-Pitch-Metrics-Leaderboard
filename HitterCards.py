@@ -422,7 +422,11 @@ def _apply_runexp_currency(pitches):
         if f:
             p['RunExp'] = v / f
             n_fixed += 1
-    if n_fixed:
+    # Only report a real rescale. The CI-released pickle is written AFTER
+    # process_data's in-place correction, so its factors measure ~1.000 and
+    # this is a no-op; a locally refreshed pickle (refresh_pickle.py goes
+    # Sheets -> pickle with no correction) is the case that actually moves.
+    if n_fixed and any(abs(d['global'] - 1.0) > 0.005 for d in scale.values()):
         print(f"  RunExp -> MLB currency: {n_fixed} MiLB pitches rescaled "
               + ", ".join(f"{s} /{d['global']:.3f}" for s, d in sorted(scale.items())))
 
@@ -2567,8 +2571,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 # ─────────────────────────────────────────────────────────────────────
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team           = None                   # Team filter (e.g., "NYY"), or None for all teams
-    filter_hitters = "Rutschman, Adley; Basallo, Samuel"       # Semicolon-separated "Last, First" names, or "" for all
+    team           = "ROC"                   # Team filter (e.g., "NYY"), or None for all teams
+    filter_hitters = "Ortiz, Abimelec; Wallace, Cayden; King, Seaver; Morales, Yohandy; Pinckney, Andrew; Glasser, Phillip; "       # Semicolon-separated "Last, First" names, or "" for all
     year_label     = "2026 Season"        # Display label on the card
     output_dir     = OUTPUT_DIR
 

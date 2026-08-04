@@ -225,10 +225,38 @@ def is_stale(cache, max_age_hours=24):
     return age.total_seconds() > max_age_hours * 3600
 
 
+RELEASE_CACHE_URL = ('https://github.com/wjhuron/Huronalytics/releases/download/'
+                     'latest-data/fg_overrides.json')
+
+
+def fetch_from_release(timeout=30):
+    """The cache as CI last published it, from the latest-data release.
+
+    FanGraphs sits behind Cloudflare bot scoring, which challenges some
+    client IPs while letting others (GitHub's runners among them) straight
+    through — so a local run can 403 on every endpoint at the same moment
+    CI fetches all three cleanly. The cache is gitignored, so without this
+    a blocked machine has no route to fresh values at all and silently
+    serves an ever-older cache. Same pattern the pitch pickle already uses.
+    """
+    req = urllib.request.Request(RELEASE_CACHE_URL, headers=HEADERS)
+    body = urllib.request.urlopen(req, timeout=timeout).read().decode('utf-8')
+    return json.loads(body)
+
+
+def _fetched_at(cache):
+    """Cache timestamp as a datetime; datetime.min when absent/unparseable."""
+    try:
+        return datetime.datetime.fromisoformat((cache or {}).get('fetchedAt') or '')
+    except (TypeError, ValueError):
+        return datetime.datetime.min
+
+
 def refresh_if_stale(year=2026, max_age_hours=24, path=CACHE_PATH, verbose=False):
     """Refresh the cache if it's older than max_age_hours. Returns the
-    cache dict (refreshed or current). Failures fall back to the existing
-    cache, or to an empty-but-valid shape if there's no cache at all."""
+    cache dict (refreshed or current). A failed direct fetch falls back to
+    the release copy, then to the existing cache, then to an empty-but-valid
+    shape."""
     cache = load_cache(path)
     if not is_stale(cache, max_age_hours):
         return cache
@@ -242,6 +270,19 @@ def refresh_if_stale(year=2026, max_age_hours=24, path=CACHE_PATH, verbose=False
     except Exception as e:
         if verbose:
             print(f'  WARNING: FG overrides refresh failed ({type(e).__name__}: {e})')
+        try:
+            rel = fetch_from_release()
+        except Exception as e2:
+            rel = None
+            if verbose:
+                print(f'  release fallback also failed ({type(e2).__name__}: {e2})')
+        # Only adopt it if it actually beats what we already have.
+        if rel and _fetched_at(rel) > _fetched_at(cache):
+            save_cache(rel, path)
+            cache = rel
+            if verbose:
+                print(f"  -> using CI-published cache from the release "
+                      f"(fetched {rel.get('fetchedAt')})")
         if cache is None:
             return {
                 'fetchedAt': '', 'season': year,

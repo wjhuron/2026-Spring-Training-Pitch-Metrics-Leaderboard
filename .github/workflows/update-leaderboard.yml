@@ -220,11 +220,20 @@ jobs:
           tag_name: latest-data
           name: Latest pipeline pickle
           body: |
-            Automated upload of the pitch-level cache from the most
-            recent pipeline run. HitterCards.py downloads this file
-            automatically when it detects a stale local pickle.
+            Automated upload from the most recent pipeline run.
+
+            - all_pitches_rs_cache.pkl.enc — pitch-level cache;
+              HitterCards.py downloads it when the local pickle is stale.
+            - fg_overrides.json — the FanGraphs override cache as CI
+              fetched it. FanGraphs' Cloudflare bot scoring challenges
+              some client IPs while letting GitHub's runners through, and
+              the cache is gitignored, so a blocked machine has no other
+              route to fresh values; fg_overrides.refresh_if_stale falls
+              back to this copy when the direct fetch fails.
 
             Updated: ${{ github.event.repository.updated_at }}
-          files: data/all_pitches_rs_cache.pkl.enc
+          files: |
+            data/all_pitches_rs_cache.pkl.enc
+            data/fg_overrides.json
           fail_on_unmatched_files: true
           make_latest: false
