@@ -202,8 +202,16 @@ const DataStore = {
         hitterSwingLocations: {},
       };
       self.updateGlobals();
-      // background — never blocks the first render
-      self._loadTables();
+      // Wait for idle before starting the background chunks. They are async,
+      // but their JSON.parse is not: firing this immediately landed the
+      // 26.6 MB data_tables parse in the middle of the first render and
+      // pushed first paint out by ~800 ms. Idle means "after the first table
+      // is on screen", which is the whole point of splitting the payload.
+      if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(function () { self._loadTables(); }, { timeout: 3000 });
+      } else {
+        setTimeout(function () { self._loadTables(); }, 0);
+      }
     });
   },
 
