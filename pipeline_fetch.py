@@ -232,8 +232,13 @@ def read_sheet_with_retry(ws, max_retries=5):
     return sheets_call_with_retry(ws.get_all_values, max_retries)
 
 
-def read_pitches_from_sheet(gc, sheet_id, extra_tabs=None):
-    """Read all pitches from a single Google Sheets spreadsheet. Returns a list of pitch dicts."""
+def read_pitches_from_sheet(gc, sheet_id, extra_tabs=None, only_tabs=None):
+    """Read all pitches from a single Google Sheets spreadsheet. Returns a list of pitch dicts.
+
+    only_tabs (optional): read ONLY these tabs, skipping the team sheets. Used
+    by read_new_tab_pitches so the scoring-only NEW tab can be fetched without
+    paying for five team tabs that the caller already has.
+    """
     pitches = []
     extra_tabs = extra_tabs or set()
     sh = sheets_call_with_retry(lambda: gc.open_by_key(sheet_id))
@@ -241,10 +246,15 @@ def read_pitches_from_sheet(gc, sheet_id, extra_tabs=None):
     print(f"  {sh.title} ({len(tabs)} tabs)")
     for i, ws in enumerate(tabs):
         tab_name = ws.title
-        is_extra = tab_name in extra_tabs
-        if tab_name not in MLB_TEAMS and not is_extra:
-            print(f"    Skipping {tab_name} (not a team sheet)")
-            continue
+        if only_tabs is not None:
+            if tab_name not in only_tabs:
+                continue
+            is_extra = True
+        else:
+            is_extra = tab_name in extra_tabs
+            if tab_name not in MLB_TEAMS and not is_extra:
+                print(f"    Skipping {tab_name} (not a team sheet)")
+                continue
         print(f"    Reading {ws.title}...")
         if i > 0:
             time_module.sleep(0.5)
@@ -396,6 +406,40 @@ def _gspread_client():
         creds = Credentials.from_service_account_info(json.loads(sa_json), scopes=scopes)
         return gspread.authorize(creds)
     return gspread.service_account()
+
+
+NEW_TAB_WORKBOOK = 'NLE2026'
+NEW_TAB_NAME = 'NEW'
+
+
+def read_new_tab_pitches(gc=None):
+    """Read the NLE2026 'NEW' tab — the scratch space for arms new to the org.
+
+    SCORING ONLY. These rows exist so Stuff+/Loc+ get written back into the
+    tab's grade columns; they are deliberately kept out of `all_pitches` by the
+    caller, so nothing here can reach a leaderboard, micro data, the embedded
+    site payload, or any league baseline. PTeam on this tab is always WSH and
+    the BTeam labelling is scratch-quality, so ingesting it normally would both
+    mint phantom WSH pitcher rows and double-count the MLB pitches it re-lists.
+
+    Tagged `_source='NEW'`, which is what keeps them out of every MLB-only
+    filter downstream (Loc+ surfaces, SD+/CT+ cell tables, xRV offsets).
+    """
+    gc = gc or _gspread_client()
+    rows = read_pitches_from_sheet(gc, DIVISION_WORKBOOK_IDS[NEW_TAB_WORKBOOK],
+                                   only_tabs={NEW_TAB_NAME})
+    for p in rows:
+        p['_source'] = 'NEW'
+        # PTeam on this tab is a scratch 'WSH' for every row, including pitches
+        # thrown for a previous org before the trade. Retag to 'NEW' — which is
+        # in neither MLB_TEAMS nor AAA_TEAMS — so that any consumer keying on
+        # (pitcher, team) lands somewhere that can never match a published row.
+        # Without this, a NEW-tab arm who later pitches for Washington would
+        # have his real WSH row silently absorb his prior-org minor league
+        # pitches. Original preserved for traceability.
+        p['_sheetPTeam'] = p.get('PTeam')
+        p['PTeam'] = 'NEW'
+    return rows
 
 
 def read_all_pitches_from_sheets():
