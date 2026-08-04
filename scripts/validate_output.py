@@ -126,10 +126,18 @@ def check_core_stays_lean():
     if strays:
         fail(f"{name}: {strays} are back in data_core — they belong in "
              f"data_tables; first paint now parses them again")
-    counts = (core.get('metadata') or {}).get('homeCounts') or {}
+    meta = core.get('metadata') or {}
+    counts = meta.get('homeCounts') or {}
     if not counts.get('pitchers') or not counts.get('hitters'):
         fail(f"{name}: metadata.homeCounts missing or zero {counts} — the "
              f"home page renders its headline counts from this")
+    # Without teamGames every 'Qualified' threshold is zero until data_heavy
+    # lands, so the leaderboard shows all ~733 pitchers while the control still
+    # reads "Qualified". Silent and wrong, so assert it is present and sane.
+    tg = meta.get('teamGames') or {}
+    if len(tg) < 30 or min(tg.values(), default=0) < 1:
+        fail(f"{name}: metadata.teamGames has {len(tg)} teams — qualification "
+             f"thresholds collapse to zero without it (expect ~30+)")
     raw = len(json.dumps(core).encode('utf-8'))
     if raw > 12_000_000:
         fail(f"{name}: inflates to {raw:,} bytes; first paint parses all of "

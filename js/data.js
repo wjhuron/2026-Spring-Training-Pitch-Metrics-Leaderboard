@@ -312,9 +312,18 @@ const DataStore = {
     const rocTeamsArr = (this.metadata && this.metadata.rocTeams) || [];
     var rocTeamSet = {};
     for (var ri = 0; ri < rocTeamsArr.length; ri++) rocTeamSet[rocTeamsArr[ri]] = true;
-    // Team games for per-team qualifying thresholds
+    // Team games for per-team qualifying thresholds. Falling back to {} here
+    // meant a threshold of zero, so every pitcher passed while the control
+    // still read "Qualified" — wrong, and wrong in a way that looks like the
+    // filter is broken rather than still loading. metadata.teamGames ships
+    // with data_core and matches Aggregator.getTeamGamesPlayed() exactly, so
+    // qualification is right from the first table; the Aggregator still wins
+    // once loaded because it honours an active date range.
     var _teamGames = (filters.minIp === 'Q' || filters.minCount === 'Q')
-      ? (Aggregator.loaded ? Aggregator.getTeamGamesPlayed() : {}) : {};
+      ? (Aggregator.loaded
+          ? Aggregator.getTeamGamesPlayed()
+          : ((this.metadata && this.metadata.teamGames) || {}))
+      : {};
 
     // Multi-team support: scan once to build player→combined-row map and cumulative team games.
     // When "All Teams" is selected, per-team rows of multi-team players are hidden; the 2TM/3TM

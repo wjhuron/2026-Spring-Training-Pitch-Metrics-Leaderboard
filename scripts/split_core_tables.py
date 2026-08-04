@@ -47,22 +47,46 @@ def _count_distinct_mlb_players(rows, name_key, roc_teams):
     return len(seen)
 
 
+def _team_games_played(micro):
+    """Mirrors process_data._team_games_played / Aggregator.getTeamGamesPlayed()
+    with no date range: distinct game dates per team."""
+    ci = {c: i for i, c in enumerate(micro['pitcherCols'])}
+    team_idx, date_idx = ci['teamIdx'], ci['dateIdx']
+    teams = micro['lookups']['teams']
+    seen = {}
+    for row in micro['pitcherMicro']:
+        seen.setdefault(row[team_idx], set()).add(row[date_idx])
+    return {teams[t]: len(dates) for t, dates in seen.items()}
+
+
 def main():
     core = _read_gz('data_core.json.gz')
-    if not any(k in core for k in MOVED):
-        print('data_core already split — nothing to do.')
-        return
+    already_split = not any(k in core for k in MOVED)
 
-    tables = {k: core.pop(k, []) for k in MOVED}
+    tables = None
+    if not already_split:
+        tables = {k: core.pop(k, []) for k in MOVED}
 
-    roc = set((core.get('metadata') or {}).get('rocTeams') or [])
-    core.setdefault('metadata', {})['homeCounts'] = {
-        'pitchers': _count_distinct_mlb_players(core['pitcherData'], 'pitcher', roc),
-        'hitters': _count_distinct_mlb_players(tables['hitterData'], 'hitter', roc),
-    }
-    print('  home counts:', core['metadata']['homeCounts'])
+    meta = core.setdefault('metadata', {})
+    roc = set(meta.get('rocTeams') or [])
 
-    for name, obj in (('data_core.json.gz', core), ('data_tables.json.gz', tables)):
+    if 'homeCounts' not in meta:
+        hitters = (tables or _read_gz('data_tables.json.gz'))['hitterData']
+        meta['homeCounts'] = {
+            'pitchers': _count_distinct_mlb_players(core['pitcherData'], 'pitcher', roc),
+            'hitters': _count_distinct_mlb_players(hitters, 'hitter', roc),
+        }
+    print('  home counts:', meta['homeCounts'])
+
+    # Qualification denominator. Without it the 'Qualified' filter has a
+    # threshold of zero until data_heavy lands and silently shows everyone.
+    meta['teamGames'] = _team_games_played(_read_gz('data_heavy.json.gz')['microData'])
+    print(f"  teamGames: {len(meta['teamGames'])} teams")
+
+    written = [('data_core.json.gz', core)]
+    if tables is not None:
+        written.append(('data_tables.json.gz', tables))
+    for name, obj in written:
         gz_mb, raw_mb = _write_gz(name, obj)
         print(f'  {name}: {gz_mb:.2f} MB gz, {raw_mb:.1f} MB raw')
 

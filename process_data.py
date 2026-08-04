@@ -4494,10 +4494,32 @@ def write_embedded_js(rs_result):
                      else 'nm:' + str(r.get(name_key) or i))
         return len(seen)
 
+    def _team_games_played(micro):
+        """Distinct game dates per team — the denominator for every 'Qualified'
+        threshold (IP or PA per team game).
+
+        This lived only in microData, inside the 17.7 MB data_heavy chunk, so
+        until that landed the qualified filter had a threshold of zero and the
+        leaderboard showed every pitcher while still displaying 'Qualified'.
+        It is 33 numbers; it belongs in metadata where it arrives with the
+        first table. Mirrors Aggregator.getTeamGamesPlayed() called with no
+        date range (verified equal for all 33 entries) — a date range still
+        recomputes there, which is fine because the date filters only unlock
+        once microData is in memory anyway.
+        """
+        ci = {c: i for i, c in enumerate(micro['pitcherCols'])}
+        teams = micro['lookups']['teams']
+        team_idx, date_idx = ci['teamIdx'], ci['dateIdx']
+        seen = {}
+        for row in micro['pitcherMicro']:
+            seen.setdefault(row[team_idx], set()).add(row[date_idx])
+        return {teams[t]: len(dates) for t, dates in seen.items()}
+
     # The shard index rides in metadata so it lands with data_core — the
     # client needs it before it can resolve any player page.
     metadata = dict(rs_result['metadata'])
     metadata['pitchDetailsIndex'] = pitch_detail_index
+    metadata['teamGames'] = _team_games_played(rs_result['micro_data'])
     _roc = set(metadata.get('rocTeams') or [])
     metadata['homeCounts'] = {
         'pitchers': _count_distinct_mlb_players(pitcher_rows, 'pitcher', _roc),
