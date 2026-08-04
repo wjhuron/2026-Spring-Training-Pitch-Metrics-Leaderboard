@@ -109,6 +109,36 @@ def check_gz_chunk(name, min_bytes, required_keys, row_probe):
         ok(f"{name}: {size:,} bytes, inflates to JSON ({n} {probe_desc})")
 
 
+def check_core_stays_lean():
+    """data_core is the only thing first paint waits on, so guard the two ways
+    that quietly regresses: a big table drifting back into it, and homeCounts
+    going missing (js/app.js falls back to rendering no count at all, which
+    looks fine locally and would tempt someone to re-add hitterData)."""
+    name = 'data_core lean'
+    try:
+        with gzip.open(os.path.join(DATA_DIR, 'data_core.json.gz'), 'rt', encoding='utf-8') as f:
+            core = json.load(f)
+    except Exception as e:
+        fail(f"{name}: could not read data_core ({e})")
+        return
+
+    strays = [k for k in ('pitchData', 'hitterData', 'hitterPitchData') if k in core]
+    if strays:
+        fail(f"{name}: {strays} are back in data_core — they belong in "
+             f"data_tables; first paint now parses them again")
+    counts = (core.get('metadata') or {}).get('homeCounts') or {}
+    if not counts.get('pitchers') or not counts.get('hitters'):
+        fail(f"{name}: metadata.homeCounts missing or zero {counts} — the "
+             f"home page renders its headline counts from this")
+    raw = len(json.dumps(core).encode('utf-8'))
+    if raw > 12_000_000:
+        fail(f"{name}: inflates to {raw:,} bytes; first paint parses all of "
+             f"it, so this should stay near pitcherData + metadata")
+    if not strays and counts.get('pitchers') and raw <= 12_000_000:
+        ok(f"{name}: {raw:,} bytes inflated, "
+           f"{counts['pitchers']}P/{counts['hitters']}H home counts")
+
+
 def check_pitch_detail_shards():
     """Pitch details ship as one gzipped shard per pitcher, indexed by
     metadata.pitchDetailsIndex in data_core (2026-08-03). A missing shard
@@ -157,9 +187,13 @@ def main():
     check_woba_bounds()
 
     print("Embed chunks:")
-    check_gz_chunk('data_core.json.gz', 1_000_000,
-                   ['pitcherData', 'pitchData', 'hitterData', 'hitterPitchData', 'metadata'],
+    check_gz_chunk('data_core.json.gz', 500_000,
+                   ['pitcherData', 'metadata'],
                    ('pitcherData', len, 50, 'pitchers'))
+    check_gz_chunk('data_tables.json.gz', 500_000,
+                   ['pitchData', 'hitterData', 'hitterPitchData'],
+                   ('hitterData', len, 50, 'hitters'))
+    check_core_stays_lean()
     check_gz_chunk('data_heavy.json.gz', 5_000_000,
                    ['microData', 'hitterPitchDetails', 'hitterSwingLocations'],
                    ('microData', lambda m: len(m.get('pitchMicro', [])), 1000, 'pitch micro rows'))

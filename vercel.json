@@ -30,6 +30,14 @@
       ]
     },
     {
+      "source": "/data/data_tables.json.gz",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
+        { "key": "Content-Encoding", "value": "gzip" },
+        { "key": "Content-Type", "value": "application/json" }
+      ]
+    },
+    {
       "source": "/data/data_heavy.json.gz",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },

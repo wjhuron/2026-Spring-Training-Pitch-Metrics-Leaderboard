@@ -135,28 +135,20 @@
       setupColumnSettings();
       setupRangeFilters();
 
-      const pitcherCount = document.getElementById('home-pitcher-count');
-      const hitterCount = document.getElementById('home-hitter-count');
-      const rocTeamsInit = (DataStore.metadata.rocTeams || []);
       // Homepage counts = distinct players with at least one MLB appearance.
       // ROC/AAA-only players are excluded; a player with both MLB and AAA
       // stints counts once, and a traded player's per-team + 2TM/3TM aggregate
-      // rows collapse to a single mlbId (no double counting).
-      function countDistinctMlbPlayers(rows, nameKey) {
-        const seen = Object.create(null);
-        for (let i = 0; i < rows.length; i++) {
-          const r = rows[i];
-          if (rocTeamsInit.indexOf(r.team) !== -1) continue;   // skip AAA rows
-          const key = (r.mlbId != null) ? ('id:' + r.mlbId) : ('nm:' + (r[nameKey] || i));
-          seen[key] = true;
-        }
-        return Object.keys(seen).length;
+      // rows collapse to a single mlbId (no double counting). Precomputed in
+      // process_data now — counting them here would have meant keeping the
+      // 13.9 MB hitterData in data_core to render two numbers.
+      const pitcherCount = document.getElementById('home-pitcher-count');
+      const hitterCount = document.getElementById('home-hitter-count');
+      const homeCounts = DataStore.metadata.homeCounts || {};
+      if (pitcherCount && homeCounts.pitchers != null) {
+        pitcherCount.textContent = homeCounts.pitchers + ' pitchers';
       }
-      if (pitcherCount && DataStore.pitcherData) {
-        pitcherCount.textContent = countDistinctMlbPlayers(DataStore.pitcherData, 'pitcher') + ' pitchers';
-      }
-      if (hitterCount && DataStore.hitterData) {
-        hitterCount.textContent = countDistinctMlbPlayers(DataStore.hitterData, 'hitter') + ' hitters';
+      if (hitterCount && homeCounts.hitters != null) {
+        hitterCount.textContent = homeCounts.hitters + ' hitters';
       }
 
       document.getElementById('player-back').addEventListener('click', function () {
@@ -921,6 +913,16 @@
       dataTab = 'hitterPitch';
     }
 
+    // Only pitcherData ships in data_core; every other table arrives moments
+    // later in data_tables. Team view needs them too — the Aggregator merges
+    // the pre-aggregated rows in for team totals — so gate on that as well.
+    // Re-runs itself once the chunk lands; the leaderboard keeps whatever it
+    // was showing until then rather than flashing an empty table.
+    if ((dataTab !== 'pitcher' || filters.viewMode === 'team') && !DataStore.tablesReady) {
+      DataStore.whenTables(function () { refresh(); });
+      return;
+    }
+
     // ROC column visibility: hide columns that have no data for AAA teams
     const rocTeamsRefresh = (DataStore.metadata && DataStore.metadata.rocTeams) || [];
     const isROCTeam = rocTeamsRefresh.indexOf(filters.team) !== -1;
@@ -1145,6 +1147,15 @@
   function buildPanelMetricsTable(pitcherName, team) {
     const container = document.getElementById('panel-metrics-table');
     container.innerHTML = '';
+
+    // pitchData rides in data_tables, which can still be in flight if the
+    // panel is opened in the first moments. Without this the table would
+    // silently render empty (the rows just aren't there yet) instead of
+    // filling in when the chunk lands.
+    if (!DataStore.tablesReady) {
+      DataStore.whenTables(function () { buildPanelMetricsTable(pitcherName, team); });
+      return;
+    }
 
     const pitchData = DataStore.pitchData;
     if (!pitchData) return;

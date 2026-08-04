@@ -47,6 +47,18 @@ const DataStore = {
     this._heavyCallbacks.push(cb);
   },
 
+  // data_tables (pitchData / hitterData / hitterPitchData) landed here on
+  // 2026-08-03. Consumers outside the pitcher-stats tab gate on this the same
+  // way heavy consumers gate on whenHeavy. heavyReady implies tablesReady, so
+  // anything already gated on heavy needs no change.
+  tablesReady: false,
+  _tablesCallbacks: [],
+
+  whenTables: function (cb) {
+    if (this.tablesReady) { cb(); return; }
+    this._tablesCallbacks.push(cb);
+  },
+
   // Pitch details are sharded one file per pitcher (2026-08-03) rather than
   // riding in data_heavy, where they were 18.6 MB gz / 120.6 MB of JSON that
   // every visitor parsed to read at most a handful of pitchers. Each shard is
@@ -180,9 +192,9 @@ const DataStore = {
     return this._fetchGz('data_core.json.gz').then(function (rd) {
       self.rs = {
         pitcherData: rd.pitcherData || [],
-        pitchData: rd.pitchData || [],
-        hitterData: rd.hitterData || [],
-        hitterPitchData: rd.hitterPitchData || [],
+        pitchData: [],
+        hitterData: [],
+        hitterPitchData: [],
         metadata: rd.metadata || {},
         microData: null,
         pitchDetails: {},
@@ -190,9 +202,30 @@ const DataStore = {
         hitterSwingLocations: {},
       };
       self.updateGlobals();
-      // background prefetch — never blocks the first render
-      self._loadHeavy();
+      // background — never blocks the first render
+      self._loadTables();
     });
+  },
+
+  // data_tables then data_heavy, in that order and not in parallel. Tables are
+  // needed sooner and are a quarter the size, so they must not queue behind
+  // heavy; chaining also keeps the invariant that heavyReady implies
+  // tablesReady, which is what lets every existing whenHeavy() gate stay
+  // correct without knowing tables exist.
+  _loadTables: function () {
+    var self = this;
+    this._fetchGz('data_tables.json.gz').then(function (rd) {
+      self.rs.pitchData = rd.pitchData || [];
+      self.rs.hitterData = rd.hitterData || [];
+      self.rs.hitterPitchData = rd.hitterPitchData || [];
+      self.updateGlobals();
+      self.tablesReady = true;
+      var cbs = self._tablesCallbacks; self._tablesCallbacks = [];
+      cbs.forEach(function (cb) { try { cb(); } catch (e) { console.error(e); } });
+    }).catch(function (e) {
+      // Pitcher stats still work; the other tabs stay in their loading state.
+      console.error('Tables chunk failed to load:', e);
+    }).then(function () { self._loadHeavy(); });
   },
 
   _loadHeavy: function () {

@@ -4382,13 +4382,16 @@ def write_json_outputs(result, suffix):
 def write_embedded_js(rs_result):
     """Write the site data payload as two gzip chunks plus per-pitcher shards:
 
-      data_core.json.gz   leaderboard tables + metadata — everything the
-                          unfiltered tabs need. Small (~5 MB gz), fetched
-                          first; the site renders its first table from this.
+      data_core.json.gz   pitcherData + metadata — exactly what the opening
+                          table needs and nothing else (~1.5 MB gz). Fetched
+                          first; first paint waits only on this.
+      data_tables.json.gz pitchData + hitterData + hitterPitchData — the
+                          Arsenal/Hitters/vs-Pitches tabs and the Aggregator's
+                          team merges (~4.4 MB gz). Loads right after core.
       data_heavy.json.gz  microData + hitterPitchDetails + hitterSwingLocations
                           — powers client-side filters and hitter pages.
-                          (~18 MB gz), prefetched in the background
-                          immediately after core (js/data.js).
+                          (~18 MB gz), loaded after tables so that
+                          heavyReady implies tablesReady (js/data.js).
       pitchdetails/*.gz   one shard per pitcher (~10 KB each), fetched on
                           demand when a player page, side panel, or compare
                           chart actually needs that pitcher (2026-08-03).
@@ -4472,17 +4475,48 @@ def write_embedded_js(rs_result):
         {k: v for k, v in row.items() if not k.startswith('_')}
         for row in rs_result['hitter_pitch_leaderboard']]
 
+    pitcher_rows = strip_internal(rs_result['pitcher_leaderboard'])
+    hitter_rows = strip_internal(rs_result['hitter_leaderboard'])
+
+    def _count_distinct_mlb_players(rows, name_key, roc_teams):
+        """Home-page headline counts, precomputed so data_core no longer has to
+        carry hitterData just to render two numbers. Must stay in lockstep with
+        the countDistinctMlbPlayers() this replaced in js/app.js: skip ROC/AAA
+        rows, key on mlbId when present so a traded player's per-team and
+        2TM/3TM rows collapse, and fall back to name (then row index) when
+        there is no id."""
+        seen = set()
+        for i, r in enumerate(rows):
+            if r.get('team') in roc_teams:
+                continue
+            mlb_id = r.get('mlbId')
+            seen.add(f'id:{mlb_id}' if mlb_id is not None
+                     else 'nm:' + str(r.get(name_key) or i))
+        return len(seen)
+
     # The shard index rides in metadata so it lands with data_core — the
     # client needs it before it can resolve any player page.
     metadata = dict(rs_result['metadata'])
     metadata['pitchDetailsIndex'] = pitch_detail_index
+    _roc = set(metadata.get('rocTeams') or [])
+    metadata['homeCounts'] = {
+        'pitchers': _count_distinct_mlb_players(pitcher_rows, 'pitcher', _roc),
+        'hitters': _count_distinct_mlb_players(hitter_rows, 'hitter', _roc),
+    }
 
+    # Split 2026-08-03: first paint used to wait on all 32.8 MB of core JSON
+    # when the opening table needs 6.2 MB of it. pitchData/hitterData/
+    # hitterPitchData back the Arsenal, Hitters and vs-Pitches tabs plus the
+    # Aggregator's team-level merges — real consumers, but none of them on the
+    # path to the first table — so they ship separately and load right after.
     core_mb = _write_gz('data_core.json.gz', {
-        'pitcherData': strip_internal(rs_result['pitcher_leaderboard']),
-        'pitchData': strip_internal(rs_result['pitch_leaderboard']),
-        'hitterData': strip_internal(rs_result['hitter_leaderboard']),
-        'hitterPitchData': hitter_pitch_lb_slim,
+        'pitcherData': pitcher_rows,
         'metadata': metadata,
+    })
+    tables_mb = _write_gz('data_tables.json.gz', {
+        'pitchData': strip_internal(rs_result['pitch_leaderboard']),
+        'hitterData': hitter_rows,
+        'hitterPitchData': hitter_pitch_lb_slim,
     })
     heavy_mb = _write_gz('data_heavy.json.gz', {
         'microData': rs_result['micro_data'],
@@ -4499,10 +4533,11 @@ def write_embedded_js(rs_result):
     # Guard on COMPRESSED sizes (what git/GitHub sees). Tripping means a
     # payload grew ~3x unexpectedly — fail fast with an actionable message
     # rather than at the push step.
-    if core_mb > 40 or heavy_mb > 90:
+    if core_mb > 40 or tables_mb > 40 or heavy_mb > 90:
         raise RuntimeError(
-            f"Embed chunk unexpectedly large (core {core_mb:.1f} MB, heavy "
-            f"{heavy_mb:.1f} MB) — investigate before committing.")
+            f"Embed chunk unexpectedly large (core {core_mb:.1f} MB, tables "
+            f"{tables_mb:.1f} MB, heavy {heavy_mb:.1f} MB) — investigate "
+            f"before committing.")
 
 
 def bump_asset_version(index_path=None):
