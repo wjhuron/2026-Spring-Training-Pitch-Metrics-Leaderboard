@@ -3,7 +3,7 @@
     "Manually entered FanGraphs constants, used ONLY when the live fetch fails.",
     "FanGraphs sits behind Cloudflare bot scoring that challenges scripted",
     "clients (and, since 2026-08-04, GitHub's runners too), but a logged-in",
-    "browser loads the pages fine — so these get read by eye and typed here.",
+    "browser loads the pages fine \u2014 so these get read by eye and typed here.",
     "",
     "This file is COMMITTED on purpose: CI checks out the repo, so a gitignored",
     "copy would never reach the pipeline.",
@@ -17,13 +17,12 @@
     "           All 30 teams required; a partial set is refused, because the",
     "           missing teams would silently fall back to neutral 1.0.",
     "",
-    "Update enteredAt whenever you refresh the numbers — the pipeline prints it",
+    "Update enteredAt whenever you refresh the numbers \u2014 the pipeline prints it",
     "so a stale hand-entry is visible in the log rather than silent."
   ],
   "season": 2026,
   "enteredAt": "2026-08-04",
-  "source": "recovered from the 2026-08-04 13:57 pipeline run, which fetched FanGraphs successfully",
-
+  "source": "guts recovered from the 2026-08-04 13:57 run; park factors hand-exported from fangraphs.com/guts.aspx?type=pf (Basic 5yr / 100)",
   "guts": {
     "wBB": 0.698,
     "wHBP": 0.729,
@@ -36,6 +35,36 @@
     "lgWOBA": 0.3164,
     "lgRPA": 0.1188
   },
-
-  "parkFactors": {}
+  "parkFactors": {
+    "ARI": 1.0064,
+    "ATH": 1.0287,
+    "ATL": 1.0013,
+    "BAL": 0.9861,
+    "BOS": 1.0424,
+    "CHC": 0.9786,
+    "CIN": 1.0455,
+    "CLE": 0.9887,
+    "COL": 1.1335,
+    "CWS": 1.0031,
+    "DET": 1.0031,
+    "HOU": 0.9948,
+    "KCR": 1.0306,
+    "LAA": 1.0123,
+    "LAD": 0.9914,
+    "MIA": 1.01,
+    "MIL": 0.989,
+    "MIN": 1.0081,
+    "NYM": 0.9634,
+    "NYY": 0.9893,
+    "PHI": 1.0127,
+    "PIT": 1.0154,
+    "SDP": 0.959,
+    "SEA": 0.9354,
+    "SFG": 0.9725,
+    "STL": 0.975,
+    "TBR": 1.0094,
+    "TEX": 0.9865,
+    "TOR": 0.9945,
+    "WSH": 0.9963
+  }
 }
