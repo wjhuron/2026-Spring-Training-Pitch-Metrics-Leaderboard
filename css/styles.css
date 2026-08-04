@@ -1631,6 +1631,39 @@ body.compact #table-pinned-body td { padding: 4px 8px; font-size: 12px; }
 .location-section-header .section-title {
   margin-bottom: 0;
 }
+.location-section-header .section-note {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* --- Player Page: platoon split panel (vs LHH / vs RHH / L-R) --- */
+/* Label column pins so "vs LHH" / "vs RHH" stay readable while the 14 stat
+   columns scroll horizontally (narrow screens). */
+.platoon-split-table td.platoon-split-label,
+.platoon-split-table thead th:first-child {
+  text-align: left;
+  font-weight: 700;
+  white-space: nowrap;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--bg-card) !important;
+}
+.platoon-split-table tbody tr.platoon-split-active td.platoon-split-label {
+  box-shadow: inset 3px 0 0 var(--accent, #c0603a);
+}
+.platoon-split-table tbody tr.platoon-split-diff td {
+  border-top: 2px solid var(--border);
+  color: var(--text-secondary) !important;
+  font-variant-numeric: tabular-nums;
+}
+.platoon-split-loading {
+  color: var(--text-secondary);
+  padding: 12px;
+  text-align: center;
+  font-size: 13px;
+}
 .hand-toggle {
   display: flex;
   border-radius: 6px;

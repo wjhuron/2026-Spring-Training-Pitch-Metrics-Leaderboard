@@ -672,6 +672,12 @@ const Aggregator = {
     const kbbPct = (kPct !== null && bbPct !== null) ? Math.round((kPct - bbPct) * 10000) / 10000 : null;
     const babip_denom = ab - k - hr + sf;
     const babip = babip_denom > 0 ? Math.round((h - hr) / babip_denom * 1000) / 1000 : null;
+    // AVG/OBP against. Micro carries H but not 2B/3B, so there is no SLG
+    // against — the platoon views lean on xSLG for the slugging axis.
+    // OBP keeps IBB in the numerator (unlike bbPct, which strips it).
+    const avgAgainst = ab > 0 ? h / ab : null;
+    const obp_denom = ab + bb + hbp + sf;
+    const obpAgainst = obp_denom > 0 ? (h + bb + hbp) / obp_denom : null;
     const fpsPct = firstPitches > 0 ? firstPitchStrikes / firstPitches : null;
     const oneOneWinPct = oneOneTotal > 0 ? oneOneWins / oneOneTotal : null;
     const earlyActionPct = pa > 0 ? earlyActionPAs / pa : null;
@@ -708,6 +714,8 @@ const Aggregator = {
       bbPct: bbPct,
       kbbPct: kbbPct,
       babip: babip,
+      avgAgainst: avgAgainst,
+      obpAgainst: obpAgainst,
       fpsPct: fpsPct,
       oneOneWinPct: oneOneWinPct,
       earlyActionPct: earlyActionPct,
@@ -740,9 +748,10 @@ const Aggregator = {
     const mlbIdMap = this._getMlbIdMap('pitcher');
 
     let STAT_KEYS = ['strikePct', 'izPct', 'cswPct', 'izWhiffPct', 'swStrPct', 'chasePct', 'gbPct', 'kPct', 'bbPct', 'kbbPct', 'babip', 'fpsPct', 'oneOneWinPct', 'earlyActionPct', 'hrFbPct',
+                     'avgAgainst', 'obpAgainst',
                      'avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'xwOBAsp',
                      'stuffScore', 'locPlus', 'pitchingScore'];
-    let INVERT = { bbPct: true, babip: true, hrFbPct: true, avgEVAgainst: true, maxEVAgainst: true, hardHitPct: true, barrelPctAgainst: true, xwOBAsp: true };
+    let INVERT = { bbPct: true, babip: true, hrFbPct: true, avgAgainst: true, obpAgainst: true, avgEVAgainst: true, maxEVAgainst: true, hardHitPct: true, barrelPctAgainst: true, xwOBAsp: true };
     if (teamMode) {
       // Boxscore-merged stats have no pre-aggregated _pctl at team level —
       // rank them across the team pool here.

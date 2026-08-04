@@ -197,6 +197,29 @@ var PlayerPage = {
     { key: 'siera', label: 'SIERA', format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
   ],
 
+  // Shown in place of STATS_COLS whenever a handedness is selected. The
+  // season line's counting stats (G/GS/IP/W/L/SV/HLD) and IP-denominated
+  // rates (ERA/FIP/xFIP/SIERA) have no per-hand split in the data — leaving
+  // them on screen made the toggle look inert. Every column here does split:
+  // TBF/AVG/OBP/BABIP/K%/BB%/Whiff% come from the micro counters, the
+  // expected stats from PITCHER_DATA's _vsL/_vsR fields.
+  PLATOON_STATS_COLS: [
+    { key: 'pa', label: 'TBF', format: function(v) { return v != null ? v : '—'; }, noPctl: true },
+    { key: 'avgAgainst', label: 'AVG', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'obpAgainst', label: 'OBP', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'wOBA', label: 'wOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'xwOBA', label: 'xwOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'xBA', label: 'xBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'xSLG', label: 'xSLG', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'babip', label: 'BABIP', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'kPct', label: 'K%', format: function(v) { return Utils.formatPct(v); } },
+    { key: 'bbPct', label: 'BB%', format: function(v) { return Utils.formatPct(v); } },
+    { key: 'kbbPct', label: 'K-BB%', format: function(v) { return Utils.formatPct(v); } },
+    { key: 'swStrPct', label: 'Whiff%', format: function(v) { return Utils.formatPct(v); } },
+    { key: 'hardHitPct', label: 'Hard-Hit%', format: function(v) { return Utils.formatPct(v); } },
+    { key: 'barrelPctAgainst', label: 'Barrel%', format: function(v) { return Utils.formatPct(v); } },
+  ],
+
   BATTED_BALL_COLS: [
     { key: 'pitchType', label: 'Pitch' },
     { key: 'count', label: 'Count', format: function(v) { return v != null ? v : '—'; } },
@@ -337,7 +360,8 @@ var PlayerPage = {
     this._platoonHand = 'all';
     this._resetPlatoonToggleUI('pitcher-platoon-toggle');
     document.getElementById('player-percentiles').innerHTML = '';
-    var sections = ['player-pitch-usage-table', 'player-stats-table', 'player-expanded-pitch-table',
+    var sections = ['player-pitch-usage-table', 'player-stats-table', 'player-platoon-split-table',
+                    'player-expanded-pitch-table',
                     'player-batted-ball-table', 'player-plate-discipline-table',
                     'player-heat-maps', 'player-count-table', 'player-game-grades-table'];
     for (var i = 0; i < sections.length; i++) {
@@ -373,6 +397,7 @@ var PlayerPage = {
     this._renderMovementChart(data); // uses PITCH_DETAILS, already filtered
     this._renderPitchTable(data); // uses PITCH_DETAILS, already filtered
     this._renderStatsTable(filteredData);
+    this._renderPlatoonSplitDeferred(data);
     this._renderExpandedPitchTable(data); // will use _filteredPitchRows
     this._renderPlateDisciplineTable(data); // will use _filteredPitchRows
     this._renderBattedBallTable(data); // will use _filteredPitchRows
@@ -598,7 +623,8 @@ var PlayerPage = {
       var el = document.getElementById(hitterSections[i]);
       if (el) el.style.display = 'none';
     }
-    var pitcherSections = ['player-stats-section', 'player-expanded-pitch-section',
+    var pitcherSections = ['player-stats-section', 'player-platoon-split-section',
+      'player-expanded-pitch-section',
       'player-batted-ball-section', 'player-plate-discipline-section',
       'player-location-section', 'player-count-section'];
     for (var j = 0; j < pitcherSections.length; j++) {
@@ -622,7 +648,8 @@ var PlayerPage = {
     if (sprayToggle) sprayToggle.style.display = '';
     var sprayLegend = document.getElementById('spray-legend-inline');
     if (sprayLegend) sprayLegend.style.display = '';
-    var pitcherSections = ['player-stats-section', 'player-expanded-pitch-section',
+    var pitcherSections = ['player-stats-section', 'player-platoon-split-section',
+      'player-expanded-pitch-section',
       'player-batted-ball-section', 'player-plate-discipline-section',
       'player-location-section', 'player-count-section', 'player-game-grades-section'];
     for (var i = 0; i < pitcherSections.length; i++) {
@@ -1781,14 +1808,18 @@ var PlayerPage = {
     if (!data) { if (section) section.style.display = 'none'; return; }
     section.style.display = '';
 
+    // Platoon mode swaps in a column set where every cell actually splits.
+    var hand = this._platoonHand || 'all';
+    var cols = hand === 'all' ? this.STATS_COLS : this.PLATOON_STATS_COLS;
+
     var table = document.createElement('table');
     table.className = 'player-pitch-stats-table expanded-pitch-table';
 
     var thead = document.createElement('thead');
     var headerRow = document.createElement('tr');
-    for (var i = 0; i < this.STATS_COLS.length; i++) {
+    for (var i = 0; i < cols.length; i++) {
       var th = document.createElement('th');
-      th.textContent = this.STATS_COLS[i].label;
+      th.textContent = cols[i].label;
       headerRow.appendChild(th);
     }
     thead.appendChild(headerRow);
@@ -1796,14 +1827,211 @@ var PlayerPage = {
 
     var tbody = document.createElement('tbody');
     var tr = document.createElement('tr');
-    for (var c = 0; c < this.STATS_COLS.length; c++) {
-      var col = this.STATS_COLS[c];
+    for (var c = 0; c < cols.length; c++) {
+      var col = cols[c];
       var td = document.createElement('td');
       var val = data[col.key];
       td.textContent = col.format ? col.format(val) : (val != null ? val : '—');
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
+    table.appendChild(tbody);
+    container.appendChild(table);
+  },
+
+
+  // Pool-wide platoon aggregations are expensive (~350 ms) and identical for
+  // every pitcher, so they're computed once per session and reused. Filters
+  // match _refreshPlatoonStats exactly so both share the cache.
+  PLATOON_PT_REQUEST: ['Hard', 'Breaking', 'Offspeed', 'FF', 'SI', 'FC', 'SL', 'ST', 'CU', 'SV', 'CH', 'FS', 'KN'],
+
+  _platoonFilters: function (hand) {
+    return { vsHand: hand, team: 'all', throws: 'all', search: '', role: 'all',
+             pitchTypes: this.PLATOON_PT_REQUEST };
+  },
+
+  _platoonAggregate: function (tab, hand) {
+    if (!Aggregator.loaded) return null;
+    // Drop the cache if the aggregator was reloaded under us.
+    if (this._platoonAggData !== Aggregator.data) {
+      this._platoonAggCache = null;
+      this._platoonAggData = Aggregator.data;
+    }
+    if (!this._platoonAggCache) this._platoonAggCache = {};
+    var key = tab + '|' + hand;
+    if (!this._platoonAggCache[key]) {
+      this._platoonAggCache[key] = Aggregator.aggregate(tab, this._platoonFilters(hand));
+    }
+    return this._platoonAggCache[key];
+  },
+
+  // wOBA/xwOBA/xBA/xSLG are boxscore-merged: the aggregator swaps in the
+  // _vsL/_vsR VALUE but carries the season _pctl alongside it, so coloring a
+  // split cell with that rank would paint the wrong number. Rank them within
+  // the same filtered pool instead, under a panel-local key so nothing else
+  // on the page changes. Pool is every pitcher in the aggregation (the house
+  // rule: all MLB defines the distribution, qualification only gates color).
+  PLATOON_RERANK_KEYS: ['wOBA', 'xwOBA', 'xBA', 'xSLG'],
+
+  _ensurePlatoonPctls: function (rows) {
+    if (!rows || rows._platoonPctlsDone) return;
+    for (var ki = 0; ki < this.PLATOON_RERANK_KEYS.length; ki++) {
+      var k = this.PLATOON_RERANK_KEYS[ki];
+      var pk = k + '_pctl';
+      var saved = [];
+      for (var s = 0; s < rows.length; s++) saved.push(rows[s][pk]);
+      Aggregator._computePercentiles(rows, k);
+      for (var r = 0; r < rows.length; r++) {
+        var v = rows[r][pk];
+        // Lower is better against a pitcher, so invert like the aggregator's
+        // own INVERT pass does for the stats it ranks itself.
+        rows[r][k + '_platoonPctl'] = (v == null) ? null : 100 - v;
+        rows[r][pk] = saved[r];
+      }
+    }
+    rows._platoonPctlsDone = true;
+  },
+
+  _findPlatoonRow: function (tab, hand, nameKey, name, team) {
+    var rows = this._platoonAggregate(tab, hand);
+    if (!rows) return null;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i][nameKey] === name && rows[i].team === team) return rows[i];
+    }
+    return null;
+  },
+
+
+  // The two pool-wide aggregations behind the split panel cost ~700 ms the
+  // first time (cached for the rest of the session), so the panel fills in
+  // after the page paints rather than blocking it.
+  _renderPlatoonSplitDeferred: function (data) {
+    var section = document.getElementById('player-platoon-split-section');
+    var container = document.getElementById('player-platoon-split-table');
+    if (!section || !container) return;
+    if (!Aggregator.loaded) { section.style.display = 'none'; return; }
+
+    // Cache warm: render synchronously so the panel doesn't flash a skeleton.
+    if (this._platoonAggData === Aggregator.data && this._platoonAggCache &&
+        this._platoonAggCache['pitcher|L'] && this._platoonAggCache['pitcher|R']) {
+      this._renderPlatoonSplit(data);
+      return;
+    }
+
+    section.style.display = '';
+    container.innerHTML = '<p class="platoon-split-loading">Computing platoon splits…</p>';
+    var self = this;
+    var token = (this._platoonSplitToken = (this._platoonSplitToken || 0) + 1);
+    setTimeout(function () {
+      // A different player was opened while this was queued — drop it.
+      if (token !== self._platoonSplitToken) return;
+      if (!self._currentData || self._currentData.pitcher !== data.pitcher ||
+          self._currentData.team !== data.team) return;
+      self._renderPlatoonSplit(data);
+    }, 50);
+  },
+
+
+  // Side-by-side vs LHH / vs RHH with the L-R difference underneath, so the
+  // platoon gap reads at a glance instead of requiring the toggle to be
+  // flipped back and forth. The row matching the active toggle is highlighted.
+  _renderPlatoonSplit: function (data) {
+    var section = document.getElementById('player-platoon-split-section');
+    var container = document.getElementById('player-platoon-split-table');
+    if (!section || !container) return;
+    container.innerHTML = '';
+
+    if (!Aggregator.loaded) { section.style.display = 'none'; return; }
+
+    var cols = this.PLATOON_STATS_COLS;
+    this._ensurePlatoonPctls(this._platoonAggregate('pitcher', 'L'));
+    this._ensurePlatoonPctls(this._platoonAggregate('pitcher', 'R'));
+    var vsL = this._findPlatoonRow('pitcher', 'L', 'pitcher', data.pitcher, data.team);
+    var vsR = this._findPlatoonRow('pitcher', 'R', 'pitcher', data.pitcher, data.team);
+    if (!vsL && !vsR) { section.style.display = 'none'; return; }
+    section.style.display = '';
+
+    var table = document.createElement('table');
+    table.className = 'player-pitch-stats-table expanded-pitch-table platoon-split-table';
+
+    var thead = document.createElement('thead');
+    var headerRow = document.createElement('tr');
+    var thLabel = document.createElement('th');
+    thLabel.textContent = '';
+    headerRow.appendChild(thLabel);
+    for (var i = 0; i < cols.length; i++) {
+      var th = document.createElement('th');
+      th.textContent = cols[i].label;
+      headerRow.appendChild(th);
+    }
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    var self = this;
+    function valueRow(label, row, hand) {
+      var tr = document.createElement('tr');
+      if (self._platoonHand === hand) tr.className = 'platoon-split-active';
+      var tdLabel = document.createElement('td');
+      tdLabel.className = 'platoon-split-label';
+      tdLabel.textContent = label;
+      tr.appendChild(tdLabel);
+      for (var c = 0; c < cols.length; c++) {
+        var col = cols[c];
+        var td = document.createElement('td');
+        var val = row ? row[col.key] : null;
+        td.textContent = col.format ? col.format(val) : (val != null ? val : '—');
+        // Percentile coloring uses the same-handedness pool (all pitchers vs
+        // LHH / vs RHH), which is the honest comparison group for a split.
+        // Qualification gates color on SEASON IP, not on the split's own TBF —
+        // same convention the leaderboard uses for hitter platoon splits.
+        var pctl = null;
+        if (!col.noPctl && row) {
+          pctl = row[col.key + '_platoonPctl'];
+          if (pctl === undefined) pctl = row[col.key + '_pctl'];
+        }
+        if (pctl != null && val != null && row._qualified) {
+          td.style.backgroundColor = Utils.percentileColor(pctl);
+          td.style.color = Utils.percentileTextColor(pctl);
+        }
+        tr.appendChild(td);
+      }
+      return tr;
+    }
+
+    var tbody = document.createElement('tbody');
+    tbody.appendChild(valueRow('vs LHH', vsL, 'L'));
+    tbody.appendChild(valueRow('vs RHH', vsR, 'R'));
+
+    // Difference row. House format rule: no leading "+" on positives, so the
+    // header spells out the direction rather than relying on signs.
+    var diffRow = document.createElement('tr');
+    diffRow.className = 'platoon-split-diff';
+    var tdDiff = document.createElement('td');
+    tdDiff.className = 'platoon-split-label';
+    tdDiff.textContent = 'L − R';
+    diffRow.appendChild(tdDiff);
+    for (var d = 0; d < cols.length; d++) {
+      var dcol = cols[d];
+      var td2 = document.createElement('td');
+      var lv = vsL ? vsL[dcol.key] : null;
+      var rv = vsR ? vsR[dcol.key] : null;
+      if (lv == null || rv == null) {
+        td2.textContent = '—';
+      } else if (dcol.key === 'pa') {
+        // TBF difference is workload, not effectiveness — leave it blank
+        // rather than inviting it to be read as a split.
+        td2.textContent = '—';
+      } else if (dcol.dec3) {
+        // col.format's /^0/ strip misses negatives, so sign and magnitude
+        // are formatted separately to keep ".022" / "-.022" symmetric.
+        var diff = lv - rv;
+        td2.textContent = (diff < 0 ? '-' : '') + Math.abs(diff).toFixed(3).replace(/^0/, '');
+      } else {
+        td2.textContent = dcol.format ? dcol.format(lv - rv) : String(lv - rv);
+      }
+      diffRow.appendChild(td2);
+    }
+    tbody.appendChild(diffRow);
     table.appendChild(tbody);
     container.appendChild(table);
   },
@@ -2029,7 +2257,7 @@ var PlayerPage = {
     var label = document.createElement('div');
     label.className = 'heatmap-label';
     var title = document.createElement('span');
-    title.textContent = 'Loc+ Command Map';
+    title.textContent = 'Loc+ Command Map (season, all hitters)';
     label.appendChild(title);
     if (data.locPlus != null) {
       var meta = document.createElement('span');
@@ -2048,7 +2276,9 @@ var PlayerPage = {
 
     var note = document.createElement('div');
     note.className = 'command-map-note';
-    note.textContent = 'blue = good location · red = costly · opacity = usage';
+    // Season-only by construction: pipeline_locplus.py ships one grid per
+    // pitcher, not one per batter hand, so the toggle above cannot move it.
+    note.textContent = 'blue = good location · red = costly · opacity = usage · does not follow the vs LHH/RHH toggle';
     wrap.appendChild(note);
 
     this._renderLocValueCanvas(canvas, hm);
@@ -2690,6 +2920,7 @@ var PlayerPage = {
         this._filteredData = filteredData;
         this._filteredPitchRows = filteredPitchRows;
         this._renderStatsTable(filteredData);
+        this._renderPlatoonSplit(data); // clears the active-row highlight
         this._renderExpandedPitchTable(data);
         this._renderBattedBallTable(data);
         this._renderPlateDisciplineTable(data);
@@ -2705,20 +2936,31 @@ var PlayerPage = {
       return;
     }
 
-    // Re-aggregate with hand filter
-    if (!Aggregator.loaded) return;
+    // Platoon views are driven entirely by the micro aggregator. Without it
+    // the toggle can do nothing — say so instead of silently no-opping, and
+    // roll the state back so the next click isn't swallowed by the
+    // hand === _platoonHand early return in the click handler.
+    if (!Aggregator.loaded) {
+      var statsId = type === 'pitcher' ? 'player-stats-table' : 'player-hitter-stats-table';
+      var statsEl = document.getElementById(statsId);
+      if (statsEl) {
+        statsEl.innerHTML = '<p style="color:var(--text-secondary);padding:12px;text-align:center;font-size:13px;">' +
+          'Splits are still loading — try again in a moment.</p>';
+      }
+      this._platoonHand = 'all';
+      this._resetPlatoonToggleUI(type === 'pitcher' ? 'pitcher-platoon-toggle' : 'hitter-platoon-toggle');
+      return;
+    }
 
     // Request both category rows (Hard/Breaking/Offspeed) and individual pitch
     // types in one aggregation pass so the player-page tables can mirror the
     // default-view's grouped/expandable layout in platoon mode too.
-    var HITTER_PT_REQUEST = ['Hard', 'Breaking', 'Offspeed', 'FF', 'SI', 'FC', 'SL', 'ST', 'CU', 'SV', 'CH', 'FS', 'KN'];
-    var baseFilters = { vsHand: hand, team: 'all', throws: 'all', search: '', role: 'all', pitchTypes: HITTER_PT_REQUEST };
     var noDataMsg = '<p style="color:var(--text-secondary);padding:12px;text-align:center;font-size:13px;">No data vs ' +
       (type === 'pitcher' ? (hand === 'L' ? 'LHH' : 'RHH') : (hand === 'L' ? 'LHP' : 'RHP')) + '</p>';
 
     if (type === 'pitcher') {
       // Re-aggregate pitcher-level stats
-      var rows = Aggregator.aggregate('pitcher', baseFilters);
+      var rows = this._platoonAggregate('pitcher', hand);
       var found = null;
       for (var i = 0; i < rows.length; i++) {
         if (rows[i].pitcher === data.pitcher && rows[i].team === data.team) {
@@ -2733,9 +2975,10 @@ var PlayerPage = {
       }
       this._filteredData = found;
       this._renderStatsTable(found);
+      this._renderPlatoonSplit(data); // moves the active-row highlight
 
       // Re-aggregate pitch-type rows with hand filter
-      var pitchRows = Aggregator.aggregate('pitch', baseFilters);
+      var pitchRows = this._platoonAggregate('pitch', hand);
       var myPitchRows = [];
       for (var i = 0; i < pitchRows.length; i++) {
         if (pitchRows[i].pitcher === data.pitcher && pitchRows[i].team === data.team) {
@@ -2756,7 +2999,7 @@ var PlayerPage = {
 
     } else {
       // Re-aggregate hitter-level stats
-      var rows = Aggregator.aggregate('hitter', baseFilters);
+      var rows = this._platoonAggregate('hitter', hand);
       var found = null;
       for (var i = 0; i < rows.length; i++) {
         if (rows[i].hitter === data.hitter && rows[i].team === data.team) {
@@ -2775,7 +3018,7 @@ var PlayerPage = {
       // category rows (Hard/Breaking/Offspeed) for the main table view and a
       // sub-rows map for category expansion. Pitch types the hitter hasn't
       // seen vs this handedness are dropped (count == 0).
-      var hpRows = Aggregator.aggregate('hitterPitch', baseFilters);
+      var hpRows = this._platoonAggregate('hitterPitch', hand);
       var CATS = Aggregator.PITCH_CATEGORIES;
       var ptToCat = {};
       for (var cn in CATS) {
@@ -4434,6 +4677,7 @@ var PlayerPage = {
     var isPitcher = !!data.pitcher;
     var sections = isPitcher ? [
       ['player-stats-section',             'stats'],
+      ['player-platoon-split-section',     'platoon-split'],
       ['player-expanded-pitch-section',    'arsenal'],
       ['player-plate-discipline-section',  'plate-discipline'],
       ['player-batted-ball-section',       'batted-ball'],
