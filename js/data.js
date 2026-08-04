@@ -122,26 +122,61 @@ const DataStore = {
     else setTimeout(run, 300);
   },
 
+  // vercel.json serves these .gz files with `Content-Encoding: gzip`, so the
+  // browser inflates them in the network stack and we parse the stream
+  // straight into objects. The old path inflated via DecompressionStream and
+  // built the whole payload as one JS string before JSON.parse ever started —
+  // 33 MB of string for data_core alone. Measured roughly half the blocking
+  // time, plus it stops the allocation churn that string caused.
+  //
+  // A local dev server (python http.server) sets no such header and hands
+  // back the raw .gz, and a lost CDN header would do the same, so sniff the
+  // gzip magic bytes and inflate in JS when needed. Sniffing rather than
+  // reading Content-Encoding is deliberate: browsers strip that header once
+  // they have decoded, so it is not a usable signal, and guessing wrong
+  // breaks every payload on the site.
   _fetchGz: function (name, priority) {
     var url = 'data/' + name + (DATA_VERSION ? ('?v=' + DATA_VERSION) : '');
     var opts = priority ? { priority: priority } : undefined;
     return fetch(url, opts).then(function (resp) {
       if (!resp.ok) throw new Error('Data fetch failed: HTTP ' + resp.status + ' (' + name + ')');
       if (!resp.body) throw new Error('Data fetch returned no body stream (' + name + ')');
-      var inflated = resp.body.pipeThrough(new DecompressionStream('gzip'));
-      return new Response(inflated).text();
-    }).then(function (text) { return JSON.parse(text); });
+      var reader = resp.body.getReader();
+      return reader.read().then(function (first) {
+        var head = first.value;
+        var isRawGzip = !!(head && head.length > 1 && head[0] === 0x1f && head[1] === 0x8b);
+        if (isRawGzip && typeof DecompressionStream === 'undefined') {
+          reader.cancel();
+          throw new Error(
+            'This browser does not support gzip DecompressionStream. ' +
+            'Please use a current version of Chrome, Firefox, Safari, or Edge.');
+        }
+        // Re-head the stream: the sniffed chunk goes back on the front, the
+        // rest is pulled from the same reader, so nothing is buffered twice.
+        var stream = new ReadableStream({
+          start: function (c) {
+            if (head) c.enqueue(head);
+            if (first.done) c.close();
+          },
+          pull: function (c) {
+            return reader.read().then(function (r) {
+              if (r.done) c.close(); else c.enqueue(r.value);
+            });
+          },
+          cancel: function (reason) { return reader.cancel(reason); }
+        });
+        var body = isRawGzip
+          ? stream.pipeThrough(new DecompressionStream('gzip'))
+          : stream;
+        return new Response(body).json();
+      });
+    });
   },
 
   load: function () {
     var self = this;
-
-    if (typeof DecompressionStream === 'undefined') {
-      return Promise.reject(new Error(
-        'This browser does not support gzip DecompressionStream. ' +
-        'Please use a current version of Chrome, Firefox, Safari, or Edge.'));
-    }
-
+    // No upfront DecompressionStream guard: _fetchGz only needs it when the
+    // response arrives still gzipped, and it raises the same error there.
     return this._fetchGz('data_core.json.gz').then(function (rd) {
       self.rs = {
         pitcherData: rd.pitcherData || [],

@@ -25,20 +25,14 @@
       "source": "/data/data_core.json.gz",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
-        { "key": "Content-Type", "value": "application/gzip" }
+        { "key": "Content-Encoding", "value": "gzip" },
+        { "key": "Content-Type", "value": "application/json" }
       ]
     },
     {
       "source": "/data/data_heavy.json.gz",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
-        { "key": "Content-Type", "value": "application/gzip" }
-      ]
-    },
-    {
-      "source": "/data/_ce_probe.json.gz",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-store" },
         { "key": "Content-Encoding", "value": "gzip" },
         { "key": "Content-Type", "value": "application/json" }
       ]
@@ -47,7 +41,8 @@
       "source": "/data/pitchdetails/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
-        { "key": "Content-Type", "value": "application/gzip" }
+        { "key": "Content-Encoding", "value": "gzip" },
+        { "key": "Content-Type", "value": "application/json" }
       ]
     },
     {
