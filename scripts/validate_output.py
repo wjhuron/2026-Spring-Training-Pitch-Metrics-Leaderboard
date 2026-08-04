@@ -147,6 +147,70 @@ def check_core_stays_lean():
            f"{counts['pitchers']}P/{counts['hitters']}H home counts")
 
 
+def check_chunks_match_sources():
+    """Assert the shipped chunks actually carry what the pipeline last wrote.
+
+    The leaderboard JSONs are the post-injection source of truth: process_data
+    builds the chunks from its in-memory result with the PREVIOUS run's Stuff+,
+    then train_stuff_v11 --inject rewrites the JSONs, then rebuild_embed swaps
+    them into the chunks. Any step that swaps into the wrong file, or forgets
+    one, ships a stale table — and nothing about it looks wrong: right shape,
+    right row count, plausible numbers, just last cycle's grades.
+
+    That is exactly how pitchData shipped a cycle stale after the 2026-08-03
+    split (rebuild_embed still wrote it into data_core). The size guard caught
+    the misplacement; the staleness would have been invisible. This catches the
+    staleness directly.
+    """
+    name = 'chunks match sources'
+    try:
+        with gzip.open(os.path.join(DATA_DIR, 'data_core.json.gz'), 'rt', encoding='utf-8') as f:
+            core = json.load(f)
+        with gzip.open(os.path.join(DATA_DIR, 'data_tables.json.gz'), 'rt', encoding='utf-8') as f:
+            tables = json.load(f)
+    except Exception as e:
+        fail(f"{name}: could not read the chunks ({e})")
+        return
+
+    # (label, shipped rows, source json, key fields, compared fields)
+    checks = [
+        ('pitcherData', core.get('pitcherData'), 'pitcher_leaderboard_rs.json',
+         ('pitcher', 'team'), ('stuffScore', 'pitchingScore', 'era', 'kPct')),
+        ('pitchData', tables.get('pitchData'), 'pitch_leaderboard_rs.json',
+         ('pitcher', 'team', 'pitchType'), ('stuffScore', 'count', 'velocity')),
+        ('hitterData', tables.get('hitterData'), 'hitter_leaderboard_rs.json',
+         ('hitter', 'team'), ('pa', 'avg')),
+        ('hitterPitchData', tables.get('hitterPitchData'), 'hitter_pitch_leaderboard_rs.json',
+         ('hitter', 'team', 'pitchType'), ('count',)),
+    ]
+
+    clean = True
+    for label, shipped, src_name, key_fields, cmp_fields in checks:
+        src_path = os.path.join(DATA_DIR, src_name)
+        if shipped is None or not os.path.exists(src_path):
+            fail(f"{name}: {label} missing from the chunks or {src_name} absent")
+            clean = False
+            continue
+        with open(src_path) as f:
+            src = json.load(f)
+        keyfn = lambda r: tuple(r.get(k) for k in key_fields)
+        a = {keyfn(r): r for r in src}
+        b = {keyfn(r): r for r in shipped}
+        if len(a) != len(b) or set(a) != set(b):
+            fail(f"{name}: {label} has {len(b)} rows vs {len(a)} in {src_name} "
+                 f"— the chunk was not rebuilt from the current JSON")
+            clean = False
+            continue
+        stale = [(k, fld) for k in a for fld in cmp_fields if a[k].get(fld) != b[k].get(fld)]
+        if stale:
+            fail(f"{name}: {label} disagrees with {src_name} on {len(stale)} "
+                 f"field(s), e.g. {stale[:2]} — likely swapped into the wrong "
+                 f"chunk or not swapped at all")
+            clean = False
+    if clean:
+        ok(f"{name}: all four leaderboard tables match their source JSONs")
+
+
 def check_pitch_detail_shards():
     """Pitch details ship as one gzipped shard per pitcher, indexed by
     metadata.pitchDetailsIndex in data_core (2026-08-03). A missing shard
@@ -202,6 +266,7 @@ def main():
                    ['pitchData', 'hitterData', 'hitterPitchData'],
                    ('hitterData', len, 50, 'hitters'))
     check_core_stays_lean()
+    check_chunks_match_sources()
     check_gz_chunk('data_heavy.json.gz', 5_000_000,
                    ['microData', 'hitterPitchDetails', 'hitterSwingLocations'],
                    ('microData', lambda m: len(m.get('pitchMicro', [])), 1000, 'pitch micro rows'))
