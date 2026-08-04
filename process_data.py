@@ -502,9 +502,9 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
     #  37:firstPitchAppearances  38:firstPitchSwings
     #  39:xBA_sum  40:xBA_count  41:xSLG_sum  42:xSLG_count
     #  43:xwOBA_sum  44:xwOBA_count  45:xwOBAcon_sum  46:xwOBAcon_count
-    #  47:swingsNonBunt  48:contactNonBunt  49:buntAB
+    #  47:swingsNonBunt  48:contactNonBunt  49:buntAB  50:ibb
     # ==========================================================
-    hitter_micro = defaultdict(lambda: [0.0] * 50)
+    hitter_micro = defaultdict(lambda: [0.0] * 51)
 
     for p in all_pitches:
         batter = p.get('Batter')
@@ -537,6 +537,11 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
             if event == 'Triple':        c[4] += 1   # tp
             if event == 'Home Run':      c[5] += 1   # hr
             if event in BB_EVENTS:       c[6] += 1   # bb (all walks including IBB)
+            # IBB tracked separately so the client can build uBB. Hitter BB%
+            # keeps TOTAL walks, but wOBA needs uBB (IBB carries no weight) —
+            # without this column a client-computed wOBA would sit on a
+            # different scale than the boxscore-merged season value.
+            if event == 'Intent Walk':   c[50] += 1  # ibb
             if event in HBP_EVENTS:      c[7] += 1   # hbp
             if event in SF_EVENTS:       c[8] += 1   # sf
             if event in SH_EVENTS:       c[9] += 1   # sh
@@ -650,7 +655,7 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
     hitter_rows = []
     for (hi, ti, bats, di, ph), c in hitter_micro.items():
         row = [hi, ti, bats, di, ph]
-        for i in range(50):  # 0-49 (incl. buntAB at 49); matches hitterCols
+        for i in range(51):  # 0-50 (incl. buntAB at 49, ibb at 50); matches hitterCols
             val = c[i]
             row.append(round(val, 4) if isinstance(val, float) and val != int(val) else int(val))
         hitter_rows.append(row)
@@ -1024,14 +1029,14 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
             hmicro_by_hitter[hi].append((ti, bats, di, ph, c))
         for hi, combined_ti in combined_hitter_ti.items():
             teamset = hitter_mlb_team_set_micro[hi]
-            by_key = defaultdict(lambda: [0.0] * 50)
+            by_key = defaultdict(lambda: [0.0] * 51)
             for (ti, bats, di, ph, c) in hmicro_by_hitter[hi]:
                 if ti not in teamset:
                     continue
-                _sum_counts(by_key[(bats, di, ph)], c, 50)
+                _sum_counts(by_key[(bats, di, ph)], c, 51)
             for (bats, di, ph), c in by_key.items():
                 row = [hi, combined_ti, bats, di, ph]
-                for i in range(50):  # incl. buntAB at 49
+                for i in range(51):  # incl. buntAB at 49, ibb at 50
                     v = c[i]
                     row.append(round(v, 4) if isinstance(v, float) and v != int(v) else int(v))
                 hitter_rows.append(row)
@@ -1192,7 +1197,7 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
             'firstPitchAppearances', 'firstPitchSwings',
             'xBA_sum', 'xBA_count', 'xSLG_sum', 'xSLG_count',
             'xwOBA_sum', 'xwOBA_count', 'xwOBAcon_sum', 'xwOBAcon_count',
-            'swingsNonBunt', 'contactNonBunt', 'buntAB',
+            'swingsNonBunt', 'contactNonBunt', 'buntAB', 'ibb',
         ],
         'hitterMicro': hitter_rows,
         'hitterBipCols': ['hitterIdx', 'teamIdx', 'dateIdx', 'pitcherHand', 'batSide', 'exitVelo', 'launchAngle', 'hcX', 'hcY', 'bbType', 'event', 'distance', 'wOBAval', 'barrel'],
@@ -3983,6 +3988,18 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path):
             'lgWOBA': GUTS_EXTRA.get('lgWOBA'),
             'wOBAScale': GUTS_EXTRA.get('wOBAScale'),
             'lgRPA': GUTS_EXTRA.get('lgRPA'),
+        }
+
+    # Per-event linear weights, so the website can compute wOBA itself from the
+    # hitter micro counters under a handedness or date filter. Without these the
+    # client could only surface the season wOBA merged from the boxscore, which
+    # made wOBA look frozen whenever a filter was on. Same weights the boxscore
+    # merge uses above, so a filtered wOBA is on the identical scale.
+    if WOBA_WEIGHTS:
+        metadata['wobaWeights'] = {
+            'BB': WOBA_WEIGHTS.get('BB'), 'HBP': WOBA_WEIGHTS.get('HBP'),
+            '1B': WOBA_WEIGHTS.get('1B'), '2B': WOBA_WEIGHTS.get('2B'),
+            '3B': WOBA_WEIGHTS.get('3B'), 'HR': WOBA_WEIGHTS.get('HR'),
         }
 
     # Second pass: apply SIERA constant and clean up

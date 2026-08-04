@@ -91,12 +91,13 @@ var PlayerPage = {
   ],
 
   // Shown in place of HITTER_STATS_COLS whenever a handedness is selected.
-  // G is meaningless per hand, and wOBA/wRC+/xWRC+/Hitter+ are season-only in
-  // the embed: wOBA/wRC+/xWRC+ need FanGraphs linear weights and park factors,
-  // and Hitter+ needs the SD+/CT+ weight tables — none of which ship to the
-  // client (aggregator.js hBoxAlways). Leaving them on screen made the toggle
-  // look inert, so the value axis is carried here by the expected stats, which
-  // ARE recomputed from micro under the hand filter.
+  // G is meaningless per hand. wOBA and xWRC+ now split — the Guts linear
+  // weights ship in metadata and the hitter micro carries IBB, so the
+  // aggregator rebuilds both under the filter on the same scale as the season
+  // value. wRC+ and Hitter+ stay out: wRC+ is overwritten with the canonical
+  // FanGraphs number (which has no per-hand split, so a pipeline-formula
+  // version would read on a different scale), and Hitter+ needs the SD+/CT+
+  // weight tables, which are server-side only.
   HITTER_PLATOON_STATS_COLS: [
     { key: 'pa', label: 'PA', format: function(v) { return v != null ? v : '—'; }, noPctl: true, noDiff: true },
     { key: 'ab', label: 'AB', format: function(v) { return v != null ? v : '—'; }, noPctl: true, noDiff: true },
@@ -109,9 +110,11 @@ var PlayerPage = {
     { key: 'ops', label: 'OPS', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
     { key: 'iso', label: 'ISO', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
     { key: 'babip', label: 'BABIP', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'wOBA', label: 'wOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'xwOBA', label: 'xwOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
+    { key: 'xWRCplus', label: 'xWRC+', format: function(v) { return v != null ? v : '—'; } },
     { key: 'xBA', label: 'xBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
     { key: 'xSLG', label: 'xSLG', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
-    { key: 'xwOBA', label: 'xwOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
     { key: 'xwOBAcon', label: 'xwOBAcon', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; }, dec3: true },
     { key: 'hardHitPct', label: 'Hard-Hit%', format: function(v) { return Utils.formatPct(v); } },
     { key: 'barrelPct', label: 'Barrel%', format: function(v) { return Utils.formatPct(v); } },

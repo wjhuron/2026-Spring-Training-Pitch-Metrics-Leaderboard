@@ -2032,6 +2032,22 @@ const Aggregator = {
 
   // Team mode: hitter bats (stands) filter resolved per hitter — switch
   // hitters are excluded from R/L views, matching player-mode semantics.
+  // FanGraphs Guts per-event linear weights, shipped in metadata by
+  // process_data.py. Absent on embeds built before 2026-08-04, in which case
+  // every wOBA consumer here falls back to the boxscore-merged season value.
+  _wobaWeights: function () {
+    if (this._wobaW) return this._wobaW;
+    const w = (typeof DataStore !== 'undefined' && DataStore.metadata &&
+               DataStore.metadata.wobaWeights) || null;
+    const ok = w && ['BB', 'HBP', '1B', '2B', '3B', 'HR'].every(function (k) {
+      return typeof w[k] === 'number';
+    });
+    // Only a successful lookup is cached — metadata may not have landed yet
+    // on the first call, and caching that miss would disable wOBA all session.
+    if (ok) this._wobaW = w;
+    return ok ? w : null;
+  },
+
   _buildHitterStandsMap: function (micro, ci) {
     const sets = {};
     for (let i = 0; i < micro.length; i++) {
@@ -2183,16 +2199,18 @@ const Aggregator = {
           hitterIdx: teamMode ? null : row[ci.hitterIdx],
           teamIdx: row[ci.teamIdx],
           batsSet: {},
-          counts: new Array(50)  // 50 hitter-micro data cols (incl. buntAB at 49)
+          counts: new Array(51)  // hitter-micro data cols (buntAB at 49, ibb at 50)
         };
-        for (let z = 0; z < 50; z++) groups[gk].counts[z] = 0;
+        for (let z = 0; z < 51; z++) groups[gk].counts[z] = 0;
       }
 
       const g = groups[gk];
       g.batsSet[row[ci.bats]] = true;
 
-      for (let f = 0; f < 50; f++) {
-        g.counts[f] += row[5 + f];
+      // Pre-ibb embeds are 50 wide; row[55] is undefined there and must not
+      // poison the accumulator with NaN.
+      for (let f = 0; f < 51; f++) {
+        g.counts[f] += row[5 + f] || 0;
       }
     }
 
@@ -2256,6 +2274,11 @@ const Aggregator = {
       const xBA_sum = c[39], xBA_count = c[40], xSLG_sum = c[41], xSLG_count = c[42];
       const xwOBA_sum = c[43], xwOBA_count = c[44], xwOBAcon_sum = c[45], xwOBAcon_count = c[46];
       const swingsNonBunt = c[47], contactNonBunt = c[48], buntAB = c[49] || 0;
+      // Intentional walks. Absent on pre-2026-08-04 embeds (hitter micro was
+      // 50 counts wide) — hasIbbCol distinguishes "no IBBs" from "column not
+      // shipped", since only the former is safe to build a uBB-based wOBA from.
+      const ibb = c[50] || 0;
+      const hasIbbCol = ci.ibb !== undefined;
 
       const ab = pa - bb - hbp - sf - sh - ci_v;
       const nonbuntAB = ab - buntAB;  // xBA/xSLG denominator (Savant excludes bunts)
@@ -2271,6 +2294,26 @@ const Aggregator = {
       const iso_val = (slg_val !== null && batting_avg !== null) ? Math.round((slg_val - batting_avg) * 1000) / 1000 : null;
       const babip_denom = ab - k - hr + sf;
       const babip_val = babip_denom > 0 ? Math.round((h - hr) / babip_denom * 1000) / 1000 : null;
+
+      // wOBA from the micro counters + FanGraphs Guts linear weights, so it
+      // survives a handedness or date filter instead of falling back to the
+      // frozen season value merged from the boxscore. Same formula and same
+      // weights process_data.py uses on the boxscore counts, including uBB
+      // (IBB carries no wOBA weight), so a filtered wOBA sits on the identical
+      // scale as the unfiltered one. Null unless BOTH the weights and the ibb
+      // column are present — a BB-based approximation would silently read a
+      // few points high against the season number beside it.
+      const wobaW = Aggregator._wobaWeights();
+      let woba_val = null;
+      if (wobaW && hasIbbCol) {
+        const ubb = bb - ibb;
+        const woba_denom = ab + ubb + sf + hbp;
+        if (woba_denom > 0) {
+          woba_val = Math.round((wobaW.BB * ubb + wobaW.HBP * hbp +
+                                 wobaW['1B'] * singles + wobaW['2B'] * db +
+                                 wobaW['3B'] * tp + wobaW.HR * hr) / woba_denom * 1000) / 1000;
+        }
+      }
 
       const kPct = pa > 0 ? k / pa : null;
       const bbPct = pa > 0 ? bb / pa : null;
@@ -2405,7 +2448,23 @@ const Aggregator = {
         xSLG: nonbuntAB > 0 && xSLG_count > 0 ? xSLG_sum / nonbuntAB : null,
         xwOBA: xwOBA_count > 0 ? xwOBA_sum / xwOBA_count : null,
         xwOBAcon: xwOBAcon_count > 0 ? xwOBAcon_sum / xwOBAcon_count : null,
+        wOBA: woba_val,
       };
+
+      // xWRC+ from the filtered xwOBA. Pure function of xwOBA and the Guts
+      // constants — deliberately NO park factor (xwOBA is already mapped to
+      // league-average-park outcomes; process_data.py drops the PF term here
+      // for the same reason), so this reproduces the server formula exactly.
+      // wRC+ is NOT recomputed: process_data.py overwrites it with the
+      // canonical FanGraphs value, and FanGraphs publishes no per-hand split,
+      // so a pipeline-formula wRC+ would sit on a visibly different scale than
+      // the season number next to it.
+      const guts = (typeof DataStore !== 'undefined' && DataStore.metadata &&
+                    DataStore.metadata.gutsConstants) || null;
+      if (guts && guts.wOBAScale > 0 && guts.lgRPA > 0 && obj.xwOBA != null) {
+        obj.xWRCplus = Math.round((((obj.xwOBA - guts.lgWOBA) / guts.wOBAScale) + guts.lgRPA)
+                                  / guts.lgRPA * 100);
+      }
 
       // BB+ (2026-07-13 definition): weighted xwOBAcon+ / sprayPlus indexed
       // so 100 = league avg, then Bayesian-regressed toward 100 by sample
@@ -2514,12 +2573,23 @@ const Aggregator = {
     for (let hbi = 0; hbi < hPreAgg.length; hbi++) {
       hPreAggMap[hPreAgg[hbi].hitter + '|' + hPreAgg[hbi].team] = hPreAgg[hbi];
     }
+    // wOBA and xWRC+ sit in hBoxAlways because the client historically could
+    // not compute them. It can now — micro counters + the Guts weights and
+    // constants shipped in metadata — so under a filter the micro value wins.
+    //
+    // Note the merge is skipped under a filter even when the micro value came
+    // back null (an embed built before the weights/ibb column shipped). That
+    // leaves the cell empty for one pipeline run, which is the honest answer:
+    // pasting the SEASON wOBA into a row labelled "vs LHP" is not a missing
+    // number, it's a wrong one.
+    const hBoxYieldToMicro = { wOBA: true, xWRCplus: true };
     for (let hmi = 0; hmi < rows.length; hmi++) {
       const hKey = rows[hmi].hitter + '|' + rows[hmi].team;
       const hPre = hPreAggMap[hKey];
       if (hPre) {
         for (let hfi = 0; hfi < hBoxFields.length; hfi++) {
           const hbf = hBoxFields[hfi];
+          if (hBoxYieldToMicro[hbf] && hasHitterContextFilter) continue;
           if (hPre[hbf] !== undefined) rows[hmi][hbf] = hPre[hbf];
         }
         // Always attach overall-season PA for qualification gates (platoon-split safe).
