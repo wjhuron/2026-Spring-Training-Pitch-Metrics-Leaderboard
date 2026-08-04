@@ -212,6 +212,10 @@ jobs:
         run: |
           openssl enc -aes-256-cbc -pbkdf2 -pass env:STUFF_DATA_KEY \
             -in data/all_pitches_rs_cache.pkl -out data/all_pitches_rs_cache.pkl.enc
+          # Same treatment for the FG override cache: the repo is public and
+          # this is a third party's leaderboard data, so it ships encrypted.
+          openssl enc -aes-256-cbc -pbkdf2 -pass env:STUFF_DATA_KEY \
+            -in data/fg_overrides.json -out data/fg_overrides.json.enc
 
       - name: Publish pickle to "latest-data" release
         if: success()
@@ -224,7 +228,7 @@ jobs:
 
             - all_pitches_rs_cache.pkl.enc — pitch-level cache;
               HitterCards.py downloads it when the local pickle is stale.
-            - fg_overrides.json — the FanGraphs override cache as CI
+            - fg_overrides.json.enc — the FanGraphs override cache as CI
               fetched it. FanGraphs' Cloudflare bot scoring challenges
               some client IPs while letting GitHub's runners through, and
               the cache is gitignored, so a blocked machine has no other
@@ -234,6 +238,6 @@ jobs:
             Updated: ${{ github.event.repository.updated_at }}
           files: |
             data/all_pitches_rs_cache.pkl.enc
-            data/fg_overrides.json
+            data/fg_overrides.json.enc
           fail_on_unmatched_files: true
           make_latest: false

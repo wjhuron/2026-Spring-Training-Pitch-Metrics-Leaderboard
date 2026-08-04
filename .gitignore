@@ -12,6 +12,8 @@ outlier_results.json
 name_duplicates_report.txt
 data/fg_aaa_wrcplus.json
 data/fg_overrides.json
+# release asset, rebuilt each CI run
+data/fg_overrides.json.enc
 # micro_data is redundant in-repo: the browser loads microData from
 # data_embedded.json.gz; the raw file is a local-only pipeline artifact
 # (fallback for local dev + diagnostic scripts). ~51 MB, was tripping

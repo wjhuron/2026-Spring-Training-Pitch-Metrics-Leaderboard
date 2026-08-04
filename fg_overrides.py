@@ -226,7 +226,20 @@ def is_stale(cache, max_age_hours=24):
 
 
 RELEASE_CACHE_URL = ('https://github.com/wjhuron/Huronalytics/releases/download/'
-                     'latest-data/fg_overrides.json')
+                     'latest-data/fg_overrides.json.enc')
+
+
+def _stuff_data_key():
+    """STUFF_DATA_KEY from .env, else the environment (same source the
+    pitch pickle's release asset uses)."""
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+    try:
+        for line in open(env_path):
+            if line.startswith('STUFF_DATA_KEY='):
+                return line.split('=', 1)[1].strip()
+    except OSError:
+        pass
+    return os.environ.get('STUFF_DATA_KEY')
 
 
 def fetch_from_release(timeout=30):
@@ -237,11 +250,37 @@ def fetch_from_release(timeout=30):
     through — so a local run can 403 on every endpoint at the same moment
     CI fetches all three cleanly. The cache is gitignored, so without this
     a blocked machine has no route to fresh values at all and silently
-    serves an ever-older cache. Same pattern the pitch pickle already uses.
+    serves an ever-older cache. Same pattern the pitch pickle already uses,
+    including AES-256 at rest: the repo is public and this is a third
+    party's leaderboard data, so it does not ship in the clear.
     """
+    import subprocess
+    import tempfile
+    key = _stuff_data_key()
+    if not key:
+        raise RuntimeError('STUFF_DATA_KEY missing from .env — cannot '
+                           'decrypt the release cache')
     req = urllib.request.Request(RELEASE_CACHE_URL, headers=HEADERS)
-    body = urllib.request.urlopen(req, timeout=timeout).read().decode('utf-8')
-    return json.loads(body)
+    blob = urllib.request.urlopen(req, timeout=timeout).read()
+    enc_path = dec_path = None
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.enc') as f:
+            f.write(blob)
+            enc_path = f.name
+        dec_path = enc_path + '.dec'
+        subprocess.run(['openssl', 'enc', '-d', '-aes-256-cbc', '-pbkdf2',
+                        '-pass', 'env:STUFF_DATA_KEY',
+                        '-in', enc_path, '-out', dec_path],
+                       check=True, env={**os.environ, 'STUFF_DATA_KEY': key})
+        with open(dec_path) as f:
+            return json.load(f)
+    finally:
+        for p in (enc_path, dec_path):
+            if p and os.path.exists(p):
+                try:
+                    os.remove(p)
+                except OSError:
+                    pass
 
 
 def _fetched_at(cache):
