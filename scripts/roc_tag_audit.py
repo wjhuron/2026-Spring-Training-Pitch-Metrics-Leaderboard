@@ -363,58 +363,111 @@ def bench_report(trials):
 
 
 # ---------------------------------------------------------------- plotting
-def make_plot(pitcher, date, flagged, by_pd, outdir):
+#
+# These used to be HB x IVB and Velocity x OTilt scatters. Measured across the
+# Medium+ candidates, that pair of panels carried only 34% of the evidence the
+# flags were built on: RTilt, Spin Rate and ArmAngle were drawn nowhere, and
+# they are disproportionately the axes that drive flags. For the strongest
+# finding (Lara 2026-04-05) the entire case is Spin Rate at +13.9z, roughly six
+# times the next contributor, and the scatter could not show it at all. Worse,
+# a projection in which a flagged pitch looks unremarkable is exactly the case
+# where the eye overrides the arithmetic in the wrong direction -- that happened
+# once during development on a Champlain pitch that looked interior in 2D while
+# sitting 4.25z from its own cluster in the full space.
+#
+# The plot now draws the discriminant itself: per-axis pull toward the suggested
+# type, in the same z units the decision is made in, all 7 axes, nothing hidden.
+
+
+def axis_pulls(f, groups, scl):
+    """[(pull_z, metric, value, own_centroid, tgt_centroid)] favouring the target.
+
+    pull > 0 means the axis argues for the suggested type. For orphans there is
+    no own-cluster centroid, so pull is reported as -|z to target|: bars near
+    zero mean the pitch matches the target on that axis.
+    """
+    p = f['p']
+    g = groups[(p['Pitcher'], p['_g'])]
+    tgt = A.centroid([x['_mv'] for x in g[f['tgt']] if x is not p])
+    own = None
+    if f['kind'] != 'orphan':
+        own = A.centroid([x['_mv'] for x in g[f['own']] if x is not p])
+    out = []
+    for m in A.METRICS:
+        a, ct = p['_mv'].get(m), tgt.get(m)
+        if a is None or ct is None or not scl.get(m):
+            continue
+        dt = (A.cdiff(a, ct) if m in A.CIRC else abs(a - ct)) / scl[m]
+        if own is None:
+            out.append((-dt, m, a, None, ct))
+        else:
+            co = own.get(m)
+            if co is None:
+                continue
+            do = (A.cdiff(a, co) if m in A.CIRC else abs(a - co)) / scl[m]
+            out.append((do - dt, m, a, co, ct))
+    out.sort(reverse=True)
+    return out
+
+
+def _fmt(m, v):
+    if v is None:
+        return '--'
+    return A.deg_clock(v) if m in A.CIRC else (f'{v:.0f}' if m == 'Spin Rate'
+                                              else f'{v:.1f}')
+
+
+def make_plot(pitcher, date, flagged, groups, scl, outdir):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    PAL = {'FF': '#0072B2', 'SI': '#E69F00', 'FC': '#CC79A7', 'SL': '#009E73',
-           'ST': '#56B4E9', 'CU': '#D55E00', 'CH': '#F0E442', 'FS': '#999999'}
-    pitches = by_pd.get((pitcher, date), [])
-    if not pitches:
-        return None
-    fig, axes = plt.subplots(1, 2, figsize=(13, 6))
-    specs = [('HorzBrk', 'IndVertBrk', 'Horizontal Break (in.)',
-              'Induced Vertical Break (in.)', 'movement', False),
-             ('Velocity', 'OTilt', 'Velocity (mph)',
-              'Observed Tilt (deg on 12h face)', 'velocity x tilt', True)]
-    for ax, (fx, fy, lx, ly, title, circ) in zip(axes, specs):
-        for pt in sorted({q['Pitch Type'] for q in pitches}):
-            pts = []
-            for q in pitches:
-                if q['Pitch Type'] != pt:
-                    continue
-                x = A.sf(q.get(fx))
-                y = A.clock_deg(q.get(fy)) if circ else A.sf(q.get(fy))
-                if x is not None and y is not None:
-                    pts.append((x, y))
-            if pts:
-                ax.scatter([a for a, _ in pts], [b for _, b in pts], s=46,
-                           c=PAL.get(pt, '#444'), label=pt, alpha=.72,
-                           edgecolors='white', linewidths=.6, zorder=2)
-        for f in flagged:
-            q = f['p']
-            x = A.sf(q.get(fx))
-            y = A.clock_deg(q.get(fy)) if circ else A.sf(q.get(fy))
-            if x is None or y is None:
-                continue
-            col = '#B00020' if f['kind'] == 'cluster' else '#6A00B0'
-            ax.scatter([x], [y], s=340, facecolors='none', edgecolors=col,
-                       linewidths=2.4, zorder=4)
-            if not circ:
-                ax.annotate(f"{f['own']}→{f['tgt']}", (x, y), fontsize=10,
-                            textcoords='offset points', xytext=(9, 9),
-                            color=col, fontweight='bold', zorder=5)
-        ax.set_xlabel(lx)
-        ax.set_ylabel(ly)
-        ax.set_title(title if circ else f'{pitcher}  {date}  -- {title}')
-        ax.legend(fontsize=8, loc='best', frameon=True)
-        if not circ:
-            ax.axhline(0, color='#bbb', lw=.8, zorder=1)
-            ax.axvline(0, color='#bbb', lw=.8, zorder=1)
-            ax.set_aspect('equal', adjustable='datalim')
+    n = len(flagged)
+    fig, axes = plt.subplots(1, n, figsize=(7.6 * n, 5.4), squeeze=False)
+    for ax, f in zip(axes[0], sorted(flagged, key=lambda f: -f['conf'])):
+        pulls = axis_pulls(f, groups, scl)
+        if not pulls:
+            continue
+        ys = list(range(len(pulls)))[::-1]
+        vals = [d for d, *_ in pulls]
+        cols = ['#B00020' if d > 0 else '#4878A8' for d in vals]
+        ax.barh(ys, vals, color=cols, height=.62, zorder=2)
+        ax.axvline(0, color='#333', lw=1.0, zorder=3)
+        labels = []
+        for d, m, a, co, ct in pulls:
+            if co is None:
+                labels.append(f"{A.SHORT[m]}   {_fmt(m,a)}  ({f['tgt']} {_fmt(m,ct)})")
+            else:
+                labels.append(f"{A.SHORT[m]}   {_fmt(m,a)}  "
+                              f"({f['own']} {_fmt(m,co)} / {f['tgt']} {_fmt(m,ct)})")
+        ax.set_yticks(ys)
+        ax.set_yticklabels(labels, fontsize=9, fontfamily='monospace')
+        for y, d in zip(ys, vals):
+            ax.annotate(f'{d:+.1f}', (d, y), fontsize=9, fontweight='bold',
+                        va='center', ha='left' if d >= 0 else 'right',
+                        xytext=(4 if d >= 0 else -4, 0),
+                        textcoords='offset points', color='#222', zorder=4)
+        span = max(abs(min(vals)), abs(max(vals))) or 1.0
+        ax.set_xlim(-span * 1.45, span * 1.45)
+        if f['kind'] == 'orphan':
+            sub = (f"ORPHAN, only {f['nsame']} tagged {f['own']} this game   "
+                   f"d_best {f['d_best']:.2f}   bars = -|z| to {f['tgt']}")
+            ax.set_xlabel(f"closer to {f['tgt']}  ->", fontsize=10)
+        else:
+            sub = (f"margin {f['margin']:.2f}   d_own {f['d_own']:.2f}   "
+                   f"d_best {f['d_best']:.2f}   agree {f['agree']}/{f['tot']}   "
+                   f"same-game flips {f['nflip']}/{f['ntype']}")
+            ax.set_xlabel(f"<-  favours {f['own']}        favours {f['tgt']}  ->",
+                          fontsize=10)
+        ax.set_title(f"{pitcher}   {date}\n{f['own']} → {f['tgt']}   "
+                     f"conf {f['conf']} ({f['tier']})\n{sub}",
+                     fontsize=11, linespacing=1.5)
+        ax.grid(axis='x', color='#e6e6e6', zorder=0)
+        ax.set_axisbelow(True)
+        for s in ('top', 'right', 'left'):
+            ax.spines[s].set_visible(False)
     fig.tight_layout()
     path = os.path.join(outdir, f"{pitcher.replace(', ', '_').replace(' ', '_')}_{date}.png")
-    fig.savefig(path, dpi=125)
+    fig.savefig(path, dpi=125, bbox_inches='tight')
     plt.close(fig)
     return path
 
@@ -530,13 +583,14 @@ def main():
 
     if '--plots' in sys.argv:
         os.makedirs(PLOTDIR, exist_ok=True)
-        by_pd = defaultdict(list)
-        for p in roc_all:
-            by_pd[(p['Pitcher'], p['Game Date'])].append(p)
+        groups = defaultdict(lambda: defaultdict(list))
+        for p in roc:
+            groups[(p['Pitcher'], p['_g'])][p['Pitch Type']].append(p)
         pages = defaultdict(list)
         for f in allf:
             pages[(f['p']['Pitcher'], f['p']['Game Date'])].append(f)
-        made = [make_plot(pit, dt, fs, by_pd, PLOTDIR) for (pit, dt), fs in sorted(pages.items())]
+        made = [make_plot(pit, dt, fs, groups, scl, PLOTDIR)
+                for (pit, dt), fs in sorted(pages.items())]
         print(f"\nWrote {len([m for m in made if m])} plots to {PLOTDIR}")
 
 
