@@ -73,8 +73,42 @@ def load_sidecar():
         return {}
 
 
+def repair_elevations(store):
+    """Fill elevation on games ALREADY cached whose venue has since been added
+    to VENUE_ELEVATION_FT_OVERRIDE.
+
+    fetch_missing() only looks at games absent from the sidecar, so without
+    this a newly-listed park stays un-adjusted forever: the entry exists, it
+    just has elevationFt=None, which rho_of() turns into factor 1.0. This is
+    how 373 MiLB games sat at factor 1.0 while carrying a valid temperature.
+    """
+    fixed = 0
+    for info in store.values():
+        if not isinstance(info, dict) or info.get('error'):
+            continue
+        if info.get('elevationFt') is not None:
+            continue
+        elev = VENUE_ELEVATION_FT_OVERRIDE.get(info.get('venueId'))
+        if elev is not None:
+            info['elevationFt'] = float(elev)
+            fixed += 1
+    print(f'repaired elevation on {fixed} cached games from the override table')
+    return store
+
+
 def fetch_missing(store, pks):
-    missing = [pk for pk in pks if pk and str(pk) not in store]
+    def stale(pk):
+        info = store.get(str(pk))
+        if info is None:
+            return True
+        if not isinstance(info, dict):
+            return True
+        # a prior failure, or a record with no venueId — the override can't
+        # repair those from cache, so go back to the feed for them
+        return bool(info.get('error')) or (
+            info.get('elevationFt') is None and info.get('venueId') is None)
+
+    missing = [pk for pk in pks if pk and stale(pk)]
     if not missing:
         return store
     print(f'fetching density inputs for {len(missing)} games not in sidecar...')
@@ -119,7 +153,10 @@ def main():
     tab_rows = []    # cache raw reads to avoid a second pass
 
     for name, wid in DIVISION_WORKBOOK_IDS.items():
-        extra = {'ROC', 'AAA'} if name == 'NLE2026' else set()
+        # NEW is the scratch tab for arms new to the org — its rows come from
+        # AAA/complex/college parks all over, which is exactly where the
+        # elevation gaps live, so it needs the backfill more than most.
+        extra = {'ROC', 'AAA', 'NEW'} if name == 'NLE2026' else set()
         sh = gc.open_by_key(wid)
         print(f'{sh.title}:')
         for ws in sh.worksheets():
@@ -143,6 +180,7 @@ def main():
             tab_rows.append((ws, tab, rows, ci))
             print(f'  {tab}: {len(rows) - 1} rows read')
 
+    store = repair_elevations(store)
     store = fetch_missing(store, sorted(all_pks))
     rho_by_pk = {pk: rho_of(store.get(str(pk))) for pk in all_pks}
     # refresh cached factor fields at the new exponent

@@ -43,17 +43,68 @@ VENUE_ELEVATION_FT_OVERRIDE = {
     4895: 16,    # London Stadium, London
     5355: 3010,  # Las Vegas Ballpark, Summerlin (Athletics temp. home) — high on
                  # the valley's western bench; MLB feed omits the elevation
-    # Triple-A (ROC/AAA) parks — the MiLB feed omits elevation for all of them,
-    # so without these the minor-league xIVB/xHB go un-adjusted (factor 1.0).
-    2773: 505,   # ESL Ballpark, Rochester NY (ROC home)
-    2756: 600,   # Sahlen Field, Buffalo NY
-    3230: 350,   # Coca-Cola Park, Allentown PA
-    2797: 920,   # PNC Field, Moosic PA (Scranton/WB)
-    2823: 400,   # NBT Bank Stadium, Syracuse NY
-    4670: 730,   # Truist Field, Charlotte NC
-    5410: 475,   # Polar Park, Worcester MA
-    2852: 20,    # VyStar Ballpark, Jacksonville FL
+    # ── Triple-A: ALL 30 parks ────────────────────────────────────────────
+    # The MiLB feed omits elevation for every one of them, so an unlisted park
+    # silently yields rho=None -> factor 1.0 -> completely un-adjusted xIVB/xHB.
+    # Listing the full league (not just the IL parks ROC visits) is what keeps
+    # the NEW tab covered: arms new to the org arrive with PCL and IL road
+    # data from anywhere, and Albuquerque at 5,118 ft is a Coors-sized miss.
+    #
+    # Values below are digital-elevation-model readings at each park's own
+    # coordinates. The ten that were hand-entered first are kept as entered;
+    # they agreed with the DEM to within 51 ft (median ~10), which is what
+    # validates the rest — 51 ft is 0.18% density, ~0.02% of a break.
+    #
+    # NOTE 2529 (Sutter Health Park) is also the Athletics' MLB home in 2026.
+    # No conflict: the override is consulted only when the feed's own
+    # elevation is absent, and MLB games there report it (24 ft).
+    #
+    # Pacific Coast League
+    2683: 5118,  # Isotopes Park, Albuquerque NM      <- thin air, Coors-like
+    6135: 4892,  # The Ballpark at America First Square, South Jordan UT
+    3789: 4505,  # Greater Nevada Field, Reno NV
+    4669: 3780,  # Southwest University Park, El Paso TX
+    5355: 3010,  # Las Vegas Ballpark, Summerlin NV (also Athletics temp. home)
+    2843: 1191,  # Chickasaw Bricktown Ballpark, Oklahoma City OK
     4271: 1150,  # Werner Park, Papillion NE (Omaha)
+    2528: 673,   # Dell Diamond, Round Rock TX
+    2745: 338,   # Cheney Stadium, Tacoma WA
+    5421: 85,    # Constellation Field, Sugar Land TX
+    2529: 39,    # Sutter Health Park, Sacramento CA
+    # International League
+    2797: 920,   # PNC Field, Moosic PA (Scranton/WB)
+    3810: 1076,  # Gwinnett Field, Lawrenceville GA
+    2844: 807,   # Principal Park, Des Moines IA (Iowa)
+    5472: 741,   # CHS Field, St. Paul MN
+    3970: 738,   # Huntington Park, Columbus OH
+    4670: 730,   # Truist Field, Charlotte NC
+    2858: 719,   # Victory Field, Indianapolis IN
+    2756: 600,   # Sahlen Field, Buffalo NY
+    2767: 581,   # Fifth Third Field, Toledo OH
+    2773: 505,   # ESL Ballpark, Rochester NY (ROC home)
+    5410: 475,   # Polar Park, Worcester MA
+    2724: 469,   # Louisville Slugger Field, Louisville KY
+    4715: 420,   # First Horizon Park, Nashville TN
+    2823: 400,   # NBT Bank Stadium, Syracuse NY
+    2541: 364,   # Durham Bulls Athletic Park, Durham NC
+    3230: 350,   # Coca-Cola Park, Allentown PA
+    2542: 253,   # AutoZone Park, Memphis TN
+    2852: 20,    # VyStar Ballpark, Jacksonville FL
+    2781: 16,    # Harbor Park, Norfolk VA
+    # ── Non-AAA sites that turn up in the NEW tab ─────────────────────────
+    # Spring-training complexes and college parks: rehab outings, spring
+    # games, and pre-draft looks all land here and the feed omits elevation
+    # for these too.
+    2603: 1217,  # Surprise Stadium, Surprise AZ
+    4629: 1184,  # Sloan Park, Mesa AZ
+    2912: 1158,  # Medlar Field at Lubrano Park, State College PA
+    4965: 1070,  # Kendrick Family Ballpark, Granville WV (WVU)
+    2738: 889,   # Eastwood Field, Niles OH
+    2735: 518,   # Journey Bank Ballpark, Williamsport PA
+    2511: 164,   # Joker Marchant Stadium, Lakeland FL
+    2842: 52,    # Trenton Thunder Ballpark, Trenton NJ
+    2508: 39,    # Ed Smith Stadium, Sarasota FL
+    2700: 33,    # BayCare Ballpark, Clearwater FL
 }
 
 

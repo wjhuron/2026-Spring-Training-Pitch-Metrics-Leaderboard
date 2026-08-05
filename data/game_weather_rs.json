@@ -305,433 +305,433 @@
 },
 "779127": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 39.0,
+"factor": 0.97969,
+"rho": 1.21859,
 "tempF": 61.0,
 "venueId": 2508
 },
 "779135": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 39.0,
+"factor": 1.00143,
+"rho": 1.19338,
 "tempF": 72.0,
 "venueId": 2508
 },
 "780388": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 0.98799,
+"rho": 1.20883,
 "tempF": 55.0,
 "venueId": 2767
 },
 "780389": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 0.99,
+"rho": 1.20649,
 "tempF": 56.0,
 "venueId": 2767
 },
 "780555": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 741.0,
+"factor": 0.99403,
+"rho": 1.20183,
 "tempF": 55.0,
 "venueId": 5472
 },
 "780895": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.03812,
+"rho": 1.15317,
 "tempF": 83.0,
 "venueId": 4715
 },
 "781044": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 469.0,
+"factor": 1.04609,
+"rho": 1.1448,
 "tempF": 86.0,
 "venueId": 2724
 },
 "781075": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 469.0,
+"factor": 0.97174,
+"rho": 1.22807,
 "tempF": 49.0,
 "venueId": 2724
 },
 "781265": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 807.0,
+"factor": 1.03113,
+"rho": 1.16062,
 "tempF": 72.0,
 "venueId": 2844
 },
 "781328": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.05814,
+"rho": 1.13239,
 "tempF": 87.0,
 "venueId": 2858
 },
 "781331": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.0561,
+"rho": 1.13446,
 "tempF": 86.0,
 "venueId": 2858
 },
 "781333": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.05407,
+"rho": 1.13654,
 "tempF": 85.0,
 "venueId": 2858
 },
 "781335": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.06017,
+"rho": 1.13032,
 "tempF": 88.0,
 "venueId": 2858
 },
 "781340": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.0561,
+"rho": 1.13446,
 "tempF": 86.0,
 "venueId": 2858
 },
 "781341": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.06017,
+"rho": 1.13032,
 "tempF": 88.0,
 "venueId": 2858
 },
 "781342": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.07237,
+"rho": 1.11807,
 "tempF": 94.0,
 "venueId": 2858
 },
 "781346": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.05001,
+"rho": 1.14073,
 "tempF": 83.0,
 "venueId": 2858
 },
 "781349": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.02564,
+"rho": 1.16653,
 "tempF": 71.0,
 "venueId": 2858
 },
 "781351": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.06627,
+"rho": 1.12416,
 "tempF": 91.0,
 "venueId": 2858
 },
 "781352": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.04391,
+"rho": 1.14707,
 "tempF": 80.0,
 "venueId": 2858
 },
 "781356": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.01753,
+"rho": 1.17539,
 "tempF": 67.0,
 "venueId": 2858
 },
 "781358": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.02767,
+"rho": 1.16433,
 "tempF": 72.0,
 "venueId": 2858
 },
 "781359": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.02158,
+"rho": 1.17094,
 "tempF": 69.0,
 "venueId": 2858
 },
 "781361": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.0297,
+"rho": 1.16215,
 "tempF": 73.0,
 "venueId": 2858
 },
 "781367": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.04391,
+"rho": 1.14707,
 "tempF": 80.0,
 "venueId": 2858
 },
 "781368": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.03173,
+"rho": 1.15997,
 "tempF": 74.0,
 "venueId": 2858
 },
 "781370": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 1.0297,
+"rho": 1.16215,
 "tempF": 73.0,
 "venueId": 2858
 },
 "781382": {
 "condition": "Drizzle",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 0.98915,
+"rho": 1.20749,
 "tempF": 53.0,
 "venueId": 2858
 },
 "781386": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 719.0,
+"factor": 0.9932,
+"rho": 1.20279,
 "tempF": 55.0,
 "venueId": 2858
 },
 "781574": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 738.0,
+"factor": 1.05687,
+"rho": 1.13368,
 "tempF": 86.0,
 "venueId": 3970
 },
 "781577": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 738.0,
+"factor": 1.05484,
+"rho": 1.13576,
 "tempF": 85.0,
 "venueId": 3970
 },
 "781579": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 738.0,
+"factor": 1.0467,
+"rho": 1.14416,
 "tempF": 81.0,
 "venueId": 3970
 },
 "814773": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 338.0,
+"factor": 0.99687,
+"rho": 1.19857,
 "tempF": 64.0,
 "venueId": 2745
 },
 "814774": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 338.0,
+"factor": 1.01487,
+"rho": 1.17832,
 "tempF": 73.0,
 "venueId": 2745
 },
 "814782": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 338.0,
+"factor": 0.98289,
+"rho": 1.21481,
 "tempF": 57.0,
 "venueId": 2745
 },
 "814783": {
 "condition": "Rain",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 338.0,
+"factor": 0.96691,
+"rho": 1.23391,
 "tempF": 49.0,
 "venueId": 2745
 },
 "814785": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 338.0,
+"factor": 0.99687,
+"rho": 1.19857,
 "tempF": 64.0,
 "venueId": 2745
 },
 "814791": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 338.0,
+"factor": 1.01087,
+"rho": 1.18276,
 "tempF": 71.0,
 "venueId": 2745
 },
 "814839": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.03887,
+"rho": 1.15238,
 "tempF": 90.0,
 "venueId": 5421
 },
 "814844": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.0349,
+"rho": 1.15659,
 "tempF": 88.0,
 "venueId": 5421
 },
 "814845": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.0349,
+"rho": 1.15659,
 "tempF": 88.0,
 "venueId": 5421
 },
 "814847": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.04085,
+"rho": 1.15029,
 "tempF": 91.0,
 "venueId": 5421
 },
 "814851": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.03292,
+"rho": 1.1587,
 "tempF": 87.0,
 "venueId": 5421
 },
 "814856": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.01309,
+"rho": 1.18029,
 "tempF": 77.0,
 "venueId": 5421
 },
 "814857": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.03292,
+"rho": 1.1587,
 "tempF": 87.0,
 "venueId": 5421
 },
 "814859": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.03093,
+"rho": 1.16083,
 "tempF": 86.0,
 "venueId": 5421
 },
 "814861": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.02498,
+"rho": 1.16724,
 "tempF": 83.0,
 "venueId": 5421
 },
 "814863": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.01903,
+"rho": 1.17373,
 "tempF": 80.0,
 "venueId": 5421
 },
 "814868": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.01705,
+"rho": 1.17591,
 "tempF": 79.0,
 "venueId": 5421
 },
 "814871": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.01903,
+"rho": 1.17373,
 "tempF": 80.0,
 "venueId": 5421
 },
 "814875": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 85.0,
+"factor": 1.02102,
+"rho": 1.17156,
 "tempF": 81.0,
 "venueId": 5421
 },
 "814942": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4892.0,
+"factor": 1.17199,
+"rho": 1.02736,
 "tempF": 57.0,
 "venueId": 6135
 },
 "814945": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4892.0,
+"factor": 1.19821,
+"rho": 1.00595,
 "tempF": 68.0,
 "venueId": 6135
 },
 "814946": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4892.0,
+"factor": 1.14105,
+"rho": 1.05388,
 "tempF": 44.0,
 "venueId": 6135
 },
@@ -753,65 +753,65 @@
 },
 "815144": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4505.0,
+"factor": 1.12855,
+"rho": 1.06499,
 "tempF": 46.0,
 "venueId": 3789
 },
 "815152": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4505.0,
+"factor": 1.17782,
+"rho": 1.02253,
 "tempF": 67.0,
 "venueId": 3789
 },
 "815158": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4505.0,
+"factor": 1.18251,
+"rho": 1.01866,
 "tempF": 69.0,
 "venueId": 3789
 },
 "815159": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4505.0,
+"factor": 1.18251,
+"rho": 1.01866,
 "tempF": 69.0,
 "venueId": 3789
 },
 "815160": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4505.0,
+"factor": 1.14496,
+"rho": 1.05045,
 "tempF": 53.0,
 "venueId": 3789
 },
 "815162": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4505.0,
+"factor": 1.18956,
+"rho": 1.01291,
 "tempF": 72.0,
 "venueId": 3789
 },
 "815168": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 4505.0,
+"factor": 1.15669,
+"rho": 1.04031,
 "tempF": 58.0,
 "venueId": 3789
 },
 "815218": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1191.0,
+"factor": 1.08566,
+"rho": 1.10503,
 "tempF": 91.0,
 "venueId": 2843
 },
@@ -913,33 +913,33 @@
 },
 "815373": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 3780.0,
+"factor": 1.20893,
+"rho": 0.99745,
 "tempF": 95.0,
 "venueId": 4669
 },
 "815375": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 3780.0,
+"factor": 1.17691,
+"rho": 1.02328,
 "tempF": 81.0,
 "venueId": 4669
 },
 "815444": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 5118.0,
+"factor": 1.27152,
+"rho": 0.95063,
 "tempF": 94.0,
 "venueId": 2683
 },
 "815445": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 5118.0,
+"factor": 1.27875,
+"rho": 0.94551,
 "tempF": 97.0,
 "venueId": 2683
 },
@@ -1007,6 +1007,14 @@
 "tempF": 63.0,
 "venueId": 5410
 },
+"815528": {
+"condition": "Partly Cloudy",
+"elevationFt": 475.0,
+"factor": 0.99204,
+"rho": 1.20413,
+"tempF": 59.0,
+"venueId": 5410
+},
 "815529": {
 "condition": "Partly Cloudy",
 "elevationFt": 475,
@@ -1031,101 +1039,149 @@
 "tempF": 83.0,
 "venueId": 5410
 },
+"815534": {
+"condition": "Partly Cloudy",
+"elevationFt": 475.0,
+"factor": 1.00409,
+"rho": 1.19036,
+"tempF": 65.0,
+"venueId": 5410
+},
+"815539": {
+"condition": "Clear",
+"elevationFt": 475.0,
+"factor": 1.0242,
+"rho": 1.1681,
+"tempF": 75.0,
+"venueId": 5410
+},
+"815543": {
+"condition": "Sunny",
+"elevationFt": 475.0,
+"factor": 0.982,
+"rho": 1.21585,
+"tempF": 54.0,
+"venueId": 5410
+},
+"815546": {
+"condition": "Clear",
+"elevationFt": 475.0,
+"factor": 0.97999,
+"rho": 1.21822,
+"tempF": 53.0,
+"venueId": 5410
+},
 "815588": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 1.04854,
+"rho": 1.14225,
 "tempF": 85.0,
 "venueId": 2767
 },
 "815595": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 1.02228,
+"rho": 1.17018,
 "tempF": 72.0,
 "venueId": 2767
 },
 "815596": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 1.02632,
+"rho": 1.1658,
 "tempF": 74.0,
 "venueId": 2767
 },
 "815598": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 1.04652,
+"rho": 1.14435,
 "tempF": 84.0,
 "venueId": 2767
 },
 "815607": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 0.99605,
+"rho": 1.19951,
 "tempF": 59.0,
 "venueId": 2767
 },
 "815610": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 1.01017,
+"rho": 1.18354,
 "tempF": 66.0,
 "venueId": 2767
 },
 "815613": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 0.98799,
+"rho": 1.20883,
 "tempF": 55.0,
 "venueId": 2767
 },
 "815614": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 0.99202,
+"rho": 1.20415,
 "tempF": 57.0,
 "venueId": 2767
 },
 "815618": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 1.01017,
+"rho": 1.18354,
 "tempF": 66.0,
 "venueId": 2767
 },
 "815619": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 1.01824,
+"rho": 1.1746,
 "tempF": 70.0,
 "venueId": 2767
 },
 "815627": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 0.95174,
+"rho": 1.25264,
 "tempF": 37.0,
 "venueId": 2767
 },
 "815629": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 581.0,
+"factor": 0.98597,
+"rho": 1.21119,
 "tempF": 54.0,
 "venueId": 2767
+},
+"815661": {
+"condition": "Partly Cloudy",
+"elevationFt": 400.0,
+"factor": 1.01526,
+"rho": 1.17789,
+"tempF": 72.0,
+"venueId": 2823
+},
+"815663": {
+"condition": "Partly Cloudy",
+"elevationFt": 400.0,
+"factor": 0.99923,
+"rho": 1.19588,
+"tempF": 64.0,
+"venueId": 2823
 },
 "815665": {
 "condition": "Partly Cloudy",
@@ -1133,6 +1189,30 @@
 "factor": 1.03331,
 "rho": 1.15828,
 "tempF": 81.0,
+"venueId": 2823
+},
+"815667": {
+"condition": "Partly Cloudy",
+"elevationFt": 400.0,
+"factor": 1.02529,
+"rho": 1.16691,
+"tempF": 77.0,
+"venueId": 2823
+},
+"815669": {
+"condition": "Clear",
+"elevationFt": 400.0,
+"factor": 1.03331,
+"rho": 1.15828,
+"tempF": 81.0,
+"venueId": 2823
+},
+"815670": {
+"condition": "Clear",
+"elevationFt": 400.0,
+"factor": 1.01727,
+"rho": 1.17567,
+"tempF": 73.0,
 "venueId": 2823
 },
 "815673": {
@@ -1199,6 +1279,22 @@
 "tempF": 73.0,
 "venueId": 2823
 },
+"815693": {
+"condition": "Partly Cloudy",
+"elevationFt": 400.0,
+"factor": 1.01326,
+"rho": 1.18011,
+"tempF": 71.0,
+"venueId": 2823
+},
+"815694": {
+"condition": "Clear",
+"elevationFt": 400.0,
+"factor": 0.98721,
+"rho": 1.20974,
+"tempF": 58.0,
+"venueId": 2823
+},
 "815703": {
 "condition": "Cloudy",
 "elevationFt": 400,
@@ -1209,43 +1305,115 @@
 },
 "815731": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 741.0,
+"factor": 1.01432,
+"rho": 1.17893,
 "tempF": 65.0,
 "venueId": 5472
 },
 "815737": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 741.0,
+"factor": 1.03463,
+"rho": 1.15688,
 "tempF": 75.0,
 "venueId": 5472
 },
 "815748": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 741.0,
+"factor": 1.01229,
+"rho": 1.18118,
 "tempF": 64.0,
 "venueId": 5472
 },
 "815749": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 741.0,
+"factor": 0.98389,
+"rho": 1.21362,
 "tempF": 50.0,
 "venueId": 5472
 },
 "815751": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 741.0,
+"factor": 1.01229,
+"rho": 1.18118,
 "tempF": 64.0,
 "venueId": 5472
+},
+"815752": {
+"condition": "Overcast",
+"elevationFt": 741.0,
+"factor": 1.01838,
+"rho": 1.17445,
+"tempF": 67.0,
+"venueId": 5472
+},
+"815760": {
+"condition": "Partly Cloudy",
+"elevationFt": 741.0,
+"factor": 1.05903,
+"rho": 1.13148,
+"tempF": 87.0,
+"venueId": 5472
+},
+"815763": {
+"condition": "Overcast",
+"elevationFt": 741.0,
+"factor": 0.96768,
+"rho": 1.23298,
+"tempF": 42.0,
+"venueId": 5472
+},
+"815773": {
+"condition": "Partly Cloudy",
+"elevationFt": 741.0,
+"factor": 1.01229,
+"rho": 1.18118,
+"tempF": 64.0,
+"venueId": 5472
+},
+"815796": {
+"condition": "Partly Cloudy",
+"elevationFt": 920.0,
+"factor": 1.04786,
+"rho": 1.14296,
+"tempF": 78.0,
+"venueId": 2797
+},
+"815802": {
+"condition": "Clear",
+"elevationFt": 920.0,
+"factor": 1.05195,
+"rho": 1.13873,
+"tempF": 80.0,
+"venueId": 2797
+},
+"815804": {
+"condition": "Partly Cloudy",
+"elevationFt": 920.0,
+"factor": 1.03558,
+"rho": 1.15586,
+"tempF": 72.0,
+"venueId": 2797
+},
+"815805": {
+"condition": "Partly Cloudy",
+"elevationFt": 920.0,
+"factor": 1.03558,
+"rho": 1.15586,
+"tempF": 72.0,
+"venueId": 2797
+},
+"815810": {
+"condition": "Cloudy",
+"elevationFt": 920.0,
+"factor": 1.04991,
+"rho": 1.14084,
+"tempF": 79.0,
+"venueId": 2797
 },
 "815814": {
 "condition": "Partly Cloudy",
@@ -1255,12 +1423,36 @@
 "tempF": 79.0,
 "venueId": 2797
 },
+"815815": {
+"condition": "Partly Cloudy",
+"elevationFt": 920.0,
+"factor": 1.06219,
+"rho": 1.12827,
+"tempF": 85.0,
+"venueId": 2797
+},
 "815816": {
 "condition": "Clear",
 "elevationFt": 920.0,
 "factor": 1.05605,
 "rho": 1.13452,
 "tempF": 82.0,
+"venueId": 2797
+},
+"815820": {
+"condition": "Cloudy",
+"elevationFt": 920.0,
+"factor": 1.05809,
+"rho": 1.13243,
+"tempF": 83.0,
+"venueId": 2797
+},
+"815821": {
+"condition": "Cloudy",
+"elevationFt": 920.0,
+"factor": 1.03149,
+"rho": 1.16023,
+"tempF": 70.0,
 "venueId": 2797
 },
 "815823": {
@@ -1279,6 +1471,30 @@
 "tempF": 69.0,
 "venueId": 2797
 },
+"815827": {
+"condition": "Partly Cloudy",
+"elevationFt": 920.0,
+"factor": 1.04786,
+"rho": 1.14296,
+"tempF": 78.0,
+"venueId": 2797
+},
+"815829": {
+"condition": "Cloudy",
+"elevationFt": 920.0,
+"factor": 0.99268,
+"rho": 1.20339,
+"tempF": 51.0,
+"venueId": 2797
+},
+"815830": {
+"condition": "Cloudy",
+"elevationFt": 920.0,
+"factor": 1.04172,
+"rho": 1.14938,
+"tempF": 75.0,
+"venueId": 2797
+},
 "815834": {
 "condition": "Partly Cloudy",
 "elevationFt": 920,
@@ -1295,9 +1511,25 @@
 "tempF": 59.0,
 "venueId": 2797
 },
+"815836": {
+"condition": "Cloudy",
+"elevationFt": 920.0,
+"factor": 1.00289,
+"rho": 1.19172,
+"tempF": 56.0,
+"venueId": 2797
+},
+"815838": {
+"condition": "Partly Cloudy",
+"elevationFt": 920.0,
+"factor": 0.99268,
+"rho": 1.20339,
+"tempF": 51.0,
+"venueId": 2797
+},
 "815842": {
 "condition": "Partly Cloudy",
-"elevationFt": 920,
+"elevationFt": 920.0,
 "factor": 1.01514,
 "rho": 1.17802,
 "tempF": 62.0,
@@ -1321,11 +1553,51 @@
 },
 "815846": {
 "condition": "Cloudy",
-"elevationFt": 920,
+"elevationFt": 920.0,
 "factor": 0.99064,
 "rho": 1.20575,
 "tempF": 50.0,
 "venueId": 2797
+},
+"815847": {
+"condition": "Sunny",
+"elevationFt": 920.0,
+"factor": 0.9988,
+"rho": 1.19636,
+"tempF": 54.0,
+"venueId": 2797
+},
+"815855": {
+"condition": "Clear",
+"elevationFt": 920.0,
+"factor": 1.00084,
+"rho": 1.19404,
+"tempF": 55.0,
+"venueId": 2797
+},
+"815869": {
+"condition": "Overcast",
+"elevationFt": 505.0,
+"factor": 1.01933,
+"rho": 1.17341,
+"tempF": 72.0,
+"venueId": 2773
+},
+"815871": {
+"condition": "Cloudy",
+"elevationFt": 505.0,
+"factor": 1.03947,
+"rho": 1.15175,
+"tempF": 82.0,
+"venueId": 2773
+},
+"815872": {
+"condition": "Clear",
+"elevationFt": 505.0,
+"factor": 1.04148,
+"rho": 1.14963,
+"tempF": 83.0,
+"venueId": 2773
 },
 "815873": {
 "condition": "Partly Cloudy",
@@ -1333,6 +1605,14 @@
 "factor": 1.02939,
 "rho": 1.16248,
 "tempF": 77.0,
+"venueId": 2773
+},
+"815874": {
+"condition": "Clear",
+"elevationFt": 505.0,
+"factor": 1.02537,
+"rho": 1.16683,
+"tempF": 75.0,
 "venueId": 2773
 },
 "815875": {
@@ -1343,12 +1623,28 @@
 "tempF": 74.0,
 "venueId": 2773
 },
+"815876": {
+"condition": "Partly Cloudy",
+"elevationFt": 505.0,
+"factor": 1.02939,
+"rho": 1.16248,
+"tempF": 77.0,
+"venueId": 2773
+},
 "815877": {
 "condition": "Clear",
 "elevationFt": 505.0,
 "factor": 1.03141,
 "rho": 1.16032,
 "tempF": 78.0,
+"venueId": 2773
+},
+"815878": {
+"condition": "Overcast",
+"elevationFt": 505.0,
+"factor": 1.01933,
+"rho": 1.17341,
+"tempF": 72.0,
 "venueId": 2773
 },
 "815879": {
@@ -1377,7 +1673,7 @@
 },
 "815882": {
 "condition": "Partly Cloudy",
-"elevationFt": 505,
+"elevationFt": 505.0,
 "factor": 1.03544,
 "rho": 1.15602,
 "tempF": 80.0,
@@ -1417,7 +1713,7 @@
 },
 "815887": {
 "condition": "Partly Cloudy",
-"elevationFt": 505,
+"elevationFt": 505.0,
 "factor": 1.05761,
 "rho": 1.13292,
 "tempF": 91.0,
@@ -1553,7 +1849,7 @@
 },
 "815905": {
 "condition": "Overcast",
-"elevationFt": 505,
+"elevationFt": 505.0,
 "factor": 0.98111,
 "rho": 1.2169,
 "tempF": 53.0,
@@ -1569,7 +1865,7 @@
 },
 "815907": {
 "condition": "Cloudy",
-"elevationFt": 505,
+"elevationFt": 505.0,
 "factor": 1.00122,
 "rho": 1.19362,
 "tempF": 63.0,
@@ -1689,7 +1985,7 @@
 },
 "815922": {
 "condition": "Cloudy",
-"elevationFt": 505,
+"elevationFt": 505.0,
 "factor": 1.02134,
 "rho": 1.17121,
 "tempF": 73.0,
@@ -1721,15 +2017,23 @@
 },
 "815926": {
 "condition": "Overcast",
-"elevationFt": 505,
+"elevationFt": 505.0,
 "factor": 0.96504,
 "rho": 1.23619,
 "tempF": 45.0,
 "venueId": 2773
 },
+"815952": {
+"condition": "Cloudy",
+"elevationFt": 1150.0,
+"factor": 1.09223,
+"rho": 1.0987,
+"tempF": 95.0,
+"venueId": 4271
+},
 "815957": {
 "condition": "Cloudy",
-"elevationFt": 1150,
+"elevationFt": 1150.0,
 "factor": 1.04266,
 "rho": 1.14839,
 "tempF": 71.0,
@@ -1855,83 +2159,171 @@
 "tempF": 59.0,
 "venueId": 4271
 },
+"816034": {
+"condition": "Cloudy",
+"elevationFt": 16.0,
+"factor": 1.01637,
+"rho": 1.17666,
+"tempF": 80.0,
+"venueId": 2781
+},
+"816038": {
+"condition": "Cloudy",
+"elevationFt": 16.0,
+"factor": 1.01835,
+"rho": 1.17449,
+"tempF": 81.0,
+"venueId": 2781
+},
+"816046": {
+"condition": "Partly Cloudy",
+"elevationFt": 16.0,
+"factor": 1.05001,
+"rho": 1.14073,
+"tempF": 97.0,
+"venueId": 2781
+},
+"816054": {
+"condition": "Clear",
+"elevationFt": 16.0,
+"factor": 0.99858,
+"rho": 1.19662,
+"tempF": 71.0,
+"venueId": 2781
+},
+"816055": {
+"condition": "Partly Cloudy",
+"elevationFt": 16.0,
+"factor": 1.02032,
+"rho": 1.17232,
+"tempF": 82.0,
+"venueId": 2781
+},
+"816057": {
+"condition": "Sunny",
+"elevationFt": 16.0,
+"factor": 0.9966,
+"rho": 1.19888,
+"tempF": 70.0,
+"venueId": 2781
+},
+"816060": {
+"condition": "Cloudy",
+"elevationFt": 16.0,
+"factor": 1.01241,
+"rho": 1.18104,
+"tempF": 78.0,
+"venueId": 2781
+},
+"816062": {
+"condition": "Overcast",
+"elevationFt": 16.0,
+"factor": 0.96502,
+"rho": 1.23622,
+"tempF": 54.0,
+"venueId": 2781
+},
+"816063": {
+"condition": "Sunny",
+"elevationFt": 16.0,
+"factor": 1.01439,
+"rho": 1.17885,
+"tempF": 79.0,
+"venueId": 2781
+},
 "816075": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 16.0,
+"factor": 0.94924,
+"rho": 1.25578,
 "tempF": 46.0,
 "venueId": 2781
 },
 "816101": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.03812,
+"rho": 1.15317,
+"tempF": 83.0,
+"venueId": 4715
+},
+"816102": {
+"condition": "Cloudy",
+"elevationFt": 420.0,
+"factor": 1.03812,
+"rho": 1.15317,
 "tempF": 83.0,
 "venueId": 4715
 },
 "816104": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.03812,
+"rho": 1.15317,
 "tempF": 83.0,
 "venueId": 4715
 },
 "816108": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.05218,
+"rho": 1.13849,
 "tempF": 90.0,
 "venueId": 4715
 },
 "816114": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.04013,
+"rho": 1.15105,
 "tempF": 84.0,
 "venueId": 4715
 },
 "816128": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.03008,
+"rho": 1.16174,
 "tempF": 79.0,
+"venueId": 4715
+},
+"816135": {
+"condition": "Sunny",
+"elevationFt": 420.0,
+"factor": 1.004,
+"rho": 1.19047,
+"tempF": 66.0,
 "venueId": 4715
 },
 "816136": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 0.99798,
+"rho": 1.1973,
 "tempF": 63.0,
 "venueId": 4715
 },
 "816139": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 0.99999,
+"rho": 1.19501,
 "tempF": 64.0,
 "venueId": 4715
 },
 "816140": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 0.97995,
+"rho": 1.21828,
 "tempF": 54.0,
 "venueId": 4715
 },
 "816142": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.03611,
+"rho": 1.1553,
 "tempF": 82.0,
 "venueId": 4715
 },
@@ -1945,75 +2337,219 @@
 },
 "816146": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.03611,
+"rho": 1.1553,
 "tempF": 82.0,
 "venueId": 4715
 },
 "816149": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.03611,
+"rho": 1.1553,
 "tempF": 82.0,
 "venueId": 4715
 },
 "816154": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 420.0,
+"factor": 1.02808,
+"rho": 1.1639,
 "tempF": 78.0,
 "venueId": 4715
 },
+"816182": {
+"condition": "Partly Cloudy",
+"elevationFt": 253.0,
+"factor": 1.05151,
+"rho": 1.13918,
+"tempF": 93.0,
+"venueId": 2542
+},
+"816183": {
+"condition": "Clear",
+"elevationFt": 253.0,
+"factor": 1.05351,
+"rho": 1.13712,
+"tempF": 94.0,
+"venueId": 2542
+},
+"816186": {
+"condition": "Cloudy",
+"elevationFt": 253.0,
+"factor": 1.03753,
+"rho": 1.15379,
+"tempF": 86.0,
+"venueId": 2542
+},
+"816192": {
+"condition": "Cloudy",
+"elevationFt": 253.0,
+"factor": 1.02755,
+"rho": 1.16446,
+"tempF": 81.0,
+"venueId": 2542
+},
+"816194": {
+"condition": "Overcast",
+"elevationFt": 253.0,
+"factor": 1.02955,
+"rho": 1.16231,
+"tempF": 82.0,
+"venueId": 2542
+},
+"816206": {
+"condition": "Partly Cloudy",
+"elevationFt": 253.0,
+"factor": 1.03354,
+"rho": 1.15804,
+"tempF": 84.0,
+"venueId": 2542
+},
+"816215": {
+"condition": "Cloudy",
+"elevationFt": 253.0,
+"factor": 1.0096,
+"rho": 1.18417,
+"tempF": 72.0,
+"venueId": 2542
+},
+"816217": {
+"condition": "Sunny",
+"elevationFt": 253.0,
+"factor": 0.98768,
+"rho": 1.20919,
+"tempF": 61.0,
+"venueId": 2542
+},
+"816222": {
+"condition": "Partly Cloudy",
+"elevationFt": 253.0,
+"factor": 1.01957,
+"rho": 1.17314,
+"tempF": 77.0,
+"venueId": 2542
+},
+"816225": {
+"condition": "Partly Cloudy",
+"elevationFt": 253.0,
+"factor": 1.02556,
+"rho": 1.16662,
+"tempF": 80.0,
+"venueId": 2542
+},
 "816286": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 469.0,
+"factor": 1.00386,
+"rho": 1.19062,
 "tempF": 65.0,
 "venueId": 2724
 },
 "816288": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 469.0,
+"factor": 1.02597,
+"rho": 1.16617,
 "tempF": 76.0,
 "venueId": 2724
 },
 "816291": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 469.0,
+"factor": 1.04006,
+"rho": 1.15113,
 "tempF": 83.0,
 "venueId": 2724
 },
 "816295": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 469.0,
+"factor": 1.04006,
+"rho": 1.15113,
 "tempF": 83.0,
 "venueId": 2724
 },
 "816303": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 469.0,
+"factor": 0.96773,
+"rho": 1.23292,
 "tempF": 47.0,
 "venueId": 2724
 },
 "816305": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 469.0,
+"factor": 1.00587,
+"rho": 1.18835,
 "tempF": 66.0,
 "venueId": 2724
+},
+"816321": {
+"condition": "Cloudy",
+"elevationFt": 350.0,
+"factor": 1.03335,
+"rho": 1.15824,
+"tempF": 82.0,
+"venueId": 3230
+},
+"816326": {
+"condition": "Partly Cloudy",
+"elevationFt": 350.0,
+"factor": 1.02935,
+"rho": 1.16253,
+"tempF": 80.0,
+"venueId": 3230
+},
+"816327": {
+"condition": "Overcast",
+"elevationFt": 350.0,
+"factor": 1.02735,
+"rho": 1.16469,
+"tempF": 79.0,
+"venueId": 3230
+},
+"816328": {
+"condition": "Clear",
+"elevationFt": 350.0,
+"factor": 1.03536,
+"rho": 1.1561,
+"tempF": 83.0,
+"venueId": 3230
+},
+"816330": {
+"condition": "Clear",
+"elevationFt": 350.0,
+"factor": 1.03736,
+"rho": 1.15398,
+"tempF": 84.0,
+"venueId": 3230
+},
+"816331": {
+"condition": "Cloudy",
+"elevationFt": 350.0,
+"factor": 1.00733,
+"rho": 1.18672,
+"tempF": 69.0,
+"venueId": 3230
+},
+"816333": {
+"condition": "Partly Cloudy",
+"elevationFt": 350.0,
+"factor": 1.02935,
+"rho": 1.16253,
+"tempF": 80.0,
+"venueId": 3230
+},
+"816335": {
+"condition": "Clear",
+"elevationFt": 350.0,
+"factor": 1.01733,
+"rho": 1.1756,
+"tempF": 74.0,
+"venueId": 3230
 },
 "816339": {
 "condition": "Partly Cloudy",
@@ -2023,17 +2559,33 @@
 "tempF": 67.0,
 "venueId": 3230
 },
+"816342": {
+"condition": "Clear",
+"elevationFt": 350.0,
+"factor": 1.02134,
+"rho": 1.17121,
+"tempF": 76.0,
+"venueId": 3230
+},
 "816344": {
 "condition": "Sunny",
-"elevationFt": 350,
+"elevationFt": 350.0,
 "factor": 1.03335,
 "rho": 1.15824,
 "tempF": 82.0,
 "venueId": 3230
 },
+"816345": {
+"condition": "Clear",
+"elevationFt": 350.0,
+"factor": 1.01533,
+"rho": 1.17781,
+"tempF": 73.0,
+"venueId": 3230
+},
 "816346": {
 "condition": "Clear",
-"elevationFt": 350,
+"elevationFt": 350.0,
 "factor": 1.03736,
 "rho": 1.15398,
 "tempF": 84.0,
@@ -2045,6 +2597,14 @@
 "factor": 1.03335,
 "rho": 1.15824,
 "tempF": 82.0,
+"venueId": 3230
+},
+"816348": {
+"condition": "Rain",
+"elevationFt": 350.0,
+"factor": 0.96735,
+"rho": 1.23338,
+"tempF": 49.0,
 "venueId": 3230
 },
 "816350": {
@@ -2061,6 +2621,30 @@
 "factor": 1.04137,
 "rho": 1.14975,
 "tempF": 86.0,
+"venueId": 3230
+},
+"816356": {
+"condition": "Sunny",
+"elevationFt": 350.0,
+"factor": 1.03736,
+"rho": 1.15398,
+"tempF": 84.0,
+"venueId": 3230
+},
+"816358": {
+"condition": "Overcast",
+"elevationFt": 350.0,
+"factor": 0.99133,
+"rho": 1.20495,
+"tempF": 61.0,
+"venueId": 3230
+},
+"816360": {
+"condition": "Sunny",
+"elevationFt": 350.0,
+"factor": 1.01533,
+"rho": 1.17781,
+"tempF": 73.0,
 "venueId": 3230
 },
 "816363": {
@@ -2089,7 +2673,7 @@
 },
 "816372": {
 "condition": "Partly Cloudy",
-"elevationFt": 350,
+"elevationFt": 350.0,
 "factor": 1.00533,
 "rho": 1.18897,
 "tempF": 68.0,
@@ -2105,7 +2689,7 @@
 },
 "816375": {
 "condition": "Clear",
-"elevationFt": 350,
+"elevationFt": 350.0,
 "factor": 0.95538,
 "rho": 1.2481,
 "tempF": 43.0,
@@ -2113,11 +2697,51 @@
 },
 "816376": {
 "condition": "Partly Cloudy",
-"elevationFt": 350,
+"elevationFt": 350.0,
 "factor": 0.95538,
 "rho": 1.2481,
 "tempF": 43.0,
 "venueId": 3230
+},
+"816403": {
+"condition": "Cloudy",
+"elevationFt": 20.0,
+"factor": 1.02641,
+"rho": 1.16569,
+"tempF": 85.0,
+"venueId": 2852
+},
+"816415": {
+"condition": "Cloudy",
+"elevationFt": 20.0,
+"factor": 1.00664,
+"rho": 1.1875,
+"tempF": 75.0,
+"venueId": 2852
+},
+"816422": {
+"condition": "Overcast",
+"elevationFt": 20.0,
+"factor": 1.02246,
+"rho": 1.16999,
+"tempF": 83.0,
+"venueId": 2852
+},
+"816426": {
+"condition": "Partly Cloudy",
+"elevationFt": 20.0,
+"factor": 1.02048,
+"rho": 1.17215,
+"tempF": 82.0,
+"venueId": 2852
+},
+"816427": {
+"condition": "Partly Cloudy",
+"elevationFt": 20.0,
+"factor": 1.0185,
+"rho": 1.17432,
+"tempF": 81.0,
+"venueId": 2852
 },
 "816442": {
 "condition": "Clear",
@@ -2167,77 +2791,309 @@
 "tempF": 59.0,
 "venueId": 2852
 },
+"816470": {
+"condition": "Partly Cloudy",
+"elevationFt": 807.0,
+"factor": 1.0515,
+"rho": 1.13919,
+"tempF": 82.0,
+"venueId": 2844
+},
+"816472": {
+"condition": "Cloudy",
+"elevationFt": 807.0,
+"factor": 1.04946,
+"rho": 1.1413,
+"tempF": 81.0,
+"venueId": 2844
+},
+"816476": {
+"condition": "Partly Cloudy",
+"elevationFt": 807.0,
+"factor": 1.05354,
+"rho": 1.13709,
+"tempF": 83.0,
+"venueId": 2844
+},
 "816496": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 807.0,
+"factor": 1.05558,
+"rho": 1.135,
 "tempF": 84.0,
+"venueId": 2844
+},
+"816506": {
+"condition": "Cloudy",
+"elevationFt": 807.0,
+"factor": 1.03316,
+"rho": 1.15844,
+"tempF": 73.0,
+"venueId": 2844
+},
+"816510": {
+"condition": "Cloudy",
+"elevationFt": 807.0,
+"factor": 0.99044,
+"rho": 1.20598,
+"tempF": 52.0,
+"venueId": 2844
+},
+"816523": {
+"condition": "Sunny",
+"elevationFt": 807.0,
+"factor": 0.98841,
+"rho": 1.20835,
+"tempF": 51.0,
 "venueId": 2844
 },
 "816524": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 807.0,
+"factor": 0.99247,
+"rho": 1.20363,
 "tempF": 53.0,
 "venueId": 2844
 },
+"816546": {
+"condition": "Partly Cloudy",
+"elevationFt": 719.0,
+"factor": 1.05001,
+"rho": 1.14073,
+"tempF": 83.0,
+"venueId": 2858
+},
+"816557": {
+"condition": "Partly Cloudy",
+"elevationFt": 719.0,
+"factor": 1.0297,
+"rho": 1.16215,
+"tempF": 73.0,
+"venueId": 2858
+},
+"816565": {
+"condition": "Partly Cloudy",
+"elevationFt": 719.0,
+"factor": 1.03579,
+"rho": 1.15564,
+"tempF": 76.0,
+"venueId": 2858
+},
+"816567": {
+"condition": "Overcast",
+"elevationFt": 719.0,
+"factor": 1.02564,
+"rho": 1.16653,
+"tempF": 71.0,
+"venueId": 2858
+},
+"816572": {
+"condition": "Clear",
+"elevationFt": 719.0,
+"factor": 1.03985,
+"rho": 1.15134,
+"tempF": 78.0,
+"venueId": 2858
+},
+"816635": {
+"condition": "Partly Cloudy",
+"elevationFt": 1076.0,
+"factor": 1.05206,
+"rho": 1.13861,
+"tempF": 77.0,
+"venueId": 3810
+},
+"816640": {
+"condition": "Overcast",
+"elevationFt": 1076.0,
+"factor": 1.06236,
+"rho": 1.1281,
+"tempF": 82.0,
+"venueId": 3810
+},
+"816641": {
+"condition": "Clear",
+"elevationFt": 1076.0,
+"factor": 1.07884,
+"rho": 1.11168,
+"tempF": 90.0,
+"venueId": 3810
+},
+"816651": {
+"condition": "Partly Cloudy",
+"elevationFt": 1076.0,
+"factor": 1.04383,
+"rho": 1.14716,
+"tempF": 73.0,
+"venueId": 3810
+},
 "816672": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1076.0,
+"factor": 1.06648,
+"rho": 1.12395,
 "tempF": 84.0,
 "venueId": 3810
 },
 "816673": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1076.0,
+"factor": 1.04795,
+"rho": 1.14287,
 "tempF": 75.0,
 "venueId": 3810
 },
+"816740": {
+"condition": "Partly Cloudy",
+"elevationFt": 364.0,
+"factor": 1.0299,
+"rho": 1.16194,
+"tempF": 80.0,
+"venueId": 2541
+},
+"816752": {
+"condition": "Partly Cloudy",
+"elevationFt": 364.0,
+"factor": 1.0339,
+"rho": 1.15765,
+"tempF": 82.0,
+"venueId": 2541
+},
+"816787": {
+"condition": "Partly Cloudy",
+"elevationFt": 738.0,
+"factor": 1.06297,
+"rho": 1.12748,
+"tempF": 89.0,
+"venueId": 3970
+},
+"816790": {
+"condition": "Partly Cloudy",
+"elevationFt": 738.0,
+"factor": 1.06704,
+"rho": 1.12339,
+"tempF": 91.0,
+"venueId": 3970
+},
 "816793": {
 "condition": "Overcast",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 738.0,
+"factor": 1.02639,
+"rho": 1.16572,
 "tempF": 71.0,
+"venueId": 3970
+},
+"816795": {
+"condition": "Partly Cloudy",
+"elevationFt": 738.0,
+"factor": 1.05077,
+"rho": 1.13995,
+"tempF": 83.0,
+"venueId": 3970
+},
+"816797": {
+"condition": "Sunny",
+"elevationFt": 738.0,
+"factor": 1.03248,
+"rho": 1.15917,
+"tempF": 74.0,
+"venueId": 3970
+},
+"816798": {
+"condition": "Cloudy",
+"elevationFt": 738.0,
+"factor": 1.03451,
+"rho": 1.157,
+"tempF": 75.0,
+"venueId": 3970
+},
+"816800": {
+"condition": "Partly Cloudy",
+"elevationFt": 738.0,
+"factor": 0.99797,
+"rho": 1.19731,
+"tempF": 57.0,
 "venueId": 3970
 },
 "816804": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 738.0,
+"factor": 1.05077,
+"rho": 1.13995,
 "tempF": 83.0,
 "venueId": 3970
 },
 "816808": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 738.0,
+"factor": 1.03654,
+"rho": 1.15484,
 "tempF": 76.0,
 "venueId": 3970
 },
 "816811": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 738.0,
+"factor": 0.99797,
+"rho": 1.19731,
 "tempF": 57.0,
 "venueId": 3970
 },
 "816814": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 738.0,
+"factor": 0.98175,
+"rho": 1.21614,
 "tempF": 49.0,
 "venueId": 3970
+},
+"816816": {
+"condition": "Partly Cloudy",
+"elevationFt": 738.0,
+"factor": 1.04061,
+"rho": 1.15055,
+"tempF": 78.0,
+"venueId": 3970
+},
+"816818": {
+"condition": "Partly Cloudy",
+"elevationFt": 738.0,
+"factor": 0.99392,
+"rho": 1.20196,
+"tempF": 55.0,
+"venueId": 3970
+},
+"816822": {
+"condition": "Cloudy",
+"elevationFt": 738.0,
+"factor": 0.9777,
+"rho": 1.22094,
+"tempF": 47.0,
+"venueId": 3970
+},
+"816826": {
+"condition": "Partly Cloudy",
+"elevationFt": 738.0,
+"factor": 1.04264,
+"rho": 1.14841,
+"tempF": 79.0,
+"venueId": 3970
+},
+"816847": {
+"condition": "Partly Cloudy",
+"elevationFt": 730.0,
+"factor": 1.06468,
+"rho": 1.12576,
+"tempF": 90.0,
+"venueId": 4670
+},
+"816849": {
+"condition": "Overcast",
+"elevationFt": 730.0,
+"factor": 1.03623,
+"rho": 1.15518,
+"tempF": 76.0,
+"venueId": 4670
 },
 "816851": {
 "condition": "Cloudy",
@@ -2311,6 +3167,22 @@
 "tempF": 85.0,
 "venueId": 4670
 },
+"816876": {
+"condition": "Partly Cloudy",
+"elevationFt": 730.0,
+"factor": 1.04638,
+"rho": 1.1445,
+"tempF": 81.0,
+"venueId": 4670
+},
+"816881": {
+"condition": "Clear",
+"elevationFt": 730.0,
+"factor": 1.03623,
+"rho": 1.15518,
+"tempF": 76.0,
+"venueId": 4670
+},
 "816889": {
 "condition": "Clear",
 "elevationFt": 730.0,
@@ -2319,12 +3191,28 @@
 "tempF": 81.0,
 "venueId": 4670
 },
+"816892": {
+"condition": "Sunny",
+"elevationFt": 730.0,
+"factor": 1.04435,
+"rho": 1.14662,
+"tempF": 80.0,
+"venueId": 4670
+},
 "816893": {
 "condition": "Clear",
 "elevationFt": 730.0,
 "factor": 1.04638,
 "rho": 1.1445,
 "tempF": 81.0,
+"venueId": 4670
+},
+"816897": {
+"condition": "Partly Cloudy",
+"elevationFt": 730.0,
+"factor": 1.00578,
+"rho": 1.18846,
+"tempF": 61.0,
 "venueId": 4670
 },
 "816924": {
@@ -2375,6 +3263,638 @@
 "tempF": 66.0,
 "venueId": 2756
 },
+"816934": {
+"condition": "Sunny",
+"elevationFt": 585.0,
+"factor": 1.0386,
+"rho": 1.15267,
+"tempF": 80.0,
+"venueId": 2756
+},
+"816937": {
+"condition": "Clear",
+"elevationFt": 585.0,
+"factor": 1.0386,
+"rho": 1.15267,
+"tempF": 80.0,
+"venueId": 2756
+},
+"816956": {
+"condition": "Partly Cloudy",
+"elevationFt": 585.0,
+"factor": 1.01436,
+"rho": 1.17888,
+"tempF": 68.0,
+"venueId": 2756
+},
+"816962": {
+"condition": "Overcast",
+"elevationFt": 585.0,
+"factor": 0.98814,
+"rho": 1.20866,
+"tempF": 55.0,
+"venueId": 2756
+},
+"816972": {
+"condition": "Partly Cloudy",
+"elevationFt": 585.0,
+"factor": 0.96396,
+"rho": 1.23751,
+"tempF": 43.0,
+"venueId": 2756
+},
+"818237": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 76.0,
+"venueId": 5418
+},
+"818244": {
+"condition": "Sunny",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 79.0,
+"venueId": 5418
+},
+"818250": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 102.0,
+"venueId": 5418
+},
+"818253": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 87.0,
+"venueId": 5418
+},
+"818256": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 80.0,
+"venueId": 5418
+},
+"818259": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 84.0,
+"venueId": 5418
+},
+"818261": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 81.0,
+"venueId": 5418
+},
+"818263": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 78.0,
+"venueId": 5418
+},
+"818264": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 82.0,
+"venueId": 5418
+},
+"818265": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 68.0,
+"venueId": 5418
+},
+"818268": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 66.0,
+"venueId": 5418
+},
+"818269": {
+"condition": "Overcast",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 75.0,
+"venueId": 5418
+},
+"818272": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 65.0,
+"venueId": 5418
+},
+"818277": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 61.0,
+"venueId": 5418
+},
+"818278": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 59.0,
+"venueId": 5418
+},
+"818314": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 91.0,
+"venueId": 7257
+},
+"818335": {
+"condition": "Sunny",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 82.0,
+"venueId": 7257
+},
+"818404": {
+"condition": "Overcast",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 64.0,
+"venueId": 2769
+},
+"818417": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 69.0,
+"venueId": 2769
+},
+"818450": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 78.0,
+"venueId": 2779
+},
+"818454": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 80.0,
+"venueId": 2779
+},
+"818464": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 73.0,
+"venueId": 2779
+},
+"818465": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 63.0,
+"venueId": 2779
+},
+"818466": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 72.0,
+"venueId": 2779
+},
+"818511": {
+"condition": "Sunny",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 78.0,
+"venueId": 2868
+},
+"818514": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 79.0,
+"venueId": 2868
+},
+"818521": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 82.0,
+"venueId": 2868
+},
+"818524": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 82.0,
+"venueId": 2868
+},
+"818527": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 80.0,
+"venueId": 2868
+},
+"818671": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 86.0,
+"venueId": 2749
+},
+"818672": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 85.0,
+"venueId": 2749
+},
+"818673": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 74.0,
+"venueId": 2749
+},
+"818674": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 74.0,
+"venueId": 2749
+},
+"818682": {
+"condition": "Drizzle",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 51.0,
+"venueId": 2749
+},
+"818697": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 70.0,
+"venueId": 2749
+},
+"818717": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 79.0,
+"venueId": 2512
+},
+"818724": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 78.0,
+"venueId": 2512
+},
+"818725": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 76.0,
+"venueId": 2512
+},
+"818743": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 84.0,
+"venueId": 2512
+},
+"818808": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 80.0,
+"venueId": 2832
+},
+"818817": {
+"condition": "Rain",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 52.0,
+"venueId": 2832
+},
+"818818": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 88.0,
+"venueId": 2832
+},
+"818836": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 72.0,
+"venueId": 2832
+},
+"818866": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 82.0,
+"venueId": 2820
+},
+"818926": {
+"condition": "Overcast",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 84.0,
+"venueId": 2733
+},
+"818939": {
+"condition": "Overcast",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 73.0,
+"venueId": 2733
+},
+"819000": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 76.0,
+"venueId": 2740
+},
+"819006": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 93.0,
+"venueId": 2740
+},
+"819012": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 86.0,
+"venueId": 2740
+},
+"819016": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 73.0,
+"venueId": 2740
+},
+"819024": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 71.0,
+"venueId": 2740
+},
+"819027": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 68.0,
+"venueId": 2740
+},
+"819028": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 59.0,
+"venueId": 2740
+},
+"819036": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 69.0,
+"venueId": 2740
+},
+"819040": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 72.0,
+"venueId": 2740
+},
+"819045": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 69.0,
+"venueId": 2740
+},
+"819532": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 93.0,
+"venueId": 2765
+},
+"819536": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 82.0,
+"venueId": 2765
+},
+"819569": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 79.0,
+"venueId": 2765
+},
+"819863": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 74.0,
+"venueId": 2759
+},
+"819871": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 83.0,
+"venueId": 2759
+},
+"819873": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 69.0,
+"venueId": 2759
+},
+"819876": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 76.0,
+"venueId": 2759
+},
+"819877": {
+"condition": "Drizzle",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 51.0,
+"venueId": 2759
+},
+"819878": {
+"condition": "Overcast",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 62.0,
+"venueId": 2759
+},
+"819882": {
+"condition": "Sunny",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 53.0,
+"venueId": 2759
+},
+"819887": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 45.0,
+"venueId": 2759
+},
+"819889": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 69.0,
+"venueId": 3189
+},
+"819891": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 46.0,
+"venueId": 2759
+},
+"819896": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 60.0,
+"venueId": 2759
+},
+"819897": {
+"condition": "Overcast",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 49.0,
+"venueId": 2759
+},
+"819901": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 68.0,
+"venueId": 2759
+},
+"819906": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 67.0,
+"venueId": 2759
+},
+"819995": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 76.0,
+"venueId": 3790
+},
 "82": {
 "condition": null,
 "elevationFt": null,
@@ -2382,6 +3902,334 @@
 "rho": null,
 "tempF": null,
 "venueId": null
+},
+"820004": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 84.0,
+"venueId": 3790
+},
+"820092": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 66.0,
+"venueId": 2766
+},
+"820098": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 76.0,
+"venueId": 2766
+},
+"820209": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 74.0,
+"venueId": 5525
+},
+"820217": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 81.0,
+"venueId": 5525
+},
+"821788": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 76.0,
+"venueId": 4089
+},
+"821792": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 55.0,
+"venueId": 4089
+},
+"821793": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 58.0,
+"venueId": 4089
+},
+"821878": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 85.0,
+"venueId": 2851
+},
+"821883": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 92.0,
+"venueId": 2851
+},
+"821967": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 75.0,
+"venueId": 2866
+},
+"821976": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 76.0,
+"venueId": 2866
+},
+"822035": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 64.0,
+"venueId": 2757
+},
+"822037": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 57.0,
+"venueId": 2757
+},
+"822046": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 66.0,
+"venueId": 2757
+},
+"822051": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 67.0,
+"venueId": 2757
+},
+"822052": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 59.0,
+"venueId": 2757
+},
+"822054": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 50.0,
+"venueId": 2757
+},
+"822128": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 77.0,
+"venueId": 6134
+},
+"822151": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 92.0,
+"venueId": 3429
+},
+"822268": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 81.0,
+"venueId": 2782
+},
+"822288": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 81.0,
+"venueId": 2782
+},
+"822294": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 83.0,
+"venueId": 2782
+},
+"822295": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 75.0,
+"venueId": 2782
+},
+"822300": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 90.0,
+"venueId": 2782
+},
+"822305": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 66.0,
+"venueId": 2782
+},
+"822309": {
+"condition": "Overcast",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 54.0,
+"venueId": 2782
+},
+"822310": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 57.0,
+"venueId": 2782
+},
+"822311": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 90.0,
+"venueId": 2782
+},
+"822314": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 61.0,
+"venueId": 2782
+},
+"822315": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 52.0,
+"venueId": 2782
+},
+"822317": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 77.0,
+"venueId": 2782
+},
+"822320": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 83.0,
+"venueId": 2782
+},
+"822321": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 81.0,
+"venueId": 2782
+},
+"822358": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 91.0,
+"venueId": 2795
+},
+"822360": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 81.0,
+"venueId": 2795
+},
+"822376": {
+"condition": "Sunny",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 54.0,
+"venueId": 2795
+},
+"822377": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 54.0,
+"venueId": 2795
+},
+"822392": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 63.0,
+"venueId": 2795
+},
+"822702": {
+"condition": "Partly Cloudy",
+"elevationFt": 35.0,
+"factor": 1.01908,
+"rho": 1.17368,
+"tempF": 81.0,
+"venueId": 3309
+},
+"822703": {
+"condition": "Overcast",
+"elevationFt": 35.0,
+"factor": 0.99535,
+"rho": 1.20032,
+"tempF": 69.0,
+"venueId": 3309
 },
 "822704": {
 "condition": "Partly Cloudy",
@@ -2823,6 +4671,30 @@
 "tempF": 62.0,
 "venueId": 3309
 },
+"822781": {
+"condition": "Partly Cloudy",
+"elevationFt": 270.0,
+"factor": 1.02023,
+"rho": 1.17242,
+"tempF": 77.0,
+"venueId": 14
+},
+"822782": {
+"condition": "Clear",
+"elevationFt": 270.0,
+"factor": 1.02023,
+"rho": 1.17242,
+"tempF": 77.0,
+"venueId": 14
+},
+"822783": {
+"condition": "Roof Closed",
+"elevationFt": 270.0,
+"factor": 1.01025,
+"rho": 1.18345,
+"tempF": 72.0,
+"venueId": 14
+},
 "822784": {
 "condition": "Partly Cloudy",
 "elevationFt": 270.0,
@@ -2869,6 +4741,14 @@
 "factor": 1.01025,
 "rho": 1.18345,
 "tempF": 72.0,
+"venueId": 14
+},
+"822790": {
+"condition": "Roof Closed",
+"elevationFt": 270.0,
+"factor": 1.01025,
+"rho": 1.18345,
+"tempF": 68.0,
 "venueId": 14
 },
 "822791": {
@@ -2956,7 +4836,7 @@
 "elevationFt": 270.0,
 "factor": 1.01025,
 "rho": 1.18345,
-"tempF": 68.0,
+"tempF": 72.0,
 "venueId": 14
 },
 "822802": {
@@ -3262,6 +5142,22 @@
 "rho": 1.18345,
 "tempF": 68.0,
 "venueId": 14
+},
+"822865": {
+"condition": "Roof Closed",
+"elevationFt": 545.0,
+"factor": 1.02088,
+"rho": 1.17171,
+"tempF": 72.0,
+"venueId": 5325
+},
+"822867": {
+"condition": "Roof Closed",
+"elevationFt": 545.0,
+"factor": 1.02088,
+"rho": 1.17171,
+"tempF": 72.0,
+"venueId": 5325
 },
 "822868": {
 "condition": "Roof Closed",
@@ -3580,7 +5476,7 @@
 "elevationFt": 545.0,
 "factor": 1.02088,
 "rho": 1.17171,
-"tempF": 74.0,
+"tempF": 72.0,
 "venueId": 5325
 },
 "822908": {
@@ -3687,7 +5583,55 @@
 "tempF": 74.0,
 "venueId": 5325
 },
+"822943": {
+"condition": "Dome",
+"elevationFt": 15.0,
+"factor": 1.00052,
+"rho": 1.19441,
+"tempF": 72.0,
+"venueId": 12
+},
+"822944": {
+"condition": "Dome",
+"elevationFt": 15.0,
+"factor": 1.00052,
+"rho": 1.19441,
+"tempF": 72.0,
+"venueId": 12
+},
+"822945": {
+"condition": "Dome",
+"elevationFt": 15.0,
+"factor": 1.00052,
+"rho": 1.19441,
+"tempF": 72.0,
+"venueId": 12
+},
+"822946": {
+"condition": "Dome",
+"elevationFt": 15.0,
+"factor": 1.00052,
+"rho": 1.19441,
+"tempF": 72.0,
+"venueId": 12
+},
+"822947": {
+"condition": "Dome",
+"elevationFt": 15.0,
+"factor": 1.00052,
+"rho": 1.19441,
+"tempF": 72.0,
+"venueId": 12
+},
 "822948": {
+"condition": "Dome",
+"elevationFt": 15.0,
+"factor": 1.00052,
+"rho": 1.19441,
+"tempF": 72.0,
+"venueId": 12
+},
+"822949": {
 "condition": "Dome",
 "elevationFt": 15.0,
 "factor": 1.00052,
@@ -4119,12 +6063,36 @@
 "tempF": 72.0,
 "venueId": 12
 },
+"823022": {
+"condition": "Partly Cloudy",
+"elevationFt": 460.0,
+"factor": 1.04171,
+"rho": 1.14939,
+"tempF": 84.0,
+"venueId": 2889
+},
+"823023": {
+"condition": "Partly Cloudy",
+"elevationFt": 460.0,
+"factor": 1.04372,
+"rho": 1.14728,
+"tempF": 85.0,
+"venueId": 2889
+},
 "823025": {
 "condition": "Partly Cloudy",
 "elevationFt": 460.0,
 "factor": 1.05379,
 "rho": 1.13684,
 "tempF": 90.0,
+"venueId": 2889
+},
+"823026": {
+"condition": "Cloudy",
+"elevationFt": 460.0,
+"factor": 1.04775,
+"rho": 1.14308,
+"tempF": 87.0,
 "venueId": 2889
 },
 "823027": {
@@ -4583,12 +6551,44 @@
 "tempF": null,
 "venueId": 680
 },
+"823107": {
+"condition": "Cloudy",
+"elevationFt": 10.0,
+"factor": 0.99045,
+"rho": 1.20597,
+"tempF": 67.0,
+"venueId": 680
+},
+"823108": {
+"condition": "Cloudy",
+"elevationFt": 10.0,
+"factor": 1.01021,
+"rho": 1.1835,
+"tempF": 77.0,
+"venueId": 680
+},
+"823109": {
+"condition": "Partly Cloudy",
+"elevationFt": 10.0,
+"factor": 1.0023,
+"rho": 1.19238,
+"tempF": 73.0,
+"venueId": 680
+},
 "823110": {
 "condition": "Sunny",
 "elevationFt": 10.0,
 "factor": 1.02405,
 "rho": 1.16826,
 "tempF": 84.0,
+"venueId": 680
+},
+"823111": {
+"condition": "Clear",
+"elevationFt": 10.0,
+"factor": 1.01614,
+"rho": 1.17692,
+"tempF": 80.0,
 "venueId": 680
 },
 "823112": {
@@ -4621,6 +6621,14 @@
 "factor": 1.00033,
 "rho": 1.19463,
 "tempF": 72.0,
+"venueId": 680
+},
+"823116": {
+"condition": "Clear",
+"elevationFt": 10.0,
+"factor": 1.00428,
+"rho": 1.19015,
+"tempF": 74.0,
 "venueId": 680
 },
 "823117": {
@@ -4998,6 +7006,22 @@
 "rho": 1.24132,
 "tempF": 52.0,
 "venueId": 680
+},
+"823192": {
+"condition": "Sunny",
+"elevationFt": 0.0,
+"factor": 0.99008,
+"rho": 1.2064,
+"tempF": 67.0,
+"venueId": 2395
+},
+"823193": {
+"condition": "Clear",
+"elevationFt": 0.0,
+"factor": 0.98613,
+"rho": 1.211,
+"tempF": 65.0,
+"venueId": 2395
 },
 "823194": {
 "condition": "Partly Cloudy",
@@ -5407,12 +7431,60 @@
 "tempF": 63.0,
 "venueId": 2395
 },
+"823269": {
+"condition": "Clear",
+"elevationFt": 23.0,
+"factor": 1.01466,
+"rho": 1.17855,
+"tempF": 79.0,
+"venueId": 2680
+},
+"823270": {
+"condition": "Sunny",
+"elevationFt": 23.0,
+"factor": 1.0206,
+"rho": 1.17202,
+"tempF": 82.0,
+"venueId": 2680
+},
+"823271": {
+"condition": "Clear",
+"elevationFt": 23.0,
+"factor": 1.00675,
+"rho": 1.18737,
+"tempF": 75.0,
+"venueId": 2680
+},
+"823272": {
+"condition": "Clear",
+"elevationFt": 23.0,
+"factor": 1.00675,
+"rho": 1.18737,
+"tempF": 75.0,
+"venueId": 2680
+},
+"823273": {
+"condition": "Sunny",
+"elevationFt": 23.0,
+"factor": 1.01071,
+"rho": 1.18294,
+"tempF": 77.0,
+"venueId": 2680
+},
 "823274": {
 "condition": "Partly Cloudy",
 "elevationFt": 23.0,
 "factor": 1.0028,
 "rho": 1.19182,
 "tempF": 73.0,
+"venueId": 2680
+},
+"823275": {
+"condition": "Clear",
+"elevationFt": 23.0,
+"factor": 1.00477,
+"rho": 1.18959,
+"tempF": 74.0,
 "venueId": 2680
 },
 "823276": {
@@ -5821,6 +7893,22 @@
 "factor": 1.026,
 "rho": 1.16614,
 "tempF": null,
+"venueId": 31
+},
+"823350": {
+"condition": "Partly Cloudy",
+"elevationFt": 780.0,
+"factor": 1.04431,
+"rho": 1.14666,
+"tempF": 79.0,
+"venueId": 31
+},
+"823351": {
+"condition": "Cloudy",
+"elevationFt": 780.0,
+"factor": 1.0321,
+"rho": 1.15958,
+"tempF": 73.0,
 "venueId": 31
 },
 "823352": {
@@ -6263,6 +8351,22 @@
 "tempF": 75.0,
 "venueId": 31
 },
+"823431": {
+"condition": "Partly Cloudy",
+"elevationFt": 20.0,
+"factor": 1.03433,
+"rho": 1.15719,
+"tempF": 89.0,
+"venueId": 2681
+},
+"823432": {
+"condition": "Partly Cloudy",
+"elevationFt": 20.0,
+"factor": 1.02444,
+"rho": 1.16784,
+"tempF": 84.0,
+"venueId": 2681
+},
 "823433": {
 "condition": "Partly Cloudy",
 "elevationFt": 20.0,
@@ -6325,6 +8429,14 @@
 "factor": 1.04423,
 "rho": 1.14674,
 "tempF": 94.0,
+"venueId": 2681
+},
+"823441": {
+"condition": "Overcast",
+"elevationFt": 20.0,
+"factor": 1.03037,
+"rho": 1.16143,
+"tempF": 87.0,
 "venueId": 2681
 },
 "823442": {
@@ -6695,6 +8807,14 @@
 "tempF": 45.0,
 "venueId": 2681
 },
+"823517": {
+"condition": "Partly Cloudy",
+"elevationFt": 55.0,
+"factor": 1.01787,
+"rho": 1.17501,
+"tempF": 80.0,
+"venueId": 3313
+},
 "823518": {
 "condition": "Partly Cloudy",
 "elevationFt": 55.0,
@@ -6709,6 +8829,14 @@
 "factor": 1.02184,
 "rho": 1.17067,
 "tempF": 82.0,
+"venueId": 3313
+},
+"823520": {
+"condition": "Clear",
+"elevationFt": 55.0,
+"factor": 1.01787,
+"rho": 1.17501,
+"tempF": 80.0,
 "venueId": 3313
 },
 "823521": {
@@ -7087,12 +9215,60 @@
 "tempF": 52.0,
 "venueId": 3313
 },
+"823592": {
+"condition": "Partly Cloudy",
+"elevationFt": 10.0,
+"factor": 1.02009,
+"rho": 1.17257,
+"tempF": 82.0,
+"venueId": 3289
+},
+"823593": {
+"condition": "Partly Cloudy",
+"elevationFt": 10.0,
+"factor": 1.01416,
+"rho": 1.1791,
+"tempF": 79.0,
+"venueId": 3289
+},
+"823594": {
+"condition": "Sunny",
+"elevationFt": 10.0,
+"factor": 1.02998,
+"rho": 1.16185,
+"tempF": 87.0,
+"venueId": 3289
+},
+"823595": {
+"condition": "Cloudy",
+"elevationFt": 10.0,
+"factor": 1.00033,
+"rho": 1.19463,
+"tempF": 72.0,
+"venueId": 3289
+},
+"823596": {
+"condition": "Cloudy",
+"elevationFt": 10.0,
+"factor": 1.01218,
+"rho": 1.1813,
+"tempF": 78.0,
+"venueId": 3289
+},
 "823597": {
 "condition": "Cloudy",
 "elevationFt": 10.0,
 "factor": 1.01416,
 "rho": 1.1791,
 "tempF": 79.0,
+"venueId": 3289
+},
+"823598": {
+"condition": "Cloudy",
+"elevationFt": 10.0,
+"factor": 1.01021,
+"rho": 1.1835,
+"tempF": 77.0,
 "venueId": 3289
 },
 "823599": {
@@ -7510,6 +9686,30 @@
 "rho": 1.26607,
 "tempF": 42.0,
 "venueId": 3289
+},
+"823674": {
+"condition": "Partly Cloudy",
+"elevationFt": 828.0,
+"factor": 1.05642,
+"rho": 1.13414,
+"tempF": 84.0,
+"venueId": 3312
+},
+"823676": {
+"condition": "Partly Cloudy",
+"elevationFt": 828.0,
+"factor": 1.06663,
+"rho": 1.1238,
+"tempF": 89.0,
+"venueId": 3312
+},
+"823677": {
+"condition": "Partly Cloudy",
+"elevationFt": 828.0,
+"factor": 1.06867,
+"rho": 1.12176,
+"tempF": 90.0,
+"venueId": 3312
 },
 "823678": {
 "condition": "Partly Cloudy",
@@ -7951,6 +10151,22 @@
 "tempF": 86.0,
 "venueId": 32
 },
+"823756": {
+"condition": "Cloudy",
+"elevationFt": 597.0,
+"factor": 1.04312,
+"rho": 1.14791,
+"tempF": 82.0,
+"venueId": 32
+},
+"823757": {
+"condition": "Clear",
+"elevationFt": 597.0,
+"factor": 1.03099,
+"rho": 1.16077,
+"tempF": 76.0,
+"venueId": 32
+},
 "823758": {
 "condition": "Cloudy",
 "elevationFt": 597.0,
@@ -7989,6 +10205,14 @@
 "factor": 1.04312,
 "rho": 1.14791,
 "tempF": 82.0,
+"venueId": 32
+},
+"823763": {
+"condition": "Sunny",
+"elevationFt": 597.0,
+"factor": 1.05121,
+"rho": 1.1395,
+"tempF": 86.0,
 "venueId": 32
 },
 "823764": {
@@ -8076,7 +10300,7 @@
 "elevationFt": 597.0,
 "factor": 1.0229,
 "rho": 1.1695,
-"tempF": 69.0,
+"tempF": 72.0,
 "venueId": 32
 },
 "823775": {
@@ -8228,7 +10452,7 @@
 "elevationFt": 597.0,
 "factor": 1.0229,
 "rho": 1.1695,
-"tempF": 64.0,
+"tempF": 72.0,
 "venueId": 32
 },
 "823794": {
@@ -8382,6 +10606,22 @@
 "rho": 1.1695,
 "tempF": 65.0,
 "venueId": 32
+},
+"823837": {
+"condition": "Roof Closed",
+"elevationFt": 10.0,
+"factor": 1.00033,
+"rho": 1.19463,
+"tempF": 72.0,
+"venueId": 4169
+},
+"823838": {
+"condition": "Roof Closed",
+"elevationFt": 10.0,
+"factor": 1.00033,
+"rho": 1.19463,
+"tempF": 72.0,
+"venueId": 4169
 },
 "823839": {
 "condition": "Roof Closed",
@@ -8823,6 +11063,54 @@
 "tempF": 79.0,
 "venueId": 4169
 },
+"823919": {
+"condition": "Sunny",
+"elevationFt": 515.0,
+"factor": 1.04994,
+"rho": 1.1408,
+"tempF": 87.0,
+"venueId": 22
+},
+"823920": {
+"condition": "Clear",
+"elevationFt": 515.0,
+"factor": 1.04591,
+"rho": 1.14499,
+"tempF": 85.0,
+"venueId": 22
+},
+"823921": {
+"condition": "Clear",
+"elevationFt": 515.0,
+"factor": 1.0318,
+"rho": 1.1599,
+"tempF": 78.0,
+"venueId": 22
+},
+"823922": {
+"condition": "Clear",
+"elevationFt": 515.0,
+"factor": 1.0318,
+"rho": 1.1599,
+"tempF": 78.0,
+"venueId": 22
+},
+"823923": {
+"condition": "Clear",
+"elevationFt": 515.0,
+"factor": 1.02979,
+"rho": 1.16206,
+"tempF": 77.0,
+"venueId": 22
+},
+"823924": {
+"condition": "Clear",
+"elevationFt": 515.0,
+"factor": 1.02979,
+"rho": 1.16206,
+"tempF": 77.0,
+"venueId": 22
+},
 "823925": {
 "condition": "Cloudy",
 "elevationFt": 515.0,
@@ -9223,12 +11511,52 @@
 "tempF": 76.0,
 "venueId": 22
 },
+"823996": {
+"condition": "Sunny",
+"elevationFt": 151.0,
+"factor": 1.03551,
+"rho": 1.15594,
+"tempF": 87.0,
+"venueId": 1
+},
+"823999": {
+"condition": "Clear",
+"elevationFt": 151.0,
+"factor": 1.02954,
+"rho": 1.16232,
+"tempF": 84.0,
+"venueId": 1
+},
+"824000": {
+"condition": "Clear",
+"elevationFt": 151.0,
+"factor": 1.02954,
+"rho": 1.16232,
+"tempF": 84.0,
+"venueId": 1
+},
 "824001": {
 "condition": "Clear",
 "elevationFt": 151.0,
 "factor": 1.02557,
 "rho": 1.16661,
 "tempF": 82.0,
+"venueId": 1
+},
+"824002": {
+"condition": "Partly Cloudy",
+"elevationFt": 151.0,
+"factor": 1.02358,
+"rho": 1.16877,
+"tempF": 81.0,
+"venueId": 1
+},
+"824003": {
+"condition": "Clear",
+"elevationFt": 151.0,
+"factor": 1.02358,
+"rho": 1.16877,
+"tempF": 81.0,
 "venueId": 1
 },
 "824004": {
@@ -9261,6 +11589,14 @@
 "factor": 1.02954,
 "rho": 1.16232,
 "tempF": 84.0,
+"venueId": 1
+},
+"824008": {
+"condition": "Clear",
+"elevationFt": 151.0,
+"factor": 1.0196,
+"rho": 1.17311,
+"tempF": 79.0,
 "venueId": 1
 },
 "824009": {
@@ -9647,6 +11983,14 @@
 "tempF": 79.0,
 "venueId": 7
 },
+"824084": {
+"condition": "Overcast",
+"elevationFt": 856.0,
+"factor": 1.07186,
+"rho": 1.11858,
+"tempF": 91.0,
+"venueId": 7
+},
 "824085": {
 "condition": "Partly Cloudy",
 "elevationFt": 856.0,
@@ -9669,6 +12013,14 @@
 "factor": 1.08412,
 "rho": 1.10652,
 "tempF": 97.0,
+"venueId": 7
+},
+"824088": {
+"condition": "Partly Cloudy",
+"elevationFt": 856.0,
+"factor": 1.06981,
+"rho": 1.12061,
+"tempF": 90.0,
 "venueId": 7
 },
 "824089": {
@@ -10055,6 +12407,46 @@
 "tempF": 55.0,
 "venueId": 7
 },
+"824160": {
+"condition": "Roof Closed",
+"elevationFt": 45.0,
+"factor": 1.00166,
+"rho": 1.19312,
+"tempF": 72.0,
+"venueId": 2392
+},
+"824161": {
+"condition": "Roof Closed",
+"elevationFt": 45.0,
+"factor": 1.00166,
+"rho": 1.19312,
+"tempF": 72.0,
+"venueId": 2392
+},
+"824162": {
+"condition": "Roof Closed",
+"elevationFt": 45.0,
+"factor": 1.00166,
+"rho": 1.19312,
+"tempF": 72.0,
+"venueId": 2392
+},
+"824163": {
+"condition": "Roof Closed",
+"elevationFt": 45.0,
+"factor": 1.00166,
+"rho": 1.19312,
+"tempF": 72.0,
+"venueId": 2392
+},
+"824164": {
+"condition": "Roof Closed",
+"elevationFt": 45.0,
+"factor": 1.00166,
+"rho": 1.19312,
+"tempF": 72.0,
+"venueId": 2392
+},
 "824165": {
 "condition": "Roof Closed",
 "elevationFt": 45.0,
@@ -10085,6 +12477,14 @@
 "factor": 1.00166,
 "rho": 1.19312,
 "tempF": 72.0,
+"venueId": 2392
+},
+"824169": {
+"condition": "Roof Closed",
+"elevationFt": 45.0,
+"factor": 1.00166,
+"rho": 1.19312,
+"tempF": 73.0,
 "venueId": 2392
 },
 "824170": {
@@ -10356,7 +12756,7 @@
 "elevationFt": 45.0,
 "factor": 1.00166,
 "rho": 1.19312,
-"tempF": 73.0,
+"tempF": 72.0,
 "venueId": 2392
 },
 "824204": {
@@ -10470,6 +12870,22 @@
 "rho": 1.19312,
 "tempF": 73.0,
 "venueId": 2392
+},
+"824242": {
+"condition": "Sunny",
+"elevationFt": 600.0,
+"factor": 1.03717,
+"rho": 1.15418,
+"tempF": 79.0,
+"venueId": 2394
+},
+"824243": {
+"condition": "Partly Cloudy",
+"elevationFt": 600.0,
+"factor": 1.03717,
+"rho": 1.15418,
+"tempF": 79.0,
+"venueId": 2394
 },
 "824244": {
 "condition": "Partly Cloudy",
@@ -10919,6 +13335,46 @@
 "tempF": null,
 "venueId": 3110
 },
+"824321": {
+"condition": "Partly Cloudy",
+"elevationFt": 5190.0,
+"factor": 1.23163,
+"rho": 0.97993,
+"tempF": 76.0,
+"venueId": 19
+},
+"824323": {
+"condition": "Sunny",
+"elevationFt": 5190.0,
+"factor": 1.28722,
+"rho": 0.93959,
+"tempF": 99.0,
+"venueId": 19
+},
+"824324": {
+"condition": "Cloudy",
+"elevationFt": 5190.0,
+"factor": 1.26303,
+"rho": 0.95671,
+"tempF": 89.0,
+"venueId": 19
+},
+"824325": {
+"condition": "Partly Cloudy",
+"elevationFt": 5190.0,
+"factor": 1.25337,
+"rho": 0.96374,
+"tempF": 85.0,
+"venueId": 19
+},
+"824326": {
+"condition": "Clear",
+"elevationFt": 5190.0,
+"factor": 1.27512,
+"rho": 0.94807,
+"tempF": 94.0,
+"venueId": 19
+},
 "824327": {
 "condition": "Sunny",
 "elevationFt": 5190.0,
@@ -10949,6 +13405,14 @@
 "factor": 1.27029,
 "rho": 0.95151,
 "tempF": 92.0,
+"venueId": 19
+},
+"824331": {
+"condition": "Sunny",
+"elevationFt": 5190.0,
+"factor": 1.26303,
+"rho": 0.95671,
+"tempF": 89.0,
 "venueId": 19
 },
 "824332": {
@@ -11343,12 +13807,44 @@
 "tempF": null,
 "venueId": 3125
 },
+"824403": {
+"condition": "Clear",
+"elevationFt": 653.0,
+"factor": 1.03724,
+"rho": 1.1541,
+"tempF": 78.0,
+"venueId": 5
+},
+"824404": {
+"condition": "Overcast",
+"elevationFt": 653.0,
+"factor": 1.04332,
+"rho": 1.1477,
+"tempF": 81.0,
+"venueId": 5
+},
+"824405": {
+"condition": "Partly Cloudy",
+"elevationFt": 653.0,
+"factor": 1.04129,
+"rho": 1.14983,
+"tempF": 80.0,
+"venueId": 5
+},
 "824406": {
 "condition": "Sunny",
 "elevationFt": 653.0,
 "factor": 1.02509,
 "rho": 1.16713,
 "tempF": 72.0,
+"venueId": 5
+},
+"824407": {
+"condition": "Partly Cloudy",
+"elevationFt": 653.0,
+"factor": 1.03927,
+"rho": 1.15196,
+"tempF": 79.0,
 "venueId": 5
 },
 "824408": {
@@ -11383,12 +13879,28 @@
 "tempF": 76.0,
 "venueId": 5
 },
+"824412": {
+"condition": "Cloudy",
+"elevationFt": 653.0,
+"factor": 1.03927,
+"rho": 1.15196,
+"tempF": 79.0,
+"venueId": 5
+},
 "824413": {
 "condition": "Partly Cloudy",
 "elevationFt": 653.0,
 "factor": 1.04129,
 "rho": 1.14983,
 "tempF": 80.0,
+"venueId": 5
+},
+"824414": {
+"condition": "Partly Cloudy",
+"elevationFt": 653.0,
+"factor": 1.05953,
+"rho": 1.13097,
+"tempF": 89.0,
 "venueId": 5
 },
 "824415": {
@@ -11750,6 +14262,62 @@
 "rho": 1.23201,
 "tempF": 44.0,
 "venueId": 5
+},
+"824483": {
+"condition": "Partly Cloudy",
+"elevationFt": 535.0,
+"factor": 1.02452,
+"rho": 1.16774,
+"tempF": 74.0,
+"venueId": 2602
+},
+"824484": {
+"condition": "Clear",
+"elevationFt": 535.0,
+"factor": 1.04873,
+"rho": 1.14206,
+"tempF": 86.0,
+"venueId": 2602
+},
+"824485": {
+"condition": "Overcast",
+"elevationFt": 535.0,
+"factor": 1.02855,
+"rho": 1.16338,
+"tempF": 76.0,
+"venueId": 2602
+},
+"824486": {
+"condition": "Clear",
+"elevationFt": 535.0,
+"factor": 1.04469,
+"rho": 1.14626,
+"tempF": 84.0,
+"venueId": 2602
+},
+"824487": {
+"condition": "Clear",
+"elevationFt": 535.0,
+"factor": 1.04066,
+"rho": 1.1505,
+"tempF": 82.0,
+"venueId": 2602
+},
+"824488": {
+"condition": "Partly Cloudy",
+"elevationFt": 535.0,
+"factor": 1.04469,
+"rho": 1.14626,
+"tempF": 84.0,
+"venueId": 2602
+},
+"824489": {
+"condition": "Partly Cloudy",
+"elevationFt": 535.0,
+"factor": 1.04469,
+"rho": 1.14626,
+"tempF": 84.0,
+"venueId": 2602
 },
 "824490": {
 "condition": "Partly Cloudy",
@@ -12158,6 +14726,30 @@
 "rho": 1.15262,
 "tempF": 81.0,
 "venueId": 2602
+},
+"824567": {
+"condition": "Clear",
+"elevationFt": 595.0,
+"factor": 1.02889,
+"rho": 1.16302,
+"tempF": 75.0,
+"venueId": 4
+},
+"824568": {
+"condition": "Partly Cloudy",
+"elevationFt": 595.0,
+"factor": 1.04708,
+"rho": 1.14377,
+"tempF": 84.0,
+"venueId": 4
+},
+"824569": {
+"condition": "Partly Cloudy",
+"elevationFt": 595.0,
+"factor": 1.02485,
+"rho": 1.16739,
+"tempF": 73.0,
+"venueId": 4
 },
 "824570": {
 "condition": "Clear",
@@ -12575,12 +15167,52 @@
 "tempF": 50.0,
 "venueId": 4
 },
+"824645": {
+"condition": "Partly Cloudy",
+"elevationFt": 595.0,
+"factor": 1.04506,
+"rho": 1.14588,
+"tempF": 83.0,
+"venueId": 17
+},
+"824647": {
+"condition": "Clear",
+"elevationFt": 595.0,
+"factor": 1.03091,
+"rho": 1.16085,
+"tempF": 76.0,
+"venueId": 17
+},
+"824648": {
+"condition": "Overcast",
+"elevationFt": 595.0,
+"factor": 1.02081,
+"rho": 1.17179,
+"tempF": 71.0,
+"venueId": 17
+},
+"824649": {
+"condition": "Overcast",
+"elevationFt": 595.0,
+"factor": 1.02081,
+"rho": 1.17179,
+"tempF": 71.0,
+"venueId": 17
+},
 "824650": {
 "condition": "Clear",
 "elevationFt": 595.0,
 "factor": 1.02283,
 "rho": 1.16959,
 "tempF": 72.0,
+"venueId": 17
+},
+"824651": {
+"condition": "Cloudy",
+"elevationFt": 595.0,
+"factor": 1.03293,
+"rho": 1.15869,
+"tempF": 77.0,
 "venueId": 17
 },
 "824652": {
@@ -12621,6 +15253,14 @@
 "factor": 1.01879,
 "rho": 1.174,
 "tempF": 70.0,
+"venueId": 17
+},
+"824657": {
+"condition": "Partly Cloudy",
+"elevationFt": 595.0,
+"factor": 1.04101,
+"rho": 1.15012,
+"tempF": 81.0,
 "venueId": 17
 },
 "824658": {
@@ -12991,6 +15631,14 @@
 "tempF": 75.0,
 "venueId": 3
 },
+"824731": {
+"condition": "Clear",
+"elevationFt": 21.0,
+"factor": 1.02052,
+"rho": 1.17211,
+"tempF": 82.0,
+"venueId": 3
+},
 "824732": {
 "condition": "Overcast",
 "elevationFt": 21.0,
@@ -13037,6 +15685,14 @@
 "factor": 1.02447,
 "rho": 1.16779,
 "tempF": 84.0,
+"venueId": 3
+},
+"824738": {
+"condition": "Cloudy",
+"elevationFt": 21.0,
+"factor": 0.99877,
+"rho": 1.1964,
+"tempF": 71.0,
 "venueId": 3
 },
 "824739": {
@@ -13406,6 +16062,38 @@
 "rho": 1.2312,
 "tempF": 56.0,
 "venueId": 3
+},
+"824805": {
+"condition": "Partly Cloudy",
+"elevationFt": 33.0,
+"factor": 1.03286,
+"rho": 1.15876,
+"tempF": 88.0,
+"venueId": 2
+},
+"824807": {
+"condition": "Cloudy",
+"elevationFt": 33.0,
+"factor": 1.02098,
+"rho": 1.1716,
+"tempF": 82.0,
+"venueId": 2
+},
+"824808": {
+"condition": "Cloudy",
+"elevationFt": 33.0,
+"factor": 1.02098,
+"rho": 1.1716,
+"tempF": 82.0,
+"venueId": 2
+},
+"824809": {
+"condition": "Partly Cloudy",
+"elevationFt": 33.0,
+"factor": 1.02098,
+"rho": 1.1716,
+"tempF": 82.0,
+"venueId": 2
 },
 "824810": {
 "condition": "Partly Cloudy",
@@ -13855,12 +16543,52 @@
 "tempF": 77.0,
 "venueId": 2
 },
+"824888": {
+"condition": "Partly Cloudy",
+"elevationFt": 1001.0,
+"factor": 1.06548,
+"rho": 1.12495,
+"tempF": 85.0,
+"venueId": 4705
+},
+"824890": {
+"condition": "Clear",
+"elevationFt": 1001.0,
+"factor": 1.07164,
+"rho": 1.11879,
+"tempF": 88.0,
+"venueId": 4705
+},
+"824891": {
+"condition": "Partly Cloudy",
+"elevationFt": 1001.0,
+"factor": 1.06753,
+"rho": 1.12289,
+"tempF": 86.0,
+"venueId": 4705
+},
+"824892": {
+"condition": "Clear",
+"elevationFt": 1001.0,
+"factor": 1.0737,
+"rho": 1.11675,
+"tempF": 89.0,
+"venueId": 4705
+},
 "824893": {
 "condition": "Cloudy",
 "elevationFt": 1001.0,
 "factor": 1.05932,
 "rho": 1.13118,
 "tempF": 82.0,
+"venueId": 4705
+},
+"824894": {
+"condition": "Clear",
+"elevationFt": 1001.0,
+"factor": 1.06959,
+"rho": 1.12084,
+"tempF": 87.0,
 "venueId": 4705
 },
 "824895": {
@@ -13893,6 +16621,14 @@
 "factor": 1.07781,
 "rho": 1.1127,
 "tempF": 91.0,
+"venueId": 4705
+},
+"824899": {
+"condition": "Partly Cloudy",
+"elevationFt": 1001.0,
+"factor": 1.07986,
+"rho": 1.11068,
+"tempF": 92.0,
 "venueId": 4705
 },
 "824900": {
@@ -14263,6 +16999,54 @@
 "tempF": 77.0,
 "venueId": 4705
 },
+"824971": {
+"condition": "Sunny",
+"elevationFt": 24.0,
+"factor": 1.04637,
+"rho": 1.14451,
+"tempF": 95.0,
+"venueId": 2529
+},
+"824972": {
+"condition": "Clear",
+"elevationFt": 24.0,
+"factor": 1.05231,
+"rho": 1.13835,
+"tempF": 98.0,
+"venueId": 2529
+},
+"824973": {
+"condition": "Clear",
+"elevationFt": 24.0,
+"factor": 1.03845,
+"rho": 1.15283,
+"tempF": 91.0,
+"venueId": 2529
+},
+"824974": {
+"condition": "Clear",
+"elevationFt": 24.0,
+"factor": 1.03647,
+"rho": 1.15492,
+"tempF": 90.0,
+"venueId": 2529
+},
+"824975": {
+"condition": "Clear",
+"elevationFt": 24.0,
+"factor": 1.04637,
+"rho": 1.14451,
+"tempF": 95.0,
+"venueId": 2529
+},
+"824976": {
+"condition": "Clear",
+"elevationFt": 24.0,
+"factor": 1.04043,
+"rho": 1.15074,
+"tempF": 92.0,
+"venueId": 2529
+},
 "824977": {
 "condition": "Clear",
 "elevationFt": 24.0,
@@ -14277,6 +17061,14 @@
 "factor": 1.02855,
 "rho": 1.16339,
 "tempF": 86.0,
+"venueId": 2529
+},
+"824979": {
+"condition": "Clear",
+"elevationFt": 24.0,
+"factor": 1.03251,
+"rho": 1.15914,
+"tempF": 88.0,
 "venueId": 2529
 },
 "824980": {
@@ -14663,6 +17455,14 @@
 "tempF": 76.0,
 "venueId": 2529
 },
+"825054": {
+"condition": "Roof Closed",
+"elevationFt": 1086.0,
+"factor": 1.04217,
+"rho": 1.1489,
+"tempF": 72.0,
+"venueId": 15
+},
 "825055": {
 "condition": "Roof Closed",
 "elevationFt": 1086.0,
@@ -14693,6 +17493,14 @@
 "factor": 1.04217,
 "rho": 1.1489,
 "tempF": 72.0,
+"venueId": 15
+},
+"825059": {
+"condition": "Roof Closed",
+"elevationFt": 1086.0,
+"factor": 1.04217,
+"rho": 1.1489,
+"tempF": 76.0,
 "venueId": 15
 },
 "825060": {
@@ -14975,6 +17783,14 @@
 "tempF": 85.0,
 "venueId": 5340
 },
+"825095": {
+"condition": "Roof Closed",
+"elevationFt": 1086.0,
+"factor": 1.04217,
+"rho": 1.1489,
+"tempF": 72.0,
+"venueId": 15
+},
 "825096": {
 "condition": "Roof Closed",
 "elevationFt": 1086.0,
@@ -15103,6 +17919,14 @@
 "tempF": 68.0,
 "venueId": 2392
 },
+"828169": {
+"condition": "Partly Cloudy",
+"elevationFt": 20.0,
+"factor": 1.02444,
+"rho": 1.16784,
+"tempF": 84.0,
+"venueId": 2852
+},
 "828170": {
 "condition": "Clear",
 "elevationFt": 20.0,
@@ -15121,57 +17945,57 @@
 },
 "828178": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 673.0,
+"factor": 1.00765,
+"rho": 1.18636,
 "tempF": 63.0,
 "venueId": 2528
 },
 "828179": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 673.0,
+"factor": 0.98539,
+"rho": 1.21187,
 "tempF": 52.0,
 "venueId": 2528
 },
 "828197": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.09711,
+"rho": 1.09404,
 "tempF": 96.0,
 "venueId": 2603
 },
 "828200": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.09503,
+"rho": 1.09602,
 "tempF": 95.0,
 "venueId": 2603
 },
 "828201": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.07846,
+"rho": 1.11206,
 "tempF": 87.0,
 "venueId": 2603
 },
 "828203": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.07017,
+"rho": 1.12025,
 "tempF": 83.0,
 "venueId": 2603
 },
 "828204": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.08674,
+"rho": 1.10398,
 "tempF": 91.0,
 "venueId": 2603
 },
@@ -15185,9 +18009,9 @@
 },
 "828211": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.06603,
+"rho": 1.1244,
 "tempF": 81.0,
 "venueId": 2603
 },
@@ -15233,18 +18057,50 @@
 },
 "828227": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 33.0,
+"factor": 1.0289,
+"rho": 1.16301,
 "tempF": 86.0,
+"venueId": 2700
+},
+"828232": {
+"condition": "Clear",
+"elevationFt": 33.0,
+"factor": 1.02296,
+"rho": 1.16944,
+"tempF": 83.0,
+"venueId": 2700
+},
+"828234": {
+"condition": "Sunny",
+"elevationFt": 33.0,
+"factor": 1.03088,
+"rho": 1.16088,
+"tempF": 87.0,
+"venueId": 2700
+},
+"828236": {
+"condition": "Sunny",
+"elevationFt": 33.0,
+"factor": 1.0388,
+"rho": 1.15245,
+"tempF": 91.0,
 "venueId": 2700
 },
 "828237": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 33.0,
+"factor": 1.01703,
+"rho": 1.17594,
 "tempF": 80.0,
+"venueId": 2700
+},
+"828238": {
+"condition": "Partly Cloudy",
+"elevationFt": 33.0,
+"factor": 1.02494,
+"rho": 1.16729,
+"tempF": 84.0,
 "venueId": 2700
 },
 "829616": {
@@ -15263,27 +18119,35 @@
 "tempF": 72.0,
 "venueId": 5325
 },
+"829623": {
+"condition": "Roof Closed",
+"elevationFt": 545.0,
+"factor": 1.02088,
+"rho": 1.17171,
+"tempF": 72.0,
+"venueId": 5325
+},
 "829628": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.05361,
+"rho": 1.13702,
 "tempF": 75.0,
 "venueId": 2603
 },
 "829629": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.035,
+"rho": 1.15648,
 "tempF": 66.0,
 "venueId": 2603
 },
 "829630": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.0412,
+"rho": 1.14992,
 "tempF": 69.0,
 "venueId": 2603
 },
@@ -15351,44 +18215,164 @@
 "tempF": 72.0,
 "venueId": 5325
 },
+"830145": {
+"condition": "Sunny",
+"elevationFt": 518.0,
+"factor": 1.04603,
+"rho": 1.14487,
+"tempF": 85.0,
+"venueId": 2735
+},
+"830150": {
+"condition": "Cloudy",
+"elevationFt": 1070.0,
+"factor": 1.05388,
+"rho": 1.13674,
+"tempF": 78.0,
+"venueId": 4965
+},
+"830154": {
+"condition": "Partly Cloudy",
+"elevationFt": 1158.0,
+"factor": 1.06156,
+"rho": 1.1289,
+"tempF": 80.0,
+"venueId": 2912
+},
 "830162": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1070.0,
+"factor": 1.08065,
+"rho": 1.10991,
 "tempF": 91.0,
 "venueId": 4965
 },
 "830176": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 889.0,
+"factor": 1.07321,
+"rho": 1.11724,
 "tempF": 91.0,
 "venueId": 2738
 },
 "830177": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1158.0,
+"factor": 1.0533,
+"rho": 1.13733,
 "tempF": 76.0,
+"venueId": 2912
+},
+"830178": {
+"condition": "Drizzle",
+"elevationFt": 1070.0,
+"factor": 1.04565,
+"rho": 1.14526,
+"tempF": 74.0,
+"venueId": 4965
+},
+"830180": {
+"condition": "Overcast",
+"elevationFt": 1158.0,
+"factor": 1.03886,
+"rho": 1.15239,
+"tempF": 69.0,
 "venueId": 2912
 },
 "830192": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 52.0,
+"factor": 0.99797,
+"rho": 1.19732,
 "tempF": 70.0,
 "venueId": 2842
 },
+"830195": {
+"condition": "Partly Cloudy",
+"elevationFt": 889.0,
+"factor": 1.03845,
+"rho": 1.15283,
+"tempF": 74.0,
+"venueId": 2738
+},
+"830197": {
+"condition": "Cloudy",
+"elevationFt": 1070.0,
+"factor": 1.04359,
+"rho": 1.14741,
+"tempF": 73.0,
+"venueId": 4965
+},
 "830202": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 889.0,
+"factor": 1.03232,
+"rho": 1.15934,
 "tempF": 71.0,
+"venueId": 2738
+},
+"830211": {
+"condition": "Cloudy",
+"elevationFt": 1070.0,
+"factor": 1.05388,
+"rho": 1.13674,
+"tempF": 78.0,
+"venueId": 4965
+},
+"830216": {
+"condition": "Partly Cloudy",
+"elevationFt": 889.0,
+"factor": 1.04458,
+"rho": 1.14638,
+"tempF": 77.0,
+"venueId": 2738
+},
+"830220": {
+"condition": "Partly Cloudy",
+"elevationFt": 889.0,
+"factor": 1.05275,
+"rho": 1.1379,
+"tempF": 81.0,
+"venueId": 2738
+},
+"830233": {
+"condition": "Cloudy",
+"elevationFt": 889.0,
+"factor": 1.04866,
+"rho": 1.14213,
+"tempF": 79.0,
+"venueId": 2738
+},
+"830237": {
+"condition": "Cloudy",
+"elevationFt": 1070.0,
+"factor": 1.05388,
+"rho": 1.13674,
+"tempF": 78.0,
+"venueId": 4965
+},
+"830243": {
+"condition": "Overcast",
+"elevationFt": 1158.0,
+"factor": 1.04505,
+"rho": 1.14589,
+"tempF": 72.0,
+"venueId": 2912
+},
+"830249": {
+"condition": "Clear",
+"elevationFt": 518.0,
+"factor": 1.04603,
+"rho": 1.14487,
+"tempF": 85.0,
+"venueId": 2735
+},
+"830250": {
+"condition": "Clear",
+"elevationFt": 889.0,
+"factor": 1.05684,
+"rho": 1.13371,
+"tempF": 83.0,
 "venueId": 2738
 },
 "831441": {
@@ -15398,6 +18382,54 @@
 "rho": 1.1798,
 "tempF": 78.0,
 "venueId": 2392
+},
+"831445": {
+"condition": "Partly Cloudy",
+"elevationFt": 39.0,
+"factor": 1.02122,
+"rho": 1.17134,
+"tempF": 82.0,
+"venueId": 2508
+},
+"831470": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 83.0,
+"venueId": 2526
+},
+"831482": {
+"condition": "Sunny",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 84.0,
+"venueId": 2520
+},
+"831489": {
+"condition": "Sunny",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 62.0,
+"venueId": 2520
+},
+"831491": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 68.0,
+"venueId": 5000
+},
+"831493": {
+"condition": "Sunny",
+"elevationFt": 34.0,
+"factor": 1.01311,
+"rho": 1.18027,
+"tempF": 78.0,
+"venueId": 2523
 },
 "831510": {
 "condition": "Rain",
@@ -15409,11 +18441,91 @@
 },
 "831512": {
 "condition": "Cloudy",
+"elevationFt": 164.0,
+"factor": 1.01414,
+"rho": 1.17912,
+"tempF": 76.0,
+"venueId": 2511
+},
+"831514": {
+"condition": "Cloudy",
+"elevationFt": 34.0,
+"factor": 1.01706,
+"rho": 1.1759,
+"tempF": 80.0,
+"venueId": 2523
+},
+"831515": {
+"condition": "Cloudy",
 "elevationFt": null,
 "factor": 1.0,
 "rho": null,
-"tempF": 76.0,
+"tempF": 85.0,
+"venueId": 4309
+},
+"831517": {
+"condition": "Clear",
+"elevationFt": 34.0,
+"factor": 1.02102,
+"rho": 1.17156,
+"tempF": 82.0,
+"venueId": 2523
+},
+"831528": {
+"condition": "Partly Cloudy",
+"elevationFt": 164.0,
+"factor": 1.02011,
+"rho": 1.17256,
+"tempF": 79.0,
 "venueId": 2511
+},
+"831532": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 82.0,
+"venueId": 2534
+},
+"831542": {
+"condition": "Sunny",
+"elevationFt": 19.0,
+"factor": 1.01451,
+"rho": 1.17872,
+"tempF": 79.0,
+"venueId": 2536
+},
+"831562": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 80.0,
+"venueId": 2526
+},
+"831563": {
+"condition": "Partly Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 79.0,
+"venueId": 5380
+},
+"831565": {
+"condition": "Partly Cloudy",
+"elevationFt": 33.0,
+"factor": 1.01307,
+"rho": 1.18031,
+"tempF": 78.0,
+"venueId": 2700
+},
+"831568": {
+"condition": "Clear",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 75.0,
+"venueId": 5000
 },
 "831572": {
 "condition": "Partly Cloudy",
@@ -15441,9 +18553,9 @@
 },
 "831591": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 33.0,
+"factor": 0.98934,
+"rho": 1.20726,
 "tempF": 66.0,
 "venueId": 2700
 },
@@ -15463,11 +18575,27 @@
 "tempF": 81.0,
 "venueId": 5000
 },
-"831610": {
+"831601": {
 "condition": "Sunny",
+"elevationFt": 164.0,
+"factor": 1.01414,
+"rho": 1.17912,
+"tempF": 76.0,
+"venueId": 2511
+},
+"831609": {
+"condition": "Overcast",
 "elevationFt": null,
 "factor": 1.0,
 "rho": null,
+"tempF": 56.0,
+"venueId": 2534
+},
+"831610": {
+"condition": "Sunny",
+"elevationFt": 164.0,
+"factor": 0.97442,
+"rho": 1.22485,
 "tempF": 56.0,
 "venueId": 2511
 },
@@ -15495,6 +18623,30 @@
 "tempF": 79.0,
 "venueId": 2536
 },
+"831628": {
+"condition": "Partly Cloudy",
+"elevationFt": 39.0,
+"factor": 1.02122,
+"rho": 1.17134,
+"tempF": 82.0,
+"venueId": 2508
+},
+"831634": {
+"condition": "Cloudy",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 85.0,
+"venueId": 4309
+},
+"831636": {
+"condition": "Sunny",
+"elevationFt": 34.0,
+"factor": 1.00717,
+"rho": 1.18689,
+"tempF": 75.0,
+"venueId": 2523
+},
 "831637": {
 "condition": "Partly Cloudy",
 "elevationFt": null,
@@ -15503,11 +18655,19 @@
 "tempF": 77.0,
 "venueId": 2534
 },
+"831649": {
+"condition": "Sunny",
+"elevationFt": 19.0,
+"factor": 0.96315,
+"rho": 1.2385,
+"tempF": 53.0,
+"venueId": 2536
+},
 "831657": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 164.0,
+"factor": 1.00421,
+"rho": 1.19023,
 "tempF": 71.0,
 "venueId": 2511
 },
@@ -15519,6 +18679,14 @@
 "tempF": 82.0,
 "venueId": 2518
 },
+"831779": {
+"condition": "Sunny",
+"elevationFt": 1184.0,
+"factor": 1.08537,
+"rho": 1.10531,
+"tempF": 91.0,
+"venueId": 4629
+},
 "831784": {
 "condition": "Sunny",
 "elevationFt": null,
@@ -15529,9 +18697,9 @@
 },
 "831789": {
 "condition": "Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1184.0,
+"factor": 1.09572,
+"rho": 1.09536,
 "tempF": 96.0,
 "venueId": 4629
 },
@@ -15553,9 +18721,9 @@
 },
 "831794": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.07846,
+"rho": 1.11206,
 "tempF": 87.0,
 "venueId": 2603
 },
@@ -15575,11 +18743,19 @@
 "tempF": 85.0,
 "venueId": 2507
 },
-"831829": {
+"831826": {
 "condition": "Sunny",
 "elevationFt": null,
 "factor": 1.0,
 "rho": null,
+"tempF": 69.0,
+"venueId": 3834
+},
+"831829": {
+"condition": "Sunny",
+"elevationFt": 1217.0,
+"factor": 1.02053,
+"rho": 1.17209,
 "tempF": 59.0,
 "venueId": 2603
 },
@@ -15589,6 +18765,30 @@
 "factor": 1.07557,
 "rho": 1.1149,
 "tempF": 84.0,
+"venueId": 4249
+},
+"831881": {
+"condition": "Sunny",
+"elevationFt": 1217.0,
+"factor": 1.05775,
+"rho": 1.13278,
+"tempF": 77.0,
+"venueId": 2603
+},
+"831886": {
+"condition": "Sunny",
+"elevationFt": null,
+"factor": 1.0,
+"rho": null,
+"tempF": 77.0,
+"venueId": 2507
+},
+"831888": {
+"condition": "Sunny",
+"elevationFt": 1298.0,
+"factor": 1.08388,
+"rho": 1.10675,
+"tempF": 88.0,
 "venueId": 4249
 },
 "831915": {
@@ -15601,17 +18801,17 @@
 },
 "831927": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.06396,
+"rho": 1.12648,
 "tempF": 80.0,
 "venueId": 2603
 },
 "831936": {
 "condition": "Sunny",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1217.0,
+"factor": 1.07639,
+"rho": 1.11409,
 "tempF": 86.0,
 "venueId": 2603
 },
@@ -15646,6 +18846,22 @@
 "rho": null,
 "tempF": 79.0,
 "venueId": 2507
+},
+"832034": {
+"condition": "Sunny",
+"elevationFt": 39.0,
+"factor": 1.01924,
+"rho": 1.17351,
+"tempF": 81.0,
+"venueId": 2508
+},
+"832062": {
+"condition": "Sunny",
+"elevationFt": 34.0,
+"factor": 0.99333,
+"rho": 1.20264,
+"tempF": 68.0,
+"venueId": 2523
 },
 "832651": {
 "condition": "Clear",
@@ -15745,17 +18961,25 @@
 },
 "837212": {
 "condition": "Clear",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1184.0,
+"factor": 1.03989,
+"rho": 1.1513,
 "tempF": 69.0,
+"venueId": 4629
+},
+"837214": {
+"condition": "Partly Cloudy",
+"elevationFt": 1184.0,
+"factor": 1.04195,
+"rho": 1.14913,
+"tempF": 70.0,
 "venueId": 4629
 },
 "842596": {
 "condition": "Partly Cloudy",
-"elevationFt": null,
-"factor": 1.0,
-"rho": null,
+"elevationFt": 1191.0,
+"factor": 1.07739,
+"rho": 1.11311,
 "tempF": 87.0,
 "venueId": 2843
 },
@@ -15774,6 +18998,14 @@
 "rho": 1.21244,
 "tempF": 64.0,
 "venueId": 2852
+},
+"845464": {
+"condition": "Cloudy",
+"elevationFt": 595.0,
+"factor": 0.96231,
+"rho": 1.23953,
+"tempF": 42.0,
+"venueId": 17
 },
 "846865": {
 "condition": "Cloudy",
