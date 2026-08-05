@@ -86,10 +86,18 @@ MIN_CLUSTER = 3      # in-game pitches of a type needed to form a centroid
 MARGIN_MIN = 1.0     # d_own - d_best, in within-game RMS-z
 D_BEST_MAX = 3.0     # pitch must genuinely look like the target
 D_BEST_REVIEW = 4.0  # wider band surfaced for manual adjudication
-ORPHAN_DBEST = 2.5   # tighter: orphans have no d_own evidence. ROC orphan
-#   d_best runs min 2.27 / p05 3.57 / median 6.99, so orphans normally sit far
-#   from every other in-game cluster. 2.5 is where a pitch becomes statistically
-#   indistinguishable from the cluster it is near, not a percentile cut.
+ORPHAN_DBEST = 2.0   # MEASURED, not reasoned. Injecting orphan mistags (relabel
+#   a pitch to a type with no other instances that game, which is exactly how a
+#   real mistag creates an orphan) gives a sharp precision cliff:
+#       d_best <= 2.0   86.2% recall, 0.16 false flags per 1000 orphans
+#       d_best <= 2.5   92.1% recall, 6.17   <-- 39x worse
+#       d_best <= 3.0   94.6% recall, 19.97
+#   ROC has ~440 real orphans, so 2.5 expects ~2.7 false flags and produced
+#   exactly 3 -- indistinguishable from noise. An earlier version of this file
+#   loosened the gate to 2.5 on the argument that 2.5 is where a pitch becomes
+#   statistically indistinguishable from the cluster it sits near. That argument
+#   was plausible and wrong; the injection curve settles it.
+ORPHAN_REVIEW = 2.5  # surfaced for eyeballing, never tiered above Low
 SCALE_MIN_N = 6      # cluster size contributing to noise-scale estimation
 CSV_TIERS = {'High', 'Medium'}   # stdout still prints every tier
 PLOTDIR = os.path.expanduser('~/Downloads/roc_tag_plots')
@@ -287,8 +295,12 @@ def confidence(flags, rows):
         ntype = own_in_game[(p['Pitcher'], p['_g'], f['own'])] or 1
         f['nflip'], f['ntype'] = nflip, ntype
         if f['kind'] == 'orphan':
-            # no margin evidence; score on fit to the target alone
-            s = 100 * (0.7 * max(0.0, 1 - f['d_best'] / ORPHAN_DBEST) + 0.3)
+            # Tier straight off the measured precision cliff (see ORPHAN_DBEST),
+            # not off an invented continuous formula. The previous formula could
+            # not exceed ~40 in practice, so no orphan could ever reach Medium
+            # and any "Medium+" filter silently deleted the whole mechanism.
+            d = f['d_best']
+            s = 82 if d <= 1.75 else 62 if d <= ORPHAN_DBEST else 30
         else:
             m = min(1.0, f['margin'] / 3.0)
             a = (f['agree'] / f['tot']) if f['tot'] else 0.0
@@ -444,7 +456,7 @@ def main():
              if v['margin'] >= MARGIN_MIN and v['d_best'] <= D_BEST_MAX]
     review = [v for v in res.values()
               if v['margin'] >= MARGIN_MIN and D_BEST_MAX < v['d_best'] <= D_BEST_REVIEW]
-    orphf = [o for o in orph if o['d_best'] <= ORPHAN_DBEST]
+    orphf = [o for o in orph if o['d_best'] <= ORPHAN_REVIEW]
     for f in flags + review + orphf:
         f['rel'] = rel_outlier(f['p'], rs)
     confidence(flags + review + orphf, roc)
@@ -476,7 +488,8 @@ def main():
 
     show(flags, f"PER-PITCH FLAGS (margin>={MARGIN_MIN}, d_best<={D_BEST_MAX})")
     show(review, f"REVIEW BAND (d_best {D_BEST_MAX}-{D_BEST_REVIEW})")
-    show(orphf, f"ORPHAN PITCHES (d_best<={ORPHAN_DBEST})")
+    show(orphf, f"ORPHAN PITCHES (flag d_best<={ORPHAN_DBEST}, "
+                f"review to {ORPHAN_REVIEW})")
 
     print("\n=== WHOLE-GAME DRIFT (cluster shifted vs season; calibration, not mistag) ===")
     for d, pit, dt, pt, n in game_drift(roc, scl)[:10]:
