@@ -91,6 +91,7 @@ ORPHAN_DBEST = 2.5   # tighter: orphans have no d_own evidence. ROC orphan
 #   from every other in-game cluster. 2.5 is where a pitch becomes statistically
 #   indistinguishable from the cluster it is near, not a percentile cut.
 SCALE_MIN_N = 6      # cluster size contributing to noise-scale estimation
+CSV_TIERS = {'High', 'Medium'}   # stdout still prints every tier
 PLOTDIR = os.path.expanduser('~/Downloads/roc_tag_plots')
 
 # pairs that actually get confused in practice, used by --bench injection
@@ -485,30 +486,34 @@ def main():
     if '--csv' in sys.argv:
         import csv
         out = os.path.expanduser('~/Downloads/roc_tag_audit_2026.csv')
+        rows = [f for f in allf if f['tier'] in CSV_TIERS]
         with open(out, 'w', newline='') as fh:
             w = csv.writer(fh)
-            w.writerow(['Pitcher', 'Game Date', 'PitchID', 'Kind', 'Tagged',
-                        'Suggested', 'Tier', 'Confidence', 'Margin', 'DistOwn',
-                        'DistBest', 'MetricsAgree', 'SameGameFlips',
-                        'TypePitchesInGame', 'ReleaseOutlierZ', 'RelPosZ',
-                        'RelPosX', 'Velocity', 'SpinRate', 'RTilt', 'OTilt',
-                        'IVB', 'HB', 'ArmAngle', 'Why'])
-            for f in sorted(allf, key=lambda f: (f['p']['Pitcher'],
+            # identity, then the raw pitch metrics, then the scoring block.
+            w.writerow(['Pitcher', 'Game Date', 'Kind', 'Tagged', 'Suggested',
+                        'Tier', 'Velocity', 'SpinRate', 'RTilt', 'OTilt', 'IVB',
+                        'HB', 'RelPosZ', 'RelPosX', 'ArmAngle', 'ReleaseOutlierZ',
+                        'Confidence', 'Margin', 'DistOwn', 'DistBest',
+                        'MetricsAgree', 'SameGameFlips', 'TypePitchesInGame',
+                        'Why', 'PitchID'])
+            for f in sorted(rows, key=lambda f: (f['p']['Pitcher'],
                                                  f['p']['Game Date'], -f['conf'])):
                 p = f['p']
-                w.writerow([p['Pitcher'], p['Game Date'], p.get('PitchID'),
-                            f['kind'], f['own'], f['tgt'], f['tier'], f['conf'],
+                w.writerow([p['Pitcher'], p['Game Date'], f['kind'], f['own'],
+                            f['tgt'], f['tier'],
+                            p.get('Velocity'), p.get('Spin Rate'), p.get('RTilt'),
+                            p.get('OTilt'), p.get('IndVertBrk'), p.get('HorzBrk'),
+                            p.get('RelPosZ'), p.get('RelPosX'), p.get('ArmAngle'),
+                            '' if f['rel'] is None else round(f['rel'], 2),
+                            f['conf'],
                             '' if f['margin'] is None else round(f['margin'], 2),
                             '' if f['d_own'] is None else round(f['d_own'], 2),
                             round(f['d_best'], 2),
                             '' if f['tot'] is None else f"{f['agree']}/{f['tot']}",
-                            f.get('nflip'), f.get('ntype'),
-                            '' if f['rel'] is None else round(f['rel'], 2),
-                            p.get('RelPosZ'), p.get('RelPosX'), p.get('Velocity'),
-                            p.get('Spin Rate'), p.get('RTilt'), p.get('OTilt'),
-                            p.get('IndVertBrk'), p.get('HorzBrk'), p.get('ArmAngle'),
-                            f['why']])
-        print(f"\nWrote {out}")
+                            f.get('nflip'), f.get('ntype'), f['why'],
+                            p.get('PitchID')])
+        print(f"\nWrote {out}  ({len(rows)} rows, tiers {'/'.join(sorted(CSV_TIERS))}; "
+              f"{len(allf) - len(rows)} Low-tier candidates omitted)")
 
     if '--plots' in sys.argv:
         os.makedirs(PLOTDIR, exist_ok=True)
