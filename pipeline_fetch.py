@@ -280,11 +280,11 @@ def read_pitches_from_sheet(gc, sheet_id, extra_tabs=None, only_tabs=None):
             # pipeline-internal (like _source) and never serialized to JSON.
             pitch['_sheet_tab'] = tab_name
             pitch['_sheet_row'] = row_num
-            # Fallback: use raw movement if adjusted values not yet backfilled
-            if pitch.get('xIndVrtBrk') is None and pitch.get('IndVertBrk') is not None:
-                pitch['xIndVrtBrk'] = pitch['IndVertBrk']
-            if pitch.get('xHorzBrk') is None and pitch.get('HorzBrk') is not None:
-                pitch['xHorzBrk'] = pitch['HorzBrk']
+            # NO raw-movement fallback. Movement is ALWAYS the adjusted columns
+            # (xIndVrtBrk / xHorzBrk, sheet cols L/M); a blank there stays blank
+            # rather than silently reverting to the unadjusted J/K values, which
+            # made a leaderboard or card show raw movement with nothing to
+            # distinguish it. Wally's call 2026-08-05.
             # Barrel IS stored in the sheet again (official launch_speed_angle,
             # col 48, re-added 2026-06-29) — this branch only fills BLANK cells
             # (pre-supplement rows, AAA gaps) with the EV/LA code_barrel
@@ -360,11 +360,8 @@ def read_pitches_from_supabase(teams=None):
                 pitch[name] = str(v)
         pteam = pitch.get('PTeam')
         pitch['_source'] = pteam if pteam in ('ROC', 'AAA') else 'MLB'
-        # identical fallbacks to read_pitches_from_sheet
-        if pitch.get('xIndVrtBrk') is None and pitch.get('IndVertBrk') is not None:
-            pitch['xIndVrtBrk'] = pitch['IndVertBrk']
-        if pitch.get('xHorzBrk') is None and pitch.get('HorzBrk') is not None:
-            pitch['xHorzBrk'] = pitch['HorzBrk']
+        # identical fallbacks to read_pitches_from_sheet — movement deliberately
+        # has none: blank adjusted movement stays blank, never reverts to raw
         if not pitch.get('Barrel'):
             try:
                 _ev = float(pitch['ExitVelo']) if pitch.get('ExitVelo') not in (None, '') else None

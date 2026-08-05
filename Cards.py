@@ -1419,10 +1419,9 @@ def render_card(config, pitches, output_file):
 
     for p in pitches:
         pt = p.get('Pitch Type', '')
-        # `is None` (not `or`): a numeric 0.0 adjusted value must not fall
-        # through to raw. Safe today only because cache values are strings.
-        hb = p.get('xHorzBrk') if p.get('xHorzBrk') is not None else p.get('HorzBrk')
-        ivb = p.get('xIndVrtBrk') if p.get('xIndVrtBrk') is not None else p.get('IndVertBrk')
+        # Adjusted movement only (sheet cols L/M) — no raw fallback.
+        hb = p.get('xHorzBrk')
+        ivb = p.get('xIndVrtBrk')
         if pt and hb is not None and hb != '' and ivb is not None and ivb != '':
             try: groups[pt].append((float(hb), float(ivb)))
             except Exception: pass
@@ -1974,8 +1973,8 @@ def render_card(config, pitches, output_file):
         n = len(pp)
         velos=[v for v in (sf(p.get('Velocity')) for p in pp) if v]
         spins=[v for v in (sf(p.get('Spin Rate')) for p in pp) if v]
-        ivbs=[v for v in (sf(p.get('xIndVrtBrk') if p.get('xIndVrtBrk') is not None else p.get('IndVertBrk')) for p in pp) if v is not None]
-        hbs=[v for v in (sf(p.get('xHorzBrk') if p.get('xHorzBrk') is not None else p.get('HorzBrk')) for p in pp) if v is not None]
+        ivbs=[v for v in (sf(p.get('xIndVrtBrk')) for p in pp) if v is not None]
+        hbs=[v for v in (sf(p.get('xHorzBrk')) for p in pp) if v is not None]
         relzs=[v for v in (sf(p.get('RelPosZ')) for p in pp) if v is not None]
         relxs=[v for v in (sf(p.get('RelPosX')) for p in pp) if v is not None]
         exts=[v for v in (sf(p.get('Extension')) for p in pp) if v is not None]
@@ -2575,15 +2574,12 @@ def _pitching_score(stuff, loc, scale=None):
 
 def _normalize_scratch_pitch(row):
     """Sheet row → pipeline-format pitch dict. Mirrors
-    pipeline_fetch.read_pitches_from_sheet: blanks → None, adjusted-movement
-    fallback, Barrel recompute fallback, plus the InZone recompute the
-    pipeline applies in process_data (the scratch tab has no InZone column)."""
+    pipeline_fetch.read_pitches_from_sheet: blanks → None, Barrel recompute
+    fallback, plus the InZone recompute the pipeline applies in process_data
+    (the scratch tab has no InZone column). Movement has NO fallback — see
+    read_pitches_from_sheet."""
     from pipeline_utils import compute_in_zone, is_barrel
     p = {k: (None if v == '' else v) for k, v in row.items()}
-    if p.get('xIndVrtBrk') is None and p.get('IndVertBrk') is not None:
-        p['xIndVrtBrk'] = p['IndVertBrk']
-    if p.get('xHorzBrk') is None and p.get('HorzBrk') is not None:
-        p['xHorzBrk'] = p['HorzBrk']
     if not p.get('Barrel'):
         p['Barrel'] = '6' if is_barrel(sf(p.get('ExitVelo')), sf(p.get('LaunchAngle'))) else ''
     p['InZone'] = compute_in_zone(p)
