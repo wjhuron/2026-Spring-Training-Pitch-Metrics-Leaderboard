@@ -2588,8 +2588,8 @@
     "fetched": "2026-07-03"
   },
   "666163": {
-    "position": null,
-    "fetched": "2026-07-03"
+    "position": "C",
+    "fetched": "2026-08-05"
   },
   "686676": {
     "position": null,
@@ -2645,11 +2645,11 @@
   },
   "682729": {
     "position": "LF",
-    "fetched": "2026-07-28"
+    "fetched": "2026-08-05"
   },
   "691024": {
     "position": null,
-    "fetched": "2026-07-28"
+    "fetched": "2026-08-05"
   },
   "661531": {
     "position": "C",
@@ -2685,7 +2685,7 @@
   },
   "676551": {
     "position": "RF",
-    "fetched": "2026-07-28"
+    "fetched": "2026-08-05"
   },
   "828599": {
     "position": "CF",
@@ -2705,11 +2705,11 @@
   },
   "682988": {
     "position": "1B",
-    "fetched": "2026-07-28"
+    "fetched": "2026-08-05"
   },
   "681190": {
     "position": null,
-    "fetched": "2026-07-28"
+    "fetched": "2026-08-05"
   },
   "690469": {
     "position": null,
@@ -2750,5 +2750,21 @@
   "670223": {
     "position": null,
     "fetched": "2026-08-04"
+  },
+  "695763": {
+    "position": null,
+    "fetched": "2026-08-05"
+  },
+  "699302": {
+    "position": "RF",
+    "fetched": "2026-08-05"
+  },
+  "678760": {
+    "position": "LF",
+    "fetched": "2026-08-05"
+  },
+  "806146": {
+    "position": "SS",
+    "fetched": "2026-08-05"
   }
 }
