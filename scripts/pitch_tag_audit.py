@@ -46,6 +46,14 @@ MIN_CLUSTER = 6   # per-pitcher per-type cluster size to be a valid centroid
 G1_MARGIN = 1.5   # min (d_own - d_best) in RMS-z to flag
 G1_DBEST = 2.0    # pitch must genuinely look like the target
 G1_DSELF = 2.5    # pitch must genuinely NOT look like its own tag
+MIN_METRICS = 5   # of the 7 axes a pitch must actually have measured.
+#   Without this, a record whose entire tracking row is missing except ArmAngle
+#   is scored on that one weak axis (discriminability 1.07 vs 14.9 for RTilt),
+#   and n_agree returns 1/1, which maxes the agreement term in add_confidence.
+#   Every such flag landed in the High tier. The observed `tot` distribution is
+#   bimodal with a hole (1, then 6, then 7 -- nothing between 2 and 5), so any
+#   value in [2, 6] is equivalent on current data; 5 is a convention chosen for
+#   headroom, not a measured optimum.
 
 # ---- Goal 2 thresholds ---------------------------------------------------
 MIN_TYPE = 12      # pitcher-type cluster size to audit as a whole
@@ -324,6 +332,8 @@ def audit_goal1(subj, scales, pcen, fbv):
         if own not in cd:
             continue
         pv = p['_mv']
+        if sum(1 for m in METRICS if pv.get(m) is not None) < MIN_METRICS:
+            continue  # sparse tracking record -- see MIN_METRICS
         d_own = dist(pv, cd[own][0], scales)
         if d_own is None:
             continue
@@ -401,6 +411,13 @@ def audit_goal2(subj, protos, spread, fbv):
             if len(mvs) < MIN_TYPE or pt not in lib:
                 continue
             cen = centroid(mvs)
+            if sum(1 for m in METRICS if cen[m] is not None) < MIN_METRICS:
+                continue  # latent form of the Goal 1 sparse-axis bug: centroid()
+            #   yields None for any metric absent across the cluster and dist()
+            #   silently skips it, so the comparison could rest on 1-2 axes.
+            #   Measured: 28 of 3089 audited clusters are this thin and every one
+            #   is a position player's EP. None currently reach the gates, so this
+            #   removes a latent failure mode at zero cost to real flags.
             d_label = dist(cen, lib[pt][0], spread)
             if d_label is None:
                 continue
