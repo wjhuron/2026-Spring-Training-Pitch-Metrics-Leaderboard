@@ -515,6 +515,31 @@ def load_tab_pitches(tab, role, start=None, end=None):
         p['InZone'] = compute_in_zone(p)
         p['BTeam' if role == 'hitter' else 'PTeam'] = tab
         out.append(p)
+    # Backfill Stuff+/Loc+/Pitching+ from the pipeline cache by PitchID
+    # (2026-08-06). The grade write-back deliberately leaves a scratch-tab row
+    # BLANK when the same PitchID is graded under its real team tab (one pitch
+    # must not be graded twice on two level baselines), which is correct for
+    # the sheet but starves tab-mode grade atoms: Bird's NEW rows were 16%
+    # graded because his 548 MLB pitches live blank here and graded in NYY.
+    # The cache carries those grades, so join them back before aggregating.
+    blank = [p for p in out
+             if p.get('PitchID') and not str(p.get('Stuff+') or '').strip()]
+    if blank:
+        want = {p['PitchID'] for p in blank}
+        grades = {}
+        for cp in _load_cache('2026-01-01', end):
+            pid = cp.get('PitchID')
+            if pid in want and str(cp.get('Stuff+') or '').strip():
+                grades[pid] = (cp.get('Stuff+'), cp.get('Loc+'), cp.get('Pitching+'))
+        n_fill = 0
+        for p in blank:
+            g = grades.get(p['PitchID'])
+            if g:
+                p['Stuff+'], p['Loc+'], p['Pitching+'] = g
+                n_fill += 1
+        if n_fill:
+            print(f"(tab {tab}: grades backfilled from the cache on "
+                  f"{n_fill}/{len(blank)} ungraded rows)")
     print(f"(tab {tab}: {len(out)} pitches loaded)")
     return out
 
@@ -978,7 +1003,7 @@ def interactive():
     # — Settings (edit these directly, or pass command-line flags instead) —
     role       = "both"     # "hitter", "pitcher", or "both"
     player     = ""         # "Last, First" for one player, or "" for whole team
-    team       = "ROC"      # batch mode: team whose players get comped
+    team       = "NEW"      # batch mode: team whose players get comped
     level      = "both"     # which of the TARGET's stat lines to use: "mlb",
                             #   "aaa", or "both" (comp pool is ALWAYS MLB-only)
     tab        = None       # scratch tab (NLE2026 workbook) as the target's
@@ -986,8 +1011,8 @@ def interactive():
     start_date = None       # "yyyy-mm-dd", or None for full season
     end_date   = None       # "yyyy-mm-dd", or None for through today
     exclude    = ""         # batch mode: semicolon-separated names to skip
-    min_pa     = 100        # batch mode: min PA to include a hitter
-    min_ip     = 25         # batch mode: min IP to include a pitcher
+    min_pa     = 1        # batch mode: min PA to include a hitter
+    min_ip     = 1         # batch mode: min IP to include a pitcher
     mix_w      = None       # arsenal share of distance (None = default 1/3;
                             #   1.0 = arsenal-only comps)
     mix_outcomes = True     # per-type whiff/zone/GB dims in the pair cost
