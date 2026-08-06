@@ -2715,7 +2715,11 @@ const Aggregator = {
       rows = rows.filter(function (r) { return r.team === filters.team; });
     } else {
       rows = rows.filter(function (r) {
-        if (self3._isROCTeam(r.team)) return false;
+        // includeROC: player-page platoon aggregations keep ROC rows so ROC
+        // hitter pages can split by hand (their percentiles are already
+        // interpolated vs the MLB pool above). Leaderboard views never set
+        // it, so the All-Teams board still hides ROC.
+        if (self3._isROCTeam(r.team)) return !!filters.includeROC;
         if (combinedByHitter[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return false;
         return true;
       });
@@ -3153,7 +3157,9 @@ const Aggregator = {
       rows = rows.filter(function (r) { return r.team === filters.team; });
     } else {
       rows = rows.filter(function (r) {
-        if (self4._isROCTeam(r.team)) return false;
+        // includeROC: see the hitter narrowing above — player-page platoon
+        // aggregations only.
+        if (self4._isROCTeam(r.team)) return !!filters.includeROC;
         if (combinedByHitterPT[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return false;
         return true;
       });

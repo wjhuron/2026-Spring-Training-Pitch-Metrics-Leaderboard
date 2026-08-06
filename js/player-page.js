@@ -615,7 +615,11 @@ var PlayerPage = {
     var rocTeams = (DataStore.metadata && DataStore.metadata.rocTeams) || [];
     var isROCPlayer = rocTeams.indexOf(data.team) !== -1;
     this._isROC = isROCPlayer;
-    this._setPlatoonTogglesVisible('hitter', !isROCPlayer);
+    // Hitter platoon toggles show for ROC too (2026-08-06, per Wally): the
+    // micro tables carry ROC hitter rows split by pitcher hand (they didn't
+    // when the toggle was first hidden in 12fa8b9), and the aggregation path
+    // keeps them via filters.includeROC. Pitcher-page toggles stay MLB-only.
+    this._setPlatoonTogglesVisible('hitter', true);
 
     if (!isROCPlayer) {
       this._renderHitterRunValue(data);
@@ -1885,8 +1889,12 @@ var PlayerPage = {
   PLATOON_PT_REQUEST: ['Hard', 'Breaking', 'Offspeed', 'FF', 'SI', 'FC', 'SL', 'ST', 'CU', 'SV', 'CH', 'FS', 'KN'],
 
   _platoonFilters: function (hand) {
+    // includeROC keeps ROC hitters in the returned rows (their percentiles
+    // interpolate vs the MLB pool inside the aggregator), so ROC hitter pages
+    // can platoon-split. Pitcher/pitch narrowings ignore the flag, so pitcher
+    // pages are unchanged. Cache stays shared across MLB and ROC pages.
     return { vsHand: hand, team: 'all', throws: 'all', search: '', role: 'all',
-             pitchTypes: this.PLATOON_PT_REQUEST };
+             pitchTypes: this.PLATOON_PT_REQUEST, includeROC: true };
   },
 
   _platoonAggregate: function (tab, hand) {
