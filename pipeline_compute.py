@@ -60,7 +60,11 @@ HITTER_STAT_KEYS = [
     'runValue', 'xRunValue', 'rv100', 'xRv100',
     'hr', 'sb',
 ]
-HITTER_INVERT_PCTL = {'swingPct', 'chasePct', 'whiffPct', 'gbPct', 'kPct', 'puPct', 'twoStrikeWhiffPct', 'firstPitchSwingPct'}
+# oppoPct inverted 2026-08-06 (per Wally): oppo contact is the anti-pull-damage
+# direction, so low oppo colors well — consistent with airPullPct higher-better.
+# Only the player-page batted-ball table colors it (leaderboard Oppo% is
+# noPercentile), so the flip is visible exactly where requested.
+HITTER_INVERT_PCTL = {'swingPct', 'chasePct', 'whiffPct', 'gbPct', 'kPct', 'puPct', 'twoStrikeWhiffPct', 'firstPitchSwingPct', 'oppoPct'}
 
 PITCHER_BB_KEYS = ['avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'ldPct', 'fbPct', 'puPct', 'hrFbPct', 'xwOBAsp']
 PITCHER_BB_INVERT = {'avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'hrFbPct', 'xwOBAsp'}

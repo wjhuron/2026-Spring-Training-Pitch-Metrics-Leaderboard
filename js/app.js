@@ -394,7 +394,9 @@
       throwsLabel.textContent = isHitterTab(currentTab) ? 'Bats' : 'Throws';
     }
     const minCountLabel = document.querySelector('[for="min-count"]');
-    const isMinPA = isHitterTab(currentTab) && currentTab !== 'hitterPitch';
+    // hitterPitch joined the Min PA tabs 2026-08-06 (per Wally): its outcome
+    // stats are PA-denominated, so the minimum is now PA there too.
+    const isMinPA = isHitterTab(currentTab);
     if (minCountLabel) {
       minCountLabel.textContent = isMinPA ? 'Min PA' : 'Min Pitches';
     }
@@ -799,7 +801,9 @@
       if (isPitcherTab(currentTab)) {
         return 1;
       }
-      // hitterPitch (vs Pitches): per-pitch-type minimum.
+      // hitterPitch (vs Pitches): per-pitch-type minimum, in PA as of
+      // 2026-08-06. 10 PA is a display convention (the old default was 10
+      // pitches, ~2.5 PA), not a measured stabilization point.
       return 10;
     }
     return parseInt(val) || 1;

@@ -3012,14 +3012,20 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     HITTER_PITCH_PCTL_KEYS = [
         'avg', 'slg', 'iso',
         'wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'xwOBAsp',
-        'ev50', 'maxEV', 'hardHitPct', 'barrelPct',
-        'gbPct', 'ldPct', 'fbPct', 'hrFbPct',
+        'ev50', 'maxEV', 'hardHitPct', 'barrelPct', 'babip',
+        'gbPct', 'ldPct', 'fbPct', 'puPct', 'hrFbPct',
         'pullPct', 'oppoPct',
         'swingPct', 'izSwingPct', 'chasePct', 'izSwChase', 'firstPitchSwingPct',
         'contactPct', 'izContactPct', 'whiffPct', 'twoStrikeWhiffPct',
         'runValue', 'rv100', 'xRunValue', 'xRv100',
     ]
-    HITTER_PITCH_INVERT_PCTL = {'swingPct', 'chasePct', 'whiffPct', 'gbPct', 'twoStrikeWhiffPct'}
+    # babip/puPct added 2026-08-06 (batted-ball table coloring, per Wally):
+    # BABIP/LD%/FB% color higher-is-better; PU% and Oppo% lower-is-better
+    # (popups are auto-outs; oppo contact is the anti-pull-damage direction,
+    # consistent with Air Pull% coloring higher). Mirrored in js/aggregator.js
+    # HITTER_PITCH_PCTL_KEYS / HITTER_PITCH_INVERT.
+    HITTER_PITCH_INVERT_PCTL = {'swingPct', 'chasePct', 'whiffPct', 'gbPct',
+                                'twoStrikeWhiffPct', 'puPct', 'oppoPct'}
 
     PITCH_CATEGORIES = {
         'Hard': ['FF', 'SI'],

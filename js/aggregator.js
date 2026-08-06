@@ -962,7 +962,10 @@ const Aggregator = {
       rows = rows.filter(function (r) { return r.team === filters.team; });
     } else {
       rows = rows.filter(function (r) {
-        if (self._isROCTeam(r.team)) return false;
+        // includeROC: player-page platoon aggregations only — ROC pitcher
+        // pages split by hand (2026-08-06). Percentiles already interpolated
+        // vs the MLB pool above; leaderboards never set the flag.
+        if (self._isROCTeam(r.team)) return !!filters.includeROC;
         if (combinedByPitcher[Aggregator._combinedKey(r)] && !self._isCombinedTeam(r.team)) return false;
         return true;
       });
@@ -2017,7 +2020,8 @@ const Aggregator = {
       rows = rows.filter(function (r) { return r.team === filters.team; });
     } else {
       rows = rows.filter(function (r) {
-        if (self._isROCTeam(r.team)) return false;
+        // includeROC: see the pitcher narrowing — player-page platoon only.
+        if (self._isROCTeam(r.team)) return !!filters.includeROC;
         if (combinedByPitchRow[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return false;
         return true;
       });
@@ -2249,7 +2253,8 @@ const Aggregator = {
       'hr', 'sb',
     ];
     const HITTER_INVERT = {
-      swingPct: true, chasePct: true, whiffPct: true, gbPct: true, kPct: true, puPct: true, twoStrikeWhiffPct: true, firstPitchSwingPct: true
+      swingPct: true, chasePct: true, whiffPct: true, gbPct: true, kPct: true, puPct: true, twoStrikeWhiffPct: true, firstPitchSwingPct: true,
+      oppoPct: true   // mirrors pipeline_compute.HITTER_INVERT_PCTL (2026-08-06)
     };
 
     let rows = [];
@@ -2922,15 +2927,19 @@ const Aggregator = {
     const HITTER_PITCH_PCTL_KEYS = [
       'avg', 'slg', 'iso', 'wOBA',
       'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'xwOBAsp',
-      'ev50', 'maxEV', 'hardHitPct', 'barrelPct',
-      'gbPct', 'ldPct', 'fbPct', 'hrFbPct',
-      'pullPct', 'airPullPct',
+      'ev50', 'maxEV', 'hardHitPct', 'barrelPct', 'babip',
+      'gbPct', 'ldPct', 'fbPct', 'puPct', 'hrFbPct',
+      'pullPct', 'oppoPct', 'airPullPct',
       'swingPct', 'izSwingPct', 'chasePct', 'izSwChase', 'firstPitchSwingPct',
       'contactPct', 'izContactPct', 'whiffPct', 'twoStrikeWhiffPct',
       'runValue', 'rv100', 'xRunValue', 'xRv100',
     ];
+    // babip/puPct/oppoPct added 2026-08-06 — mirrors process_data
+    // HITTER_PITCH_PCTL_KEYS / HITTER_PITCH_INVERT_PCTL (batted-ball coloring:
+    // BABIP/LD/FB higher-is-better, PU/Oppo lower-is-better).
     const HITTER_PITCH_INVERT = {
-      swingPct: true, chasePct: true, whiffPct: true, gbPct: true, twoStrikeWhiffPct: true
+      swingPct: true, chasePct: true, whiffPct: true, gbPct: true, twoStrikeWhiffPct: true,
+      puPct: true, oppoPct: true
     };
 
     let rows = [];
@@ -3065,7 +3074,12 @@ const Aggregator = {
 
       // Apply baseball-context filters (comparison group — affects percentiles)
       if (filters.throws !== 'all' && obj.stands !== filters.throws) continue;
-      if (obj.count < (filters.minCount || 1)) continue;
+      // Min sample is PA, not pitches (2026-08-06, per Wally): the board's
+      // outcome stats are PA-denominated, so a pitch-count floor was the
+      // wrong unit. Only applied above 1 so callers that pass no minimum
+      // (the player-page platoon aggregation) keep pa=0 rows, whose
+      // swing/whiff columns are still real data.
+      if ((filters.minCount || 1) > 1 && (obj.pa || 0) < filters.minCount) continue;
       if (filters.minSwings && (obj.nSwings || 0) < filters.minSwings) continue;
       if (filters.minBip && (obj.nBip || 0) < filters.minBip) continue;
 

@@ -137,10 +137,13 @@ var PlayerPage = {
     { key: 'hardHitPct', label: 'Hard-Hit%', format: function(v) { return Utils.formatPct(v); } },
     { key: 'barrelPct', label: 'Barrel%', format: function(v) { return Utils.formatPct(v); } },
     // Composition
+    // LD/FB/PU coloring enabled 2026-08-06 (per Wally): LD%/FB% color
+    // higher-is-better, PU% lower-is-better; directions live in the
+    // server/aggregator invert lists, this table just stopped suppressing them.
     { key: 'gbPct', label: 'GB%', format: function(v) { return Utils.formatPct(v); } },
-    { key: 'ldPct', label: 'LD%', format: function(v) { return Utils.formatPct(v); }, noPctl: true },
-    { key: 'fbPct', label: 'FB%', format: function(v) { return Utils.formatPct(v); }, noPctl: true },
-    { key: 'puPct', label: 'PU%', format: function(v) { return Utils.formatPct(v); }, noPctl: true },
+    { key: 'ldPct', label: 'LD%', format: function(v) { return Utils.formatPct(v); } },
+    { key: 'fbPct', label: 'FB%', format: function(v) { return Utils.formatPct(v); } },
+    { key: 'puPct', label: 'PU%', format: function(v) { return Utils.formatPct(v); } },
     // Spray
     { key: 'pullPct', label: 'Pull%', format: function(v) { return Utils.formatPct(v); } },
     { key: 'middlePct', label: 'Mid%', format: function(v) { return Utils.formatPct(v); } },
@@ -417,7 +420,11 @@ var PlayerPage = {
     var rocTeams = (DataStore.metadata && DataStore.metadata.rocTeams) || [];
     var isROCPlayer = rocTeams.indexOf(data.team) !== -1;
     this._isROC = isROCPlayer;
-    this._setPlatoonTogglesVisible('pitcher', !isROCPlayer);
+    // ROC pitcher pages get the platoon toggles too (2026-08-06, per Wally,
+    // matching the ROC hitter enable): pitcherMicro/pitchMicro/pitcherBip all
+    // carry ROC rows split by batter hand, and the platoon aggregation keeps
+    // them via filters.includeROC.
+    this._setPlatoonTogglesVisible('pitcher', true);
 
     if (!isROCPlayer) {
       this._renderPitchRunValues(filteredData);
@@ -2068,8 +2075,9 @@ var PlayerPage = {
     }
 
     var tbody = document.createElement('tbody');
-    tbody.appendChild(valueRow(cfg.labelL, vsL, 'L'));
+    // vs R on top (2026-08-06, per Wally) — the majority split reads first.
     tbody.appendChild(valueRow(cfg.labelR, vsR, 'R'));
+    tbody.appendChild(valueRow(cfg.labelL, vsL, 'L'));
 
     // Difference row. House format rule: no leading "+" on positives, so the
     // header spells out the direction rather than relying on signs.
@@ -4787,5 +4795,105 @@ var PlayerPage = {
       if (!sec || sec.style.display === 'none') continue;
       this._addDownloadButton(sections[i][0], sections[i][1]);
     }
+    // Hitter pages also get a one-click "everything" export (2026-08-06, per
+    // Wally): stats + platoon split + plate discipline + batted ball + bat
+    // tracking stacked into a single PNG. Lives in the STATS header, which
+    // _addDownloadButton just promoted to a flex header above.
+    if (!isPitcher) this._addCombinedDownloadButton();
+  },
+
+  // The five table sections, in page order. Bat tracking is appended only for
+  // MLB hitters — ROC has no bat-tracking data, so the export excludes it
+  // rather than shipping an empty box.
+  _combinedDownloadSections: function () {
+    var ids = ['player-hitter-stats-section',
+               'player-hitter-platoon-split-section',
+               'player-hitter-plate-discipline-section',
+               'player-hitter-batted-ball-section'];
+    if (!this._isROC) ids.push('player-hitter-bat-tracking-section');
+    var parts = [];
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (el && el.style.display !== 'none' && el.offsetHeight > 0) parts.push(el);
+    }
+    return parts;
+  },
+
+  _addCombinedDownloadButton: function () {
+    var section = document.getElementById('player-hitter-stats-section');
+    if (!section) return;
+    if (section.querySelector(':scope .section-download-all-btn')) return;
+    var slot = section.querySelector(':scope > .location-section-header, :scope > .spray-section-header');
+    if (!slot) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'section-download-btn section-download-all-btn';
+    btn.title = 'Download all tables as one PNG';
+    btn.setAttribute('aria-label', 'Download all hitter tables as one PNG');
+    btn.innerHTML = this._DOWNLOAD_ICON_SVG +
+      '<span style="font-size:11px;font-weight:600;margin-left:3px;">All</span>';
+
+    var self = this;
+    btn.addEventListener('click', function () { self._downloadCombinedPng(btn); });
+    slot.appendChild(btn);
+  },
+
+  _downloadCombinedPng: function (btn) {
+    if (!window.html2canvas) {
+      console.warn('html2canvas not loaded yet');
+      return;
+    }
+    var parts = this._combinedDownloadSections();
+    if (!parts.length) return;
+
+    var data = this._currentData || {};
+    var playerName = data.hitter || 'player';
+    var filename = this._slugify(playerName) +
+                   (data.team ? '-' + this._slugify(data.team) : '') +
+                   '-all-tables.png';
+    var bgColor = getComputedStyle(document.body).backgroundColor || '#1a1d23';
+
+    // Clone into an off-screen stack and capture THAT: the live sections are
+    // not contiguous siblings, and these five are pure tables (no <canvas>),
+    // which is exactly the case cloneNode + html2canvas handles faithfully.
+    var maxW = 0;
+    for (var i = 0; i < parts.length; i++) maxW = Math.max(maxW, parts[i].offsetWidth);
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'position:absolute;left:-10000px;top:0;padding:12px;' +
+                         'background:' + bgColor + ';width:' + (maxW + 24) + 'px;';
+    for (var j = 0; j < parts.length; j++) {
+      var clone = parts[j].cloneNode(true);
+      clone.style.display = '';
+      clone.style.marginBottom = (j < parts.length - 1) ? '18px' : '0';
+      wrap.appendChild(clone);
+    }
+    document.body.appendChild(wrap);
+
+    btn.disabled = true;
+    window.html2canvas(wrap, {
+      backgroundColor: bgColor,
+      scale: 2,
+      logging: false,
+      useCORS: true,
+      ignoreElements: function (el) {
+        return el.classList && (
+          el.classList.contains('section-download-btn') ||
+          el.id === 'la-spray-zone-tooltip'
+        );
+      }
+    }).then(function (canvas) {
+      var link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }).catch(function (err) {
+      console.error('Combined download failed', err);
+    }).then(function () {
+      btn.disabled = false;
+      if (wrap.parentNode) wrap.parentNode.removeChild(wrap);
+    });
   },
 };
