@@ -135,7 +135,11 @@ def main():
         bias = contrib[:, -1]
         fc = contrib[:, :-1]                 # per-feature, order = feats
 
-        # Per-type ledgers in Stuff+ points.
+        # Per-type ledgers in Stuff+ points. For the pitcher's REFERENCE
+        # fastball the *_diff features are structurally zero — their SHAP is
+        # pooled-model accounting for "this is the reference pitch", not a
+        # trait of the pitch — so those contributions fold into the base.
+        DIFF_FEATS = {'velo_diff', 'ivb_diff', 'hb_diff', 'vaa_diff'}
         panels = []
         for pt, sub in df.groupby('pitch_type'):
             if len(sub) < MIN_TYPE_N or pt not in league:
@@ -150,8 +154,12 @@ def main():
             pts = {feats[j]: float(np.mean(-fc[idx, j]) * k_sd)
                    for j in range(len(feats))}
             vals = {f: float(sub[f].mean()) for f in feats if f in sub.columns}
+            is_ref = abs(vals.get('velo_diff', 1.0)) < 0.05
+            if is_ref:
+                base += sum(pts.pop(f) for f in list(pts) if f in DIFF_FEATS)
             panels.append({'pt': pt, 'n': len(sub), 'grade': float(np.mean(atoms)),
-                           'base': base, 'pts': pts, 'vals': vals})
+                           'base': base, 'pts': pts, 'vals': vals,
+                           'is_ref': is_ref})
         panels.sort(key=lambda d: -d['n'])
         if not panels:
             continue
