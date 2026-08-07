@@ -116,14 +116,18 @@ def draw_panel(ax, title, zone_stats, n_total, lg_shares, name_zones=False):
         lx, lz = LABEL_POS[zone]
         dim = mean is not None and n < FADE_N
         big = '–' if mean is None else f'{mean:.0f}'
-        ax.text(lx, lz + 0.045, big, ha='center', fontsize=10.5,
+        ax.text(lx, lz + 0.055, big, ha='center', fontsize=10,
                 color=(*INK, 0.45 if dim else 1.0), fontweight=700, bbox=halo, zorder=4)
         if mean is not None:
             share = 100.0 * n / n_total
             lg = lg_shares.get(zone)
-            line = f'{share:.0f}%' + (f' · lg {lg:.0f}%' if lg is not None else '')
-            ax.text(lx, lz - 0.075, line, ha='center', fontsize=5.6,
-                    color=(*INK, 0.75), bbox=halo, zorder=4)
+            if lg is not None:
+                lg_share, lg_grade = lg
+                line = f'lg {lg_grade:.0f}  ·  {share:.0f}% vs lg {lg_share:.0f}%'
+            else:
+                line = f'{share:.0f}%'
+            ax.text(lx, lz - 0.06, line, ha='center', fontsize=5.2,
+                    color=(*INK, 0.7), bbox=halo, zorder=4)
         if name_zones:
             ax.text(-DX + 0.08, lz - 0.01, ZONE_TITLES[zone], ha='left', fontsize=5.5,
                     color=(*INK, 0.8), fontweight=600, bbox=halo, zorder=4)
@@ -138,25 +142,27 @@ def main():
     by_pitcher = defaultdict(list)
     # League zone shares per pitch-type group (MLB pitches only), the anchor
     # for reading a pitcher's usage shares. 'ALL' pools every graded pitch.
-    lg_acc = defaultdict(lambda: defaultdict(int))
+    lg_acc = defaultdict(dict)
     for p in allp:
         teams = PITCHERS.get(p.get('Pitcher'))
         if teams and p.get('PTeam') in teams:
             by_pitcher[p['Pitcher']].append(p)
-        if p.get('_source') == 'MLB' and sf(p.get('Loc+')) is not None:
+        v = sf(p.get('Loc+'))
+        if p.get('_source') == 'MLB' and v is not None:
             zone = classify_zone(p)
             if zone is not None:
-                lg_acc['ALL'][zone] += 1
-                lg_acc[group_of_code(p.get('Pitch Type'))][zone] += 1
-    lg_shares = {}
+                for g in ('ALL', group_of_code(p.get('Pitch Type'))):
+                    s, c = lg_acc[g].setdefault(zone, [0.0, 0])
+                    lg_acc[g][zone] = [s + v, c + 1]
+    lg_stats = {}   # grp -> zone -> (lg share %, lg mean grade)
     for grp, zc in lg_acc.items():
-        tot = sum(zc.values())
-        lg_shares[grp] = {z: 100.0 * c / tot for z, c in zc.items()}
+        tot = sum(c for _, c in zc.values())
+        lg_stats[grp] = {z: (100.0 * c / tot, s / c) for z, (s, c) in zc.items()}
 
-    footer = ('big number = average location grade (Loc+) of his pitches in that zone: '
-              '100 = the MLB-average pitch location for that pitch type and count, '
-              'each 10 = one SD better (higher helps the pitcher) · below it: his share '
-              'of pitches thrown there vs the MLB share for that pitch group · '
+    footer = ('big number = average location grade (Loc+) of his pitches in that zone '
+              '(100 = MLB-average pitch location for that pitch type and count, 10 = one SD, '
+              'higher helps the pitcher) · small line = the league’s average grade in that '
+              'zone for the same pitch group, then his usage share vs the league’s · '
               'usage-weighted zone average = the pitch’s overall Loc+ · red = good, '
               'blue = costly · faded = under 10 pitches · catcher view')
 
@@ -207,7 +213,7 @@ def main():
             label = 'All pitches' if key == 'ALL' else key
             grp = 'ALL' if key == 'ALL' else group_of_code(key)
             draw_panel(ax, f'{label} · Loc+ {overall:.0f} · n={n_total}', stats,
-                       n_total, lg_shares.get(grp, {}), name_zones=(i == 0))
+                       n_total, lg_stats.get(grp, {}), name_zones=(i == 0))
 
         fig.suptitle(f'{first} {last}: Loc+ by Attack Zone · 2026 ({teams})',
                      fontsize=14, color=INK, y=0.995, **TITLE_FONT)
