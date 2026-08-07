@@ -210,27 +210,28 @@ def draw_panel(ax, title, zone_stats, count_stats, n_total, lg_zone, lg_count):
 
 
 
-def draw_matrix_panel(ax, title, cell_stats, n_total):
-    """cell_stats: (zone, state) -> (mean grade, n)."""
+def draw_matrix_panel(ax, title, cell_stats, n_total, lg_cells):
+    """Zone x count matrix. Cell: usage% (lg avg) over Loc+ (lg avg)."""
     ax.set_xlim(0, 3)
     ax.set_ylim(-0.75, 5)
     ax.invert_yaxis()
     ax.axis('off')
     for j, cs in enumerate(COUNT_STATES):
         ax.text(j + 0.5, -0.28, COUNT_NAMES[cs].replace(' in count', '').replace(' count', '').upper(),
-                ha='center', fontsize=6.5, color=(*INK, 0.7), fontweight=600)
+                ha='center', fontsize=7.5, color=(*INK, 0.7), fontweight=600)
     for i, z in enumerate(ZONES):
         ax.text(-0.06, i + 0.5, ZONE_NAMES[z], ha='right', va='center',
-                fontsize=7.5, color=INK)
+                fontsize=8.5, color=INK)
         for j, cs in enumerate(COUNT_STATES):
             mean, n = cell_stats.get((z, cs), (None, 0))
             if mean is None or n == 0:
                 ax.add_patch(Rectangle((j, i), 1, 1, facecolor=PAPER,
                                        edgecolor=(*INK, 0.25), linewidth=0.6))
                 ax.text(j + 0.5, i + 0.5, '\u2013', ha='center', va='center',
-                        fontsize=7, color=(*INK, 0.4))
+                        fontsize=8, color=(*INK, 0.4))
                 continue
             share = 100.0 * n / n_total
+            lg_share, lg_grade = lg_cells.get((z, cs), (None, None))
             t = (mean - ATOM_LO) / (ATOM_HI - ATOM_LO)
             face = heat_color(t)
             dim = n < FADE_N
@@ -238,82 +239,15 @@ def draw_matrix_panel(ax, title, cell_stats, n_total):
                                    alpha=0.45 if dim else 1.0,
                                    edgecolor=(*INK, 0.25), linewidth=0.6))
             txt = CREAM_RGB if (abs(t - 0.5) > 0.28 and not dim) else INK
-            ax.text(j + 0.5, i + 0.36, f'{share:.1f}%', ha='center', va='center',
-                    fontsize=7.5, fontweight=700,
-                    color=(*txt, 0.55) if dim else txt)
-            ax.text(j + 0.5, i + 0.70, f'grade {mean:.0f}', ha='center', va='center',
-                    fontsize=5.6, color=(*txt, 0.5) if dim else (*txt, 0.85))
-    ax.set_title(title, fontsize=10.5, color=INK, pad=10, loc='left', **TITLE_FONT)
-
-
-
-def draw_matrix_main_panel(ax, title, cell_stats, zone_stats, count_stats,
-                           n_total, lg_zone, lg_count, lg_cells, overall):
-    """Matrix with league-anchored margins: body = zone x count interaction,
-    right col = zone totals vs lg, bottom row = count totals vs lg."""
-    GX, GY = 3.3, 5.3           # margin col/row origins (0.3 gap after body)
-    ax.set_xlim(-0.05, GX + 1.05)
-    ax.set_ylim(-0.8, GY + 1.05)
-    ax.invert_yaxis()
-    ax.axis('off')
-
-    heads = [('AHEAD', 0.5), ('EVEN', 1.5), ('BEHIND', 2.5), ('ALL COUNTS', GX + 0.5)]
-    for txt, x in heads:
-        ax.text(x, -0.30, txt, ha='center', fontsize=6.2,
-                color=(*INK, 0.7), fontweight=600)
-
-    def margin_cell(x, y, mean, n, lg, border=1.1):
-        if mean is None or n == 0:
-            ax.add_patch(Rectangle((x, y), 1, 1, facecolor=PAPER,
-                                   edgecolor=(*INK, 0.25), linewidth=0.6))
-            ax.text(x + 0.5, y + 0.5, '\u2013', ha='center', va='center',
-                    fontsize=7, color=(*INK, 0.4))
-            return
-        share = 100.0 * n / n_total
-        lg_share, lg_grade = lg if lg else (None, None)
-        t = (mean - ATOM_LO) / (ATOM_HI - ATOM_LO)
-        dim = n < FADE_N
-        ax.add_patch(Rectangle((x, y), 1, 1, facecolor=heat_color(t),
-                               alpha=0.45 if dim else 1.0,
-                               edgecolor=(*INK, 0.55 if border > 1 else 0.25),
-                               linewidth=border))
-        txt = CREAM_RGB if (abs(t - 0.5) > 0.28 and not dim) else INK
-        main_c = (*txt, 0.55) if dim else txt
-        sub_c = (*txt, 0.5) if dim else (*txt, 0.85)
-        lg_s = f'  \u00b7  lg {lg_share:.1f}%' if lg_share is not None else ''
-        ax.text(x + 0.5, y + 0.30, f'{share:.1f}%', ha='center', va='center',
-                fontsize=6.8, fontweight=700, color=main_c)
-        ax.text(x + 0.5, y + 0.30, ' ' * 14 + f'lg {lg_share:.1f}%' if False else '',
-                ha='center', va='center', fontsize=5.0, color=sub_c)
-        ax.text(x + 0.5, y + 0.53, f'lg {lg_share:.1f}%' if lg_share is not None else '',
-                ha='center', va='center', fontsize=5.0, color=sub_c)
-        lg_g = f' \u00b7 lg {lg_grade:.0f}' if lg_grade is not None else ''
-        ax.text(x + 0.5, y + 0.78, f'grade {mean:.0f}{lg_g}', ha='center',
-                va='center', fontsize=5.2, color=sub_c)
-
-    for i, z in enumerate(ZONES):
-        ax.text(-0.12, i + 0.5, ZONE_NAMES[z], ha='right', va='center',
-                fontsize=7.2, color=INK)
-        for j, cs in enumerate(COUNT_STATES):
-            mean, n = cell_stats.get((z, cs), (None, 0))
-            margin_cell(j, i, mean, n, lg_cells.get((z, cs)), border=0.6)
-        zmean, zn = zone_stats.get(z, (None, 0))
-        margin_cell(GX, i, zmean, zn, lg_zone.get(z))
-
-    ax.text(-0.12, GY + 0.5, 'All zones', ha='right', va='center',
-            fontsize=7.2, color=INK, style='italic')
-    for j, cs in enumerate(COUNT_STATES):
-        cmean, cn = count_stats.get(cs, (None, 0))
-        margin_cell(j, GY, cmean, cn, lg_count.get(cs))
-    t = (overall - ATOM_LO) / (ATOM_HI - ATOM_LO)
-    ax.add_patch(Rectangle((GX, GY), 1, 1, facecolor=heat_color(t),
-                           edgecolor=INK, linewidth=1.4))
-    txtc = CREAM_RGB if abs(t - 0.5) > 0.28 else INK
-    ax.text(GX + 0.5, GY + 0.42, f'Loc+ {overall:.0f}', ha='center', va='center',
-            fontsize=7.6, fontweight=700, color=txtc)
-    ax.text(GX + 0.5, GY + 0.72, 'overall', ha='center', va='center',
-            fontsize=5.0, color=(*txtc, 0.85))
-    ax.set_title(title, fontsize=10.5, color=INK, pad=10, loc='left', **TITLE_FONT)
+            main_c = (*txt, 0.55) if dim else txt
+            sub_c = (*txt, 0.5) if dim else (*txt, 0.85)
+            lg_s = f' (lg avg {lg_share:.1f}%)' if lg_share is not None else ''
+            ax.text(j + 0.5, i + 0.34, f'{share:.1f}%{lg_s}', ha='center',
+                    va='center', fontsize=6.9, fontweight=700, color=main_c)
+            lg_g = f' (lg avg {lg_grade:.0f})' if lg_grade is not None else ''
+            ax.text(j + 0.5, i + 0.68, f'Loc+ {mean:.0f}{lg_g}', ha='center',
+                    va='center', fontsize=6.1, color=sub_c)
+    ax.set_title(title, fontsize=11, color=INK, pad=10, loc='left', **TITLE_FONT)
 
 
 def main():
@@ -459,86 +393,48 @@ def main():
             plt.close(fig)
             print(name, hand_label or 'season', '->', out)
 
-            if hand == 'ALL':
-                mfig = plt.figure(figsize=(11.5, 2.4 + 3.0 * nrows), dpi=200)
-                mfig.patch.set_facecolor(CREAM)
-                mgs = GridSpec(nrows + 1, ncols, figure=mfig,
-                               height_ratios=[0.62] + [1.3] * nrows,
-                               hspace=0.55, wspace=0.55,
-                               left=0.085, right=0.97, top=0.90, bottom=0.05)
-                mh = mfig.add_subplot(mgs[0, :])
-                mh.axis('off')
-                mh.text(0, 0.95, f'{first} {last}: The Same Spot Changes Value '
-                        'With the Count', fontsize=14, color=INK, va='top',
-                        **TITLE_FONT)
-                mh.text(0, 0.52, f'2026 season ({teams}) \u00b7 zone \u00d7 count matrix \u00b7 '
-                        'cell = % of that pitch thrown to that zone in that count state, '
-                        'on a background colored by the location grade of those pitches\n'
-                        '(red = good spots for that count, blue = costly \u00b7 100 = MLB-average '
-                        'location \u00b7 faded = under 10 pitches). Compare a row across its three '
-                        'columns: chase pitches while ahead are weapons, the same pitches while '
-                        'behind are walks.',
-                        fontsize=7.3, color=(*INK, 0.85), va='top', linespacing=1.5)
-                for i, (key, zs) in enumerate(panels):
-                    n_total = sum(n for _, n in zs.values())
-                    cells = {k: (s / n, n) for k, (s, n) in macc[key].items()}
-                    label = 'All pitches' if key == 'ALL' else PITCH_NAMES.get(key, key)
-                    r, c = divmod(i, ncols)
-                    axm = mfig.add_subplot(mgs[1 + r, c])
-                    draw_matrix_panel(axm, f'{label} \u00b7 Loc+ '
-                                      f'{sum(s for s, _ in zs.values()) / n_total:.0f}',
-                                      cells, n_total)
-                mout = os.path.join(outdir, f'LocZones_{last}{first}_matrix.png')
-                mfig.savefig(mout, facecolor=CREAM, bbox_inches='tight')
-                plt.close(mfig)
-                print(name, 'matrix ->', mout)
-
-                mm_cols = 2
-                mm_rows = math.ceil(len(panels) / mm_cols)
-                f2 = plt.figure(figsize=(11.0, 2.6 + 3.6 * mm_rows), dpi=200)
-                f2.patch.set_facecolor(CREAM)
-                g2 = GridSpec(mm_rows + 1, mm_cols + 1, figure=f2,
-                              height_ratios=[1.15] + [1.3] * mm_rows,
-                              width_ratios=[1.0, 1.0, 0.52],
-                              hspace=0.5, wspace=0.45,
-                              left=0.085, right=0.985, top=0.93, bottom=0.04)
-                h2 = f2.add_subplot(g2[0, :2])
-                h2.axis('off')
-                h2.text(0, 0.96, f'{first} {last}: Location \u00d7 Count, One Page',
-                        fontsize=15, color=INK, va='top', **TITLE_FONT)
-                h2.text(0, 0.66, f'2026 season ({teams}) \u00b7 Loc+ zone \u00d7 count matrix '
-                        'with league-anchored margins', fontsize=8.5,
-                        color=(*INK, 0.7), va='top')
-                h2.text(0, 0.46,
-                        'Every cell: how often this pitch goes to that zone in that '
-                        'count state, vs how often the league does ("lg"),\nand the '
-                        'location grade of those pitches vs the league\u2019s grade in the '
-                        'same cell (100 = MLB-average location,\nhigher helps the pitcher; '
-                        'red = good, blue = costly). The outlined ALL COUNTS column and '
-                        'All zones row are\nthe totals; the corner is the pitch\u2019s '
-                        'overall Loc+. Faded = under 10 pitches. Catcher\u2019s view in the legend.',
-                        fontsize=7.2, color=(*INK, 0.85), va='top', linespacing=1.55)
-                l2 = f2.add_subplot(g2[0, 2])
-                draw_zone_legend(l2)
-                for i, (key, zs) in enumerate(panels):
-                    n_total = sum(n for _, n in zs.values())
-                    overall = sum(s for s, _ in zs.values()) / n_total
-                    cells = {k: (s / n, n) for k, (s, n) in macc[key].items()}
-                    zstats = {z: (s / n, n) for z, (s, n) in zs.items()}
-                    cstats = {c: (s / n, n) for c, (s, n) in cacc[key].items()}
-                    label = 'All pitches' if key == 'ALL' else PITCH_NAMES.get(key, key)
-                    grp = 'ALL' if key == 'ALL' else group_of_code(key)
-                    r, c = divmod(i, mm_cols)
-                    axm2 = f2.add_subplot(g2[1 + r, c] if c < mm_cols else g2[1 + r, c])
-                    draw_matrix_main_panel(axm2, f'{label} \u00b7 Loc+ {overall:.0f} \u00b7 '
-                                           f'{n_total} pitches', cells, zstats, cstats,
-                                           n_total, lg_stats[hand].get(grp, {}),
-                                           lg_cstats[hand].get(grp, {}),
-                                           lg_mstats[hand].get(grp, {}), overall)
-                out2 = os.path.join(outdir, f'LocZones_{last}{first}_matrixmain.png')
-                f2.savefig(out2, facecolor=CREAM, bbox_inches='tight')
-                plt.close(f2)
-                print(name, 'matrixmain ->', out2)
+            mm_cols = 2
+            mm_rows = math.ceil(len(panels) / mm_cols)
+            f2 = plt.figure(figsize=(12.0, 2.5 + 3.7 * mm_rows), dpi=200)
+            f2.patch.set_facecolor(CREAM)
+            g2 = GridSpec(mm_rows + 1, mm_cols + 1, figure=f2,
+                          height_ratios=[1.0] + [1.3] * mm_rows,
+                          width_ratios=[1.0, 1.0, 0.5],
+                          hspace=0.45, wspace=0.4,
+                          left=0.075, right=0.985, top=0.94, bottom=0.04)
+            h2 = f2.add_subplot(g2[0, :2])
+            h2.axis('off')
+            h2.text(0, 0.95, f'{first} {last}{vs_title.get(hand, "")}: The Same Spot '
+                    'Changes Value With the Count', fontsize=15, color=INK,
+                    va='top', **TITLE_FONT)
+            sub2 = f'2026 season ({teams}) \u00b7 zone \u00d7 count matrix'
+            if hand != 'ALL':
+                sub2 += f'{hand_label} \u00b7 league averages = MLB{hand_label} only'
+            h2.text(0, 0.62, sub2, fontsize=8.5, color=(*INK, 0.7), va='top')
+            h2.text(0, 0.42,
+                    'Each cell: how often the pitch is thrown to that zone in that count '
+                    'state, and the Loc+ of those pitches, each with the\nMLB average for '
+                    'that pitch family in parentheses. Background color follows the Loc+ '
+                    '(red = good spots for that count,\nblue = costly \u00b7 100 = MLB-average '
+                    'location \u00b7 faded = under 10 pitches). Compare a row across its three columns.',
+                    fontsize=7.4, color=(*INK, 0.85), va='top', linespacing=1.55)
+            l2 = f2.add_subplot(g2[0, 2])
+            draw_zone_legend(l2)
+            for i, (key, zs) in enumerate(panels):
+                n_total = sum(n for _, n in zs.values())
+                overall = sum(s for s, _ in zs.values()) / n_total
+                cells = {k: (s / n, n) for k, (s, n) in macc[key].items()}
+                label = 'All pitches' if key == 'ALL' else PITCH_NAMES.get(key, key)
+                grp = 'ALL' if key == 'ALL' else group_of_code(key)
+                r, c = divmod(i, mm_cols)
+                axm2 = f2.add_subplot(g2[1 + r, c])
+                draw_matrix_panel(axm2, f'{label} \u00b7 Loc+ {overall:.0f} \u00b7 '
+                                  f'{n_total} pitches', cells, n_total,
+                                  lg_mstats[hand].get(grp, {}))
+            out2 = os.path.join(outdir, f'LocZones_{last}{first}_matrix{suffix}.png')
+            f2.savefig(out2, facecolor=CREAM, bbox_inches='tight')
+            plt.close(f2)
+            print(name, 'matrix', hand_label or 'season', '->', out2)
 
 
 if __name__ == '__main__':
