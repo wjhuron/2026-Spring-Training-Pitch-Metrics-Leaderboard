@@ -169,13 +169,13 @@ def draw_panel(ax, title, cells, state_n, lg, n_total, lg_tot):
     for j, st in enumerate(STATES):
         hs = 100.0 * state_n.get(st, 0) / n_total if n_total else 0.0
         ls = 100.0 * lg['state'].get(st, 0.0)
-        ax.text(j + 0.5, -0.52, STATE_NAMES[st], ha='center', fontsize=7.5,
-                color=(*INK, 0.75), fontweight=700)
-        ax.text(j + 0.5, -0.18, f'{hs:.1f}% of pitches (lg {ls:.1f}%)',
-                ha='center', fontsize=5.6, color=(*INK, 0.7))
+        ax.text(j + 0.5, -0.52, STATE_NAMES[st], ha='center', fontsize=8,
+                color=INK, fontweight=700)
+        ax.text(j + 0.5, -0.18, f'{hs:.1f}% (lg {ls:.1f}%)',
+                ha='center', fontsize=6.2, color=(*INK, 0.85))
     for i, z in enumerate(ZONES):
         ax.text(-0.06, i + 0.5, ZONE_NAMES[z], ha='right', va='center',
-                fontsize=8.5, color=INK)
+                fontsize=9, color=INK, fontweight=600)
         for j, st in enumerate(STATES):
             c = cells[(z, st)]
             t = 0.5 + c['impact'] / (2 * IMPACT_SPAN)
@@ -185,23 +185,24 @@ def draw_panel(ax, title, cells, state_n, lg, n_total, lg_tot):
                                    alpha=0.45 if dim else 1.0,
                                    edgecolor=(*INK, 0.25), linewidth=0.6))
             txt = CREAM_RGB if (abs(t - 0.5) > 0.28 and not dim) else INK
-            main_c = (*txt, 0.55) if dim else txt
-            sub_c = (*txt, 0.5) if dim else (*txt, 0.85)
-            ax.text(j + 0.5, i + 0.24, f'{c["impact"]:.1f} pts', ha='center',
-                    va='center', fontsize=7.6, fontweight=700, color=main_c)
+            star = '*' if dim else ''
+            ax.text(j + 0.5, i + 0.24, f'{c["impact"]:.1f} pts{star}',
+                    ha='center', va='center', fontsize=8.6, fontweight=700,
+                    color=txt)
             sn = state_n.get(st, 0)
             cshare = 100.0 * c['n'] / sn if sn else 0.0
             lg_state = lg['state'].get(st, 0.0)
             lgc = (100.0 * c['lg_share'] / lg_state) if lg_state else 0.0
-            ax.text(j + 0.5, i + 0.52, f'{cshare:.1f}% (lg {lgc:.1f}%)',
-                    ha='center', va='center', fontsize=5.7, color=sub_c)
+            sub_c = (*txt, 0.92)
+            ax.text(j + 0.5, i + 0.53, f'{cshare:.1f}% (lg {lgc:.1f}%)',
+                    ha='center', va='center', fontsize=6.2, color=sub_c)
             g_txt = f'{c["g_raw"]:.0f}' if c['g_raw'] is not None else '–'
-            ax.text(j + 0.5, i + 0.76, f'Loc+ {g_txt} (lg {c["lg_grade"]:.0f})',
-                    ha='center', va='center', fontsize=5.7, color=sub_c)
+            ax.text(j + 0.5, i + 0.78, f'Loc+ {g_txt} (lg {c["lg_grade"]:.0f})',
+                    ha='center', va='center', fontsize=6.2, color=sub_c)
     total = sum(c['impact'] for c in cells.values())
     ax.text(0, 5.32, f'cells sum to {total:.1f} pts vs a league-average map '
-            f'(league overall grade {lg_tot:.0f})',
-            fontsize=5.8, color=(*INK, 0.65))
+            f'(league overall grade {lg_tot:.0f}) · * = under 10 pitches',
+            fontsize=6.4, color=(*INK, 0.8))
     ax.set_title(title, fontsize=11, color=INK, pad=10, loc='left', **TITLE_FONT)
 
 
@@ -289,7 +290,7 @@ def main():
 
         mm_cols = 2
         mm_rows = math.ceil(len(panels) / mm_cols)
-        fig = plt.figure(figsize=(12.0, 3.3 + 6.8 * mm_rows), dpi=200)
+        fig = plt.figure(figsize=(12.0, 3.3 + 5.0 * mm_rows), dpi=200)
         fig.patch.set_facecolor(CREAM)
         gs = GridSpec(mm_rows + 1, mm_cols + 1, figure=fig,
                       height_ratios=[0.52] + [1.3] * mm_rows,
@@ -311,12 +312,12 @@ def main():
                 'in that count state, how often that zone\n(league in parentheses); '
                 'the column header shows how often he is in that count at all. '
                 'Loc+ line shows the unshrunken grade of those pitches.',
-                fontsize=7.2, color=(*INK, 0.85), va='top', linespacing=1.55)
+                fontsize=7.4, color=INK, va='top', linespacing=1.55)
         hd.text(0, 0.24, 'Helps him most:  ' + '   |   '.join(sentence(r) for r in helps),
-                fontsize=7.6, color=(140 / 255, 52 / 255, 38 / 255),
+                fontsize=8.4, color=(140 / 255, 52 / 255, 38 / 255),
                 va='top', fontweight=700)
         hd.text(0, 0.10, 'Costs him most:  ' + '   |   '.join(sentence(r) for r in costs),
-                fontsize=7.6, color=(52 / 255, 80 / 255, 110 / 255),
+                fontsize=8.4, color=(52 / 255, 80 / 255, 110 / 255),
                 va='top', fontweight=700)
         lg_ax = fig.add_subplot(gs[0, 2])
         draw_zone_legend(lg_ax)
