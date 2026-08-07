@@ -71,7 +71,7 @@ PITCH_NAMES = {'FF': 'Fastball', 'SI': 'Sinker', 'FC': 'Cutter', 'SL': 'Slider',
                'ST': 'Sweeper', 'SV': 'Slurve', 'CU': 'Curveball',
                'KC': 'Knuckle-Curve', 'CH': 'Changeup', 'FS': 'Splitter'}
 
-SHARE_MAX = 52   # x-axis limit (%) for the bar panels
+SHARE_MAX = 66   # x-axis span; bars use 0-50%, grades live at the right edge
 
 
 def heat_color(t):
@@ -119,10 +119,10 @@ def draw_zone_legend(ax):
                  color=(*INK, 0.75), pad=4)
 
 
-def draw_panel(ax, title, zone_stats, n_total, lg_stats, show_xlabel):
+def draw_panel(ax, title, zone_stats, n_total, lg_stats):
     ax.set_facecolor(CREAM)
     ax.set_xlim(0, SHARE_MAX)
-    ax.set_ylim(-0.65, 4.65)
+    ax.set_ylim(-0.85, 4.65)
     ax.invert_yaxis()
     for s in ax.spines.values():
         s.set_visible(False)
@@ -131,13 +131,16 @@ def draw_panel(ax, title, zone_stats, n_total, lg_stats, show_xlabel):
     ax.set_yticks(range(5))
     ax.set_yticklabels([ZONE_NAMES[z] for z in ZONES], fontsize=8, color=INK)
     ax.tick_params(axis='y', length=0, pad=4)
-    if show_xlabel:
-        ax.set_xticks([0, 10, 20, 30, 40, 50])
-        ax.set_xticklabels(['0%', '10', '20', '30', '40', '50'],
-                           fontsize=6.5, color=(*INK, 0.6))
-        ax.tick_params(axis='x', length=0)
-    else:
-        ax.set_xticks([])
+    ax.set_xticks([0, 10, 20, 30, 40, 50])
+    ax.set_xticklabels(['0%', '10', '20', '30', '40', '50'],
+                       fontsize=6.5, color=(*INK, 0.6))
+    ax.tick_params(axis='x', length=0)
+
+    # Column headers so neither number can be misread.
+    ax.text(0, -0.68, '% OF PITCHES THROWN THERE', fontsize=5.6,
+            color=(*INK, 0.55), fontweight=600)
+    ax.text(SHARE_MAX - 0.5, -0.68, 'GRADE · LG', fontsize=5.6, ha='right',
+            color=(*INK, 0.55), fontweight=600)
 
     for i, z in enumerate(ZONES):
         mean, n = zone_stats.get(z, (None, 0))
@@ -154,14 +157,15 @@ def draw_panel(ax, title, zone_stats, n_total, lg_stats, show_xlabel):
         if lg_share is not None:
             ax.plot([lg_share, lg_share], [i - 0.40, i + 0.40],
                     color=INK, linewidth=1.4, zorder=3)
-        label = f'{mean:.0f}'
-        x_text = max(share, lg_share or 0) + 1.2
-        ax.text(x_text, i, label, fontsize=8.5, va='center', fontweight=700,
-                color=(*INK, 0.5 if n < FADE_N else 1.0), zorder=4)
+        ax.text(max(share, lg_share or 0) + 1.2, i, f'{share:.1f}%',
+                fontsize=7, va='center', fontweight=600,
+                color=(*INK, 0.5 if n < FADE_N else 0.95), zorder=4)
+        ax.text(59, i, f'{mean:.0f}', fontsize=8.5, ha='right', va='center',
+                fontweight=700, color=(*INK, 0.5 if n < FADE_N else 1.0), zorder=4)
         if lg_grade is not None:
             ax.text(SHARE_MAX - 0.5, i, f'lg {lg_grade:.0f}', fontsize=6.3,
                     ha='right', va='center', color=(*INK, 0.55), zorder=4)
-    ax.set_title(title, fontsize=10.5, color=INK, pad=7, loc='left', **TITLE_FONT)
+    ax.set_title(title, fontsize=10.5, color=INK, pad=9, loc='left', **TITLE_FONT)
 
 
 def main():
@@ -188,13 +192,15 @@ def main():
         tot = sum(c for _, c in zc.values())
         lg_stats[grp] = {z: (100.0 * c / tot, s / c) for z, (s, c) in zc.items()}
 
-    how_to = ('How to read this: each bar is how often the pitch lands in that\n'
-              'zone; the black tick is the MLB-average share for that pitch family.\n'
-              'The number and bar color grade the quality of those locations:\n'
-              '100 = MLB-average location, higher is better for the pitcher\n'
-              '(red = good spots, blue = costly); "lg" = the league’s grade there.\n'
-              'How often (bar) times how good (number), summed across the five\n'
-              'zones, IS the pitch’s Loc+. Faded bar = under 10 pitches.')
+    how_to = ('How to read this: each bar is the percent of this pitch’s throws\n'
+              'that land in that zone; the black tick is the MLB-average percent\n'
+              'for that pitch family.\n'
+              'The GRADE column scores the quality of those spots: 100 = MLB-\n'
+              'average location, higher is better for the pitcher; "lg" = the\n'
+              'league’s own grade in that zone. Bar color mirrors the grade\n'
+              '(red = good spots, blue = costly). Multiply each zone’s percent\n'
+              'by its grade and add them up: that is the pitch’s Loc+.\n'
+              'Faded bar = under 10 pitches.')
 
     for name, pitches in sorted(by_pitcher.items()):
         last, first = [s.strip() for s in name.split(',')]
@@ -225,10 +231,10 @@ def main():
 
         ncols = 3
         nrows = math.ceil(len(panels) / ncols)
-        fig = plt.figure(figsize=(11.5, 2.1 + 2.35 * nrows), dpi=200)
+        fig = plt.figure(figsize=(11.5, 2.7 + 2.35 * nrows), dpi=200)
         fig.patch.set_facecolor(CREAM)
         gs = GridSpec(nrows + 1, ncols, figure=fig,
-                      height_ratios=[1.05] + [1.3] * nrows,
+                      height_ratios=[1.55] + [1.3] * nrows,
                       hspace=0.55, wspace=0.42,
                       left=0.075, right=0.97, top=0.90, bottom=0.075)
 
@@ -256,8 +262,7 @@ def main():
             r, c = divmod(i, ncols)
             ax = fig.add_subplot(gs[1 + r, c])
             draw_panel(ax, f'{label} · Loc+ {overall:.0f} · {n_total} pitches',
-                       stats, n_total, lg_stats.get(grp, {}),
-                       show_xlabel=(i + ncols >= len(panels)))
+                       stats, n_total, lg_stats.get(grp, {}))
 
         out = os.path.join(outdir, f'LocZones_{last}{first}.png')
         fig.savefig(out, facecolor=CREAM, bbox_inches='tight')
