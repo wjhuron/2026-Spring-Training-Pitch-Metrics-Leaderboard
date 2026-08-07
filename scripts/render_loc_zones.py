@@ -28,6 +28,7 @@ from matplotlib.patches import Rectangle
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 from pipeline_sdplus import classify_zone  # noqa: E402
+from pipeline_locplus import group_of_code  # noqa: E402
 
 PICKLE = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 OUT_ROOT = os.path.expanduser('~/Downloads/ArticleVisuals')
@@ -91,12 +92,12 @@ def sf(v):
         return None
 
 
-def draw_panel(ax, title, zone_stats, n_total):
+def draw_panel(ax, title, zone_stats, n_total, lg_shares, name_zones=False):
     ax.set_xlim(-DX, DX)
     ax.set_ylim(DZ0, DZ1)
     ax.set_aspect('equal')
     ax.axis('off')
-    halo = dict(boxstyle='round,pad=0.15', facecolor=CREAM, edgecolor='none', alpha=0.55)
+    halo = dict(boxstyle='round,pad=0.12', facecolor=CREAM, edgecolor='none', alpha=0.5)
     for zone, (x, z, w, h) in ZONE_RECTS:
         mean, n = zone_stats.get(zone, (None, 0))
         if mean is None:
@@ -114,14 +115,18 @@ def draw_panel(ax, title, zone_stats, n_total):
         mean, n = zone_stats.get(zone, (None, 0))
         lx, lz = LABEL_POS[zone]
         dim = mean is not None and n < FADE_N
-        head = ZONE_TITLES[zone]
-        if mean is not None:
-            head += f' · {100.0 * n / n_total:.0f}%'
-        ax.text(lx, lz + 0.07, head, ha='center', fontsize=5.8,
-                color=(*INK, 0.75), fontweight=600, bbox=halo, zorder=4)
         big = '–' if mean is None else f'{mean:.0f}'
-        ax.text(lx, lz - 0.055, big, ha='center', fontsize=11.5,
+        ax.text(lx, lz + 0.045, big, ha='center', fontsize=10.5,
                 color=(*INK, 0.45 if dim else 1.0), fontweight=700, bbox=halo, zorder=4)
+        if mean is not None:
+            share = 100.0 * n / n_total
+            lg = lg_shares.get(zone)
+            line = f'{share:.0f}%' + (f' · lg {lg:.0f}%' if lg is not None else '')
+            ax.text(lx, lz - 0.075, line, ha='center', fontsize=5.6,
+                    color=(*INK, 0.75), bbox=halo, zorder=4)
+        if name_zones:
+            ax.text(-DX + 0.08, lz - 0.01, ZONE_TITLES[zone], ha='left', fontsize=5.5,
+                    color=(*INK, 0.8), fontweight=600, bbox=halo, zorder=4)
     ax.set_title(title, fontsize=10, color=INK, pad=8, **TITLE_FONT)
 
 
@@ -131,17 +136,29 @@ def main():
         allp = pickle.load(f)
 
     by_pitcher = defaultdict(list)
+    # League zone shares per pitch-type group (MLB pitches only), the anchor
+    # for reading a pitcher's usage shares. 'ALL' pools every graded pitch.
+    lg_acc = defaultdict(lambda: defaultdict(int))
     for p in allp:
         teams = PITCHERS.get(p.get('Pitcher'))
         if teams and p.get('PTeam') in teams:
             by_pitcher[p['Pitcher']].append(p)
+        if p.get('_source') == 'MLB' and sf(p.get('Loc+')) is not None:
+            zone = classify_zone(p)
+            if zone is not None:
+                lg_acc['ALL'][zone] += 1
+                lg_acc[group_of_code(p.get('Pitch Type'))][zone] += 1
+    lg_shares = {}
+    for grp, zc in lg_acc.items():
+        tot = sum(zc.values())
+        lg_shares[grp] = {z: 100.0 * c / tot for z, c in zc.items()}
 
-    footer = ('number = average location grade (Loc+) of his pitches in that zone: '
+    footer = ('big number = average location grade (Loc+) of his pitches in that zone: '
               '100 = the MLB-average pitch location for that pitch type and count, '
-              'each 10 = one SD better (higher = spots that help the pitcher) · '
-              '% = share of pitches thrown there · usage-weighted zone average = the '
-              'pitch’s overall Loc+ · red = good, blue = costly · '
-              'faded = under 10 pitches · catcher view')
+              'each 10 = one SD better (higher helps the pitcher) · below it: his share '
+              'of pitches thrown there vs the MLB share for that pitch group · '
+              'usage-weighted zone average = the pitch’s overall Loc+ · red = good, '
+              'blue = costly · faded = under 10 pitches · catcher view')
 
     for name, pitches in sorted(by_pitcher.items()):
         last, first = [s.strip() for s in name.split(',')]
@@ -173,13 +190,13 @@ def main():
 
         ncols = 3
         nrows = math.ceil(len(panels) / ncols)
-        fig, axes = plt.subplots(nrows, ncols, figsize=(3.6 * ncols, 3.6 * nrows), dpi=200)
+        fig, axes = plt.subplots(nrows, ncols, figsize=(4.1 * ncols, 4.1 * nrows), dpi=200)
         fig.patch.set_facecolor(CREAM)
         axes = [ax for row in (axes if nrows > 1 else [axes]) for ax in row]
         for ax in axes[len(panels):]:
             ax.axis('off')
 
-        for ax, (key, zs) in zip(axes, panels):
+        for i, (ax, (key, zs)) in enumerate(zip(axes, panels)):
             n_total = sum(n for _, n in zs.values())
             wsum = sum(s for s, _ in zs.values())
             overall = wsum / n_total
@@ -188,7 +205,9 @@ def main():
             assert abs(recon - overall) < 1e-9
             stats = {z: (s / n, n) for z, (s, n) in zs.items()}
             label = 'All pitches' if key == 'ALL' else key
-            draw_panel(ax, f'{label} · Loc+ {overall:.0f} · n={n_total}', stats, n_total)
+            grp = 'ALL' if key == 'ALL' else group_of_code(key)
+            draw_panel(ax, f'{label} · Loc+ {overall:.0f} · n={n_total}', stats,
+                       n_total, lg_shares.get(grp, {}), name_zones=(i == 0))
 
         fig.suptitle(f'{first} {last}: Loc+ by Attack Zone · 2026 ({teams})',
                      fontsize=14, color=INK, y=0.995, **TITLE_FONT)
