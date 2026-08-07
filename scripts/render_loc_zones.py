@@ -102,7 +102,8 @@ def draw_panel(ax, title, zone_stats, n_total):
         if mean is None:
             face, alpha = PAPER, 1.0
         else:
-            t = (ATOM_HI - mean) / (ATOM_HI - ATOM_LO)
+            # Percentile-heat convention: brick (hot) = good grades, slate = costly.
+            t = (mean - ATOM_LO) / (ATOM_HI - ATOM_LO)
             face = heat_color(t)
             alpha = 1.0 if n >= FADE_N else 0.45
         ax.add_patch(Rectangle((x, z), w, h, facecolor=face, alpha=alpha,
@@ -135,9 +136,12 @@ def main():
         if teams and p.get('PTeam') in teams:
             by_pitcher[p['Pitcher']].append(p)
 
-    footer = ('number = mean Loc+ of pitches thrown in that zone (100 = MLB-average '
-              'location quality, 10 = one SD) · small = usage share · '
-              'blue = good, red = costly · faded = under 10 pitches · catcher view')
+    footer = ('number = average location grade (Loc+) of his pitches in that zone: '
+              '100 = the MLB-average pitch location for that pitch type and count, '
+              'each 10 = one SD better (higher = spots that help the pitcher) · '
+              '% = share of pitches thrown there · usage-weighted zone average = the '
+              'pitch’s overall Loc+ · red = good, blue = costly · '
+              'faded = under 10 pitches · catcher view')
 
     for name, pitches in sorted(by_pitcher.items()):
         last, first = [s.strip() for s in name.split(',')]
