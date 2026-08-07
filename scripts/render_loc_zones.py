@@ -71,6 +71,19 @@ PITCH_NAMES = {'FF': 'Fastball', 'SI': 'Sinker', 'FC': 'Cutter', 'SL': 'Slider',
                'ST': 'Sweeper', 'SV': 'Slurve', 'CU': 'Curveball',
                'KC': 'Knuckle-Curve', 'CH': 'Changeup', 'FS': 'Splitter'}
 
+COUNT_STATES = ['ahead', 'even', 'behind']
+COUNT_NAMES = {'ahead': 'Ahead in count', 'even': 'Even count',
+               'behind': 'Behind in count'}
+
+
+def count_state(p):
+    """Pitcher's count state from 'balls-strikes'."""
+    try:
+        b, s = (int(x) for x in str(p.get('Count', '')).split('-'))
+    except ValueError:
+        return None
+    return 'ahead' if s > b else ('behind' if b > s else 'even')
+
 SHARE_MAX = 66   # x-axis span; bars use 0-50%, grades live at the right edge
 
 
@@ -122,55 +135,76 @@ def draw_zone_legend(ax):
 ROW = 1.65   # vertical spacing between zone rows (bar height stays 0.62)
 
 
-def draw_panel(ax, title, zone_stats, n_total, lg_stats):
+def draw_panel(ax, title, zone_stats, count_stats, n_total, lg_zone, lg_count):
+    n_rows_z, n_rows_c = 5, 3
+    cbase = n_rows_z * ROW + 1.9          # y of first count row
+    y_max = cbase + (n_rows_c - 1) * ROW + 0.85
     ax.set_facecolor(CREAM)
     ax.set_xlim(0, SHARE_MAX)
-    ax.set_ylim(-1.0, 4 * ROW + 0.85)
+    ax.set_ylim(-1.0, y_max)
     ax.invert_yaxis()
     for s in ax.spines.values():
         s.set_visible(False)
     for gx in (10, 20, 30, 40, 50):
         ax.axvline(gx, color=(*INK, 0.10), linewidth=0.7, zorder=1)
-    ax.set_yticks([i * ROW for i in range(5)])
-    ax.set_yticklabels([ZONE_NAMES[z] for z in ZONES], fontsize=8, color=INK)
+    ys = [i * ROW for i in range(n_rows_z)] + [cbase + j * ROW for j in range(n_rows_c)]
+    ax.set_yticks(ys)
+    ax.set_yticklabels([ZONE_NAMES[z] for z in ZONES]
+                       + [COUNT_NAMES[c] for c in COUNT_STATES],
+                       fontsize=8, color=INK)
     ax.tick_params(axis='y', length=0, pad=4)
     ax.set_xticks([0, 10, 20, 30, 40, 50])
     ax.set_xticklabels(['0%', '10', '20', '30', '40', '50'],
                        fontsize=6.5, color=(*INK, 0.6))
     ax.tick_params(axis='x', length=0)
 
-    # Column headers so neither number can be misread.
-    ax.text(0, -0.80, '% OF PITCHES THROWN THERE', fontsize=5.6,
+    ax.text(0, -0.80, '% OF PITCHES · BY ZONE (WHERE)', fontsize=5.6,
             color=(*INK, 0.55), fontweight=600)
     ax.text(SHARE_MAX - 0.5, -0.80, 'GRADE · LG', fontsize=5.6, ha='right',
             color=(*INK, 0.55), fontweight=600)
+    div_y = n_rows_z * ROW + 0.45
+    ax.axhline(div_y, xmin=0.0, xmax=1.0, color=(*INK, 0.18), linewidth=0.8)
+    ax.text(0, div_y + 0.62, '% OF PITCHES · BY COUNT (WHEN)', fontsize=5.6,
+            color=(*INK, 0.55), fontweight=600)
+    ax.text(SHARE_MAX - 0.5, div_y + 0.62, 'GRADE · LG', fontsize=5.6, ha='right',
+            color=(*INK, 0.55), fontweight=600)
 
-    for idx, z in enumerate(ZONES):
-        i = idx * ROW
-        mean, n = zone_stats.get(z, (None, 0))
-        lg_share, lg_grade = lg_stats.get(z, (None, None))
+    def row(y, key, stats, lg_stats):
+        mean, n = stats.get(key, (None, 0))
+        lg_share, lg_grade = lg_stats.get(key, (None, None))
         if mean is None:
-            ax.text(1.0, i, 'none thrown', fontsize=6.5, va='center',
+            ax.text(1.0, y, 'none thrown', fontsize=6.5, va='center',
                     color=(*INK, 0.45), style='italic')
-            continue
+            return
         share = 100.0 * n / n_total
         t = (mean - ATOM_LO) / (ATOM_HI - ATOM_LO)
         alpha = 1.0 if n >= FADE_N else 0.4
-        ax.barh(i, share, height=0.62, color=heat_color(t), alpha=alpha,
+        ax.barh(y, share, height=0.62, color=heat_color(t), alpha=alpha,
                 edgecolor=(*INK, 0.35), linewidth=0.7, zorder=2)
         if lg_share is not None:
-            ax.plot([lg_share, lg_share], [i - 0.40, i + 0.40],
+            ax.plot([lg_share, lg_share], [y - 0.40, y + 0.40],
                     color=INK, linewidth=1.4, zorder=3)
-            ax.text(lg_share, i + 0.62, f'lg {lg_share:.1f}%', fontsize=5.5,
+            ax.text(lg_share, y + 0.62, f'lg {lg_share:.1f}%', fontsize=5.5,
                     ha='center', va='center', color=(*INK, 0.9), zorder=3)
-        ax.text(max(share, lg_share or 0) + 1.2, i, f'{share:.1f}%',
-                fontsize=7, va='center', fontweight=600,
-                color=(*INK, 0.5 if n < FADE_N else 0.95), zorder=4)
-        ax.text(59, i, f'{mean:.0f}', fontsize=8.5, ha='right', va='center',
+        if share > 40:
+            # Long bar: label inside its right end so it can't hit the grades.
+            txt_color = CREAM if abs(t - 0.5) > 0.28 else INK
+            ax.text(share - 0.9, y, f'{share:.1f}%', fontsize=7, va='center',
+                    ha='right', fontweight=600, color=txt_color, zorder=4)
+        else:
+            ax.text(max(share, lg_share or 0) + 1.2, y, f'{share:.1f}%',
+                    fontsize=7, va='center', fontweight=600,
+                    color=(*INK, 0.5 if n < FADE_N else 0.95), zorder=4)
+        ax.text(59, y, f'{mean:.0f}', fontsize=8.5, ha='right', va='center',
                 fontweight=700, color=(*INK, 0.5 if n < FADE_N else 1.0), zorder=4)
         if lg_grade is not None:
-            ax.text(SHARE_MAX - 0.5, i, f'lg {lg_grade:.0f}', fontsize=6.3,
+            ax.text(SHARE_MAX - 0.5, y, f'lg {lg_grade:.0f}', fontsize=6.3,
                     ha='right', va='center', color=(*INK, 0.55), zorder=4)
+
+    for i, z in enumerate(ZONES):
+        row(i * ROW, z, zone_stats, lg_zone)
+    for j, c in enumerate(COUNT_STATES):
+        row(cbase + j * ROW, c, count_stats, lg_count)
     ax.set_title(title, fontsize=10.5, color=INK, pad=9, loc='left', **TITLE_FONT)
 
 
@@ -183,6 +217,7 @@ def main():
     # League zone shares + mean grades per (batter hand, pitch-type group),
     # MLB pitches only. hand 'ALL' pools both sides.
     lg_acc = {h: defaultdict(dict) for h in ('ALL', 'L', 'R')}
+    lg_cacc = {h: defaultdict(dict) for h in ('ALL', 'L', 'R')}
     for p in allp:
         teams = PITCHERS.get(p.get('Pitcher'))
         if teams and p.get('PTeam') in teams:
@@ -190,18 +225,28 @@ def main():
         v = sf(p.get('Loc+'))
         if p.get('_source') == 'MLB' and v is not None:
             zone = classify_zone(p)
+            state = count_state(p)
             if zone is not None:
                 hands = ['ALL'] + ([p.get('Bats')] if p.get('Bats') in ('L', 'R') else [])
                 for h in hands:
                     for g in ('ALL', group_of_code(p.get('Pitch Type'))):
                         s, c = lg_acc[h][g].setdefault(zone, [0.0, 0])
                         lg_acc[h][g][zone] = [s + v, c + 1]
-    lg_stats = {}   # hand -> grp -> zone -> (lg share %, lg mean grade)
-    for h, groups in lg_acc.items():
-        lg_stats[h] = {}
-        for grp, zc in groups.items():
-            tot = sum(c for _, c in zc.values())
-            lg_stats[h][grp] = {z: (100.0 * c / tot, s / c) for z, (s, c) in zc.items()}
+                        if state is not None:
+                            s2, c2 = lg_cacc[h][g].setdefault(state, [0.0, 0])
+                            lg_cacc[h][g][state] = [s2 + v, c2 + 1]
+
+    def finalize(accs):
+        out = {}
+        for h, groups in accs.items():
+            out[h] = {}
+            for grp, kc in groups.items():
+                tot = sum(c for _, c in kc.values())
+                out[h][grp] = {k: (100.0 * c / tot, s / c) for k, (s, c) in kc.items()}
+        return out
+
+    lg_stats = finalize(lg_acc)     # hand -> grp -> zone -> (share %, grade)
+    lg_cstats = finalize(lg_cacc)   # hand -> grp -> count state -> (share %, grade)
 
     how_to = ('How to read this: each bar is the percent of this pitch\u2019s throws\n'
               'that land in that zone; the black tick, labeled "lg __%", marks\n'
@@ -211,7 +256,10 @@ def main():
               'league\u2019s own grade in that zone. Bar color mirrors the grade\n'
               '(red = good spots, blue = costly). Multiply each zone\u2019s percent\n'
               'by its grade and add them up: that is the pitch\u2019s Loc+.\n'
-              'Faded bar = under 10 pitches.')
+              'The BY COUNT rows split the SAME pitches by count instead of\n'
+              'zone. Falling behind makes every location worth less, so a\n'
+              'bloated "Behind" bar with a blue grade is a location problem\n'
+              'all by itself. Faded bar = under 10 pitches.')
 
     PAGES = [('ALL', '', ''), ('L', '_vsLHH', ' vs LHH'), ('R', '_vsRHH', ' vs RHH')]
 
@@ -225,6 +273,7 @@ def main():
             pitches = (all_pitches if hand == 'ALL'
                        else [p for p in all_pitches if p.get('Bats') == hand])
             acc = defaultdict(lambda: defaultdict(lambda: [0.0, 0]))
+            cacc = defaultdict(lambda: defaultdict(lambda: [0.0, 0]))
             for p in pitches:
                 v = sf(p.get('Loc+'))
                 if v is None:
@@ -232,9 +281,13 @@ def main():
                 zone = classify_zone(p)
                 if zone is None:
                     continue
+                state = count_state(p)
                 for key in ('ALL', p.get('Pitch Type') or '?'):
                     acc[key][zone][0] += v
                     acc[key][zone][1] += 1
+                    if state is not None:
+                        cacc[key][state][0] += v
+                        cacc[key][state][1] += 1
             if not acc.get('ALL'):
                 continue
 
@@ -249,10 +302,10 @@ def main():
 
             ncols = 3
             nrows = math.ceil(len(panels) / ncols)
-            fig = plt.figure(figsize=(11.5, 2.7 + 3.15 * nrows), dpi=200)
+            fig = plt.figure(figsize=(11.5, 2.9 + 4.9 * nrows), dpi=200)
             fig.patch.set_facecolor(CREAM)
             gs = GridSpec(nrows + 1, ncols, figure=fig,
-                          height_ratios=[1.35] + [1.3] * nrows,
+                          height_ratios=[0.85] + [1.3] * nrows,
                           hspace=0.55, wspace=0.42,
                           left=0.075, right=0.97, top=0.90, bottom=0.075)
 
@@ -277,12 +330,14 @@ def main():
                 recon = sum((s / n) * n for s, n in zs.values()) / n_total
                 assert abs(recon - overall) < 1e-9
                 stats = {z: (s / n, n) for z, (s, n) in zs.items()}
+                cstats = {c: (s / n, n) for c, (s, n) in cacc[key].items()}
                 label = 'All pitches' if key == 'ALL' else PITCH_NAMES.get(key, key)
                 grp = 'ALL' if key == 'ALL' else group_of_code(key)
                 r, c = divmod(i, ncols)
                 ax = fig.add_subplot(gs[1 + r, c])
                 draw_panel(ax, f'{label} \u00b7 Loc+ {overall:.0f} \u00b7 {n_total} pitches',
-                           stats, n_total, lg_stats[hand].get(grp, {}))
+                           stats, cstats, n_total, lg_stats[hand].get(grp, {}),
+                           lg_cstats[hand].get(grp, {}))
 
             out = os.path.join(outdir, f'LocZones_{last}{first}{suffix}.png')
             fig.savefig(out, facecolor=CREAM, bbox_inches='tight')
