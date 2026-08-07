@@ -110,8 +110,25 @@ def main():
     mlb = [p for p in allp if p.get('_source') == 'MLB']
     print('Building league context frame ...')
     lg_df = build_df(mlb)
+    lg_df = lg_df[lg_df['arm_angle'].notna()].reset_index(drop=True)
     lg_means = lg_df.groupby('pitch_type')[
         [f for f in feats if f != 'platoon_same']].mean()
+    # League mean SHAP per (type, feature): bars display DEVIATION from the
+    # average pitch of the type, so a league-average curveball reads ~0
+    # everywhere instead of a giant global-baseline velocity bar.
+    print('League attribution baseline (sampled) ...')
+    rng = np.random.RandomState(11)
+    parts = []
+    for pt, sub in lg_df.groupby('pitch_type'):
+        take = sub.sample(n=min(4000, len(sub)), random_state=rng)
+        parts.append(take)
+    lg_sample = pd.concat(parts).reset_index(drop=True)
+    Xl = design(lg_sample).reindex(columns=feats, fill_value=0)
+    cl = booster.predict(xgb.DMatrix(Xl), pred_contribs=True)
+    lg_pts = {}
+    for pt, subm in lg_sample.groupby('pitch_type'):
+        ii = subm.index.values
+        lg_pts[pt] = {feats[j]: float(np.mean(-cl[ii, j])) for j in range(len(feats))}
 
     pitches_by_arm = {}
     for name, teams in ROC_ARMS.items():
@@ -151,13 +168,18 @@ def main():
             k_sd = K_SCALE / sc['sd']
             atoms = 100 + K_SCALE * (raw[idx] - sc['mu']) / sc['sd']
             base = float(np.mean(100 + K_SCALE * (-bias[idx] - sc['mu']) / sc['sd']))
-            pts = {feats[j]: float(np.mean(-fc[idx, j]) * k_sd)
+            lgc = lg_pts.get(pt, {})
+            pts = {feats[j]: float((np.mean(-fc[idx, j]) - lgc.get(feats[j], 0.0)) * k_sd)
                    for j in range(len(feats))}
             vals = {f: float(sub[f].mean()) for f in feats if f in sub.columns}
             is_ref = abs(vals.get('velo_diff', 1.0)) < 0.05
             if is_ref:
-                base += sum(pts.pop(f) for f in list(pts) if f in DIFF_FEATS)
-            panels.append({'pt': pt, 'n': len(sub), 'grade': float(np.mean(atoms)),
+                for f in list(pts):
+                    if f in DIFF_FEATS:
+                        pts.pop(f)
+            grade = float(np.mean(atoms))
+            base = grade - sum(pts.values())
+            panels.append({'pt': pt, 'n': len(sub), 'grade': grade,
                            'base': base, 'pts': pts, 'vals': vals,
                            'is_ref': is_ref})
         panels.sort(key=lambda d: -d['n'])
@@ -177,11 +199,11 @@ def main():
         hd.text(0, 0.93, f'{first} {last}: Why the Model Grades His Stuff '
                 'the Way It Does', fontsize=22, color=INK, va='top', **TITLE_FONT)
         hd.text(0, 0.46,
-                'Bars: how many Stuff+ points each physical trait adds to or subtracts from that pitch, from the '
-                'v11 model’s own per-pitch attributions (SHAP), averaged over the season.\n'
-                'Each panel starts at its BASE (what a league-neutral pitch of that type scores '
-                'once anchored) and base + bars = his printed grade. Values show his average '
-                'trait vs the MLB average for that pitch type. Red helps, blue hurts.',
+                'Bars: how many Stuff+ points each trait adds or subtracts VS THE LEAGUE-AVERAGE '
+                'PITCH OF THAT TYPE, from the v11 model’s own per-pitch attributions (SHAP).\n'
+                'Each panel starts at its BASE (what the league-average version of the pitch '
+                'grades, plus his share of interactions) and base + bars = his printed grade.\n'
+                'Values show his average trait vs the MLB average for the type. Red helps, blue hurts.',
                 fontsize=10.5, color=INK, va='top', linespacing=1.6)
 
         for i, d in enumerate(panels):
