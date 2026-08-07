@@ -119,16 +119,19 @@ def draw_zone_legend(ax):
                  color=(*INK, 0.75), pad=4)
 
 
+ROW = 1.35   # vertical spacing between zone rows (bar height stays 0.62)
+
+
 def draw_panel(ax, title, zone_stats, n_total, lg_stats):
     ax.set_facecolor(CREAM)
     ax.set_xlim(0, SHARE_MAX)
-    ax.set_ylim(-0.85, 4.65)
+    ax.set_ylim(-1.0, 4 * ROW + 0.85)
     ax.invert_yaxis()
     for s in ax.spines.values():
         s.set_visible(False)
     for gx in (10, 20, 30, 40, 50):
         ax.axvline(gx, color=(*INK, 0.10), linewidth=0.7, zorder=1)
-    ax.set_yticks(range(5))
+    ax.set_yticks([i * ROW for i in range(5)])
     ax.set_yticklabels([ZONE_NAMES[z] for z in ZONES], fontsize=8, color=INK)
     ax.tick_params(axis='y', length=0, pad=4)
     ax.set_xticks([0, 10, 20, 30, 40, 50])
@@ -137,12 +140,13 @@ def draw_panel(ax, title, zone_stats, n_total, lg_stats):
     ax.tick_params(axis='x', length=0)
 
     # Column headers so neither number can be misread.
-    ax.text(0, -0.68, '% OF PITCHES THROWN THERE', fontsize=5.6,
+    ax.text(0, -0.80, '% OF PITCHES THROWN THERE', fontsize=5.6,
             color=(*INK, 0.55), fontweight=600)
-    ax.text(SHARE_MAX - 0.5, -0.68, 'GRADE · LG', fontsize=5.6, ha='right',
+    ax.text(SHARE_MAX - 0.5, -0.80, 'GRADE · LG', fontsize=5.6, ha='right',
             color=(*INK, 0.55), fontweight=600)
 
-    for i, z in enumerate(ZONES):
+    for idx, z in enumerate(ZONES):
+        i = idx * ROW
         mean, n = zone_stats.get(z, (None, 0))
         lg_share, lg_grade = lg_stats.get(z, (None, None))
         if mean is None:
@@ -157,7 +161,7 @@ def draw_panel(ax, title, zone_stats, n_total, lg_stats):
         if lg_share is not None:
             ax.plot([lg_share, lg_share], [i - 0.40, i + 0.40],
                     color=INK, linewidth=1.4, zorder=3)
-            ax.text(lg_share, i + 0.47, f'lg {lg_share:.1f}%', fontsize=5.3,
+            ax.text(lg_share, i + 0.56, f'lg {lg_share:.1f}%', fontsize=5.3,
                     ha='center', va='center', color=(*INK, 0.6), zorder=3)
         ax.text(max(share, lg_share or 0) + 1.2, i, f'{share:.1f}%',
                 fontsize=7, va='center', fontweight=600,
@@ -245,10 +249,10 @@ def main():
 
             ncols = 3
             nrows = math.ceil(len(panels) / ncols)
-            fig = plt.figure(figsize=(11.5, 2.7 + 2.35 * nrows), dpi=200)
+            fig = plt.figure(figsize=(11.5, 2.7 + 2.8 * nrows), dpi=200)
             fig.patch.set_facecolor(CREAM)
             gs = GridSpec(nrows + 1, ncols, figure=fig,
-                          height_ratios=[1.55] + [1.3] * nrows,
+                          height_ratios=[1.35] + [1.3] * nrows,
                           hspace=0.55, wspace=0.42,
                           left=0.075, right=0.97, top=0.90, bottom=0.075)
 
