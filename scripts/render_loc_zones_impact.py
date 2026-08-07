@@ -206,6 +206,13 @@ def draw_panel(ax, title, cells, state_n, lg, n_total, lg_tot):
     ax.set_title(title, fontsize=11, color=INK, pad=10, loc='left', **TITLE_FONT)
 
 
+
+def fit_font(text, base=11.0, max_chars=116):
+    """Shrink fontsize when a header line would overflow its text area."""
+    n = len(text)
+    return base if n <= max_chars else max(7.2, base * max_chars / n)
+
+
 def main():
     print('Loading pitch cache ...')
     with open(PICKLE, 'rb') as f:
@@ -331,7 +338,7 @@ def main():
                f'matrix · shrinkage k={SHRINK_K}, callouts impact minus 0.6 SE (both split-half tuned)')
         if hand != 'ALL':
             sub += f' · league ={hand_label} only'
-        hd.text(0, 0.78, sub, fontsize=11.5, color=(*INK, 0.75), va='top')
+        hd.text(0, 0.78, sub, fontsize=fit_font(sub, base=11.5), color=(*INK, 0.75), va='top')
         hd.text(0, 0.68,
                 'Each cell: its IMPACT in Loc+ points, his usage times his grade '
                 'there minus the league’s usage times the league grade; red adds '
@@ -341,20 +348,21 @@ def main():
                 'the column header shows how often he is in that count at all. '
                 'Loc+ line shows the unshrunken grade of those pitches.',
                 fontsize=9.8, color=INK, va='top', linespacing=1.6)
-        hd.text(0, 0.28, 'Helps him most:  ' + '   |   '.join(sentence(r) for r in helps),
-                fontsize=11, color=(140 / 255, 52 / 255, 38 / 255),
-                va='top', fontweight=700)
-        hd.text(0, 0.09, 'Costs him most:  ' + '   |   '.join(sentence(r) for r in costs),
-                fontsize=11, color=(52 / 255, 80 / 255, 110 / 255),
-                va='top', fontweight=700)
+        helps_line = 'Helps him most:  ' + '   |   '.join(sentence(r) for r in helps)
+        hd.text(0, 0.28, helps_line, fontsize=fit_font(helps_line),
+                color=(140 / 255, 52 / 255, 38 / 255), va='top', fontweight=700)
+        costs_line = 'Costs him most:  ' + '   |   '.join(sentence(r) for r in costs)
+        hd.text(0, 0.09, costs_line, fontsize=fit_font(costs_line),
+                color=(52 / 255, 80 / 255, 110 / 255), va='top', fontweight=700)
         if type_sums:
             best_map = max(type_sums, key=lambda t: t[0])
             worst_map = min(type_sums, key=lambda t: t[0])
-            hd.text(0, -0.07, f'Whole pitch maps: best {PITCH_NAMES.get(best_map[1], best_map[1])} '
-                    f'{best_map[0]:.1f} pts ({best_map[2]} pitches) · worst '
-                    f'{PITCH_NAMES.get(worst_map[1], worst_map[1])} {worst_map[0]:.1f} pts '
-                    f'({worst_map[2]} pitches)', fontsize=10.5, color=INK,
-                    va='top', fontweight=600)
+            maps_line = (f'Whole pitch maps: best {PITCH_NAMES.get(best_map[1], best_map[1])} '
+                         f'{best_map[0]:.1f} pts ({best_map[2]} pitches) · worst '
+                         f'{PITCH_NAMES.get(worst_map[1], worst_map[1])} {worst_map[0]:.1f} pts '
+                         f'({worst_map[2]} pitches)')
+            hd.text(0, -0.07, maps_line, fontsize=fit_font(maps_line, base=10.5),
+                    color=INK, va='top', fontweight=600)
         lg_ax = fig.add_subplot(gs[0, 2])  # tall header row -> big legend
         draw_zone_legend(lg_ax)
 
