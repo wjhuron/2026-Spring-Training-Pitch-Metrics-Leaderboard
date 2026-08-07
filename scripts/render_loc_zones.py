@@ -46,6 +46,7 @@ TITLE_FONT = {'fontfamily': 'Bitter', 'fontweight': 700}
 
 PAPER = (240 / 255, 232 / 255, 216 / 255)
 CREAM = '#e8dfcb'
+CREAM_RGB = (232 / 255, 223 / 255, 203 / 255)
 INK = (58 / 255, 48 / 255, 38 / 255)
 BRICK = (176 / 255, 64 / 255, 47 / 255)
 SLATE = (66 / 255, 100 / 255, 138 / 255)
@@ -208,6 +209,43 @@ def draw_panel(ax, title, zone_stats, count_stats, n_total, lg_zone, lg_count):
     ax.set_title(title, fontsize=10.5, color=INK, pad=9, loc='left', **TITLE_FONT)
 
 
+
+def draw_matrix_panel(ax, title, cell_stats, n_total):
+    """cell_stats: (zone, state) -> (mean grade, n)."""
+    ax.set_xlim(0, 3)
+    ax.set_ylim(-0.75, 5)
+    ax.invert_yaxis()
+    ax.axis('off')
+    for j, cs in enumerate(COUNT_STATES):
+        ax.text(j + 0.5, -0.28, COUNT_NAMES[cs].replace(' in count', '').replace(' count', '').upper(),
+                ha='center', fontsize=6.5, color=(*INK, 0.7), fontweight=600)
+    for i, z in enumerate(ZONES):
+        ax.text(-0.06, i + 0.5, ZONE_NAMES[z], ha='right', va='center',
+                fontsize=7.5, color=INK)
+        for j, cs in enumerate(COUNT_STATES):
+            mean, n = cell_stats.get((z, cs), (None, 0))
+            if mean is None or n == 0:
+                ax.add_patch(Rectangle((j, i), 1, 1, facecolor=PAPER,
+                                       edgecolor=(*INK, 0.25), linewidth=0.6))
+                ax.text(j + 0.5, i + 0.5, '\u2013', ha='center', va='center',
+                        fontsize=7, color=(*INK, 0.4))
+                continue
+            share = 100.0 * n / n_total
+            t = (mean - ATOM_LO) / (ATOM_HI - ATOM_LO)
+            face = heat_color(t)
+            dim = n < FADE_N
+            ax.add_patch(Rectangle((j, i), 1, 1, facecolor=face,
+                                   alpha=0.45 if dim else 1.0,
+                                   edgecolor=(*INK, 0.25), linewidth=0.6))
+            txt = CREAM_RGB if (abs(t - 0.5) > 0.28 and not dim) else INK
+            ax.text(j + 0.5, i + 0.36, f'{share:.1f}%', ha='center', va='center',
+                    fontsize=7.5, fontweight=700,
+                    color=(*txt, 0.55) if dim else txt)
+            ax.text(j + 0.5, i + 0.70, f'grade {mean:.0f}', ha='center', va='center',
+                    fontsize=5.6, color=(*txt, 0.5) if dim else (*txt, 0.85))
+    ax.set_title(title, fontsize=10.5, color=INK, pad=10, loc='left', **TITLE_FONT)
+
+
 def main():
     print('Loading pitch cache ...')
     with open(PICKLE, 'rb') as f:
@@ -274,6 +312,7 @@ def main():
                        else [p for p in all_pitches if p.get('Bats') == hand])
             acc = defaultdict(lambda: defaultdict(lambda: [0.0, 0]))
             cacc = defaultdict(lambda: defaultdict(lambda: [0.0, 0]))
+            macc = defaultdict(lambda: defaultdict(lambda: [0.0, 0]))
             for p in pitches:
                 v = sf(p.get('Loc+'))
                 if v is None:
@@ -288,6 +327,8 @@ def main():
                     if state is not None:
                         cacc[key][state][0] += v
                         cacc[key][state][1] += 1
+                        macc[key][(zone, state)][0] += v
+                        macc[key][(zone, state)][1] += 1
             if not acc.get('ALL'):
                 continue
 
@@ -343,6 +384,40 @@ def main():
             fig.savefig(out, facecolor=CREAM, bbox_inches='tight')
             plt.close(fig)
             print(name, hand_label or 'season', '->', out)
+
+            if hand == 'ALL':
+                mfig = plt.figure(figsize=(11.5, 2.4 + 3.0 * nrows), dpi=200)
+                mfig.patch.set_facecolor(CREAM)
+                mgs = GridSpec(nrows + 1, ncols, figure=mfig,
+                               height_ratios=[0.62] + [1.3] * nrows,
+                               hspace=0.55, wspace=0.55,
+                               left=0.085, right=0.97, top=0.90, bottom=0.05)
+                mh = mfig.add_subplot(mgs[0, :])
+                mh.axis('off')
+                mh.text(0, 0.95, f'{first} {last}: The Same Spot Changes Value '
+                        'With the Count', fontsize=14, color=INK, va='top',
+                        **TITLE_FONT)
+                mh.text(0, 0.52, f'2026 season ({teams}) \u00b7 zone \u00d7 count matrix \u00b7 '
+                        'cell = % of that pitch thrown to that zone in that count state, '
+                        'on a background colored by the location grade of those pitches\n'
+                        '(red = good spots for that count, blue = costly \u00b7 100 = MLB-average '
+                        'location \u00b7 faded = under 10 pitches). Compare a row across its three '
+                        'columns: chase pitches while ahead are weapons, the same pitches while '
+                        'behind are walks.',
+                        fontsize=7.3, color=(*INK, 0.85), va='top', linespacing=1.5)
+                for i, (key, zs) in enumerate(panels):
+                    n_total = sum(n for _, n in zs.values())
+                    cells = {k: (s / n, n) for k, (s, n) in macc[key].items()}
+                    label = 'All pitches' if key == 'ALL' else PITCH_NAMES.get(key, key)
+                    r, c = divmod(i, ncols)
+                    axm = mfig.add_subplot(mgs[1 + r, c])
+                    draw_matrix_panel(axm, f'{label} \u00b7 Loc+ '
+                                      f'{sum(s for s, _ in zs.values()) / n_total:.0f}',
+                                      cells, n_total)
+                mout = os.path.join(outdir, f'LocZones_{last}{first}_matrix.png')
+                mfig.savefig(mout, facecolor=CREAM, bbox_inches='tight')
+                plt.close(mfig)
+                print(name, 'matrix ->', mout)
 
 
 if __name__ == '__main__':
