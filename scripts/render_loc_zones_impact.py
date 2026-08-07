@@ -288,15 +288,14 @@ def main():
                     f'{STATE_PROSE[st]}: {verb} {abs(imp):.1f} pts '
                     f'({driver_phrase(c)})')
 
-        mm_cols = 2
+        mm_cols = 3
         mm_rows = math.ceil(len(panels) / mm_cols)
-        fig = plt.figure(figsize=(12.0, 3.3 + 5.0 * mm_rows), dpi=200)
+        fig = plt.figure(figsize=(17.0, 3.6 + 5.2 * mm_rows), dpi=200)
         fig.patch.set_facecolor(CREAM)
-        gs = GridSpec(mm_rows + 1, mm_cols + 1, figure=fig,
-                      height_ratios=[0.52] + [1.3] * mm_rows,
-                      width_ratios=[1.0, 1.0, 0.72],
-                      hspace=0.30, wspace=0.4,
-                      left=0.075, right=0.985, top=0.945, bottom=0.035)
+        gs = GridSpec(mm_rows + 1, mm_cols, figure=fig,
+                      height_ratios=[0.78] + [1.3] * mm_rows,
+                      hspace=0.30, wspace=0.35,
+                      left=0.055, right=0.985, top=0.955, bottom=0.04)
         hd = fig.add_subplot(gs[0, :2])
         hd.axis('off')
         hd.text(0, 0.97, f'{first} {last}: What His Locations Add and Cost',
@@ -319,7 +318,7 @@ def main():
         hd.text(0, 0.10, 'Costs him most:  ' + '   |   '.join(sentence(r) for r in costs),
                 fontsize=8.4, color=(52 / 255, 80 / 255, 110 / 255),
                 va='top', fontweight=700)
-        lg_ax = fig.add_subplot(gs[0, 2])
+        lg_ax = fig.add_subplot(gs[0, 2])  # tall header row -> big legend
         draw_zone_legend(lg_ax)
 
         for i, (key, zs) in enumerate(panels):
