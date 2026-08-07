@@ -119,7 +119,7 @@ def draw_zone_legend(ax):
                  color=(*INK, 0.75), pad=4)
 
 
-ROW = 1.35   # vertical spacing between zone rows (bar height stays 0.62)
+ROW = 1.65   # vertical spacing between zone rows (bar height stays 0.62)
 
 
 def draw_panel(ax, title, zone_stats, n_total, lg_stats):
@@ -161,8 +161,8 @@ def draw_panel(ax, title, zone_stats, n_total, lg_stats):
         if lg_share is not None:
             ax.plot([lg_share, lg_share], [i - 0.40, i + 0.40],
                     color=INK, linewidth=1.4, zorder=3)
-            ax.text(lg_share, i + 0.56, f'lg {lg_share:.1f}%', fontsize=5.3,
-                    ha='center', va='center', color=(*INK, 0.6), zorder=3)
+            ax.text(lg_share, i + 0.62, f'lg {lg_share:.1f}%', fontsize=5.5,
+                    ha='center', va='center', color=(*INK, 0.9), zorder=3)
         ax.text(max(share, lg_share or 0) + 1.2, i, f'{share:.1f}%',
                 fontsize=7, va='center', fontweight=600,
                 color=(*INK, 0.5 if n < FADE_N else 0.95), zorder=4)
@@ -249,7 +249,7 @@ def main():
 
             ncols = 3
             nrows = math.ceil(len(panels) / ncols)
-            fig = plt.figure(figsize=(11.5, 2.7 + 2.8 * nrows), dpi=200)
+            fig = plt.figure(figsize=(11.5, 2.7 + 3.15 * nrows), dpi=200)
             fig.patch.set_facecolor(CREAM)
             gs = GridSpec(nrows + 1, ncols, figure=fig,
                           height_ratios=[1.35] + [1.3] * nrows,
