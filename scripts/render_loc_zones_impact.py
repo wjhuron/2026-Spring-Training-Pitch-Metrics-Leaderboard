@@ -228,29 +228,39 @@ def main():
         st = count_state(p)
         if z is None or st is None:
             continue
-        for g in ('ALL', group_of_code(p.get('Pitch Type'))):
-            cell = lg_acc[g][(z, st)]
-            cell[0] += v
-            cell[1] += 1
-            cell[2] += v * v
-            lg_state_n[g][st] += 1
-            lg_n[g] += 1
+        hands = ['ALL'] + ([p.get('Bats')] if p.get('Bats') in ('L', 'R') else [])
+        for h in hands:
+            for g in ('ALL', group_of_code(p.get('Pitch Type'))):
+                cell = lg_acc[(h, g)][(z, st)]
+                cell[0] += v
+                cell[1] += 1
+                cell[2] += v * v
+                lg_state_n[(h, g)][st] += 1
+                lg_n[(h, g)] += 1
 
-    lg = {}
-    for grp, cells in lg_acc.items():
-        tot = lg_n[grp]
+    lg = {h: {} for h in ('ALL', 'L', 'R')}
+    for (h, grp), cells in lg_acc.items():
+        tot = lg_n[(h, grp)]
         joint = {c: (n / tot, s / n) for c, (s, n, _) in cells.items()}
         sd = {c: math.sqrt(max(ss / n - (s / n) ** 2, 0.0))
               for c, (s, n, ss) in cells.items() if n}
-        lg[grp] = {'joint': joint, 'sd': sd,
-                   'state': {st: lg_state_n[grp][st] / tot for st in STATES},
-                   'total': sum(sh * g for sh, g in joint.values())}
+        lg[h][grp] = {'joint': joint, 'sd': sd,
+                      'state': {st: lg_state_n[(h, grp)][st] / tot for st in STATES},
+                      'total': sum(sh * g for sh, g in joint.values())}
 
-    for name, pitches in sorted(by_pitcher.items()):
-        last, first = [s.strip() for s in name.split(',')]
-        outdir = os.path.join(OUT_ROOT, last)
-        os.makedirs(outdir, exist_ok=True)
-        teams = ' + '.join(sorted({p['PTeam'] for p in pitches}))
+    PAGES = [('ALL', '', ''), ('L', '_vsLHH', ' vs LHH'), ('R', '_vsRHH', ' vs RHH')]
+
+    for name, all_pitches in sorted(by_pitcher.items()):
+      last, first = [s.strip() for s in name.split(',')]
+      outdir = os.path.join(OUT_ROOT, last)
+      os.makedirs(outdir, exist_ok=True)
+      teams = ' + '.join(sorted({p['PTeam'] for p in all_pitches}))
+      for hand, suffix, hand_label in PAGES:
+        pitches = (all_pitches if hand == 'ALL'
+                   else [p for p in all_pitches if p.get('Bats') == hand])
+        if not pitches:
+            continue
+        lgh = lg[hand]
 
         acc = defaultdict(lambda: defaultdict(lambda: [0.0, 0]))
         state_n = defaultdict(lambda: defaultdict(int))
@@ -283,10 +293,10 @@ def main():
         for key, zs in panels[1:]:
             n_total = sum(n for _, n in zs.values())
             grp = group_of_code(key)
-            cells = cell_impacts(zs, n_total, lg[grp])
+            cells = cell_impacts(zs, n_total, lgh[grp])
             type_sums.append((sum(c['impact'] for c in cells.values()), key, n_total))
             for (z, st), c in cells.items():
-                sd = lg[grp]['sd'].get((z, st), 0.0)
+                sd = lgh[grp]['sd'].get((z, st), 0.0)
                 se_g = sd / math.sqrt(c['n']) if c['n'] else 0.0
                 se_s = math.sqrt(max(c['share'] * (1 - c['share']), 1e-9) / n_total)
                 se = math.sqrt((c['share'] * se_g) ** 2
@@ -315,10 +325,13 @@ def main():
                       left=0.055, right=0.985, top=0.955, bottom=0.04)
         hd = fig.add_subplot(gs[0, :2])
         hd.axis('off')
-        hd.text(0, 0.97, f'{first} {last}: What His Locations Add and Cost',
+        hd.text(0, 0.97, f'{first} {last}{hand_label}: What His Locations Add and Cost',
                 fontsize=23, color=INK, va='top', **TITLE_FONT)
-        hd.text(0, 0.78, f'2026 season ({teams}) · zone × count impact '
-                f'matrix · cell shrinkage k={SHRINK_K} · callouts: impact minus 0.6 SE · both split-half tuned', fontsize=11.5, color=(*INK, 0.75), va='top')
+        sub = (f'2026 season ({teams}){hand_label} · zone × count impact '
+               f'matrix · shrinkage k={SHRINK_K}, callouts impact minus 0.6 SE (both split-half tuned)')
+        if hand != 'ALL':
+            sub += f' · league ={hand_label} only'
+        hd.text(0, 0.78, sub, fontsize=11.5, color=(*INK, 0.75), va='top')
         hd.text(0, 0.68,
                 'Each cell: its IMPACT in Loc+ points, his usage times his grade '
                 'there minus the league’s usage times the league grade; red adds '
@@ -349,17 +362,17 @@ def main():
             n_total = sum(n for _, n in zs.values())
             overall = sum(s for s, _ in zs.values()) / n_total
             grp = 'ALL' if key == 'ALL' else group_of_code(key)
-            cells = cell_impacts(zs, n_total, lg[grp])
+            cells = cell_impacts(zs, n_total, lgh[grp])
             label = 'All pitches' if key == 'ALL' else PITCH_NAMES.get(key, key)
             r, c = divmod(i, mm_cols)
             ax = fig.add_subplot(gs[1 + r, c])
             draw_panel(ax, f'{label} · Loc+ {overall:.0f} · {n_total} pitches',
-                       cells, state_n[key], lg[grp], n_total, lg[grp]['total'])
+                       cells, state_n[key], lgh[grp], n_total, lgh[grp]['total'])
 
-        out = os.path.join(outdir, f'LocZones_{last}{first}_impact.png')
+        out = os.path.join(outdir, f'LocZones_{last}{first}_impact{suffix}.png')
         fig.savefig(out, facecolor=CREAM, bbox_inches='tight')
         plt.close(fig)
-        print(name, '->', out)
+        print(name, hand_label or 'season', '->', out)
 
 
 if __name__ == '__main__':
