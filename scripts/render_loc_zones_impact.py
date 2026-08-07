@@ -212,7 +212,7 @@ def main():
         allp = pickle.load(f)
 
     by_pitcher = defaultdict(list)
-    lg_acc = defaultdict(lambda: defaultdict(lambda: [0.0, 0]))
+    lg_acc = defaultdict(lambda: defaultdict(lambda: [0.0, 0, 0.0]))
     lg_state_n = defaultdict(lambda: defaultdict(int))
     lg_n = defaultdict(int)
     for p in allp:
@@ -229,16 +229,20 @@ def main():
         if z is None or st is None:
             continue
         for g in ('ALL', group_of_code(p.get('Pitch Type'))):
-            lg_acc[g][(z, st)][0] += v
-            lg_acc[g][(z, st)][1] += 1
+            cell = lg_acc[g][(z, st)]
+            cell[0] += v
+            cell[1] += 1
+            cell[2] += v * v
             lg_state_n[g][st] += 1
             lg_n[g] += 1
 
     lg = {}
     for grp, cells in lg_acc.items():
         tot = lg_n[grp]
-        joint = {c: (n / tot, s / n) for c, (s, n) in cells.items()}
-        lg[grp] = {'joint': joint,
+        joint = {c: (n / tot, s / n) for c, (s, n, _) in cells.items()}
+        sd = {c: math.sqrt(max(ss / n - (s / n) ** 2, 0.0))
+              for c, (s, n, ss) in cells.items() if n}
+        lg[grp] = {'joint': joint, 'sd': sd,
                    'state': {st: lg_state_n[grp][st] / tot for st in STATES},
                    'total': sum(sh * g for sh, g in joint.values())}
 
@@ -269,20 +273,33 @@ def main():
             if sum(n for _, n in zs.values()) >= MIN_TYPE_N:
                 panels.append((pt, zs))
 
-        # Page-level callouts from per-type cells (ALL excluded).
+        # Page-level callouts from per-type cells (ALL excluded), ranked by
+        # impact discounted 0.6 standard errors (split-half tuned; see
+        # scripts/loczone_callout_sweep.py -- realized-spread optimum at
+        # lam=0.6 with the existing 25-pitch panel gate as the floor).
+        CALLOUT_LAM = 0.6
         ranked = []
+        type_sums = []
         for key, zs in panels[1:]:
             n_total = sum(n for _, n in zs.values())
             grp = group_of_code(key)
             cells = cell_impacts(zs, n_total, lg[grp])
+            type_sums.append((sum(c['impact'] for c in cells.values()), key, n_total))
             for (z, st), c in cells.items():
-                ranked.append((c['impact'], key, z, st, c))
+                sd = lg[grp]['sd'].get((z, st), 0.0)
+                se_g = sd / math.sqrt(c['n']) if c['n'] else 0.0
+                se_s = math.sqrt(max(c['share'] * (1 - c['share']), 1e-9) / n_total)
+                se = math.sqrt((c['share'] * se_g) ** 2
+                               + (c['lg_grade'] * se_s) ** 2)
+                d = abs(c['impact']) - CALLOUT_LAM * se
+                score = math.copysign(max(0.0, d), c['impact']) if d > 0 else 0.0
+                ranked.append((score, c['impact'], key, z, st, c))
         ranked.sort(key=lambda r: r[0])
-        costs = ranked[:2]
-        helps = ranked[-2:][::-1]
+        costs = [r for r in ranked[:2] if r[0] < 0]
+        helps = [r for r in ranked[-2:][::-1] if r[0] > 0]
 
         def sentence(r):
-            imp, key, z, st, c = r
+            _, imp, key, z, st, c = r
             verb = 'adds' if imp > 0 else 'costs'
             return (f'{PITCH_NAMES.get(key, key)} to {ZONE_NAMES[z]} '
                     f'{STATE_PROSE[st]}: {verb} {abs(imp):.1f} pts '
@@ -301,8 +318,7 @@ def main():
         hd.text(0, 0.97, f'{first} {last}: What His Locations Add and Cost',
                 fontsize=23, color=INK, va='top', **TITLE_FONT)
         hd.text(0, 0.78, f'2026 season ({teams}) · zone × count impact '
-                f'matrix · cell grades shrunk toward league (k={SHRINK_K}, '
-                'split-half tuned)', fontsize=11.5, color=(*INK, 0.75), va='top')
+                f'matrix · cell shrinkage k={SHRINK_K} · callouts: impact minus 0.6 SE · both split-half tuned', fontsize=11.5, color=(*INK, 0.75), va='top')
         hd.text(0, 0.68,
                 'Each cell: its IMPACT in Loc+ points, his usage times his grade '
                 'there minus the league’s usage times the league grade; red adds '
@@ -312,12 +328,20 @@ def main():
                 'the column header shows how often he is in that count at all. '
                 'Loc+ line shows the unshrunken grade of those pitches.',
                 fontsize=9.8, color=INK, va='top', linespacing=1.6)
-        hd.text(0, 0.26, 'Helps him most:  ' + '   |   '.join(sentence(r) for r in helps),
+        hd.text(0, 0.28, 'Helps him most:  ' + '   |   '.join(sentence(r) for r in helps),
                 fontsize=11, color=(140 / 255, 52 / 255, 38 / 255),
                 va='top', fontweight=700)
         hd.text(0, 0.09, 'Costs him most:  ' + '   |   '.join(sentence(r) for r in costs),
                 fontsize=11, color=(52 / 255, 80 / 255, 110 / 255),
                 va='top', fontweight=700)
+        if type_sums:
+            best_map = max(type_sums, key=lambda t: t[0])
+            worst_map = min(type_sums, key=lambda t: t[0])
+            hd.text(0, -0.07, f'Whole pitch maps: best {PITCH_NAMES.get(best_map[1], best_map[1])} '
+                    f'{best_map[0]:.1f} pts ({best_map[2]} pitches) · worst '
+                    f'{PITCH_NAMES.get(worst_map[1], worst_map[1])} {worst_map[0]:.1f} pts '
+                    f'({worst_map[2]} pitches)', fontsize=10.5, color=INK,
+                    va='top', fontweight=600)
         lg_ax = fig.add_subplot(gs[0, 2])  # tall header row -> big legend
         draw_zone_legend(lg_ax)
 
