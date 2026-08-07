@@ -127,10 +127,10 @@ def draw_zone_legend(ax):
     labels = [('Heart', 0, 0.5), ('Shadow-In', 0, 0.08),
               ('Shadow-Out', 0, 1.075), ('Chase', 0, 1.33), ('Waste', 0, 1.615)]
     for txt, x, y in labels:
-        ax.text(x, y, txt, ha='center', va='center', fontsize=6.5,
+        ax.text(x, y, txt, ha='center', va='center', fontsize=8,
                 color=INK, fontweight=600)
-    ax.set_title('the five zones (catcher view)', fontsize=7.5,
-                 color=(*INK, 0.75), pad=4)
+    ax.set_title('the five zones (catcher view)', fontsize=9,
+                 color=(*INK, 0.75), pad=5)
 
 
 ROW = 1.65   # vertical spacing between zone rows (bar height stays 0.62)
@@ -242,10 +242,10 @@ def draw_matrix_panel(ax, title, cell_stats, n_total, lg_cells):
             main_c = (*txt, 0.55) if dim else txt
             sub_c = (*txt, 0.5) if dim else (*txt, 0.85)
             lg_s = f' (lg avg {lg_share:.1f}%)' if lg_share is not None else ''
-            ax.text(j + 0.5, i + 0.34, f'{share:.1f}%{lg_s}', ha='center',
+            ax.text(j + 0.5, i + 0.38, f'{share:.1f}%{lg_s}', ha='center',
                     va='center', fontsize=6.9, fontweight=700, color=main_c)
             lg_g = f' (lg avg {lg_grade:.0f})' if lg_grade is not None else ''
-            ax.text(j + 0.5, i + 0.68, f'Loc+ {mean:.0f}{lg_g}', ha='center',
+            ax.text(j + 0.5, i + 0.62, f'Loc+ {mean:.0f}{lg_g}', ha='center',
                     va='center', fontsize=6.1, color=sub_c)
     ax.set_title(title, fontsize=11, color=INK, pad=10, loc='left', **TITLE_FONT)
 
@@ -395,12 +395,12 @@ def main():
 
             mm_cols = 2
             mm_rows = math.ceil(len(panels) / mm_cols)
-            f2 = plt.figure(figsize=(12.0, 2.5 + 3.7 * mm_rows), dpi=200)
+            f2 = plt.figure(figsize=(12.0, 2.6 + 6.6 * mm_rows), dpi=200)
             f2.patch.set_facecolor(CREAM)
             g2 = GridSpec(mm_rows + 1, mm_cols + 1, figure=f2,
-                          height_ratios=[1.0] + [1.3] * mm_rows,
-                          width_ratios=[1.0, 1.0, 0.5],
-                          hspace=0.45, wspace=0.4,
+                          height_ratios=[0.42] + [1.3] * mm_rows,
+                          width_ratios=[1.0, 1.0, 0.72],
+                          hspace=0.28, wspace=0.4,
                           left=0.075, right=0.985, top=0.94, bottom=0.04)
             h2 = f2.add_subplot(g2[0, :2])
             h2.axis('off')
