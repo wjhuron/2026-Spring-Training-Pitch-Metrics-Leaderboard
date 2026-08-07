@@ -757,7 +757,7 @@ const Aggregator = {
       // rank them across the team pool here.
       STAT_KEYS = STAT_KEYS.concat(['era', 'fip', 'xFIP', 'siera', 'hr9',
         'wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'twoStrikeWhiffPct',
-        'runValue', 'rv100', 'xRunValue', 'xRv100']);
+        'runValue', 'rv100', 'xRunValue', 'xRv100', 'extension']);
       INVERT = Object.assign({}, INVERT, { era: true, fip: true, xFIP: true, siera: true, hr9: true,
         wOBA: true, xBA: true, xSLG: true, xwOBA: true, xwOBAcon: true });
     }
@@ -823,7 +823,10 @@ const Aggregator = {
                      // rather than recompute it.
                      'commandPlus', 'commandPlus_pctl', 'commandPlusRaw', 'commandPlusN',
                      'pitcherPlusProj', 'pitcherPlusProj_pctl',
-                     'armAngle'];
+                     // Arm angle / extension are season-level physical traits
+                     // (all-pitch averages from PITCHER_DATA); like Command+
+                     // they carry through filtered views rather than recompute.
+                     'armAngle', 'extension', 'extension_pctl'];
     const preAgg = window.PITCHER_DATA || [];
     const preAggMap = {};
     for (let bi = 0; bi < preAgg.length; bi++) {
@@ -1057,6 +1060,7 @@ const Aggregator = {
       wadd(a, 'twoStrikeWhiffPct', p.twoStrikeWhiffPct, p.nSwings);
       wadd(a, 'locPlus', p.locPlus, p.locPlusN);
       wadd(a, 'armAngle', p.armAngle, p.count);
+      wadd(a, 'extension', p.extension, p.count);
     }
 
     const teamGames = this.getTeamGamesPlayed();
@@ -1076,7 +1080,7 @@ const Aggregator = {
         xRv100: (a.xRunValue != null && a.count > 0) ? a.xRunValue / a.count * 100 : null,
         locPlusN: a.wts.locPlus || 0,
       };
-      const W_KEYS = ['fip', 'xFIP', 'siera', 'wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'twoStrikeWhiffPct', 'locPlus', 'armAngle'];
+      const W_KEYS = ['fip', 'xFIP', 'siera', 'wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'twoStrikeWhiffPct', 'locPlus', 'armAngle', 'extension'];
       for (let ki = 0; ki < W_KEYS.length; ki++) {
         const k = W_KEYS[ki];
         o[k] = (a.wts[k] > 0) ? a.sums[k] / a.wts[k] : null;

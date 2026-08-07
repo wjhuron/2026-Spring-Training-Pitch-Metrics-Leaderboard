@@ -76,6 +76,8 @@ const COLUMNS = {
     { key: 'rvoe',        label: 'RVOE',     format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Runs above expectation — total actual runs (luck included) better (+) or worse (-) than Stuff+ and location predict, across the arsenal. Raw accounting, unregressed. RVOE minus xRVOE = contact luck. Min 300 pitches.', group: 'run_value' },
     { key: 'xrvoe',       label: 'xRVOE',    format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Expected runs above expectation — total luck-neutral runs (xwOBA on contact) better (+) or worse (-) than Stuff+ and location predict, across the arsenal. Raw accounting, unregressed. Min 300 pitches.', group: 'run_value' },
     { key: 'rvoe100',     label: 'RVOE/100', format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Runs above expectation per 100 pitches, actual results (luck included). Raw rate, unregressed — compare with xRVOE/100 (regressed, luck-neutral) to see how much is fortune. Min 300 pitches.', group: 'run_value' },
+    { key: 'armAngle',    label: 'Arm Angle', format: Utils.formatDecimal(1), sortType: 'numeric', sectionStart: true, noPercentile: true, showAvg: true, desc: 'Average arm angle at release across all pitches (degrees above horizontal): 0 = sidearm, 90 = straight over the top. League median is ~38', group: 'metrics' },
+    { key: 'extension',   label: 'Ext',      format: Utils.formatFeetInches, sortType: 'numeric', desc: 'Average extension toward home plate at release across all pitches (feet)', group: 'metrics' },
   ],
   pitcherBattedBall: [
     { key: '_rank',       label: '#',        format: function(v){ return v; }, sortType: null, align: 'center', noPercentile: true, noToggle: true, group: 'info', width: '36px' },
