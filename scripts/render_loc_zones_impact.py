@@ -299,11 +299,11 @@ def main():
         hd = fig.add_subplot(gs[0, :2])
         hd.axis('off')
         hd.text(0, 0.97, f'{first} {last}: What His Locations Add and Cost',
-                fontsize=15, color=INK, va='top', **TITLE_FONT)
-        hd.text(0, 0.80, f'2026 season ({teams}) · zone × count impact '
+                fontsize=23, color=INK, va='top', **TITLE_FONT)
+        hd.text(0, 0.78, f'2026 season ({teams}) · zone × count impact '
                 f'matrix · cell grades shrunk toward league (k={SHRINK_K}, '
-                'split-half tuned)', fontsize=8.5, color=(*INK, 0.7), va='top')
-        hd.text(0, 0.66,
+                'split-half tuned)', fontsize=11.5, color=(*INK, 0.75), va='top')
+        hd.text(0, 0.68,
                 'Each cell: its IMPACT in Loc+ points, his usage times his grade '
                 'there minus the league’s usage times the league grade; red adds '
                 'value, blue costs it,\nand the 15 cells sum to the gap between his '
@@ -311,12 +311,12 @@ def main():
                 'in that count state, how often that zone\n(league in parentheses); '
                 'the column header shows how often he is in that count at all. '
                 'Loc+ line shows the unshrunken grade of those pitches.',
-                fontsize=7.4, color=INK, va='top', linespacing=1.55)
-        hd.text(0, 0.24, 'Helps him most:  ' + '   |   '.join(sentence(r) for r in helps),
-                fontsize=8.4, color=(140 / 255, 52 / 255, 38 / 255),
+                fontsize=9.8, color=INK, va='top', linespacing=1.6)
+        hd.text(0, 0.26, 'Helps him most:  ' + '   |   '.join(sentence(r) for r in helps),
+                fontsize=11, color=(140 / 255, 52 / 255, 38 / 255),
                 va='top', fontweight=700)
-        hd.text(0, 0.10, 'Costs him most:  ' + '   |   '.join(sentence(r) for r in costs),
-                fontsize=8.4, color=(52 / 255, 80 / 255, 110 / 255),
+        hd.text(0, 0.09, 'Costs him most:  ' + '   |   '.join(sentence(r) for r in costs),
+                fontsize=11, color=(52 / 255, 80 / 255, 110 / 255),
                 va='top', fontweight=700)
         lg_ax = fig.add_subplot(gs[0, 2])  # tall header row -> big legend
         draw_zone_legend(lg_ax)
