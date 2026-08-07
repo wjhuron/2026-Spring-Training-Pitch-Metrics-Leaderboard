@@ -19,6 +19,7 @@ Implements the four-part redesign:
 Season pages only (prototype). Usage: python3 scripts/render_loc_zones_impact.py
 Outputs ~/Downloads/ArticleVisuals/<Last>/LocZones_<LastFirst>_impact.png
 """
+import json
 import math
 import os
 import pickle
@@ -67,6 +68,13 @@ PITCHERS = {
     'Cruz, Yovanny': ['NYY', 'WSH', 'AAA'],
     'Dion, Will': ['CLE', 'WSH', 'ROC', 'AAA'],
 }
+
+# Deadline arms whose FULL season (MLB + every AAA stop) lives only in the
+# NEW scratch tab; the rs cache holds just their MLB + vs-ROC slices. Their
+# pitches are fetched from the tab and Loc+ atoms re-scored live, exactly as
+# Cards.py does for scratch tabs.
+NEW_TAB_ARMS = {'Bird, Jake', 'Cruz, Yovanny', 'Dion, Will'}
+NEW_TAB_WORKBOOK = '1BypxxlWgQAltETOLqccOYigeo8nXX-FIuVv6rhT4anA'
 
 ZONES = ['heart', 'shadow_in', 'shadow_out', 'chase', 'waste']
 ZONE_NAMES = {'heart': 'Heart', 'shadow_in': 'Shadow-In',
@@ -255,13 +263,71 @@ def main():
                       'state': {st: lg_state_n[(h, grp)][st] / tot for st in STATES},
                       'total': sum(sh * g for sh, g in joint.values())}
 
+    # ---- NEW-tab arms: fetch full-season rows and re-score Loc+ atoms ----
+    if NEW_TAB_ARMS & set(PITCHERS):
+        import gspread
+        from pipeline_locplus import (compute_loc_plus, group_of, LOC_SCALE_K,
+                                      score_pitch, _is_scorable)
+        print('Fetching NEW tab ...')
+        ws = gspread.service_account().open_by_key(NEW_TAB_WORKBOOK).worksheet('NEW')
+        new_rows = defaultdict(list)
+        for r in ws.get_all_records():
+            if r.get('Pitcher') in NEW_TAB_ARMS:
+                new_rows[r['Pitcher']].append(r)
+        try:
+            with open(os.path.join(ROOT, 'data', 'metadata_rs.json')) as f:
+                g = json.load(f).get('gutsConstants') or {}
+            lg_woba, woba_scale = float(g['lgWOBA']), float(g['wOBAScale'])
+        except Exception:
+            lg_woba, woba_scale = 0.320, 1.252
+        mlb = [p for p in allp if p.get('_source') == 'MLB']
+        by_p, by_t = defaultdict(list), defaultdict(list)
+        for p in mlb:
+            k = (p.get('Pitcher'), p.get('PTeam'), p.get('Throws'))
+            by_p[k].append(p)
+            by_t[(k[0], k[1], p.get('Pitch Type'), k[2])].append(p)
+        for nm, plist in new_rows.items():
+            for p in plist:
+                by_p[(nm, 'AAA', p.get('Throws'))].append(p)
+                by_t[(nm, 'AAA', p.get('Pitch Type'), p.get('Throws'))].append(p)
+        print('Building Loc+ surfaces (one-time) ...')
+        _, _, _, anchors = compute_loc_plus(mlb, by_p, by_t, lg_woba, woba_scale,
+                                            return_anchors=True)
+        S, pt_anc = anchors['surfaces'], anchors['pt']
+
+        def loc_atom(p):
+            if not _is_scorable(p):
+                return None
+            anc = pt_anc.get(group_of(p))
+            if not anc or anc[0] is None or not anc[1] or anc[1] <= 1e-12:
+                return None
+            v = score_pitch(p, S)
+            if v is None:
+                return None
+            return int(round(100.0 - LOC_SCALE_K * (v - anc[0]) / anc[1]))
+
+        from pipeline_utils import compute_in_zone
+        for nm, plist in new_rows.items():
+            kept = []
+            for p in plist:
+                # NEW tab carries no InZone column; derive it with the exact
+                # rounded-rect rule so classify_zone can split the shadow band.
+                p['InZone'] = compute_in_zone(p)
+                a = loc_atom(p)
+                if a is not None:
+                    p['Loc+'] = a
+                    kept.append(p)
+            by_pitcher[nm] = kept
+            print(f'  {nm}: NEW tab {len(plist)} rows, {len(kept)} graded')
+
     PAGES = [('ALL', '', ''), ('L', '_vsLHH', ' vs LHH'), ('R', '_vsRHH', ' vs RHH')]
 
     for name, all_pitches in sorted(by_pitcher.items()):
       last, first = [s.strip() for s in name.split(',')]
       outdir = os.path.join(OUT_ROOT, last)
       os.makedirs(outdir, exist_ok=True)
-      teams = ' + '.join(sorted({p['PTeam'] for p in all_pitches}))
+      teams = ('NEW tab: MLB + AAA' if name in NEW_TAB_ARMS else
+               ' + '.join(sorted({p['PTeam'] for p in all_pitches})))
       for hand, suffix, hand_label in PAGES:
         pitches = (all_pitches if hand == 'ALL'
                    else [p for p in all_pitches if p.get('Bats') == hand])
