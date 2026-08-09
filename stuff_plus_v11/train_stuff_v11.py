@@ -358,6 +358,24 @@ def build_df(pitches, prefer_true_fastball=True):
         spin_eff = (math.hypot(ivb_r, hb_r) / (spin / 1000.0)
                     if (spin and spin > 0 and ivb_r is not None and hb_r is not None)
                     else None)
+        # 2026-08-09 battery candidates (emitted always; BASE_FEATS decides
+        # what trains): release-axis frame per the xmove review — cross =
+        # hand-normalized break perpendicular to the measured release axis
+        # (inches; gyro-independent SSW measure, stable where axis_dev
+        # degrees blow up on gyro sliders), ax_sin/ax_cos = the axis
+        # direction itself, hand-mirrored. Axis from SpinAxis degrees
+        # (priors) or the sheets' RTilt clock (2026). Convention matches
+        # scripts/xmove_activespin_gain.py: th=0 is pure backspin.
+        _sa = sf(p.get('SpinAxis'))
+        if _sa is None:
+            _rtm = _tilt_min(p.get('RTilt'))
+            if _rtm is not None:
+                _sa = ((_rtm / 60.0) + 6.0) * 30.0 % 360.0
+        _cross = _ax_sin = _ax_cos = None
+        if _sa is not None:
+            _th = math.radians((_sa - 180.0) % 360.0) * s
+            _ax_sin, _ax_cos = math.sin(_th), math.cos(_th)
+            _cross = -iv * _ax_sin + hb * _ax_cos
         rows.append({
             'pitcher': p.get('Pitcher'), 'team': p.get('PTeam'), 'throws': thr,
             'date': p.get('Game Date'),
@@ -372,6 +390,13 @@ def build_df(pitches, prefer_true_fastball=True):
             'axis_dev': (_dev * s) if _dev is not None else None,
             'axis_dev_abs': abs(_dev) if _dev is not None else None,
             'spin_eff': spin_eff,
+            'cross': _cross,
+            'cross_abs': abs(_cross) if _cross is not None else None,
+            'ax_sin': _ax_sin, 'ax_cos': _ax_cos,
+            # passthroughs for the battery's post-hoc transforms (location-
+            # adjusted approach angles, HAA reconstruction validation)
+            'plate_x': sf(p.get('PlateX')), 'plate_z': sf(p.get('PlateZ')),
+            'haa_meas': sf(p.get('HAA')),
         })
     out = pd.DataFrame(rows)
     # Arm-angle imputation (2026-07-18, per Wally): ArmAngle arrives ~2 days
