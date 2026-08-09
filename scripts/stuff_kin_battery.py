@@ -36,11 +36,13 @@ def main():
     print('loading 2026 ...', flush=True)
     p26 = BAT.load_mlb_2026()
     df26 = BAT.build_season(p26, (T.LG_WOBA, T.WOBA_SCALE))
+    import pandas as pd
     side = pickle.load(open(SIDE, 'rb'))
     vals = df26['pid'].map(side)
     has = vals.notna()
     for j, col in enumerate(('kin_eff', 'kin_dev', 'kin_cd')):
         df26.loc[has, col] = vals[has].str[j]
+        df26[col] = pd.to_numeric(df26[col], errors='coerce')
     print(f'  2026: {len(df26)} rows, sidecar filled {has.mean()*100:.1f}%')
 
     print('loading priors ...', flush=True)
@@ -56,6 +58,8 @@ def main():
         print(f'  {yr}: {len(d)} rows', flush=True)
     prior = pd.concat(priors, ignore_index=True)
     del priors, p26
+    for col in ('kin_eff', 'kin_dev', 'kin_cd'):
+        prior[col] = pd.to_numeric(prior[col], errors='coerce')
 
     print('\ncandidate coverage by season (%):')
     for col in ('kin_eff', 'kin_dev', 'kin_cd'):
@@ -74,14 +78,26 @@ def main():
     df26['period'] = np.where(df26['date'] < '2026-05-01', 'early', 'late')
 
     BASE = list(T.BASE_FEATS)
+    # VDMASK_FB: velo_diff masked on FASTBALLS ONLY (FF/SI/FC), keeping it
+    # for breaking + offspeed — the main battery's full mask improved
+    # fastball pred (+0.056) while crashing breaking (-0.079), so the
+    # surgical version tests whether both families can win at once.
+    FB = {'FF', 'SI', 'FC'}
+    df26_fb = df26.copy()
+    prior_fb = prior.copy()
+    for dd in (df26_fb, prior_fb):
+        dd.loc[dd['pitch_type'].isin(FB), 'velo_diff'] = np.nan
+
     results = {}
-    for name, feats in (
-            ('BASE', BASE),
-            ('KINEFF', BASE + ['kin_eff']),
-            ('KINDEV', BASE + ['kin_dev']),
-            ('KINCD', BASE + ['kin_cd']),
-            ('KINALL', BASE + ['kin_eff', 'kin_dev', 'kin_cd'])):
-        d26, dt = BAT.run_variant(name, df26, prior, feats)
+    for name, feats, frames in (
+            ('BASE', BASE, None),
+            ('KINEFF', BASE + ['kin_eff'], None),
+            ('KINDEV', BASE + ['kin_dev'], None),
+            ('KINCD', BASE + ['kin_cd'], None),
+            ('KINALL', BASE + ['kin_eff', 'kin_dev', 'kin_cd'], None),
+            ('VDMASK_FB', BASE, (df26_fb, prior_fb))):
+        a26, apr = frames if frames is not None else (df26, prior)
+        d26, dt = BAT.run_variant(name, a26, apr, feats)
         rel, pred, desc, indep, fams, n_rel, n_pred = \
             BAT.unit_metrics(d26, loc_map)
         results[name] = dict(rel=rel, pred=pred, desc=desc, indep=indep)
