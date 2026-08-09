@@ -76,11 +76,13 @@ FRIENDLY = {
     'spin_rate': ('Spin rate', 'rpm', 0),
     'extension': ('Extension', 'ft', 1),
     'arm_angle': ('Arm angle', 'deg', 0),
-    'vaa': ('Approach angle (VAA)', 'deg', 1),
-    'vaa_diff': ('VAA gap off his FB', 'deg', 1),
+    'vaa': ('Approach angle (nVAA)', 'deg', 1),
+    'vaa_diff': ('nVAA gap off his FB', 'deg', 1),
     'rel_x': ('Horizontal release', 'ft', 1),
     'axis_dev': ('Axis deviation (SSW)', 'deg', 0),
     'axis_dev_abs': ('|Axis deviation|', 'deg', 0),
+    'cross': ('Seam-shifted break (cross-axis)', 'in', 1),
+    'cross_abs': ('|Cross-axis break|', 'in', 1),
     'platoon_same': ('Same-hand share', '', 2),
 }
 

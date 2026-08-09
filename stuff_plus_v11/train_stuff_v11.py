@@ -153,9 +153,54 @@ def _harmonize_tags(prior, current):
 # hb_diff/spin_rate gains at 4-fold were noise at 8-fold; platoon_same keeps
 # real descriptive value; arm_angle is tied-most load-bearing (pred -0.049
 # when dropped) despite a small SHAP share.
+# ── v12 config (ADOPTED 2026-08-09, per Wally) ──
+# Three changes vs v11, each validated on the full-config paired 2026 harness
+# (scripts/stuff_feature_battery_2026_08.py + stuff_combo_battery.py) and the
+# LOSO 2021-2025 replicate gate (scripts/stuff_features_loso.py):
+#   1. cross/cross_abs replace axis_dev/axis_dev_abs — the same SSW quantity
+#      restated in release-axis-frame INCHES (linear in movement, stable for
+#      gyro sliders where circular degrees have sd ~40).
+#   2. velo_diff masked to None on FF/SI — the gap off the primary fastball
+#      is real signal for cutters/breaking/offspeed (masking it there crashed
+#      breaking pred -0.08) but actively harmful bookkeeping on the true
+#      fastballs themselves (masking FF/SI: fastball pred 0.217 -> 0.266).
+#   3. vaa/vaa_diff are nVAA — location-adjusted via frozen per-type slopes
+#      (NVAA_SLOPES below). Raw VAA doubled as a pitch-height proxy, i.e.
+#      location leakage in a skill-isolation model (locIndep 0.39 -> 0.29).
+# Combined 2026 harness: reliab 0.8818 -> 0.9685, pred 0.2878 -> 0.3057,
+# desc 0.3821 -> 0.3496 (the desc drop is the evicted location component).
+# LOSO: CROSS_VD beat shipped on pitcher-level fut_r in 4/5 held-out seasons
+# (rel 5/5); adding nVAA was prediction-neutral across replicates (3/5, mean
+# +0.007) while gaining +0.05 reliability in all five.
 BASE_FEATS = ['velocity', 'ivb', 'hb', 'velo_diff', 'ivb_diff', 'hb_diff',
               'spin_rate', 'extension', 'arm_angle', 'vaa', 'vaa_diff',
-              'rel_x', 'axis_dev', 'axis_dev_abs']
+              'rel_x', 'cross', 'cross_abs']
+
+# Frozen nVAA constants: per-type OLS slope of VAA on PlateZ + league mean
+# PlateZ, measured on 2021-2026 pooled (4.05M pitches; 2026-08-09). Frozen
+# like build_historical_training_set's release-point calibration so every
+# scoring path (trainer, score-only, ROC, Cards scratch, explain pages) is
+# identical with no bundle plumbing. Types below the 2000-pitch fit floor
+# (KN) keep raw VAA. Re-measure only deliberately; slopes varied < 0.03
+# across 4-season subsets in the LOSO fits.
+NVAA_SLOPES = {
+    'CH': (1.0556, 1.8315), 'CU': (1.0010, 1.8314), 'FC': (1.1703, 2.4074),
+    'FF': (1.0623, 2.8193), 'FS': (1.0604, 1.7300), 'KC': (0.9659, 1.7575),
+    'SI': (1.1030, 2.3694), 'SL': (1.1117, 1.8846), 'ST': (1.1356, 1.9935),
+    'SV': (1.0251, 1.8603),
+}
+# velo_diff is masked (None) on these types — see adoption note 2 above.
+VD_MASK_TYPES = {'FF', 'SI'}
+
+
+def _nvaa(pt, vaa, plate_z):
+    """Location-adjusted VAA; falls back to raw when unadjustable."""
+    if vaa is None:
+        return None
+    sl = NVAA_SLOPES.get(pt)
+    if sl is None or plate_z is None:
+        return vaa
+    return vaa - sl[0] * (plate_z - sl[1])
 # axis_dev/axis_dev_abs (2026-07-14): the seam-shifted-wake proxy — signed,
 # hand-normalized circular OTilt-RTilt deviation + its magnitude, per pitch
 # (Wally's tilt conventions; see _axis_dev_deg). ADOPTED after the
@@ -259,6 +304,7 @@ def build_df(pitches, prefer_true_fastball=True):
         pt, thr = p.get('Pitch Type'), p.get('Throws')
         if pt not in FB_TYPES or thr not in ('L', 'R'): continue
         v, iv, hb, vaa = sf(p.get('Velocity')), sf(p.get('IndVertBrk')), sf(p.get('HorzBrk')), sf(p.get('VAA'))
+        vaa = _nvaa(pt, vaa, sf(p.get('PlateZ')))   # v12: reference is nVAA too
         if None in (v, iv, hb): continue
         s = 1.0 if thr == 'R' else -1.0
         a = fb[(p.get('Pitcher'), thr)][pt]
@@ -314,7 +360,8 @@ def build_df(pitches, prefer_true_fastball=True):
         # density-adjusted movement (pipeline_fetch backfills these from raw
         # when the adjustment hasn't landed, so coverage matches raw)
         iv, hb_raw = sf(p.get('xIndVrtBrk')), sf(p.get('xHorzBrk'))
-        vaa, ext = sf(p.get('VAA')), sf(p.get('Extension'))
+        vaa_raw, ext = sf(p.get('VAA')), sf(p.get('Extension'))
+        vaa = _nvaa(pt, vaa_raw, sf(p.get('PlateZ')))   # v12: nVAA
         arm, rel_z = sf(p.get('ArmAngle')), sf(p.get('RelPosZ'))
         rel_x_raw = sf(p.get('RelPosX'))
         if arm is None:                       # real-time placeholder until backfill
@@ -330,6 +377,9 @@ def build_df(pitches, prefer_true_fastball=True):
             vaa_diff = (vaa - fbref['vaa']) if fbref['vaa'] is not None else None
         else:
             velo_diff = ivb_diff = hb_diff = vaa_diff = None
+        velo_diff_raw = velo_diff
+        if pt in VD_MASK_TYPES:      # v12: gap masked on true fastballs
+            velo_diff = None
         desc = p.get('Description', '')
         is_bip = desc == 'In Play'
         xw, re = sf(p.get('xwOBA')), sf(p.get('RunExp'))
@@ -386,6 +436,7 @@ def build_df(pitches, prefer_true_fastball=True):
             'ivb_diff': ivb_diff, 'hb_diff': hb_diff, 'spin_rate': spin,
             'extension': ext, 'arm_angle': arm, 'rel_z': rel_z, 'rel_x': rel_x,
             'vaa': vaa, 'vaa_diff': vaa_diff, 'target_xrv': target,
+            'vaa_raw': vaa_raw, 'velo_diff_raw': velo_diff_raw,
             'rv_raw': (-re) if re is not None else None,  # actual RV incl. BIP luck (RVOE)
             'axis_dev': (_dev * s) if _dev is not None else None,
             'axis_dev_abs': abs(_dev) if _dev is not None else None,
@@ -616,6 +667,10 @@ def main():
             B = pickle.load(f)
         if 'fold_models' not in B:
             sys.exit('--score-only needs a bundle with fold models — run a full retrain first')
+        if 'cross' not in B.get('features', []):
+            sys.exit('--score-only bundle predates the v12 config (cross/nVAA/'
+                     'velo_diff-mask) — its fold models trained on different '
+                     'features; run a full retrain (workflow: retrain=true) first')
         print(f'  score-only: using cached bundle ({len(B["fold_models"])} fold models, '
               f'trained {B.get("trained_through", "unknown")})')
     elif os.path.exists(PRIOR_PKL):
@@ -645,6 +700,16 @@ def main():
             print(f'  + {len(_d)} prior-season ({_yr}) training pitches')
         df_prior = pd.concat(prior_dfs, ignore_index=True)
         print(f'  prior total: {len(df_prior)} pitches across {len(prior_dfs)} seasons')
+        # v12 guard: cross needs SpinAxis on the prior rows. A season-shaped
+        # coverage hole acts as an era marker and silently degrades the model
+        # (the axis_dev 80%-coverage lesson) — fail loudly instead.
+        for _i, _d in enumerate(prior_dfs):
+            _cov = _d['cross'].notna().mean() if 'cross' in _d.columns else 0.0
+            if _cov < 0.90:
+                sys.exit(f'ABORT: prior season index {_i} has cross coverage '
+                         f'{_cov:.1%} (<90%) — training pickle likely predates '
+                         f'the SpinAxis augmentation; refresh the release '
+                         f'assets before retraining')
     else:
         print('  (no prior-season pickle found — training on current season only)')
 
@@ -1050,7 +1115,7 @@ def main():
     if B is None:
         with open(os.path.join(HERE, 'stuff_models_v11.pkl'), 'wb') as f:
             pickle.dump({'model': model, 'features': list(X.columns), 'base_feats': BASE_FEATS,
-                         'league': league, 'params': TUNED, 'version': 'v11',
+                         'league': league, 'params': TUNED, 'version': 'v12',
                          'model_na': model_na, 'noarm_feats': NOARM_FEATS,
                          'features_na': list(Xna.columns),
                          'na_pt_scale': na_pt, 'na_ov_scale': na_ov,
