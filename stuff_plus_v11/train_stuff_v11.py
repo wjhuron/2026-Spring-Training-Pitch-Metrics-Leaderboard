@@ -397,6 +397,10 @@ def build_df(pitches, prefer_true_fastball=True):
             # adjusted approach angles, HAA reconstruction validation)
             'plate_x': sf(p.get('PlateX')), 'plate_z': sf(p.get('PlateZ')),
             'haa_meas': sf(p.get('HAA')),
+            # per-pitch 9P kinematics (augment_kinematics / the 2026 sidecar;
+            # None on rows not yet backfilled)
+            'kin_eff': sf(p.get('KinEff')), 'kin_dev': sf(p.get('KinDev')),
+            'kin_cd': sf(p.get('KinCd')),
         })
     out = pd.DataFrame(rows)
     # Arm-angle imputation (2026-07-18, per Wally): ArmAngle arrives ~2 days
