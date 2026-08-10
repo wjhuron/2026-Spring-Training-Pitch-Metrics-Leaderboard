@@ -354,18 +354,34 @@ def render_hitters(eng, outdir):
 _GRADE_ALIAS = {'stuffPlus': 'stuffScore', 'pitchingPlus': 'pitchingScore'}
 
 
+# Per-player hard date cap (inclusive). 2026-08-10 per Wally: caps LIFTED —
+# platoon cards now include the FULL season for everyone, WSH call-up
+# outings included, matching the season cards. (Historical: Cruz/Dion were
+# capped at 8/4 while the article treated them as AAA arms awaiting a shot.)
+DATE_CAP = {}
+
+
 def pitcher_pitches(eng, sheet, policy):
-    """This arm's pitches. 'combined' folds the MLB stint together with the
-    minor league rows, per Wally: 25 lefties faced in AAA plus 75 in MLB is
-    100 lefties faced."""
+    """This arm's pitches. 'own' = ROC tab only (the four Rochester arms have
+    no MLB stint, and per Wally their cards are AAA-only regardless);
+    'combined' folds the MLB stint together with the minor league rows: 25
+    lefties faced in AAA plus 75 in MLB is 100 lefties faced."""
     out = []
     for (name, team), plist in eng['pitcher_groups'].items():
-        if name == sheet and team in MLB_TEAMS:
+        if name != sheet:
+            continue
+        if team == 'ROC':
             out += plist
-        elif name == sheet and team == 'ROC':
+        elif policy == 'combined' and team in MLB_TEAMS:
             out += plist
     if policy == 'combined':
         out += [p for p in eng['new_rows'] if p.get('Pitcher') == sheet]
+    cap = DATE_CAP.get(sheet)
+    if cap:
+        n0 = len(out)
+        out = [p for p in out if (p.get('Game Date') or '') <= cap]
+        if len(out) != n0:
+            print(f"  {sheet}: date cap {cap} dropped {n0 - len(out)} pitches")
     return out
 
 

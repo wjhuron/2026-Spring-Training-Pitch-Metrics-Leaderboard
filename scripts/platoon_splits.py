@@ -79,10 +79,12 @@ TARGETS = [
 ]
 
 # MLB team of a NEW-tab player's 2026 major league stint (pickle lookup key).
+# A NEW-tab player can have MULTIPLE MLB stints (all three were called up by
+# Washington in August 2026), so each maps to the list of cache PTeam keys.
 NEW_TAB_MLB_TEAM = {
-    'Cruz, Yovanny': 'NYY',
-    'Bird, Jake':    'NYY',
-    'Dion, Will':    'CLE',
+    'Cruz, Yovanny': ['NYY', 'WSH'],
+    'Bird, Jake':    ['NYY', 'WSH'],
+    'Dion, Will':    ['CLE', 'WSH'],
 }
 
 MIN_PITCHES_FOR_ROW = 75       # display floor for a level (~20 PA)
@@ -183,18 +185,29 @@ def load_pitches(use_new_tab=True):
 
 
 def preprocess(all_pitches, new_rows, metadata, woba_weights):
-    """The cached pitch list is ALREADY through process_game_type's
+    """The CI-released pickle is ALREADY through process_game_type's
     preprocessing (InZone recomputed, CF reclassified, ROC/AAA tagged, MiLB
-    RunExp rescaled to MLB currency, minor league xwOBA filled) — verified by
-    re-deriving the RunExp scale from it, which comes back 1.000. So only the
-    freshly-read NEW-tab rows need the same treatment."""
+    RunExp rescaled to MLB currency, minor league xwOBA filled). A pickle from
+    refresh_pickle.py (Sheets -> pickle) is NOT: it has InZone and ROC tags but
+    no CF remap, no RunExp rescale, no xwOBA fill. Every correction here is
+    therefore either self-detecting (the RunExp scale measures 1.000 on
+    already-corrected rows) or idempotent (CF remap, xwOBA fill only where
+    None), so both pickle provenances come out identical."""
     ep_pitchers = {(p['Pitcher'], p['PTeam']) for p in all_pitches
                    if p.get('Pitch Type') == 'EP'}
 
-    for p in new_rows:
-        p['InZone'] = compute_in_zone(p)
+    # CF -> FF/FC remap over EVERYTHING (matches process_data; no-op on a
+    # CI pickle where it already ran).
+    n_cf = 0
+    for p in all_pitches:
         if p.get('Pitch Type') == 'CF':
             p['Pitch Type'] = 'FC' if p.get('Pitcher') in CF_TO_FC_PITCHERS else 'FF'
+            n_cf += 1
+    if n_cf:
+        print(f"  CF remapped on {n_cf} pitches (Sheets-fresh pickle)")
+
+    for p in new_rows:
+        p['InZone'] = compute_in_zone(p)
         # Pitcher side is the tracked player; every batter here is a minor
         # league opponent who must stay out of hitter aggregations.
         p['_roc_pitcher_pitch'] = True
@@ -980,10 +993,10 @@ def main():
                 milb = [p for p in new_rows if p.get('Pitcher') == sheet_name]
                 if milb:
                     levels.append(('AAA', milb, None))
-                mt = NEW_TAB_MLB_TEAM.get(sheet_name)
-                g = pitcher_groups.get((sheet_name, mt)) if mt else None
-                if g:
-                    levels.append(('MLB (' + mt + ')', g, None))
+                for mt in (NEW_TAB_MLB_TEAM.get(sheet_name) or []):
+                    g = pitcher_groups.get((sheet_name, mt))
+                    if g:
+                        levels.append(('MLB (' + mt + ')', g, None))
 
         for level, ps_all, sd_all in levels:
             if len(ps_all) < MIN_PITCHES_FOR_ROW:
