@@ -2637,8 +2637,14 @@ K_SHRINK_DAILY = 0
 
 
 def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
-    """Stuff+ v11 for scratch pitchers. Returns ({pitcher: overall},
-    {(pitcher, pitch_type): score}). Full model when the pitcher has any
+    """Stuff+ (v12 config since 2026-08-09) for scratch pitchers. Returns
+    ({pitcher: overall}, {(pitcher, pitch_type): score}). The v12 features
+    (nVAA, release-axis cross, FF/SI velo_diff mask) live inside
+    train_stuff_v11.build_df, so this path picks them up automatically —
+    the guard below only enforces that the LOCAL bundle is a v12 retrain
+    (a stale v11 bundle would score transformed features with models
+    trained on raw ones, silently drifting every grade).
+    Full model when the pitcher has any
     ArmAngle data (build_df fills gaps with his own average); otherwise the
     no-arm companion model anchored to its MLB (no-arm) scales — exactly the
     ROC path in train_stuff_v11.main(). k_shrink overrides the season K_SHRINK
@@ -2651,6 +2657,14 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
 
     with open(os.path.join(_sv_dir, 'stuff_models_v11.pkl'), 'rb') as f:
         bundle = _pickle.load(f)
+    if 'cross' not in bundle.get('features', []):
+        raise RuntimeError(
+            'stuff_models_v11.pkl predates the v12 config — its models '
+            'trained on different features than build_df now emits. Refresh '
+            'it from the latest-data release:\n  curl -sL https://github.com/'
+            'wjhuron/Huronalytics/releases/download/latest-data/'
+            'stuff_models_v11.pkl.gz | gunzip -c > '
+            'stuff_plus_v11/stuff_models_v11.pkl')
 
     all_pitches = [p for pl in norm_by_pitcher.values() for p in pl]
     df = _sv.build_df(all_pitches)
@@ -3071,10 +3085,10 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "ROC"
+    team            = "NEW"
     start_date      = None    # Set to None for full season
     end_date        = None             # Set to a date for date range, or None for single day
-    filter_pitchers = "Perales, Luis; Kent, Jackson; Sinclair, Jack; Tolman, Erik"                 # Semicolon-separated "Last, First" names, or "" for all
+    filter_pitchers = "Rom, Drew"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR
