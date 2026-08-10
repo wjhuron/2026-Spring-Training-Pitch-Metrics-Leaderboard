@@ -1,30 +1,41 @@
 #!/usr/bin/env python3
 """Tune the zone x count impact-page constants for SD+ / CT+ hitter pages.
 
-Mirrors the two Loc+ sweeps (loczone_impact_shrink_sweep.py and
-loczone_callout_sweep.py) on the hitter decision/contact atoms — the
-pitcher-page constants (k=8, lam=0.6) were tuned on Loc+ atoms, which are
-near-deterministic in location; SD+/CT+ atoms are signed near-binary
-variables with cell SDs ~25x larger, so the constants must be re-swept,
-not adopted.
+v2 (2026-08-10): re-swept for the CARD-COHERENT cell formulas after Wally
+rejected the v1 decomposition (it counted pitch diet / swing selection,
+which the leaderboard metrics deliberately neutralize, so page and card
+values disagreed). The v1 constants (SD k=0 lam=0.25, CT k=10 lam=0.75)
+were tuned on the old formulas and do not carry over.
 
-Atoms (both make the league overall grade exactly 100 by construction):
-  SD: atom = 100 * dv / lg_mean_dv, dv = RV(chosen) - RV(opposite) from the
-      shipped sdPlusWeights table; unit = (hitter, team, pitch category).
-  CT: atom = 100 * lev * I[contact] / lg_mean(lev * (1 - p_whiff)), lev and
-      p_whiff from the shipped ctPlusWeights table; league cell grade
-      100 * lev * (1 - pw) / D, so cell-level league contact ties out.
+Cell formulas being tuned (both decompose the SHIPPED metric's own
+aggregate, so the season page can sum to leaderboard value - 100):
 
-Sweep 1 (shrinkage k): even/odd pitch split per unit; correlate shrunk
-impact vector from half A with the raw (k=0) vector from half B, both
-directions, averaged. Sweep 2 (callout ranker): SEDISC family — score =
-sign(imp) * max(0, |imp| - lam * SE); objective = realized raw impact
-spread of the top-2/bottom-2 picks in the opposite half.
+  SD+ (diet-neutral, mirroring compute_hitter_sd's mix-neutral form):
+      impact(z,st) = w_z_lg * [ s_h(st|z) * g'_h(z,st) - s_lg(st|z) * g_lg(z,st) ]
+      w_z_lg = league share of zone z, s(st|z) = within-zone count-state
+      share, g = mean decision atom (100 * dv / lg_mean_dv), g'_h shrunk
+      toward g_lg with k pseudo-decisions. Zone diet is neutralized by
+      construction (league zone weights on both sides); count mix and
+      execution both count. A zone the hitter never visits contributes 0.
 
-Sample-size note: units are capped at CAP pitches (drawn as every other
-pitch first, then the rest) so MLB tuning halves match a ROC season's
-per-category volume — tuning at a larger n than production would favor
-less shrinkage than the ROC pages need.
+  CT+ (execution-only, mirroring raw_ct = sum(lev*I) / sum(lev*E)):
+      impact(z,st) = 100 * shrink * sum_cell[lev * (I - E)] / T
+      E = league contact expectation (1 - p_whiff) for the pitch's cell,
+      T = sum(lev * E) over ALL the hitter's swings, shrink = n/(n+k)
+      (excess shrunk toward 0 = league). Swing selection contributes 0 by
+      construction. T is a per-hitter constant, so Pearson objectives are
+      invariant to it.
+
+Sweep 1 (shrinkage k): even/odd pitch split per (hitter, team, category)
+unit; correlate the shrunk 15-cell impact vector from half A with the raw
+(k=0) vector from half B, both directions, averaged. Sweep 2 (callout
+lam): SEDISC score = sign(imp) * max(0, |imp| - lam * SE); objective =
+EXPECTED realized raw-impact spread of top-2/bottom-2 picks in the
+opposite half (no-pick pages score 0 — the conditional spread is gameable
+by coverage collapse).
+
+Units are capped so MLB tuning halves match a ROC season's per-category
+volume (tuning at larger n than production favors too little shrinkage).
 
 Usage: python3 scripts/sdzone_impact_sweeps.py
 """
@@ -46,51 +57,18 @@ ZONES = ['heart', 'shadow_in', 'shadow_out', 'chase', 'waste']
 STATES = ['ahead', 'even', 'behind']
 CELLS = [(z, s) for z in ZONES for s in STATES]
 
-# Unit gates/caps (decisions for SD, swings for CT): floor ~ smallest cat a
-# ROC season page will show, cap ~ its largest (FB) cat.
 SD_MIN, SD_CAP = 250, 800
 CT_MIN, CT_CAP = 120, 400
 K_GRID = [0, 5, 10, 20, 40, 80, 160, 320, 640]
 LAM_GRID = [0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0]
 
 
-def sf(v):
-    try:
-        return float(v)
-    except (TypeError, ValueError):
-        return None
-
-
 def count_state_hitter(p):
-    """Hitter perspective: ahead = more balls than strikes."""
     c = get_count(p)
     if c is None:
         return None
     b, s = c
     return 'ahead' if b > s else ('behind' if s > b else 'even')
-
-
-def cell_agg(pitches):
-    acc = defaultdict(lambda: [0.0, 0])
-    for v, z, st in pitches:
-        acc[(z, st)][0] += v
-        acc[(z, st)][1] += 1
-    return acc
-
-
-def impact_vector(acc, n_total, lg, k):
-    out = []
-    for cell in CELLS:
-        ls, lgg, _sd = lg[cell]
-        s_sum, n = acc.get(cell, [0.0, 0])
-        share = n / n_total
-        if n > 0:
-            g = s_sum / n
-            g_shr = (n * g + k * lgg) / (n + k)
-        else:
-            g_shr = lgg
-        out.append(share * g_shr - ls * lgg)
-    return out
 
 
 def pearson(a, b):
@@ -102,8 +80,11 @@ def pearson(a, b):
     return num / (da * db) if da > 0 and db > 0 else None
 
 
-def league_table(atoms):
-    """[(atom, zone, state)] -> {cell: (share, grade, sd)}."""
+# ── SD machinery ────────────────────────────────────────────────────────
+# league table per grp: {cell: (joint_share, grade, sd)}; derived zone
+# weights w_z and within-zone shares s_lg(st|z).
+
+def sd_league(atoms):
     acc = defaultdict(lambda: [0.0, 0.0, 0])
     for v, z, st in atoms:
         c = acc[(z, st)]
@@ -111,30 +92,91 @@ def league_table(atoms):
         c[1] += v * v
         c[2] += 1
     tot = len(atoms)
-    out = {}
+    joint = {}
     for cell in CELLS:
         s, ss, n = acc.get(cell, [0.0, 0.0, 0])
         if n:
-            mean = s / n
-            out[cell] = (n / tot, mean, math.sqrt(max(ss / n - mean ** 2, 0.0)))
+            m = s / n
+            joint[cell] = (n / tot, m, math.sqrt(max(ss / n - m * m, 0.0)))
         else:
-            out[cell] = (0.0, 0.0, 0.0)
+            joint[cell] = (0.0, 0.0, 0.0)
+    wz = {z: sum(joint[(z, st)][0] for st in STATES) for z in ZONES}
+    slg = {(z, st): (joint[(z, st)][0] / wz[z] if wz[z] else 0.0)
+           for z in ZONES for st in STATES}
+    return {'joint': joint, 'wz': wz, 'slg': slg}
+
+
+def sd_cell_agg(atoms):
+    acc = defaultdict(lambda: [0.0, 0])
+    for v, z, st in atoms:
+        acc[(z, st)][0] += v
+        acc[(z, st)][1] += 1
+    return acc
+
+
+def sd_impact_vector(acc, lg, k):
+    nz = {z: sum(acc.get((z, st), [0, 0])[1] for st in STATES) for z in ZONES}
+    out = []
+    for z in ZONES:
+        for st in STATES:
+            if nz[z] == 0:
+                out.append(0.0)
+                continue
+            _ls, lgg, _sd = lg['joint'][(z, st)]
+            s_sum, n = acc.get((z, st), [0.0, 0])
+            s_h = n / nz[z]
+            g_shr = ((n * (s_sum / n) + k * lgg) / (n + k)) if n else lgg
+            out.append(lg['wz'][z] * (s_h * g_shr - lg['slg'][(z, st)] * lgg))
     return out
 
 
-def sweep_k(tag, units, lg_by_grp):
+def sd_se(acc, lg, cell):
+    z, st = cell
+    nz = sum(acc.get((z, s2), [0, 0])[1] for s2 in STATES)
+    if nz == 0:
+        return 0.0
+    _ls, lgg, sd = lg['joint'][cell]
+    _sum, n = acc.get(cell, [0.0, 0])
+    s_h = n / nz
+    se_g = sd / math.sqrt(n) if n else 0.0
+    se_s = math.sqrt(max(s_h * (1 - s_h), 1e-9) / nz)
+    return lg['wz'][z] * math.sqrt((s_h * se_g) ** 2 + (lgg * se_s) ** 2)
+
+
+# ── CT machinery ────────────────────────────────────────────────────────
+# per-pitch tuple: (e, var, z, st) with e = lev*(I-E), var = lev^2*E*(1-E).
+# Impact in sweep units: shrink * sum(e) per cell (T cancels in Pearson;
+# for the lam sweep, SEs and impacts share the same unit).
+
+def ct_cell_agg(pitches):
+    acc = defaultdict(lambda: [0.0, 0.0, 0])   # [sum_e, sum_var, n]
+    for e, var, z, st in pitches:
+        c = acc[(z, st)]
+        c[0] += e
+        c[1] += var
+        c[2] += 1
+    return acc
+
+
+def ct_impact_vector(acc, k):
+    out = []
+    for cell in CELLS:
+        s_e, _v, n = acc.get(cell, [0.0, 0.0, 0])
+        out.append((n / (n + k)) * s_e if n else 0.0)
+    return out
+
+
+# ── Sweeps ──────────────────────────────────────────────────────────────
+
+def sweep_k(tag, units, vec_fn):
     print(f'--- {tag}: shrinkage k sweep ({len(units)} units) ---')
     results = []
     for k in K_GRID:
         corrs = []
-        for grp, ps in units:
-            lg = lg_by_grp[grp]
-            half_a, half_b = ps[0::2], ps[1::2]
-            acc_a, acc_b = cell_agg(half_a), cell_agg(half_b)
-            for x, y in ((impact_vector(acc_a, len(half_a), lg, k),
-                          impact_vector(acc_b, len(half_b), lg, 0)),
-                         (impact_vector(acc_b, len(half_b), lg, k),
-                          impact_vector(acc_a, len(half_a), lg, 0))):
+        for u in units:
+            half_a, half_b = u['halves']
+            for x, y in ((vec_fn(half_a, u, k), vec_fn(half_b, u, 0)),
+                         (vec_fn(half_b, u, k), vec_fn(half_a, u, 0))):
                 c = pearson(x, y)
                 if c is not None:
                     corrs.append(c)
@@ -144,60 +186,21 @@ def sweep_k(tag, units, lg_by_grp):
     best = max(results, key=lambda kr: kr[1])
     interior = results[0][1] < best[1] and results[-1][1] < best[1]
     print(f'  best on grid: k={best[0]} (r={best[1]:.4f}) — '
-          + ('interior optimum bracketed'
-         if interior else 'EDGE — extend the grid') + '\n')
+          + ('interior optimum bracketed' if interior else
+             ('boundary optimum at k=0 (k<0 undefined)' if best[0] == 0
+              else 'EDGE — extend the grid')) + '\n')
     return best[0]
 
 
-def se_impact(share, n, n_type, lg_grade, sd_cell):
-    se_g = (sd_cell / math.sqrt(n)) if n else 0.0
-    se_s = math.sqrt(max(share * (1 - share), 1e-9) / n_type)
-    return math.sqrt((share * se_g) ** 2 + (lg_grade * se_s) ** 2)
-
-
-def sweep_lam(tag, hitter_units, lg_by_grp, k_display):
-    """hitter_units: list of {grp: [(atom, z, st), ...]} per hitter."""
+def sweep_lam(tag, hitter_dirs, k_display):
+    """hitter_dirs: list of (rows_a, b_map) where rows_a carry
+    {'grp','cell','imp','se'} at k_display and b_map maps (grp, cell) to
+    the raw k=0 impact in the opposite half."""
     print(f'--- {tag}: callout SE-discount sweep (k_display={k_display}) ---')
-
-    def half_rows(halves):
-        rows = []
-        for grp, ps in halves.items():
-            n_type = len(ps)
-            if not n_type:
-                continue
-            acc = cell_agg(ps)
-            lg = lg_by_grp[grp]
-            for cell in CELLS:
-                ls, lgg, sd = lg[cell]
-                s_sum, n = acc.get(cell, [0.0, 0])
-                share = n / n_type
-                g = (s_sum / n) if n else None
-                g_shr = ((n * g + k_display * lgg) / (n + k_display)
-                         if n else lgg)
-                rows.append({'grp': grp, 'cell': cell, 'n': n,
-                             'n_type': n_type, 'share': share,
-                             'imp': share * g_shr - ls * lgg,
-                             'imp_raw': share * (g if n else lgg) - ls * lgg,
-                             'se': se_impact(share, n, n_type, lgg, sd)})
-        return rows
-
-    dirs = []
-    for unit in hitter_units:
-        a = {grp: ps[0::2] for grp, ps in unit.items()}
-        b = {grp: ps[1::2] for grp, ps in unit.items()}
-        dirs.append((a, b))
-        dirs.append((b, a))
-
-    # Objective: EXPECTED realized spread — a direction whose ranker makes
-    # no picks contributes 0, so the metric cannot be gamed by filtering
-    # down to a cherry-picked handful of extreme pages (the conditional
-    # spread rises monotonically with lam for exactly that reason).
     results = []
     for lam in LAM_GRID:
         spreads = []
-        for ha, hb in dirs:
-            rows_a = half_rows(ha)
-            b_map = {(r['grp'], r['cell']): r['imp_raw'] for r in half_rows(hb)}
+        for rows_a, b_map in hitter_dirs:
             scored = []
             for r in rows_a:
                 d = abs(r['imp']) - lam * r['se']
@@ -214,8 +217,8 @@ def sweep_lam(tag, hitter_units, lg_by_grp, k_display):
         exp_sp = sum(spreads) / len(spreads)
         n_made = sum(1 for s in spreads if s != 0.0)
         results.append((lam, exp_sp, n_made))
-        print(f'  lam={lam:>4}: expected realized spread {exp_sp:.3f} pts '
-              f'(picks on {n_made}/{len(dirs)} directions)')
+        print(f'  lam={lam:>4}: expected realized spread {exp_sp:.3f} '
+              f'(picks on {n_made}/{len(hitter_dirs)} directions)')
     best = max(results, key=lambda r: r[1])
     interior = results[0][1] < best[1] and results[-1][1] < best[1]
     print(f'  best on grid: lam={best[0]} (expected spread {best[1]:.3f}) — '
@@ -227,7 +230,6 @@ def sweep_lam(tag, hitter_units, lg_by_grp, k_display):
 def cap_unit(ps, cap):
     if len(ps) <= cap:
         return ps
-    # every-other draw keeps both halves of the even/odd split balanced
     half = ps[0::2] + ps[1::2]
     return half[:cap]
 
@@ -248,51 +250,119 @@ def main():
         return (s - t) if classify_decision(p) == 'swing' else (t - s)
 
     lg_mean_dv = sum(dv(p) for p in mlb) / len(mlb)
-    print(f'  league mean dv = {lg_mean_dv:.5f} runs/decision')
 
-    def sd_atom(p):
-        return 100.0 * dv(p) / lg_mean_dv
+    # ── SD units ──
+    lg_atoms = defaultdict(list)
+    by_unit = defaultdict(list)
+    by_hitter = defaultdict(lambda: defaultdict(list))
+    for p in mlb:
+        st = count_state_hitter(p)
+        if st is None:
+            continue
+        a = 100.0 * dv(p) / lg_mean_dv
+        z, grp = classify_zone(p), cat_of(p)
+        lg_atoms[grp].append((a, z, st))
+        by_unit[(p.get('Batter'), p.get('BTeam'), grp)].append((a, z, st))
+        by_hitter[(p.get('Batter'), p.get('BTeam'))][grp].append((a, z, st))
+    sd_lg = {g: sd_league(v) for g, v in lg_atoms.items()}
 
+    sd_units = []
+    for (_h, _t, grp), ps in by_unit.items():
+        if len(ps) >= SD_MIN:
+            ps = cap_unit(ps, SD_CAP)
+            sd_units.append({'grp': grp,
+                             'halves': (sd_cell_agg(ps[0::2]),
+                                        sd_cell_agg(ps[1::2]))})
+
+    def sd_vec(acc, u, k):
+        return sd_impact_vector(acc, sd_lg[u['grp']], k)
+
+    k_sd = sweep_k('SD', sd_units, sd_vec)
+
+    sd_dirs = []
+    for _key, grps in by_hitter.items():
+        capped = {g: cap_unit(ps, SD_CAP) for g, ps in grps.items()
+                  if len(ps) >= SD_MIN}
+        if not capped:
+            continue
+        halves = [({g: sd_cell_agg(ps[0::2]) for g, ps in capped.items()},
+                   {g: sd_cell_agg(ps[1::2]) for g, ps in capped.items()}),
+                  ({g: sd_cell_agg(ps[1::2]) for g, ps in capped.items()},
+                   {g: sd_cell_agg(ps[0::2]) for g, ps in capped.items()})]
+        for ha, hb in halves:
+            rows_a = []
+            for g, acc in ha.items():
+                vec = sd_impact_vector(acc, sd_lg[g], k_sd)
+                for cell, imp in zip(CELLS, vec):
+                    rows_a.append({'grp': g, 'cell': cell, 'imp': imp,
+                                   'se': sd_se(acc, sd_lg[g], cell)})
+            b_map = {}
+            for g, acc in hb.items():
+                for cell, imp in zip(CELLS, sd_impact_vector(acc, sd_lg[g], 0)):
+                    b_map[(g, cell)] = imp
+            sd_dirs.append((rows_a, b_map))
+    sweep_lam('SD', sd_dirs, k_sd)
+
+    # ── CT units ──
     mlb_sw = [p for p in mlb if is_ct_eligible(p)]
 
-    def lev_pw(p):
+    def ct_tuple(p):
         cell = ctw[f'{classify_zone(p)}|{get_count(p)[0]}-{get_count(p)[1]}']
-        return cell['rv_contact'] - cell['rv_whiff'], cell['p_whiff']
-
-    D = sum(lv * (1 - pw) for lv, pw in (lev_pw(p) for p in mlb_sw)) / len(mlb_sw)
-    print(f'  league mean lev*(1-pw) = {D:.5f}')
-
-    def ct_atom(p):
-        lv, _pw = lev_pw(p)
+        lev = cell['rv_contact'] - cell['rv_whiff']
+        E = 1.0 - cell['p_whiff']
         made = 1.0 if classify_contact_outcome(p) == 'contact' else 0.0
-        return 100.0 * lv * made / D
+        st = count_state_hitter(p)
+        return (lev * (made - E), lev * lev * E * (1 - E),
+                classify_zone(p), st)
 
-    for tag, pool, atom_fn, floor, cap in (
-            ('SD', mlb, sd_atom, SD_MIN, SD_CAP),
-            ('CT', mlb_sw, ct_atom, CT_MIN, CT_CAP)):
-        lg_atoms = defaultdict(list)
-        by_unit = defaultdict(list)
-        by_hitter = defaultdict(lambda: defaultdict(list))
-        for p in pool:
-            z, st = classify_zone(p), count_state_hitter(p)
-            if st is None:
-                continue
-            grp = cat_of(p)
-            a = atom_fn(p)
-            lg_atoms[grp].append((a, z, st))
-            by_unit[(p.get('Batter'), p.get('BTeam'), grp)].append((a, z, st))
-            by_hitter[(p.get('Batter'), p.get('BTeam'))][grp].append((a, z, st))
-        lg_by_grp = {g: league_table(v) for g, v in lg_atoms.items()}
-        units = [(grp, cap_unit(ps, cap))
-                 for (_h, _t, grp), ps in by_unit.items() if len(ps) >= floor]
-        k_best = sweep_k(tag, units, lg_by_grp)
-        h_units = []
-        for _key, grps in by_hitter.items():
-            capped = {g: cap_unit(ps, cap) for g, ps in grps.items()
-                      if len(ps) >= floor}
-            if capped:
-                h_units.append(capped)
-        sweep_lam(tag, h_units, lg_by_grp, k_best)
+    ct_by_unit = defaultdict(list)
+    ct_by_hitter = defaultdict(lambda: defaultdict(list))
+    for p in mlb_sw:
+        t = ct_tuple(p)
+        if t[3] is None:
+            continue
+        grp = cat_of(p)
+        ct_by_unit[(p.get('Batter'), p.get('BTeam'), grp)].append(t)
+        ct_by_hitter[(p.get('Batter'), p.get('BTeam'))][grp].append(t)
+
+    ct_units = []
+    for (_h, _t, grp), ps in ct_by_unit.items():
+        if len(ps) >= CT_MIN:
+            ps = cap_unit(ps, CT_CAP)
+            ct_units.append({'grp': grp,
+                             'halves': (ct_cell_agg(ps[0::2]),
+                                        ct_cell_agg(ps[1::2]))})
+
+    def ct_vec(acc, _u, k):
+        return ct_impact_vector(acc, k)
+
+    k_ct = sweep_k('CT', ct_units, ct_vec)
+
+    ct_dirs = []
+    for _key, grps in ct_by_hitter.items():
+        capped = {g: cap_unit(ps, CT_CAP) for g, ps in grps.items()
+                  if len(ps) >= CT_MIN}
+        if not capped:
+            continue
+        halves = [({g: ct_cell_agg(ps[0::2]) for g, ps in capped.items()},
+                   {g: ct_cell_agg(ps[1::2]) for g, ps in capped.items()}),
+                  ({g: ct_cell_agg(ps[1::2]) for g, ps in capped.items()},
+                   {g: ct_cell_agg(ps[0::2]) for g, ps in capped.items()})]
+        for ha, hb in halves:
+            rows_a = []
+            for g, acc in ha.items():
+                for cell in CELLS:
+                    s_e, s_v, n = acc.get(cell, [0.0, 0.0, 0])
+                    shrink = n / (n + k_ct) if (n + k_ct) else 0.0
+                    rows_a.append({'grp': g, 'cell': cell,
+                                   'imp': shrink * s_e,
+                                   'se': shrink * math.sqrt(s_v)})
+            b_map = {}
+            for g, acc in hb.items():
+                for cell, imp in zip(CELLS, ct_impact_vector(acc, 0)):
+                    b_map[(g, cell)] = imp
+            ct_dirs.append((rows_a, b_map))
+    sweep_lam('CT', ct_dirs, k_ct)
 
 
 if __name__ == '__main__':
