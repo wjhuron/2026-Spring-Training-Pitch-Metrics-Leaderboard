@@ -2510,7 +2510,7 @@ def render_card(config, pitches, output_file):
 # anything up. Instead we follow the ROC translation pattern: every derived
 # quantity is COMPUTED from the scratch pitches against MLB baselines, then
 # RANKED into the MLB leaderboard pools:
-#   Stuff+  — stuff_plus_v11 bundle (full model when the pitcher has ArmAngle
+#   Stuff+  — stuff_plus_v11 bundle, v12 config (full model when the pitcher has ArmAngle
 #             data, else the no-arm companion + its MLB anchor scales)
 #   Loc+    — pipeline_locplus.compute_loc_plus with MLB pickle pitches as the
 #             baseline/pool and the scratch pitchers keyed under 'AAA' (scored
@@ -2733,7 +2733,8 @@ _MLB_PICKLE_CACHE = None   # module-level: load the 382k-pitch pickle once per p
 
 def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
     """Heavy one-time setup for scratch-tab / daily cards: MLB pickle baselines
-    (Loc+ surfaces + norm pool, xRV count anchoring), Stuff+ v11 scoring,
+    (Loc+ surfaces + norm pool, xRV count anchoring), Stuff+ scoring (v12
+    config via the bundle),
     leaderboard percentile pools, nVAA/nHAA regressions. stuff_k_shrink is
     passed through to Stuff+ scoring (light for daily cards)."""
     global _MLB_PICKLE_CACHE
@@ -2806,8 +2807,9 @@ def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
             ctx['loc_pt'][(_nm, _pt2)] = round(sum(_arr) / len(_arr), 1)
     print(f"  [scratch] Loc+ done ({time_module.time()-t0:.0f}s)")
 
-    # Stuff+ v11
-    print("  [scratch] Scoring Stuff+ v11...")
+    # Stuff+ (v12 config; version enforced by the bundle guard in
+    # _scratch_stuff_scores)
+    print("  [scratch] Scoring Stuff+ v12...")
     try:
         (ctx['stuff_overall'], ctx['stuff_pt'],
          ctx['stuff_atoms_by_pid']) = _scratch_stuff_scores(norm_by_pitcher, stuff_k_shrink)
