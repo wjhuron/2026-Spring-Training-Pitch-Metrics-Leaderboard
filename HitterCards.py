@@ -979,6 +979,13 @@ def _render_percentile_bubbles(fig, h_row):
     _is_roc = (h_row.get('team') == 'ROC')
     _columns = [(name, rows) for name, rows in BUBBLE_COLUMNS
                 if not (_is_roc and name == 'BAT TRACKING')]
+    # ROC + an MLB stint with bat tracking: show Bat Speed alone, clearly
+    # labeled as MLB-sourced (injected by render_hitter_card — the only
+    # MLB field allowed onto a ROC card).
+    if _is_roc and h_row.get('_mlbBatSpeed') is not None:
+        _columns.append(('BAT TRACKING (MLB)', [
+            ('Bat Speed', '_mlbBatSpeed', '_mlbBatSpeed_pctl', 'mph'),
+        ]))
     total_rows = sum(len(metrics) for _h, metrics in _columns)
     n_sections = len(_columns)
 
@@ -1169,6 +1176,26 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     h_row = hitter_rows[0]
     team = h_row.get('team') or team_abbrev or '???'
     bats = h_row.get('stands') or 'R'
+
+    # ROC cards: supplement the ONE level-independent bat-tracking number —
+    # Bat Speed — from the hitter's MLB stint row when one exists. Bat speed
+    # is a physical tool (Statcast hardware is MLB-only), so an MLB reading
+    # is valid context on an AAA card; nothing else from the MLB row is
+    # merged. Rendered as its own "BAT TRACKING (MLB)" bubble section.
+    if team == 'ROC':
+        _mid = h_row.get('mlbId')
+        _mlb_rows = [r for r in hitter_lb
+                     if r.get('hitter') == hitter_name
+                     and (_mid is None or r.get('mlbId') == _mid)
+                     and r.get('team') not in ('ROC', 'AAA')
+                     and r.get('batSpeed') is not None]
+        if _mlb_rows:
+            _mlb = max(_mlb_rows, key=lambda r: r.get('pa') or 0)
+            h_row = dict(h_row)
+            h_row['_mlbBatSpeed'] = _mlb.get('batSpeed')
+            h_row['_mlbBatSpeed_pctl'] = _mlb.get('batSpeed_pctl')
+            print(f"  MLB Bat Speed supplement: {_mlb.get('batSpeed')} mph "
+                  f"({_mlb.get('team')}, {_mlb.get('pa')} PA)")
 
     # Filter pitches to this hitter (and team if specified)
     hitter_pitches = [p for p in all_pitches
