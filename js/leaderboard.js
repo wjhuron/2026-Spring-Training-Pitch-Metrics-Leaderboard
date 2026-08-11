@@ -848,7 +848,10 @@ const Leaderboard = {
       // Player name as clickable link to player page (pitcher or hitter)
       if ((col.key === 'pitcher' || col.key === 'hitter') && !isAvgRow && row.mlbId) {
         const nameLink = document.createElement('a');
-        nameLink.href = '#player=' + row.mlbId;
+        // Copyable link reproduces this row's view: per-team rows carry a
+        // pteam pin; combined 2TM/3TM rows resolve to the full-season page.
+        nameLink.href = '#player=' + row.mlbId +
+          (row.team && !/^\d+TM$/.test(row.team) ? '&pteam=' + row.team : '');
         nameLink.className = 'pitcher-name-link';
         nameLink.textContent = col.format(row[col.key]);
         nameLink.addEventListener('click', function (e) {

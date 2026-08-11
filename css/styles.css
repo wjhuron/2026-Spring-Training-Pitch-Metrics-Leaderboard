@@ -1670,6 +1670,11 @@ body.compact #table-pinned-body td { padding: 4px 8px; font-size: 12px; }
   overflow: hidden;
   border: 1px solid var(--border);
 }
+/* All-vs-stint toggle in the player card (multi-team players only) */
+.player-team-toggle {
+  display: inline-flex;
+  margin-top: 10px;
+}
 .hand-toggle-btn {
   padding: 5px 14px;
   font-size: 12px;

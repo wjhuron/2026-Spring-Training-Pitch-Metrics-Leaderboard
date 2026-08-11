@@ -177,11 +177,11 @@
     const hash = window.location.hash.replace(/^#/, '');
 
     if (hash.indexOf('player=') === 0) {
-      const mlbId = hash.split('=')[1];
-      if (mlbId && /^\d+$/.test(mlbId) && !PlayerPage.isOpen) {
-        var preferTeam = teamSelect ? teamSelect.value : null;
+      const m = hash.match(/^player=(\d+)(?:&pteam=([A-Za-z0-9]+))?/);
+      if (m && !PlayerPage.isOpen) {
+        var preferTeam = m[2] || (teamSelect ? teamSelect.value : null);
         if (preferTeam === 'all') preferTeam = null;
-        PlayerPage.open(mlbId, preferTeam);
+        PlayerPage.open(m[1], preferTeam);
       }
       return;
     }

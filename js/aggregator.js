@@ -969,7 +969,11 @@ const Aggregator = {
         // pages split by hand (2026-08-06). Percentiles already interpolated
         // vs the MLB pool above; leaderboards never set the flag.
         if (self._isROCTeam(r.team)) return !!filters.includeROC;
-        if (combinedByPitcher[Aggregator._combinedKey(r)] && !self._isCombinedTeam(r.team)) return false;
+        // keepStints: player-page platoon aggregations keep per-team rows of
+        // multi-team players so stint-view pages can look up their split row
+        // by (name, team). Their percentiles interpolate vs the combined-row
+        // pool above (_inPool === false), so the comparison group is unchanged.
+        if (combinedByPitcher[Aggregator._combinedKey(r)] && !self._isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
@@ -2024,9 +2028,9 @@ const Aggregator = {
       rows = rows.filter(function (r) { return r.team === filters.team; });
     } else {
       rows = rows.filter(function (r) {
-        // includeROC: see the pitcher narrowing — player-page platoon only.
+        // includeROC/keepStints: see the pitcher narrowing — player-page platoon only.
         if (self._isROCTeam(r.team)) return !!filters.includeROC;
-        if (combinedByPitchRow[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return false;
+        if (combinedByPitchRow[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
@@ -2729,7 +2733,8 @@ const Aggregator = {
         // interpolated vs the MLB pool above). Leaderboard views never set
         // it, so the All-Teams board still hides ROC.
         if (self3._isROCTeam(r.team)) return !!filters.includeROC;
-        if (combinedByHitter[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return false;
+        // keepStints: see the pitcher narrowing — player-page platoon only.
+        if (combinedByHitter[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
@@ -3175,10 +3180,10 @@ const Aggregator = {
       rows = rows.filter(function (r) { return r.team === filters.team; });
     } else {
       rows = rows.filter(function (r) {
-        // includeROC: see the hitter narrowing above — player-page platoon
-        // aggregations only.
+        // includeROC/keepStints: see the hitter narrowing above — player-page
+        // platoon aggregations only.
         if (self4._isROCTeam(r.team)) return !!filters.includeROC;
-        if (combinedByHitterPT[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return false;
+        if (combinedByHitterPT[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }

@@ -341,6 +341,22 @@ var PlayerPage = {
     var curHash = window.location.hash.replace(/^#/, '');
     if (curHash.indexOf('player=') === -1) {
       this._lastRoute = curHash;
+    } else {
+      // Arrived via a shareable link (or toggled teams on one): keep the
+      // hash in sync so copying the URL reproduces the current view.
+      var row = pitcherData || hitterData;
+      var route = 'player=' + row.mlbId;
+      if (row.team && !/^\d+TM$/.test(row.team)) route += '&pteam=' + row.team;
+      if (route !== curHash) history.replaceState(null, '', '#' + route);
+    }
+
+    if (this.isOpen) {
+      // Team-toggle re-open (no close() in between): release listeners bound
+      // to the static toggle elements so they don't accumulate.
+      this._unbindHandToggles();
+      this._unbindPlatoonToggle();
+      this._unbindGameLog();
+      this._unbindSprayToggle();
     }
 
     this.isOpen = true;
@@ -358,12 +374,14 @@ var PlayerPage = {
 
     document.getElementById('player-page').scrollTop = 0;
 
+    this._unbindClickOutside(); // team toggle re-opens while already open
     this._bindClickOutside();
   },
 
   _renderPitcherPage: function (data) {
     this._showPitcherLayout();
     this._renderIdentity(data);
+    this._renderTeamToggle(data, true);
     this._heatMapHand = 'R';
     this._countHand = 'R';
     this._platoonHand = 'all';
@@ -592,6 +610,7 @@ var PlayerPage = {
   _renderHitterPage: function (data) {
     this._showHitterLayout();
     this._renderHitterIdentity(data);
+    this._renderTeamToggle(data, false);
     this._platoonHand = 'all';
     this._currentData = data;
     this._sprayMode = 'all';
@@ -781,9 +800,11 @@ var PlayerPage = {
     return this._findPlayerByMlbId(window.PITCHER_DATA || [], mlbId, preferTeam);
   },
 
-  // MLB priority: multi-team aggregate (2TM/3TM) > preferTeam match > any MLB
-  // match. Multi-team players open on their combined row so the page shows the
-  // full MLB season, not just games from whichever team filter was active.
+  // MLB priority: preferTeam match > multi-team aggregate (2TM/3TM) > any MLB
+  // match. A click made under an active team filter opens on that stint's row
+  // (only the pitches/games with that team); with no filter the combined
+  // 2TM/3TM row shows the full MLB season. The on-page team toggle re-opens
+  // with a different preferTeam to move between the two.
   // ROC rows live outside that aggregate (2TM/3TM combines MLB stints only),
   // so a click from a ROC team must land on the ROC row, and an MLB-context
   // click must never fall back onto one.
@@ -802,7 +823,58 @@ var PlayerPage = {
       else if (!fallback) fallback = rows[i];
     }
     if (preferROC) return preferred || rocFallback || multiTeam || fallback;
-    return multiTeam || preferred || fallback || rocFallback;
+    return preferred || multiTeam || fallback || rocFallback;
+  },
+
+  // All-vs-stint toggle for multi-team players. "All" is the combined 2TM/3TM
+  // row; each stint button re-opens the page on that team's row, so every
+  // section (bubbles, plots, platoon, game log) follows automatically.
+  // ROC pages keep their own row and never show the toggle — the aggregate
+  // combines MLB stints only, so mixing levels here would mislead.
+  _renderTeamToggle: function (data, isPitcher) {
+    var container = document.getElementById('player-team-toggle');
+    if (!container) return;
+    container.innerHTML = '';
+    container.style.display = 'none';
+
+    var rocTeams = (DataStore.metadata && DataStore.metadata.rocTeams) || [];
+    if (rocTeams.indexOf(data.team) !== -1) return;
+
+    var rows = isPitcher ? (window.PITCHER_DATA || []) : (window.HITTER_DATA || []);
+    var mlbId = data.mlbId;
+    if (!mlbId) return;
+    var MULTI_RE = /^\d+TM$/;
+    var hasCombined = false;
+    var stints = [];
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].mlbId !== mlbId) continue;
+      var t = rows[i].team;
+      if (MULTI_RE.test(t)) hasCombined = true;
+      else if (rocTeams.indexOf(t) === -1 && stints.indexOf(t) === -1) stints.push(t);
+    }
+    if (!hasCombined || stints.length < 2) return;
+
+    var self = this;
+    function addBtn(label, team, active) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'hand-toggle-btn' + (active ? ' active' : '');
+      btn.textContent = label;
+      btn.addEventListener('click', function (e) {
+        // A synchronous re-open rebuilds this toggle, detaching the clicked
+        // button — the still-bubbling click would then look like a click
+        // outside the page and close it. Stop it here.
+        e.stopPropagation();
+        if (active) return;
+        self.open(mlbId, team);
+      });
+      container.appendChild(btn);
+    }
+    addBtn('All', null, MULTI_RE.test(data.team));
+    for (var s = 0; s < stints.length; s++) {
+      addBtn(stints[s], stints[s], data.team === stints[s]);
+    }
+    container.style.display = '';
   },
 
   _getPitchRows: function (pitcherName, team) {
@@ -1900,8 +1972,10 @@ var PlayerPage = {
     // interpolate vs the MLB pool inside the aggregator), so ROC hitter pages
     // can platoon-split. Pitcher/pitch narrowings ignore the flag, so pitcher
     // pages are unchanged. Cache stays shared across MLB and ROC pages.
+    // keepStints keeps per-team rows of multi-team players in the result so
+    // stint-view pages (team toggle) can find their platoon row by (name, team).
     return { vsHand: hand, team: 'all', throws: 'all', search: '', role: 'all',
-             pitchTypes: this.PLATOON_PT_REQUEST, includeROC: true };
+             pitchTypes: this.PLATOON_PT_REQUEST, includeROC: true, keepStints: true };
   },
 
   _platoonAggregate: function (tab, hand) {
@@ -4659,9 +4733,15 @@ var PlayerPage = {
     var hash = window.location.hash.replace(/^#/, '');
     var match = hash.match(/player=(\d+)/);
     if (match) {
-      var teamEl = document.getElementById('team-filter');
-      var preferTeam = teamEl ? teamEl.value : null;
-      if (preferTeam === 'all') preferTeam = null;
+      // pteam pins a specific stint view (written by _openResolved when the
+      // team toggle or a team-filtered click selects a per-team row).
+      var teamMatch = hash.match(/pteam=([A-Za-z0-9]+)/);
+      var preferTeam = teamMatch ? teamMatch[1] : null;
+      if (!preferTeam) {
+        var teamEl = document.getElementById('team-filter');
+        preferTeam = teamEl ? teamEl.value : null;
+        if (preferTeam === 'all') preferTeam = null;
+      }
       this.open(match[1], preferTeam);
       return true;
     }
