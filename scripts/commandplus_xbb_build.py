@@ -26,6 +26,16 @@ that never saw it.
 Stage 1 builds the per-pitcher-season panel and caches it, since scoring six
 seasons is the expensive part and the modeling wants iteration.
 
+VERDICT: REJECTED, do not ship (scripts/commandplus_xbb_worth.py). The
+headline claim failed — xBB%cmd does not out-forecast a pitcher's own walk
+rate at any sample gate. The surviving incremental claim then failed the
+baseline test: a SECOND YEAR of BB%, which costs nothing and is already on
+the site, beats the whole command model (.575 vs .567, command winning 2/4).
+On top of two years of walk data it adds .593 vs .575, winning 3/4 — about
++0.018 correlation on a secondary metric, well under the bar for a
+leaderboard column. Kept as the record of a tested-and-rejected idea; the
+measurement work is what produced the K=1 and cascade changes that DID ship.
+
 Usage: python3 scripts/commandplus_xbb_build.py [--rebuild]
 """
 import json
