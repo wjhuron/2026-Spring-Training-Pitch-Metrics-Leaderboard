@@ -12,6 +12,11 @@ standard):
       EVEN     0-0, 0-1, 1-1          (establish intent)
       PUTAWAY  any two-strike count   (bury / put-away intent)
       BEHIND   1-0, 2-0, 3-0, 2-1, 3-1 (must-strike intent)
+  - a cell under MIN_CELL is NOT dropped: its pitches cascade into a
+    (pitch type, batter hand) residual bucket, then a (pitch type) bucket,
+    and a target is fit at whichever level first clears MIN_CELL. Only
+    pitches from thin cells enter a bucket, so a target is always fit on
+    exactly the pitches it scores. See the CASCADE finding below.
   - intended target = the MEAN of the cell's plate locations in PHYSICAL
     INCHES (one target per cell; see the K=1 finding below)
   - per-pitch miss = Euclidean inches to that target
@@ -48,26 +53,45 @@ Removing it also retires the whole circularity apparatus — the separation
 merge guard, the BIC selection, the K caps — since one target per cell
 cannot split a wild pitcher's cloud into flattering sub-targets at all.
 
-KNOWN BIAS — LOW VOLUME IS FLATTERED (measured, replicated 6/6 seasons,
-scripts/commandplus_volume_k1.py). Targets are fit on the same pitches they
-score, and MIN_CELL drops thin cells — secondary pitches disproportionately
-(CU ~34% of pitches excluded for the thinnest arms vs FF ~11%), so a
-low-volume pitcher is graded largely on his best-commanded pitch. Median
-coverage is 81.5% for 300-600-pitch arms (floor 57.3%) against 96.5% for
-1600+. Downsampling high-volume pitchers to reliever scale therefore makes
-their miss SMALLER, by these display points:
+CASCADE — WHY THIN CELLS ARE POOLED RATHER THAN DROPPED (2026-08-12,
+scripts/commandplus_battery_2026_08.py section D and
+scripts/commandplus_volume_fallback.py). Dropping sub-MIN_CELL cells fell
+hardest on secondary pitches (CU ~34% of pitches excluded for the thinnest
+arms vs FF ~11%), so a low-volume pitcher was graded largely on his
+best-commanded pitch. Cascading those pitches into coarser buckets instead:
 
-    N=400  +2.41    N=600  +1.63    N=900  +0.99    N=1300  +0.58
-    (six-season means; per-season range at N=400 is 1.90-2.62)
+                     coverage  reliability  persistence  BB% same  BB% next
+    drop thin cells     .914       .812         .796       .565      .440
+    CASCADE             .972       .840         .809       .573      .439
 
-The sample-dependent K caps were suspected as a driver and are NOT: the v1
-GMM measured 2.35 at N=400 against K=1's 2.41, so dropping the mixture left
-the bias untouched. It is in-sample optimism plus MIN_CELL truncation.
+Wins coverage 6/6, reliability 6/6, persistence 5/5, same-season walks 6/6,
+ties next-season walks. r(drop, cascade) = 0.987 on the displayed scale;
+the movers are thin-arsenal relievers whose secondary pitches had been
+excluded, which is the intended effect.
+
+KNOWN BIAS — LOW VOLUME IS STILL SOMEWHAT FLATTERED (measured, 6/6 seasons,
+scripts/commandplus_volume_fallback.py). Targets are fit on the same pitches
+they score, and that fit hugs the data harder when there is less of it.
+Downsampling high-volume pitchers to reliever scale makes their miss
+SMALLER, by these display points:
+
+    N=400  +0.78    N=600  +0.84    N=900  +0.60    N=1300  +0.35
+    (six-season means; the pre-cascade scorer measured 2.35 / 1.67 / 1.00 /
+     0.56, so the cascade cut it by two thirds and won 24/24 comparisons)
+
+Two mechanisms drove the old bias, MIN_CELL truncation and in-sample
+optimism, and they were NOT separable by argument — the cascade could have
+deepened the optimism half, since a rescued 20-pitch bucket is where a
+fitted mean hugs its own points hardest. Measurement settled it: truncation
+dominated. What remains is nearly flat across sample size (0.78 / 0.84 /
+0.60 / 0.35 rather than a steep decay), which is the signature of in-sample
+optimism with the volume-dependent component removed.
+
+The sample-dependent K caps were also suspected and were NOT a driver: the
+v1 GMM measured 2.35 at N=400 against K=1's 2.41.
 
 It does not invert anything — real high-volume arms command ~4 points better,
-so the artifact shrinks a true gap rather than inventing one — but a
-400-pitch reliever's Command+ should be read as ~2.4 points generous against
-a full-season starter's.
+so the artifact shrinks a true gap rather than inventing one.
 
 VALIDATION HEADLINES (2021-2025 per-season replicates + 2026, never pooled).
 The v1 GMM scorer measured 0.795 reliability / 0.793 persistence; the K=1
@@ -106,14 +130,16 @@ MIN_CELL = 20                          # min pitches to fit a cell
 MIN_POOL = 300                         # pitches to enter the (mu, sigma) pool
 CMD_SCALE_K = 10                       # display points per pool SD
 
-# RE-MEASURED 2026-08-12 on the K=1 scorer (scripts/commandplus_gate_measure.py):
+# RE-MEASURED 2026-08-12 on the cascade scorer (scripts/commandplus_gate_measure.py):
 # split-half r=0.5 crossing at the rendered unit (pitcher-season), random
 # within-pitcher splits, targets fit per half on THIS scorer. Median of 5
-# seeds = 325 (range 290-387); the v1 GMM scorer measured 328, so dropping
-# the mixture did not move the gate. Below the reliever IP-qualification's
-# ~450+ pitches, so Command+ rides the ordinary IP qual gate exactly as Loc+
-# does — no special render gate needed. Re-measure at season end with Loc+.
-STABILIZE_N = 325
+# seeds = 143 (range 125-147). The lineage: v1 GMM 328, K=1 325 (the mixture
+# never touched the gate), cascade 143 — pooling thin cells more than halves
+# it, because a given pitch budget now yields far more SCORED pitches (.972
+# coverage vs .914) at higher reliability. Comfortably below the reliever
+# IP-qualification's ~450+ pitches, so Command+ rides the ordinary IP qual
+# gate exactly as Loc+ does. Re-measure at season end with the Loc+ gates.
+STABILIZE_N = 143
 
 EXCLUDE_DESC = {'Hit By Pitch', 'Foul Bunt', 'Missed Bunt', 'Bunt Foul Tip',
                 'Pitchout', 'Swinging Pitchout', 'Foul Pitchout', 'Intent Ball'}
@@ -170,6 +196,45 @@ def fit_targets(pts):
 # ═════════════════════════════════════════════════════════════════════════
 #  SCORING + AGGREGATION
 # ═════════════════════════════════════════════════════════════════════════
+def build_cells(plist):
+    """Scoring cells for one pitcher, with the thin-cell CASCADE.
+
+    Primary cell = (pitch type, batter hand, count group). A cell that misses
+    MIN_CELL is not dropped: its pitches fall into a (pitch type, batter hand)
+    residual bucket, and if that still misses, into a (pitch type) bucket.
+    Only pitches from thin cells enter a residual bucket, so a target is
+    always fit on exactly the pitches it scores.
+
+    Returns [[(pitch_type, x_in, z_in), ...], ...] — one list per cell that
+    cleared MIN_CELL at some level. Pitches that clear it at no level are
+    dropped, which is now rare (mean coverage .972, was .914).
+    """
+    lvl1 = defaultdict(list)
+    for p in plist:
+        if not is_eligible(p):
+            continue
+        pt = p.get('Pitch Type')
+        lvl1[(pt, p.get('Bats'), count_group(p.get('Count')))].append(
+            (pt, safe_float(p.get('PlateX')) * 12.0,
+             safe_float(p.get('PlateZ')) * 12.0))
+    cells, res2 = [], defaultdict(list)
+    for (pt, bats, _cg), pts in lvl1.items():
+        if len(pts) >= MIN_CELL:
+            cells.append(pts)
+        else:
+            res2[(pt, bats)].extend(pts)
+    res3 = defaultdict(list)
+    for (pt, _bats), pts in res2.items():
+        if len(pts) >= MIN_CELL:
+            cells.append(pts)
+        else:
+            res3[pt].extend(pts)
+    for _pt, pts in res3.items():
+        if len(pts) >= MIN_CELL:
+            cells.append(pts)
+    return cells
+
+
 def score_misses(pitches_by_key):
     """pitches_by_key: dict[key] -> list of pitch dicts (key is the caller's
     pitcher grouping, e.g. (Pitcher, PTeam, Throws)). Cells are built WITHIN
@@ -180,27 +245,17 @@ def score_misses(pitches_by_key):
                           'pt_miss': {pitch type: (mean, n)}}."""
     out = {}
     for key, plist in pitches_by_key.items():
-        cells = defaultdict(list)
-        for p in plist:
-            if not is_eligible(p):
-                continue
-            ck = (p.get('Pitch Type'), p.get('Bats'), count_group(p.get('Count')))
-            x = safe_float(p.get('PlateX')) * 12.0
-            z = safe_float(p.get('PlateZ')) * 12.0
-            cells[ck].append((x, z))
         total = 0.0
         n_tot = 0
         pt_acc = defaultdict(lambda: [0.0, 0])
-        for ck, pts in cells.items():
-            if len(pts) < MIN_CELL:
-                continue
-            targets = fit_targets(pts)
-            for x, z in pts:
+        for pts in build_cells(plist):
+            targets = fit_targets([(x, z) for _pt, x, z in pts])
+            for pt, x, z in pts:
                 d = min(math.hypot(x - tx, z - tz) for tx, tz in targets)
                 total += d
                 n_tot += 1
-                pt_acc[ck[0]][0] += d
-                pt_acc[ck[0]][1] += 1
+                pt_acc[pt][0] += d
+                pt_acc[pt][1] += 1
         if n_tot == 0:
             continue
         out[key] = {
