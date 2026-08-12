@@ -158,7 +158,7 @@ var PlayerPage = {
     { key: 'swingPct', label: 'Swing%', format: function(v) { return Utils.formatPct(v); } },
     { key: 'izSwingPct', label: 'Z-Swing%', format: function(v) { return Utils.formatPct(v); } },
     { key: 'chasePct', label: 'Chase%', format: function(v) { return Utils.formatPct(v); } },
-    { key: 'izSwChase', label: 'Z-Sw-Ch%', format: function(v) { return Utils.formatPct(v); } },
+    { key: 'izSwChase', label: 'Z-Sw% - Chase%', format: function(v) { return Utils.formatPct(v); } },
     { key: 'firstPitchSwingPct', label: 'FPSw%', format: function(v) { return Utils.formatPct(v); } },
     // Miss rates
     { key: 'whiffPct', label: 'Whiff%', format: function(v) { return Utils.formatPct(v); } },

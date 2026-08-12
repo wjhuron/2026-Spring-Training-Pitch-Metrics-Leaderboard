@@ -265,6 +265,7 @@ RAW_COLOR_COLS = {
 # type: 'pct' = stored as decimal (0.23), displayed as '23.0%'; 'raw' = displayed as raw number
 STAT_LINE_COLOR = {
     'ERA':    ('era',      'raw', False, 1.5),
+    'FIP':    ('fip',      'raw', False, 1.5),
     'SIERA':  ('siera',    'raw', False, 1.5),
     'K%':     ('kPct',     'pct', True),
     'BB%':    ('bbPct',    'pct', False),
@@ -933,11 +934,16 @@ def fetch_boxscores_for_team_dates(dates, team_abbrev, include_live=False):
 # outcome → swing-and-miss → contact suppression → stuff & command.
 BUBBLE_COLUMNS = [
     ('RESULT', [
+        # xRV (cumulative) above xRV/100 (rate): volume then efficiency, so a
+        # reliever's strong rate and a starter's larger total both read.
+        ('xRV',           'xRunValue', 'xRunValue_pctl', 'dec1+'),
         ('xRV/100',       'xRv100',    'xRv100_pctl',   'dec1+'),
         # Pitcher+ (2026-07-30): flagship composite right after the outcome
         # stat — mirrors the hitter card, where Hitter+ sits second in RESULT.
         ('Pitcher+',      'pitcherPlus', 'pitcherPlus_pctl', 'int'),
-        ('xwOBA',         'xwOBA',     'xwOBA_pctl',    '3dec'),
+        # xwOBA dropped 2026-08-12 (scripts/bubble_redundancy.py): r = -0.98
+        # with xRV/100 across 842 arms, so it was the same row twice in a
+        # currency the card does not lead with.
         ('K%',            'kPct',      'kPct_pctl',     'pct1'),
         ('BB%',           'bbPct',     'bbPct_pctl',    'pct1'),
         ('K-BB%',         'kbbPct',    'kbbPct_pctl',   'pct1'),
@@ -966,11 +972,45 @@ BUBBLE_COLUMNS = [
     ]),
     ('COMMAND & SHAPE', [
         ('Velocity',   'fbVelo',    'fbVelo_pctl',    'mph'),
+        # Extension sits with Velocity as the second physical/release input:
+        # r = +0.011 with velo and 0.11 against anything else on the card
+        # (scripts/bubble_redundancy.py), and perceived velo is a function of
+        # both, so the pair reads together.
+        ('Extension',  'extension', 'extension_pctl', 'ftin'),
         ('Stuff+',     'stuffScore', 'stuffScore_pctl', 'int'),
         ('Loc+',       'locPlus',   'locPlus_pctl',   'int'),
         ('Pitching+',  'pitchingScore', 'pitchingScore_pctl', 'int'),
     ]),
 ]
+
+
+def _measure_text_axis_w(fig, strings, fontsize, weight, family='IBM Plex Sans'):
+    """Width of the widest string, as a fraction of figure width.
+
+    Measured off the real renderer rather than guessed as a fraction of the
+    column, so the label and value gutters are sized to the text actually
+    drawn and the pill bar can claim everything left over. Returns None if the
+    backend can't measure yet, in which case callers keep their fixed
+    fallback fractions.
+    """
+    try:
+        renderer = fig.canvas.get_renderer()
+    except Exception:
+        return None
+    widest = 0.0
+    for s in strings:
+        if not s:
+            continue
+        t = fig.text(0, 0, s, fontsize=fontsize, fontfamily=family,
+                     fontweight=weight)
+        try:
+            widest = max(widest, t.get_window_extent(renderer=renderer).width)
+        except Exception:
+            t.remove()
+            return None
+        t.remove()
+    fig_px = fig.get_size_inches()[0] * fig.dpi
+    return (widest / fig_px) if fig_px else None
 
 
 def _format_bubble_value(v, spec):
@@ -1001,6 +1041,10 @@ def _format_bubble_value(v, spec):
         return f'{v:.1f} mph'
     if spec == 'ft':
         return f'{v:.1f} ft'
+    if spec == 'ftin':
+        # Feet and inches (6'10"), same as the pitch table's Ext column, so the
+        # bubble and the table below it read in the same units.
+        return fmt_fi(v)
     if spec == 'deg':
         return f'{v:.1f}°'
     return str(v)
@@ -1188,10 +1232,22 @@ def _render_percentile_bubbles(fig, p_row, grid_left, grid_right, grid_top, grid
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
     ax.axis('off'); ax.set_zorder(5)
 
-    LABEL_W = col_w * 0.34
-    VALUE_W = col_w * 0.17
-    LABEL_BAR_GAP = 0.006
-    BAR_VALUE_GAP = 0.008
+    # Label and value gutters MEASURED from the strings this card will actually
+    # draw, rather than reserved as a fixed fraction of the column. The old
+    # 0.34/0.17 split left a large dead margin on every row; reclaiming it
+    # lengthens the bar, and bar length is what makes percentiles legible —
+    # travel per percentile point is (effective_bar_w - MIN_VISIBLE) / 100.
+    ROW_FS = 12.5
+    _labels = [m[0] for _s, ms in _columns for m in ms]
+    _values = [_format_bubble_value(p_row.get(m[1]), m[3])
+               for _s, ms in _columns for m in ms]
+    _lw = _measure_text_axis_w(fig, _labels, ROW_FS, '500')
+    _vw = _measure_text_axis_w(fig, _values, ROW_FS, '600')
+    LABEL_W = _lw if _lw else col_w * 0.34
+    VALUE_W = _vw if _vw else col_w * 0.17
+    # Breathing room so the bar never crowds the text on either side.
+    LABEL_BAR_GAP = 0.012
+    BAR_VALUE_GAP = 0.012
 
     BAR_HEIGHT_IN  = 0.34
     bar_h_axis     = BAR_HEIGHT_IN / fig.get_size_inches()[1]
@@ -1892,12 +1948,28 @@ def render_card(config, pitches, output_file):
     p_row = config.get('pctl_row') or {}
     if config.get('mvn_models'):
         if p_row:
+            # Extension comes off the leaderboard rounded to 0.1 ft, which is
+            # 1.2 inches — too coarse once it renders as feet and inches, and
+            # it disagreed with the pitch table's Ext column (7'1" vs 7'2" for
+            # the same arm). Recompute from this card's pitches, the same
+            # source the table uses, so the two always agree. The percentile
+            # still comes from the leaderboard.
+            _ext_vals = [v for v in (sf(p.get('Extension')) for p in pitches)
+                         if v is not None]
+            if _ext_vals:
+                p_row = dict(p_row)
+                p_row['extension'] = sum(_ext_vals) / len(_ext_vals)
             bubble_cols = _bubble_columns_for(config, p_row)
             # Classic-frame inches (0.790/0.235 of the 17.5in card) so the
             # rail's physical geometry is untouched by the taller figure; the
             # sparkline lives entirely in the extra height above the rail.
             _render_percentile_bubbles(fig, p_row,
-                                       grid_left=0.015, grid_right=0.405,
+                                       # grid_right 0.405 -> 0.425 (2026-08-12).
+                                       # The binding neighbour is NOT the
+                                       # movement plot at 0.501 but the VS RHH
+                                       # zone panel below it (LOC_L_X = 0.445),
+                                       # so this keeps a 0.020 gutter.
+                                       grid_left=0.015, grid_right=0.425,
                                        grid_top=(0.790 * FIG_H) / fig_h,
                                        grid_bot=(0.235 * FIG_H) / fig_h,
                                        columns=bubble_cols)
@@ -2528,10 +2600,10 @@ def render_card(config, pitches, output_file):
 # pitcher). Mirrors PITCHER_ALL_INVERT in process_data for the bubble stats.
 _SCRATCH_INVERT_PITCHER = {'bbPct', 'xwOBA', 'xwOBAcon', 'hardHitPct', 'barrelPctAgainst', 'babip'}
 # Bubble-panel stats we compute and rank (everything BUBBLE_COLUMNS reads).
-_SCRATCH_POOL_STATS = ['xRv100', 'xwOBA', 'kPct', 'bbPct', 'kbbPct',
+_SCRATCH_POOL_STATS = ['xRunValue', 'xRv100', 'xwOBA', 'kPct', 'bbPct', 'kbbPct',
                        'swStrPct', 'chasePct', 'izWhiffPct', 'twoStrikeWhiffPct',
                        'xwOBAcon', 'hardHitPct', 'barrelPctAgainst', 'gbPct', 'babip',
-                       'fbVelo', 'stuffScore', 'locPlus', 'pitchingScore',
+                       'fbVelo', 'extension', 'stuffScore', 'locPlus', 'pitchingScore',
                        'izPct', 'fpsPct']
 
 
@@ -2920,6 +2992,12 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
     else:
         row['fbVelo'] = None
 
+    # extension — mean over all pitches, matching process_data's pitcher-level
+    # METRIC_COLS aggregation, so a scratch card's Extension sits on the same
+    # footing as the leaderboard values its percentile pool is built from.
+    _exts = [v for v in (sf(p.get('Extension')) for p in pitches) if v is not None]
+    row['extension'] = round(sum(_exts) / len(_exts), 1) if _exts else None
+
     # COHERENT CANON: atoms come from the sheet's integer grade cells when
     # present (so card values equal AVERAGEIF over the sheet exactly), with
     # model-computed fallbacks only for rows whose cells are still blank.
@@ -3231,12 +3309,17 @@ def main():
     league_avgs = {}
     overall_avgs = {}
     siera_constant = 5.77  # fallback
+    # pipeline_fetch owns the FIP constant fallback; import it rather than
+    # re-typing the number so the two cannot drift apart.
+    from pipeline_fetch import FIP_CONSTANT_FALLBACK
+    fip_constant = FIP_CONSTANT_FALLBACK
     if os.path.exists(METADATA_PATH):
         with open(METADATA_PATH) as f:
             meta = json.load(f)
         league_avgs = meta.get('leagueAverages', {})
         overall_avgs = meta.get('pitcherLeagueAverages', {})
         siera_constant = meta.get('sieraConstant', 5.77)
+        fip_constant = meta.get('fipConstant', FIP_CONSTANT_FALLBACK)
 
     # Pitcher leaderboard — source of the season percentile ranks (_pctl) that
     # feed the bubble panel. Indexed by mlbId (primary) and (pitcher, team).
@@ -3492,16 +3575,26 @@ def main():
             siera_val = compute_siera(box['so'], box['bb'], box['tbf'],
                                       gb_count, fb_count, box.get('gs', 0), box.get('g', 1),
                                       siera_constant)
+            # FIP = (13*HR + 3*(BB+HBP) - 2*K) / IP + cFIP. Computed from the
+            # box like ERA and SIERA, so it honours the card's date range
+            # instead of pulling a season figure off the leaderboard.
+            # It earns the slot because ERA and SIERA sit far apart (r = .44);
+            # FIP is between them (.73 with ERA, .63 with SIERA).
+            fip_val = (((13 * box.get('hr', 0)
+                         + 3 * (box.get('bb', 0) + box.get('hbp', 0))
+                         - 2 * box.get('so', 0)) / ip_float) + fip_constant
+                       ) if ip_float > 0 else None
 
             # Headline strip = context (G/GS/IP) + the two rate stats that are
             # NOT bubbles (ERA/SIERA). Everything else (K%, BB%, Zone%, Whiff%,
             # GB%) lives only in the percentile bubbles — no duplication.
-            stat_headers = ['G', 'GS', 'IP', 'ERA', 'SIERA']
+            stat_headers = ['G', 'GS', 'IP', 'ERA', 'FIP', 'SIERA']
             stat_values = [
                 str(box.get('g', len(game_dates_seen))),
                 str(box.get('gs', 0)),
                 ip_str,
                 f"{era_val:.2f}" if era_val is not None else '—',
+                f"{fip_val:.2f}" if fip_val is not None else '—',
                 f"{siera_val:.2f}" if siera_val is not None else '—',
             ]
         else:

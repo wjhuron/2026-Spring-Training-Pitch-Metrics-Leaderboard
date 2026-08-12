@@ -832,17 +832,22 @@ def fmt_signed_decimal(v, decimals=1):
 # format_spec: one of '3dec' (.425), 'pct1' (62.0%), 'int' (160),
 #              'dec1' (96.3), 'dec1+' (signed, e.g. +8.7), 'mph' (96.3 mph)
 
+# 2026-08-12 restructure (per Wally): RESULT leads with the "+" family so the
+# Hitter+ decomposition reads top-down (composite, then its three components),
+# with Bat Speed folded in as the physical input. The standalone BAT TRACKING
+# section is gone — Squared-Up% and Blast% dropped, Bat Speed promoted here.
+# Directionality is handled by the stored percentiles, which are already
+# inverted for Swing% and GB% (HITTER_INVERT_PCTL in pipeline_compute.py), so
+# "lower is better" needs no special casing at render time.
 BUBBLE_COLUMNS = [
     ('RESULT', [
-        ('xwOBA',             'xwOBA',            'xwOBA_pctl',        '3dec'),
-        ('Hitter+',           'hitterPlus',       'hitterPlus_pctl',   'int'),
-        ('Swing Decisions+',  'sdPlus',           'sdPlus_pctl',       'int'),
-        ('Contact+',          'ctPlus',           'ctPlus_pctl',       'int'),
-        ('Batted Ball+',      'bbPlus',           'bbPlus_pctl',       'int'),
+        ('Hitter+',           'hitterPlus',   'hitterPlus_pctl',   'int'),
+        ('Batted Ball+',      'bbPlus',       'bbPlus_pctl',       'int'),
+        ('Contact+',          'ctPlus',       'ctPlus_pctl',       'int'),
+        ('Swing Decisions+',  'sdPlus',       'sdPlus_pctl',       'int'),
+        ('Bat Speed',         'batSpeed',     'batSpeed_pctl',     'mph'),
+        ('xwOBA',             'xwOBA',        'xwOBA_pctl',        '3dec'),
     ]),
-    # 2026-07-20 (page-card parity, battery-backed): EV50 replaces Avg EV
-    # (rel .93 vs .87, same predictive power); Whiff% bubble dropped
-    # (contact axis covered by Z-Contact% + K%). Both stay in page tables.
     ('QUALITY OF CONTACT', [
         ('xwOBAcon',    'xwOBAcon',     'xwOBAcon_pctl',     '3dec'),
         # BABIP directly under xwOBAcon (2026-08-03, per Wally): the pair
@@ -853,19 +858,52 @@ BUBBLE_COLUMNS = [
         ('Hard-Hit%',   'hardHitPct',   'hardHitPct_pctl',   'pct1'),
         ('Barrel%',     'barrelPct',    'barrelPct_pctl',    'pct1'),
         ('Air Pull%',   'airPullPct',   'airPullPct_pctl',   'pct1'),
+        ('GB%',         'gbPct',        'gbPct_pctl',        'pct1'),
     ]),
     ('PLATE DISCIPLINE', [
         ('BB%',         'bbPct',        'bbPct_pctl',        'pct1'),
         ('K%',          'kPct',         'kPct_pctl',         'pct1'),
+        # Ordered outcomes, then swing rates, then contact. Chase% sits
+        # directly above the differential it feeds rather than below it.
+        ('Swing%',      'swingPct',     'swingPct_pctl',     'pct1'),
         ('Chase%',      'chasePct',     'chasePct_pctl',     'pct1'),
-        ('Z-Contact%', 'izContactPct', 'izContactPct_pctl', 'pct1'),
-    ]),
-    ('BAT TRACKING', [
-        ('Bat Speed',   'batSpeed',     'batSpeed_pctl',     'mph'),
-        ('Squared-Up%', 'squaredUpPct', 'squaredUpPct_pctl', 'pct1'),
-        ('Blast%',      'blastPct',     'blastPct_pctl',     'pct1'),
+        # Z-Swing% minus Chase%: attacking strikes while laying off junk.
+        # Same label as the site column (js/leaderboard.js). Short enough that
+        # 'Swing Decisions+' stays the longest label, so it does not eat into
+        # the bar width the way the fully spelled-out version did.
+        ('Z-Sw% - Chase%', 'izSwChase', 'izSwChase_pctl', 'pct1'),
+        ('Z-Contact%',  'izContactPct', 'izContactPct_pctl', 'pct1'),
     ]),
 ]
+
+
+def _measure_text_axis_w(fig, strings, fontsize, weight, family='IBM Plex Sans'):
+    """Width of the widest string, as a fraction of figure width.
+
+    Measured off the real renderer rather than guessed as a fraction of the
+    column, so the label and value gutters are sized to the text actually
+    drawn and the pill bar can claim everything left over. Returns None if the
+    backend can't measure yet, in which case callers keep their fixed
+    fallback fractions.
+    """
+    try:
+        renderer = fig.canvas.get_renderer()
+    except Exception:
+        return None
+    widest = 0.0
+    for s in strings:
+        if not s:
+            continue
+        t = fig.text(0, 0, s, fontsize=fontsize, fontfamily=family,
+                     fontweight=weight)
+        try:
+            widest = max(widest, t.get_window_extent(renderer=renderer).width)
+        except Exception:
+            t.remove()
+            return None
+        t.remove()
+    fig_px = fig.get_size_inches()[0] * fig.dpi
+    return (widest / fig_px) if fig_px else None
 
 
 def _format_bubble_value(v, spec):
@@ -970,7 +1008,11 @@ def _render_percentile_bubbles(fig, h_row):
     """
     from matplotlib.patches import Rectangle, Ellipse, FancyBboxPatch
 
-    GRID_LEFT, GRID_RIGHT = 0.020, 0.385
+    # GRID_RIGHT 0.385 -> 0.390 (2026-08-12). The binding neighbour is NOT the
+    # LA x Spray plot area (spray_axes_left = 9.5/22 = 0.432) but its rotated
+    # "Launch Angle" y-label, which hangs ~0.015 further left at ~0.417. 0.405
+    # put the widest value ("116.3 mph") right up against it.
+    GRID_LEFT, GRID_RIGHT = 0.020, 0.390
     GRID_TOP, GRID_BOT = 0.715, 0.030
     col_w = GRID_RIGHT - GRID_LEFT
 
@@ -981,15 +1023,25 @@ def _render_percentile_bubbles(fig, h_row):
     # _isROC is pipeline-internal (stripped from JSON output), so detect
     # ROC the same way the rest of the card does: by team string.
     _is_roc = (h_row.get('team') == 'ROC')
-    _columns = [(name, rows) for name, rows in BUBBLE_COLUMNS
-                if not (_is_roc and name == 'BAT TRACKING')]
-    # ROC + an MLB stint with bat tracking: show Bat Speed alone, clearly
-    # labeled as MLB-sourced (injected by render_hitter_card — the only
-    # MLB field allowed onto a ROC card).
-    if _is_roc and h_row.get('_mlbBatSpeed') is not None:
-        _columns.append(('BAT TRACKING (MLB)', [
-            ('Bat Speed', '_mlbBatSpeed', '_mlbBatSpeed_pctl', 'mph'),
-        ]))
+    _columns = []
+    for name, metrics in BUBBLE_COLUMNS:
+        if _is_roc and name == 'RESULT':
+            _m = []
+            for spec in metrics:
+                if spec[1] != 'batSpeed':
+                    _m.append(spec)
+                elif h_row.get('_mlbBatSpeed') is not None:
+                    # ROC hitter with an MLB stint: show that bat speed,
+                    # labeled as MLB-sourced (injected by render_hitter_card —
+                    # the only MLB field allowed onto a ROC card).
+                    _m.append(('Bat Speed (MLB)', '_mlbBatSpeed',
+                               '_mlbBatSpeed_pctl', 'mph'))
+                # else: dropped. Bat tracking is MLB-only Statcast hardware,
+                # so the AAA value will never exist — a permanent "—" row is
+                # dead space, not missing data.
+            _columns.append((name, _m))
+        else:
+            _columns.append((name, metrics))
     total_rows = sum(len(metrics) for _h, metrics in _columns)
     n_sections = len(_columns)
 
@@ -1007,12 +1059,26 @@ def _render_percentile_bubbles(fig, h_row):
     ax.set_zorder(5)
 
     # Row layout: [label][gap][pill bar with circle on right end][gap][value]
-    # LABEL_W must accommodate the longest label — currently
-    # "Run Value (All Pitches)" at the chosen font size.
-    LABEL_W = col_w * 0.38
-    VALUE_W = col_w * 0.13
-    LABEL_BAR_GAP = 0.008
-    BAR_VALUE_GAP = 0.010
+    #
+    # The label and value gutters are MEASURED from the strings this card will
+    # actually draw, rather than reserved as a fixed fraction of the column.
+    # The old fixed 0.38/0.13 split was sized for the pitcher card's
+    # "Run Value (All Pitches)"; hitter labels top out at "Swing Decisions+",
+    # so it was donating a large dead margin to every row. Reclaiming it
+    # lengthens the bar, and bar length is what makes percentiles legible:
+    # travel per percentile point is (effective_bar_w - MIN_VISIBLE) / 100, so
+    # a longer bar is exactly what separates a 75th from a 90th.
+    ROW_FS = 13
+    _labels = [m[0] for _s, ms in _columns for m in ms]
+    _values = [_format_bubble_value(h_row.get(m[1]), m[3])
+               for _s, ms in _columns for m in ms]
+    _lw = _measure_text_axis_w(fig, _labels, ROW_FS, '500')
+    _vw = _measure_text_axis_w(fig, _values, ROW_FS, '600')
+    LABEL_W = _lw if _lw else col_w * 0.38
+    VALUE_W = _vw if _vw else col_w * 0.13
+    # Breathing room so the bar never crowds the text on either side.
+    LABEL_BAR_GAP = 0.012
+    BAR_VALUE_GAP = 0.012
 
     # Bar height is now ~85% of the circle diameter so the bar fully enters
     # the circle at the meeting point — no empty curve above/below the
@@ -1730,7 +1796,15 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         ax.grid(False)
         leftL = ('Oppo' if side == 'L' else 'Pull')
         rightL = ('Pull' if side == 'L' else 'Oppo')
-        ax.set_xlabel(f'{leftL}   •   Spray Angle   •   {rightL}',
+        # Arrows point the way each direction actually runs on the axis, so the
+        # reader never has to work out which side is pull for this handedness
+        # (leftL/rightL already swap by side, the arrows just follow them).
+        # Arrows point the way each direction actually runs on the axis, so the
+        # reader never has to work out which side is pull for this handedness
+        # (leftL/rightL already swap by side, the arrows just follow them).
+        # Drawn as mathtext: IBM Plex Sans has no U+2190/U+2192 glyph, so a
+        # literal arrow renders as tofu.
+        ax.set_xlabel(rf'$\leftarrow$ {leftL}   •   Spray Angle   •   {rightL} $\rightarrow$',
                       color=TEXT_MUTED, fontsize=10, fontfamily='IBM Plex Sans')
         if first_panel:
             ax.set_ylabel('Launch Angle', color=TEXT_MUTED, fontsize=10,

@@ -202,7 +202,7 @@ const COLUMNS = {
     { key: 'swingPct',    label: 'Swing%',   format: Utils.formatPct, sortType: 'numeric', sectionStart: true, desc: 'Overall swing rate (swings / pitches seen)', group: 'discipline' },
     { key: 'izSwingPct',  label: 'Z-Swing%',    format: Utils.formatPct, sortType: 'numeric', desc: 'In-zone swing rate', group: 'discipline' },
     { key: 'chasePct',    label: 'Chase%',   format: Utils.formatPct, sortType: 'numeric', desc: 'Out-of-zone swing rate', group: 'discipline' },
-    { key: 'izSwChase',   label: 'Z-Sw-Ch%',  format: Utils.formatPct, sortType: 'numeric', desc: 'Z-Swing% minus Chase% — swings at strikes minus swings at balls. Higher = attacking the zone while laying off junk', group: 'discipline' },
+    { key: 'izSwChase',   label: 'Z-Sw% - Chase%',  format: Utils.formatPct, sortType: 'numeric', desc: 'Z-Swing% minus Chase% — swings at strikes minus swings at balls. Higher = attacking the zone while laying off junk', group: 'discipline' },
     { key: 'contactPct',  label: 'Contact%', format: Utils.formatPct, sortType: 'numeric', desc: 'Contact rate excluding bunts (contact / swings)', group: 'discipline' },
     { key: 'izContactPct', label: 'Z-Contact%',   format: Utils.formatPct, sortType: 'numeric', desc: 'In-zone contact rate', group: 'discipline' },
     { key: 'firstPitchSwingPct', label: 'FPSw%',  format: Utils.formatPct, sortType: 'numeric', desc: 'First-pitch swing rate (% of PAs swinging on 0-0)', group: 'discipline' },

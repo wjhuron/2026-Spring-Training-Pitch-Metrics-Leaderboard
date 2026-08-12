@@ -358,7 +358,7 @@ const Utils = {
     'BB%': 'Walk Rate (walks / plate appearances)',
     'Swing%': 'Swing Rate (swings / total pitches)',
     'Z-Swing%': 'In-Zone Swing Rate',
-    'Z-Sw-Ch%': 'Z-Swing% minus Chase% — swings at strikes minus swings at balls. Higher = attacking the zone while laying off junk',
+    'Z-Sw% - Chase%': 'Z-Swing% minus Chase% — swings at strikes minus swings at balls. Higher = attacking the zone while laying off junk',
     'Whiff%': 'Whiff Rate (misses / total swings)',
     'Avg EV': 'Average Exit Velocity (mph, all BIP)',
     'Max EV': 'Max Exit Velocity (mph)',

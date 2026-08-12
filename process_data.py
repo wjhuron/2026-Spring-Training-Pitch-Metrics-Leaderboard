@@ -4132,6 +4132,11 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         siera_constant = 5.77  # fallback
     print(f"  SIERA constant: {siera_constant:.3f}")
     metadata['sieraConstant'] = round(siera_constant, 4)
+    # FIP constant published for the same reason as sieraConstant: Cards.py
+    # computes the headline FIP from the box for the selected date range, so it
+    # needs the live Guts cFIP rather than a hard-coded fallback that drifts.
+    if FIP_CONSTANT is not None:
+        metadata['fipConstant'] = round(FIP_CONSTANT, 4)
 
     # Persist live FanGraphs Guts constants so downstream tools (Cards.py)
     # can use the same values that compute_xrv used here, instead of drifting
