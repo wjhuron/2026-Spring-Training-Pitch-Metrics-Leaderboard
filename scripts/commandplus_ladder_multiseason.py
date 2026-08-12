@@ -239,8 +239,12 @@ def volume_job(arg):
 
 # ═══════════════════════════════ loading ═══════════════════════════════
 def load_season(year):
-    """-> (by_pitcher, bb_rate).  by_pitcher[(name, throws)] = list of
-    (pt, bats, cgroup, x_in, z_in, date_parity)."""
+    """-> (by_pitcher, bb_rate, zone).  by_pitcher[(name, throws)] = list of
+    (pt, bats, cgroup, x_in, z_in, date_parity); zone = (bot_in, top_in), the
+    season's mean called-zone extent, carried so downstream target-geometry
+    work does not have to re-read the cache."""
+    zt = zb = 0.0
+    nz = 0
     if year == 2026:
         import pandas as pd
         D = pd.read_pickle(os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl'))
@@ -250,6 +254,9 @@ def load_season(year):
             if p.get('_source', 'MLB') != 'MLB' or (p.get('Pitcher'), p.get('PTeam')) in ep:
                 continue
             k = (p.get('Pitcher'), p.get('Throws'))
+            _t, _b = safe_float(p.get('SzTop')), safe_float(p.get('SzBot'))
+            if _t and _b:
+                zt += _t; zb += _b; nz += 1
             ev = p.get('Event')
             if ev:
                 pa[k] += 1
@@ -263,7 +270,8 @@ def load_season(year):
     else:
         df = pickle.load(open(os.path.join(ROOT, CACHE[year]), 'rb'))
         cols = ['pitch_type', 'plate_x', 'plate_z', 'balls', 'strikes', 'description',
-                'stand', 'p_throws', 'player_name', 'game_date', 'events']
+                'stand', 'p_throws', 'player_name', 'game_date', 'events',
+                'sz_top', 'sz_bot']
         sub = df[cols]
         del df
         gc.collect()
@@ -275,6 +283,12 @@ def load_season(year):
         rows, bb, pa = [], defaultdict(int), defaultdict(int)
         for r in sub.itertuples(index=False):
             k = (r.player_name, r.p_throws)
+            try:
+                _t, _b = float(r.sz_top), float(r.sz_bot)
+                if _t == _t and _b == _b:
+                    zt += _t; zb += _b; nz += 1
+            except (TypeError, ValueError):
+                pass
             ev = r.events
             if isinstance(ev, str) and ev:
                 pa[k] += 1
@@ -315,7 +329,8 @@ def load_season(year):
     del rows
     gc.collect()
     bb_rate = {k: bb[k] / pa[k] for k in pa if pa[k] >= 100}
-    return dict(by_p), bb_rate
+    zone = (12.0 * zb / nz, 12.0 * zt / nz) if nz else (18.6, 40.8)
+    return dict(by_p), bb_rate, zone
 
 
 # ═══════════════════════════════ stats ═══════════════════════════════
@@ -348,7 +363,7 @@ def main():
 
     for y in SEASONS:
         t0 = time.time()
-        by_p, bb_rate = load_season(y)
+        by_p, bb_rate, _zone = load_season(y)
         bbr[y] = bb_rate
         jobs = [(k, v) for k, v in by_p.items() if len(v) >= MIN_FULL]
 

@@ -74,7 +74,7 @@ def main():
           ''.join(f'{"inches / Cmd+ pts":>18}' for _ in N_GRID))
     grand = defaultdict(list)
     for y in SEASONS:
-        by_p, _bb = load_season(y)
+        by_p, _bb, _zone = load_season(y)
         pool_keys = [(k, v) for k, v in by_p.items() if len(v) >= MIN_FULL]
         with Pool() as p:
             pool_vals = [r[1] for r in
