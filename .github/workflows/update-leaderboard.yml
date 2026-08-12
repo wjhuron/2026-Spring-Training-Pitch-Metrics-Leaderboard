@@ -58,7 +58,11 @@ jobs:
         env:
           STUFF_DATA_KEY: ${{ secrets.STUFF_DATA_KEY }}
         run: |
-          curl -sL -o /tmp/p25.enc \
+          # -f/--retry for the same reason as the model bundle below: without
+          # -f an HTTP error body lands in p25.enc and surfaces as an openssl
+          # decrypt failure, which reads like a bad key rather than a bad
+          # download.
+          curl -sfL --retry 3 --retry-delay 5 --retry-all-errors -o /tmp/p25.enc \
             https://github.com/wjhuron/Huronalytics/releases/download/latest-data/_pitches2025_training.pkl.enc \
             && openssl enc -d -aes-256-cbc -pbkdf2 -pass env:STUFF_DATA_KEY \
                  -in /tmp/p25.enc -out data/_pitches2025_training.pkl \
@@ -74,7 +78,7 @@ jobs:
         if: ${{ inputs.retrain }}
         run: |
           for yr in 2021 2022 2023 2024; do
-            curl -sL -o /tmp/p${yr}.gz \
+            curl -sfL --retry 3 --retry-delay 5 --retry-all-errors -o /tmp/p${yr}.gz \
               https://github.com/wjhuron/Huronalytics/releases/download/latest-data/_pitches${yr}_training.pkl.gz \
               && gunzip -c /tmp/p${yr}.gz > data/_pitches${yr}_training.pkl \
               || echo "${yr} asset unavailable — trainer will skip it"
