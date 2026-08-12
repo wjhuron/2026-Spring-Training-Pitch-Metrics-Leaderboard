@@ -16,6 +16,10 @@ rounded cells are never read back by anything).
 Cells with no grade (EP, unscorable rows, tabs the pipeline doesn't read like
 FCL/NEW) are written as blanks. Tabs whose header row isn't the migrated
 50-column schema are skipped with a warning (see sheets_append's schema guard).
+
+If EITHER dump is absent the script writes nothing at all. Because each write
+is a full-column overwrite, a partial payload would blank the missing column
+rather than leave it alone — see the guard in main().
 """
 import json
 import os
@@ -36,7 +40,7 @@ HEADER_SLICE = ['Stuff+', 'Loc+', 'Pitching+']   # 1-based cols 24-26
 
 def _load(path, label):
     if not os.path.exists(path):
-        print(f"  {label} dump missing ({path}) — its column will be blank")
+        print(f"  {label} dump missing ({path}) — this run will write nothing")
         return {}
     with open(path) as f:
         d = json.load(f)
@@ -123,8 +127,20 @@ def _write_tab(ws, name, stuff, loc):
 def main():
     stuff = _load(STUFF_DUMP, 'Stuff+')
     loc = _load(LOC_DUMP, 'Loc+')
-    if not stuff and not loc:
-        print('no grade dumps present — nothing to write')
+    # FAIL CLOSED when ANY dump is missing. Every write below is a
+    # full-column overwrite of X:Z, so a run missing one dump does not merely
+    # skip that column — it BLANKS it, and takes Pitching+ down with it (that
+    # cell needs both). This is exactly how the 2026-08-12 21:08 run wiped
+    # Stuff+ and Pitching+ across all six workbooks: a transient failure
+    # downloading the model bundle left the stuff dump unwritten, and the old
+    # guard only bailed when BOTH dumps were absent.
+    # Refusing to write costs nothing — the columns keep their last-good
+    # values, and the next healthy run rewrites every cell anyway.
+    missing = [n for n, d in (('Stuff+', stuff), ('Loc+', loc)) if not d]
+    if missing:
+        print(f"refusing to write: {' and '.join(missing)} dump(s) missing — "
+              f"a full-column overwrite would blank those columns. "
+              f"Columns keep their current values; re-run once the dump exists.")
         return
 
     gc = _gspread_client()

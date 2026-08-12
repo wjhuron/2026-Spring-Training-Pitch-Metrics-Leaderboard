@@ -87,7 +87,13 @@ jobs:
         # normal leaderboard updates skip the ~30-min retrain entirely.
         if: ${{ !inputs.retrain }}
         run: |
-          curl -sL -o /tmp/bundle.gz \
+          # -f so an HTTP error is a curl failure rather than an error page
+          # written to bundle.gz (which would surface only as a confusing
+          # gunzip error), and --retry so a transient blip does not cost the
+          # run its Stuff+ scores. A bare `curl -sL` failed once in ~1s on
+          # 2026-08-12 and, with the old sheets_write_grades guard, blanked
+          # the Stuff+/Pitching+ columns in every workbook.
+          curl -sfL --retry 3 --retry-delay 5 --retry-all-errors -o /tmp/bundle.gz \
             https://github.com/wjhuron/Huronalytics/releases/download/latest-data/stuff_models_v11.pkl.gz \
             && gunzip -c /tmp/bundle.gz > stuff_plus_v11/stuff_models_v11.pkl \
             || echo "bundle unavailable — Stuff+ step will fall back to preserved scores"
