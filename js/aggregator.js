@@ -2513,7 +2513,18 @@ const Aggregator = {
         const bbReAnchor = (DataStore && DataStore.metadata &&
                             DataStore.metadata.plusReanchor &&
                             DataStore.metadata.plusReanchor.bbPlus) || 1;
-        obj.bbPlus = Math.round(shrunkBB * bbReAnchor * 10) / 10;
+        let bbVal = shrunkBB * bbReAnchor;
+        // Then the wRC+-spread match, same order as the server: rescale around
+        // 100, then the additive shift. Without this a filtered BB+ would sit
+        // on the old ratio scale while SD+/CT+ (pass-through, already matched)
+        // sat on the new one.
+        const bbWrc = (DataStore && DataStore.metadata &&
+                       DataStore.metadata.plusWrcScale &&
+                       DataStore.metadata.plusWrcScale.bbPlus) || null;
+        if (bbWrc && bbWrc.factor) {
+          bbVal = 100 + (bbVal - 100) * bbWrc.factor + (bbWrc.shift || 0);
+        }
+        obj.bbPlus = Math.round(bbVal * 10) / 10;
       } else {
         obj.bbPlus = null;
       }

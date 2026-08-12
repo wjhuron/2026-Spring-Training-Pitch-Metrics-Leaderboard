@@ -3450,6 +3450,9 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         return sum(_v * _w for _v, _w in _pairs) / _wsum if _wsum > 0 else None
 
     plus_reanchor = {}
+    # Populated much later (needs wRC+, which the boxscore merge computes
+    # below); declared here so the metadata dict can hold the reference.
+    plus_wrc_scale = {}
     for _stat in ('bbPlus', 'sdPlus', 'ctPlus'):
         _mean = _all_mlb_pa_weighted_mean(_stat)
         if _mean and abs(_mean) > 1e-9:
@@ -3520,6 +3523,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         'locPlusWeights': loc_weights,
         'hitterPlusStandardization': hitter_plus_standardization,
         'plusReanchor': plus_reanchor,
+        # BB+/SD+/CT+ wRC+-spread match (factor + additive shift per stat).
+        # Read by js/aggregator.js for the client-side bbPlus recompute, which
+        # must land on the same scale as the server-precomputed sd/ct.
+        'plusWrcScale': plus_wrc_scale,
         # BB+ component weights + shrinkage — single source of truth, read by
         # js/aggregator.js so the client recompute can never drift from the
         # server again (the 0.6/0.4 → 0.585/0.415 desync shipped for months).
@@ -3922,6 +3929,90 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                   f"factor {_f:.3f}, n={len(_pool_hp)}).")
     else:
         print("  Hitter+ wRC+ scale match skipped (wRC+ pool too small) — SD-40 scale stands.")
+
+    # ── BB+/SD+/CT+ rescaled to the wRC+ spread ──────────────────────
+    # The same treatment Hitter+ gets above, extended to the three components
+    # it is built from. Each is a ratio-to-league index whose spread (pool SDs
+    # ~15.6 / 7.1 / 12.8 against wRC+'s ~20.9) is an accident of its own league
+    # mean rather than a measured fact, so a reader porting wRC+ intuition
+    # misreads all three — worst on CT+, where 110 is the 89th percentile but
+    # reads as "barely above average". Matching each pool SD to wRC+'s puts
+    # them on the scale readers already know, and makes the Hitter+
+    # decomposition legible: equal spreads on the components, with the value
+    # differences between them carried explicitly by the Hitter+ weights.
+    #
+    # Measured live rather than frozen, because the two sides of the ratio move
+    # independently: over 2026-07-14..08-12 wRC+'s pool SD fell 13.7% while the
+    # components moved under 1.5% (they are Bayesian-shrunk, so they lack the
+    # small-sample inflation wRC+ carries early). No constant holds parity.
+    # Evidence: scripts/plus_scale_ratio_check.py.
+    #
+    # Ordering matters and is load-bearing:
+    #   - AFTER Hitter+ is built from these three, so Hitter+ is invariant by
+    #     construction rather than by cancellation.
+    #   - re-anchors ADDITIVELY on unrounded values, so the multiplicative
+    #     re-anchor's 1-decimal rounding residual is not amplified by the
+    #     factor (BB+'s 0.032 became 0.052 when rounded first).
+    # Affine with a positive factor, so ranks, percentiles and the colouring
+    # that reads off them are unchanged.
+    _comp_pool = []
+    for _row in hitter_leaderboard:
+        if _row.get('_isROC') or _row.get('_isCombined'):
+            continue
+        _team_g = team_games_played.get(_row.get('team'))
+        if _team_g is None and team_games_played:
+            _team_g = max(team_games_played.values())
+        if not _team_g or _row.get('pa', 0) < _hitter_pa_per_game(False) * _team_g:
+            continue
+        if _row.get('wRCplus') is None:
+            continue
+        if any(_row.get(_s) is None for _s in ('bbPlus', 'sdPlus', 'ctPlus')):
+            continue
+        _comp_pool.append(_row)
+
+    if len(_comp_pool) >= 10:
+        def _cpsd(vals):
+            m = sum(vals) / len(vals)
+            return math.sqrt(sum((x - m) ** 2 for x in vals) / len(vals))
+
+        _sd_wrc_c = _cpsd([r['wRCplus'] for r in _comp_pool])
+        for _stat in ('bbPlus', 'sdPlus', 'ctPlus'):
+            _sd_c = _cpsd([r[_stat] for r in _comp_pool])
+            if _sd_wrc_c <= 1e-9 or _sd_c <= 1e-9:
+                continue
+            _f = _sd_wrc_c / _sd_c
+            # Rescale around 100 first, unrounded. ROC rows are rescaled with
+            # the MLB factor but excluded from the mean, same convention as the
+            # multiplicative re-anchor and the percentile pool.
+            _scaled = [(_r, 100.0 + (_r[_stat] - 100.0) * _f)
+                       for _r in hitter_leaderboard if _r.get(_stat) is not None]
+            _num = _den = 0.0
+            for _r, _v in _scaled:
+                if _r.get('_isROC') or _r.get('_isCombined'):
+                    continue
+                _w = _r.get('pa') or 0
+                if _w > 0:
+                    _num += _v * _w
+                    _den += _w
+            _shift = (100.0 - _num / _den) if _den > 0 else 0.0
+            for _r, _v in _scaled:
+                _r[_stat] = round(_v + _shift, 1)
+            # Keep the published component scale in step with the shipped
+            # values (documentation only — nothing reads it back).
+            _sd_meta = hitter_plus_standardization.get(_stat)
+            if _sd_meta:
+                _sd_meta['mean'] = round(100.0 + (_sd_meta['mean'] - 100.0) * _f + _shift, 3)
+                _sd_meta['sd'] = round(_sd_meta['sd'] * _f, 3)
+            plus_wrc_scale[_stat] = {'factor': round(_f, 6), 'shift': round(_shift, 4)}
+        plus_wrc_scale['poolWrcSd'] = round(_sd_wrc_c, 3)
+        plus_wrc_scale['n'] = len(_comp_pool)
+        print(f"  BB+/SD+/CT+ rescaled to the wRC+ spread (pool wRC+ SD "
+              f"{_sd_wrc_c:.1f}, n={len(_comp_pool)}): " + ", ".join(
+                  f"{_s} x{plus_wrc_scale[_s]['factor']:.3f}"
+                  for _s in ('bbPlus', 'sdPlus', 'ctPlus') if _s in plus_wrc_scale))
+    else:
+        print("  BB+/SD+/CT+ wRC+ scale match skipped (pool too small) — "
+              "ratio-to-league scale stands.")
 
     # Compute total ER and outs for league ERA (needed for SIERA constant calibration)
     # Use ALL MLB pitchers from boxscore data (including EP pitchers excluded from leaderboard)
