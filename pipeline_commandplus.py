@@ -12,21 +12,70 @@ standard):
       EVEN     0-0, 0-1, 1-1          (establish intent)
       PUTAWAY  any two-strike count   (bury / put-away intent)
       BEHIND   1-0, 2-0, 3-0, 2-1, 3-1 (must-strike intent)
-  - intended targets = component means of a Gaussian mixture fit to the
-    cell's plate locations in PHYSICAL INCHES; K = 1..3 chosen by BIC,
-    K capped by cell size (1 under 30 pitches, 2 under 60, 3 above)
-  - per-pitch miss = Euclidean inches to the NEAREST target
+  - intended target = the MEAN of the cell's plate locations in PHYSICAL
+    INCHES (one target per cell; see the K=1 finding below)
+  - per-pitch miss = Euclidean inches to that target
   - pitcher raw = plain mean of his pitch misses (mean beat median on both
     reliability and persistence in all six seasons)
-  - NO minimum-separation merge guard: swept 0-16in and proven flat to the
-    third decimal on both objectives in every season — BIC plus the sample
-    caps already prevent a wild pitcher's cloud from splitting itself into
-    flattering targets. (Misses to component MEANS in fixed inches — never
-    Mahalanobis with the pitcher's own covariance — remains load-bearing.)
+  - misses measured in fixed inches — never Mahalanobis with the pitcher's
+    own covariance, which would divide out the very scatter being graded.
+    That remains load-bearing.
 
-VALIDATION HEADLINES (2021-2025 per-season replicates + 2026, never pooled):
-  split-half reliability 0.795; inter-season persistence 0.793 (four clean
-  year-pairs; Loc+ ~0.4); +0.85 agreement with release-angle repeatability
+K=1 — WHY THE GAUSSIAN MIXTURE WAS REMOVED (2026-08-12,
+scripts/commandplus_ladder_multiseason.py). v1 fit a 1-3 component GMM per
+cell, K by BIC with sample caps. A four-rung ladder run over 2021-2026
+(GLOBAL: one centroid, no cells / CELLMEAN: cells, K=1 / PROD: the v1 GMM /
+KFREE: K up to 6, no caps), every rung scored on the same three objectives
+and restricted to a COMMON pitcher pool, settled it:
+
+                    reliability  persistence  BB% same  BB% next
+    GLOBAL             0.789        0.703       0.511     0.401
+    CELLMEAN (K=1)     0.812        0.791       0.565     0.440
+    PROD (GMM)         0.799        0.786       0.555     0.432
+    KFREE              0.774        0.778       0.547     0.430
+
+The CELLS are load-bearing (GLOBAL -> CELLMEAN gains .088 persistence).
+The MIXTURE is not: K=1 beat the GMM on 22 of 22 comparisons (6 seasons
+reliability, 5 year-pairs persistence, 6 same-season BB%, 5 next-season
+BB%) with no exceptions, and KFREE is worse still — a monotone gradient
+that says BIC was selecting overfit components. The mixture captured
+something real for a minority of genuinely two-target pitchers (Mahle, who
+works two distinct fastball spots vs LHH, drops 124.5 -> 115.2) and
+manufactured noise for the majority. r(GMM, K=1) = 0.990 on the displayed
+scale, median move 0.7 points.
+
+Removing it also retires the whole circularity apparatus — the separation
+merge guard, the BIC selection, the K caps — since one target per cell
+cannot split a wild pitcher's cloud into flattering sub-targets at all.
+
+KNOWN BIAS — LOW VOLUME IS FLATTERED (measured, replicated 6/6 seasons,
+scripts/commandplus_volume_k1.py). Targets are fit on the same pitches they
+score, and MIN_CELL drops thin cells — secondary pitches disproportionately
+(CU ~34% of pitches excluded for the thinnest arms vs FF ~11%), so a
+low-volume pitcher is graded largely on his best-commanded pitch. Median
+coverage is 81.5% for 300-600-pitch arms (floor 57.3%) against 96.5% for
+1600+. Downsampling high-volume pitchers to reliever scale therefore makes
+their miss SMALLER, by these display points:
+
+    N=400  +2.41    N=600  +1.63    N=900  +0.99    N=1300  +0.58
+    (six-season means; per-season range at N=400 is 1.90-2.62)
+
+The sample-dependent K caps were suspected as a driver and are NOT: the v1
+GMM measured 2.35 at N=400 against K=1's 2.41, so dropping the mixture left
+the bias untouched. It is in-sample optimism plus MIN_CELL truncation.
+
+It does not invert anything — real high-volume arms command ~4 points better,
+so the artifact shrinks a true gap rather than inventing one — but a
+400-pitch reliever's Command+ should be read as ~2.4 points generous against
+a full-season starter's.
+
+VALIDATION HEADLINES (2021-2025 per-season replicates + 2026, never pooled).
+The v1 GMM scorer measured 0.795 reliability / 0.793 persistence; the K=1
+scorer above measures 0.812 / 0.791 on the ladder harness (common pool,
+game-date halves) and wins every objective in every season. Because
+r(GMM, K=1) = 0.990, everything below carries over unchanged:
+  inter-season persistence ~0.79 (four clean year-pairs; Loc+ ~0.4);
+  +0.85 agreement with release-angle repeatability
   (independent kinematics route — external validation); predicts NEXT-season
   BB% beyond current BB% (+0.08..+0.26) and beyond Loc+ (+0.14..+0.33) in
   4/4 pairs. It does NOT predict future xRV beyond Loc+ and velocity — the
@@ -40,13 +89,11 @@ ROC pitchers are scored from their own pitches and excluded from the
 normalization pool, per the site convention.
 
 Normalization: commandPlus = 100 + 10 * (lg_miss - miss) / sigma over the
-qualified MLB pool (higher = better command). Display gating: the
-stabilization constant must be measured at the RENDERED unit before any
-percentile coloring ships (see STABILIZE_TODO below).
+qualified MLB pool (higher = better command). Both anchors are recomputed
+from the pool on every run — there is no stored scale constant to re-fit
+when the scorer changes.
 
-Pure Python by design (no numpy/sklearn in the pipeline): 2x2 EM is
-hand-rolled below and parity-tested against the research engine
-(scripts/commandplus_port_parity.py).
+Pure Python by design (no numpy/sklearn in the pipeline).
 """
 import math
 from collections import defaultdict
@@ -55,21 +102,18 @@ from pipeline_utils import safe_float
 
 # ── Model constants (all measured or proven-flat; see module docstring) ──
 MIN_CELL = 20                          # min pitches to fit a cell
-K_CAPS = ((60, 3), (30, 2), (0, 1))    # (min pitches, max K), first match wins
-REG_COVAR = 1e-3                       # variance floor (matches research)
-EM_TOL = 1e-4                          # loglik convergence per pitch
-EM_MAX_ITER = 200
 
 MIN_POOL = 300                         # pitches to enter the (mu, sigma) pool
 CMD_SCALE_K = 10                       # display points per pool SD
 
-# MEASURED 2026-07-28 (scripts/commandplus_gate_measure.py): split-half
-# r=0.5 crossing at the rendered unit (pitcher-season), random within-pitcher
-# splits, targets fit per half on THIS scorer. Median of 5 seeds = 328
-# (range 286-362). Below the reliever IP-qualification's ~450+ pitches, so
-# Command+ rides the ordinary IP qual gate exactly as Loc+ does — no special
-# render gate needed. Re-measure at season end alongside the Loc+ gates.
-STABILIZE_N = 328
+# RE-MEASURED 2026-08-12 on the K=1 scorer (scripts/commandplus_gate_measure.py):
+# split-half r=0.5 crossing at the rendered unit (pitcher-season), random
+# within-pitcher splits, targets fit per half on THIS scorer. Median of 5
+# seeds = 325 (range 290-387); the v1 GMM scorer measured 328, so dropping
+# the mixture did not move the gate. Below the reliever IP-qualification's
+# ~450+ pitches, so Command+ rides the ordinary IP qual gate exactly as Loc+
+# does — no special render gate needed. Re-measure at season end with Loc+.
+STABILIZE_N = 325
 
 EXCLUDE_DESC = {'Hit By Pitch', 'Foul Bunt', 'Missed Bunt', 'Bunt Foul Tip',
                 'Pitchout', 'Swinging Pitchout', 'Foul Pitchout', 'Intent Ball'}
@@ -112,127 +156,15 @@ def is_eligible(p):
 
 
 # ═════════════════════════════════════════════════════════════════════════
-#  2-D GAUSSIAN MIXTURE, PURE PYTHON
+#  TARGET INFERENCE
 # ═════════════════════════════════════════════════════════════════════════
-# Deterministic by construction (no RNG): component means initialize via
-# farthest-point seeding from the data mean, so a given cell always yields
-# the same targets. sklearn's random restarts can land in different local
-# optima per run; determinism is worth more to the pipeline than the last
-# drop of likelihood, and the parity test measures the actual gap.
-
-def _mean2(pts):
-    n = len(pts)
-    sx = sum(p[0] for p in pts); sy = sum(p[1] for p in pts)
-    return (sx / n, sy / n)
-
-
-def _cov2(pts, mx, my):
-    n = len(pts)
-    sxx = syy = sxy = 0.0
-    for x, y in pts:
-        dx = x - mx; dy = y - my
-        sxx += dx * dx; syy += dy * dy; sxy += dx * dy
-    return (sxx / n + REG_COVAR, syy / n + REG_COVAR, sxy / n)
-
-
-def _logpdf2(x, y, mx, my, cxx, cyy, cxy):
-    det = cxx * cyy - cxy * cxy
-    if det <= 1e-12:
-        det = 1e-12
-    dx = x - mx; dy = y - my
-    # inverse of [[cxx, cxy], [cxy, cyy]] applied to (dx, dy)
-    q = (cyy * dx * dx - 2.0 * cxy * dx * dy + cxx * dy * dy) / det
-    return -0.918938533204673 * 2 - 0.5 * math.log(det) - 0.5 * q
-    # -0.918... = -0.5*log(2*pi); doubled for two dimensions
-
-
-def _farthest_point_init(pts, k):
-    """Deterministic k-seed: data mean first, then repeatedly the point
-    farthest from its nearest existing seed."""
-    seeds = [_mean2(pts)]
-    while len(seeds) < k:
-        best_d, best_p = -1.0, None
-        for x, y in pts:
-            d = min((x - sx) ** 2 + (y - sy) ** 2 for sx, sy in seeds)
-            if d > best_d:
-                best_d, best_p = d, (x, y)
-        seeds.append(best_p)
-    return seeds
-
-
-def _em_fit(pts, k):
-    """EM for a k-component full-covariance 2-D GMM.
-    Returns (means, weights, loglik). means = [(mx, my)] * k."""
-    n = len(pts)
-    means = _farthest_point_init(pts, k)
-    covs = [_cov2(pts, mx, my) for mx, my in means]
-    weights = [1.0 / k] * k
-    prev_ll = None
-    resp = [[0.0] * k for _ in range(n)]
-    for _it in range(EM_MAX_ITER):
-        # E-step
-        ll = 0.0
-        for i, (x, y) in enumerate(pts):
-            row = resp[i]
-            mx_l = None
-            for j in range(k):
-                m = means[j]; c = covs[j]
-                lp = math.log(weights[j] + 1e-300) + _logpdf2(x, y, m[0], m[1], c[0], c[1], c[2])
-                row[j] = lp
-                if mx_l is None or lp > mx_l:
-                    mx_l = lp
-            s = 0.0
-            for j in range(k):
-                row[j] = math.exp(row[j] - mx_l)
-                s += row[j]
-            for j in range(k):
-                row[j] /= s
-            ll += mx_l + math.log(s)
-        if prev_ll is not None and abs(ll - prev_ll) < EM_TOL * n:
-            prev_ll = ll
-            break
-        prev_ll = ll
-        # M-step
-        for j in range(k):
-            nj = sum(resp[i][j] for i in range(n))
-            if nj < 1e-8:
-                # dead component: reseed at the worst-fit point
-                worst_i = max(range(n), key=lambda i: -max(resp[i]))
-                means[j] = pts[worst_i]
-                covs[j] = _cov2(pts, means[j][0], means[j][1])
-                weights[j] = 1.0 / n
-                continue
-            mx = sum(resp[i][j] * pts[i][0] for i in range(n)) / nj
-            my = sum(resp[i][j] * pts[i][1] for i in range(n)) / nj
-            sxx = syy = sxy = 0.0
-            for i in range(n):
-                r = resp[i][j]
-                dx = pts[i][0] - mx; dy = pts[i][1] - my
-                sxx += r * dx * dx; syy += r * dy * dy; sxy += r * dx * dy
-            means[j] = (mx, my)
-            covs[j] = (sxx / nj + REG_COVAR, syy / nj + REG_COVAR, sxy / nj)
-            weights[j] = nj / n
-    return means, weights, prev_ll
-
-
-def _bic(loglik, k, n):
-    # full-covariance 2-D mixture: 2k means + 3k covariances + (k-1) weights
-    p = 6 * k - 1
-    return -2.0 * loglik + p * math.log(n)
-
-
 def fit_targets(pts):
-    """BIC-selected targets for one cell. pts = [(x_in, z_in), ...].
-    Returns list of (mx, my) target means."""
+    """Inferred target for one cell. pts = [(x_in, z_in), ...].
+    Returns a list of (mx, my) — always length 1; see the K=1 note above.
+    The list shape is kept so score_misses stays a nearest-target lookup and
+    a future multi-target model can drop straight back in."""
     n = len(pts)
-    kmax = next(k for thr, k in K_CAPS if n >= thr)
-    best_means, best_bic = None, None
-    for k in range(1, kmax + 1):
-        means, _w, ll = _em_fit(pts, k)
-        b = _bic(ll, k, n)
-        if best_bic is None or b < best_bic:
-            best_means, best_bic = means, b
-    return best_means
+    return [(sum(p[0] for p in pts) / n, sum(p[1] for p in pts) / n)]
 
 
 # ═════════════════════════════════════════════════════════════════════════
