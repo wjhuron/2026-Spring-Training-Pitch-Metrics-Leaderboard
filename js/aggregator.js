@@ -2261,8 +2261,9 @@ const Aggregator = {
       'hr', 'sb',
     ];
     const HITTER_INVERT = {
-      swingPct: true, chasePct: true, whiffPct: true, gbPct: true, kPct: true, puPct: true, twoStrikeWhiffPct: true, firstPitchSwingPct: true,
-      oppoPct: true   // mirrors pipeline_compute.HITTER_INVERT_PCTL (2026-08-06)
+      chasePct: true, whiffPct: true, gbPct: true, kPct: true, puPct: true, twoStrikeWhiffPct: true, firstPitchSwingPct: true,
+      oppoPct: true   // mirrors pipeline_compute.HITTER_INVERT_PCTL (2026-08-12:
+                      // swingPct dropped, a swing rate has no honest good direction)
     };
 
     let rows = [];
@@ -2958,8 +2959,8 @@ const Aggregator = {
     // HITTER_PITCH_PCTL_KEYS / HITTER_PITCH_INVERT_PCTL (batted-ball coloring:
     // BABIP/LD/FB higher-is-better, PU/Oppo lower-is-better).
     const HITTER_PITCH_INVERT = {
-      swingPct: true, chasePct: true, whiffPct: true, gbPct: true, twoStrikeWhiffPct: true,
-      puPct: true, oppoPct: true
+      chasePct: true, whiffPct: true, gbPct: true, twoStrikeWhiffPct: true,
+      puPct: true, oppoPct: true   // swingPct dropped 2026-08-12, matches server
     };
 
     let rows = [];

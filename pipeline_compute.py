@@ -64,7 +64,11 @@ HITTER_STAT_KEYS = [
 # direction, so low oppo colors well — consistent with airPullPct higher-better.
 # Only the player-page batted-ball table colors it (leaderboard Oppo% is
 # noPercentile), so the flip is visible exactly where requested.
-HITTER_INVERT_PCTL = {'swingPct', 'chasePct', 'whiffPct', 'gbPct', 'kPct', 'puPct', 'twoStrikeWhiffPct', 'firstPitchSwingPct', 'oppoPct'}
+# swingPct is deliberately NOT inverted (2026-08-12, per Wally): a swing rate
+# has no honest good direction, so it is coloured in its natural direction and
+# the cards/leaderboard carry a note saying aggression is only good when it is
+# aimed well. Inverting it asserted that taking pitches is a virtue.
+HITTER_INVERT_PCTL = {'chasePct', 'whiffPct', 'gbPct', 'kPct', 'puPct', 'twoStrikeWhiffPct', 'firstPitchSwingPct', 'oppoPct'}
 
 PITCHER_BB_KEYS = ['avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'ldPct', 'fbPct', 'puPct', 'hrFbPct', 'xwOBAsp']
 PITCHER_BB_INVERT = {'avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'hrFbPct', 'xwOBAsp'}

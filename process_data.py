@@ -3024,7 +3024,9 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # (popups are auto-outs; oppo contact is the anti-pull-damage direction,
     # consistent with Air Pull% coloring higher). Mirrored in js/aggregator.js
     # HITTER_PITCH_PCTL_KEYS / HITTER_PITCH_INVERT.
-    HITTER_PITCH_INVERT_PCTL = {'swingPct', 'chasePct', 'whiffPct', 'gbPct',
+    # swingPct dropped 2026-08-12 to match HITTER_INVERT_PCTL: a swing rate has
+    # no honest good direction, so it colours in its natural one.
+    HITTER_PITCH_INVERT_PCTL = {'chasePct', 'whiffPct', 'gbPct',
                                 'twoStrikeWhiffPct', 'puPct', 'oppoPct'}
 
     PITCH_CATEGORIES = {

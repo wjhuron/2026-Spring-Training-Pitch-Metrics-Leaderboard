@@ -1013,7 +1013,8 @@ def _render_percentile_bubbles(fig, h_row):
     # "Launch Angle" y-label, which hangs ~0.015 further left at ~0.417. 0.405
     # put the widest value ("116.3 mph") right up against it.
     GRID_LEFT, GRID_RIGHT = 0.020, 0.390
-    GRID_TOP, GRID_BOT = 0.715, 0.030
+    # GRID_BOT raised 0.030 -> 0.088 to clear the reader's notes below.
+    GRID_TOP, GRID_BOT = 0.715, 0.088
     col_w = GRID_RIGHT - GRID_LEFT
 
     # ROC (AAA) hitters: hide the BAT TRACKING section entirely. Bat
@@ -2171,9 +2172,26 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         _render_percentile_bubbles(fig, h_row)
 
         # Watermark — bottom-right corner.
-        fig.text(0.99, 0.012, 'Huronalytics', color=TEXT_DIMMED, fontsize=10,
-                  fontfamily='IBM Plex Sans', ha='right', va='bottom',
-                  fontweight='600')
+        # Reader's notes — the same job the pitcher card's below-table block
+        # does. Each line exists because the number above it is either
+        # directionally ambiguous, freshly rescaled, or luck-laden, and a
+        # reader has no way to know that from the bubble alone.
+        # Ordered to follow the rail above: RESULT's "+" family, then Quality of
+        # Contact's GB%, then Plate Discipline's Swing%. Bulleted so each note
+        # reads as its own item rather than one running paragraph.
+        _notes = (
+            '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+ are on wRC+\'s scale:\n'
+            '     a 120 is as far above average as a 120 wRC+.\n'
+            '•  GB% is colored so that lower = better.\n'
+            '•  Swing% is colored so that higher = more aggressive. Does NOT necessarily mean better.'
+        )
+        fig.text(0.020, 0.082, _notes, fontsize=13, color=TEXT_MUTED, va='top',
+                 ha='left', fontfamily='IBM Plex Sans', fontweight='600',
+                 linespacing=1.5)
+
+        fig.text(0.99, 0.012, 'huronalytics.vercel.app', color=TEXT_PRIMARY,
+                  fontsize=9, fontfamily='IBM Plex Sans', ha='right',
+                  va='bottom', style='italic')
 
         # Save with _bubbles suffix so the two layouts can coexist.
         safe_name = display_name.replace(' ', '_').replace('.', '').replace(',', '')
@@ -2657,9 +2675,9 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 
     # ─── Watermark ─────────────────────────────────────────────────
     # Watermark — bottom-right corner.
-    fig.text(0.99, 0.012, 'Huronalytics', color=TEXT_DIMMED, fontsize=10,
-              fontfamily='IBM Plex Sans', ha='right', va='bottom',
-              fontweight='600')
+    fig.text(0.99, 0.012, 'huronalytics.vercel.app', color=TEXT_PRIMARY,
+              fontsize=9, fontfamily='IBM Plex Sans', ha='right',
+              va='bottom', style='italic')
 
     # Save
     safe_name = display_name.replace(' ', '_').replace('.', '').replace(',', '')
