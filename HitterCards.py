@@ -1013,8 +1013,9 @@ def _render_percentile_bubbles(fig, h_row):
     # "Launch Angle" y-label, which hangs ~0.015 further left at ~0.417. 0.405
     # put the widest value ("116.3 mph") right up against it.
     GRID_LEFT, GRID_RIGHT = 0.020, 0.390
-    # GRID_BOT raised 0.030 -> 0.088 to clear the reader's notes below.
-    GRID_TOP, GRID_BOT = 0.715, 0.088
+    # GRID_BOT raised 0.030 -> 0.098 to clear the reader's notes below, with
+    # a visible gap: at 0.088 the last bubble row sat almost on top of them.
+    GRID_TOP, GRID_BOT = 0.715, 0.098
     col_w = GRID_RIGHT - GRID_LEFT
 
     # ROC (AAA) hitters: hide the BAT TRACKING section entirely. Bat
@@ -2180,12 +2181,12 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         # Contact's GB%, then Plate Discipline's Swing%. Bulleted so each note
         # reads as its own item rather than one running paragraph.
         _notes = (
-            '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+ are on wRC+\'s scale:\n'
-            '     a 120 is as far above average as a 120 wRC+.\n'
+            '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+ are on wRC+\'s scale, '
+            'where 100 is average\n'
             '•  GB% is colored so that lower = better.\n'
             '•  Swing% is colored so that higher = more aggressive. Does NOT necessarily mean better.'
         )
-        fig.text(0.020, 0.082, _notes, fontsize=13, color=TEXT_MUTED, va='top',
+        fig.text(0.020, 0.068, _notes, fontsize=13, color=TEXT_MUTED, va='top',
                  ha='left', fontfamily='IBM Plex Sans', fontweight='600',
                  linespacing=1.5)
 
