@@ -866,6 +866,12 @@ BUBBLE_COLUMNS = [
         # Ordered outcomes, then swing rates, then contact. Chase% sits
         # directly above the differential it feeds rather than below it.
         ('Swing%',      'swingPct',     'swingPct_pctl',     'pct1'),
+        # Whiff% restored 2026-08-12 per Wally. Statistically it is close to a
+        # triplicate of things already here (r = -0.92 with Z-Contact%, -0.92
+        # with Contact+, +0.91 with K%), which is why the 2026-07-20 prune
+        # dropped it. It earns the row on readability rather than on new
+        # information: swing-and-miss is the number a scout asks for by name.
+        ('Whiff%',      'whiffPct',     'whiffPct_pctl',     'pct1'),
         ('Chase%',      'chasePct',     'chasePct_pctl',     'pct1'),
         # Z-Swing% minus Chase%: attacking strikes while laying off junk.
         # Same label as the site column (js/leaderboard.js). Short enough that
