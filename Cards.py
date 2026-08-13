@@ -1063,7 +1063,9 @@ BUBBLE_COLUMNS = [
         ('Extension',  'extension', 'extension_pctl', 'ftin'),
         ('Stuff+',     'stuffScore', 'stuffScore_pctl', 'int'),
         ('Loc+',       'locPlus',   'locPlus_pctl',   'int'),
-        ('Pitching+',  'pitchingScore', 'pitchingScore_pctl', 'int'),
+        # Pitching+ bubble removed 2026-08-13 (per Wally): it is the
+        # deterministic 0.8/0.2 blend of the two bubbles directly above it —
+        # same reasoning as dropping the per-pitch table column.
     ]),
 ]
 
@@ -2021,29 +2023,19 @@ def render_card(config, pitches, output_file):
                     angle = np.degrees(np.arctan2(vecs[1, 1], vecs[0, 1]))
                     mx, my = np.mean(xs), np.mean(ys)
                     _pc = PITCH_COLORS[pt]
-                    if is_season:
-                        # Outline-only ellipse + center dot at the mean.
-                        ax.add_patch(Ellipse(
-                            (mx, my),
-                            2 * 1.0 * np.sqrt(vals[1]), 2 * 1.0 * np.sqrt(vals[0]),
-                            angle=angle, fill=False,
-                            edgecolor=_rgba(_pc, 0.95),
-                            linewidth=2.2, zorder=1
-                        ))
-                        ax.scatter([mx], [my], c=_pc, s=32, alpha=1.0,
-                                   edgecolors=TEXT_PRIMARY, linewidths=0.6, zorder=4)
-                    else:
-                        # Faint fill + a bold darker edge so the ellipse is
-                        # defined even when the fill is light. Separate
-                        # fill/edge alphas, so no single `alpha=`.
-                        ax.add_patch(Ellipse(
-                            (mx, my),
-                            2 * 1.0 * np.sqrt(vals[1]), 2 * 1.0 * np.sqrt(vals[0]),
-                            angle=angle, fill=True,
-                            facecolor=_rgba(_pc, 0.28),
-                            edgecolor=_rgba(_darken(_pc, 0.6), 0.9),
-                            linewidth=1.3, zorder=1
-                        ))
+                    # Outline-only ellipse + center dot at the mean — one
+                    # format on both layouts (daily matched to season
+                    # 2026-08-13, per Wally; the filled daily look fought the
+                    # per-pitch dots layered on top of it).
+                    ax.add_patch(Ellipse(
+                        (mx, my),
+                        2 * 1.0 * np.sqrt(vals[1]), 2 * 1.0 * np.sqrt(vals[0]),
+                        angle=angle, fill=False,
+                        edgecolor=_rgba(_pc, 0.95),
+                        linewidth=2.2, zorder=1
+                    ))
+                    ax.scatter([mx], [my], c=_pc, s=32, alpha=1.0,
+                               edgecolors=TEXT_PRIMARY, linewidths=0.6, zorder=4)
         # Pitch dots and W/B annotations — single-game cards only. Season
         # panels show just the outline ellipses, per-type center dots,
         # zone/plate, and the legend panel (no per-pitch marks).
@@ -2069,13 +2061,19 @@ def render_card(config, pitches, output_file):
     def _zone_title(h):
         """'VS RHH (Loc+ 82)' when the per-hand grade is available.
 
-        Daily cards only: season location titles are left untouched. Falls back
-        to the bare title when the source is the pitch-level leaderboard, which
-        carries no per-hand split.
+        Daily cards carry the split in config['pitch_locplus'] (_vsR/_vsL from
+        the scratch context). Season cards get theirs computed here from the
+        window's own per-pitch integer Loc+ atoms filtered by batter side —
+        same coherent-canon atoms as every other displayed grade (added
+        2026-08-13, per Wally, to match the daily card). Falls back to the
+        bare title when no atoms exist (e.g. grade columns not yet stamped).
         """
-        if is_season_loc:
-            return _hand_title[h]
         v = (config.get('pitch_locplus') or {}).get(f'_vs{h}')
+        if v is None:
+            _lh = [l for l in (sf(p.get('Loc+'))
+                               for p in pitches if p.get('Bats') == h)
+                   if l is not None]
+            v = (sum(_lh) / len(_lh)) if _lh else None
         return _hand_title[h] if v is None else f'{_hand_title[h]} (Loc+ {int(round(v))})'
 
     if len(_loc_hands) == 1:
@@ -2518,7 +2516,7 @@ def render_card(config, pitches, output_file):
     if not is_season:
         _daily_order = ['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate',
                         'IVB','HB','RelZ','RelX','Ext','Arm Angle','nVAA','nHAA',
-                        'Zone%','CSW%','Whiff%','Chase%','Stuff+','Loc+','Pitching+','xwOBAcon'] + rv_cols
+                        'Zone%','CSW%','Whiff%','Chase%','xwOBAcon','Stuff+','Loc+','Pitching+'] + rv_cols
         _perm = [all_col_headers.index(h) for h in _daily_order]
         all_col_headers = _daily_order
         all_cell_data = [[row[i] for i in _perm] for row in all_cell_data]
