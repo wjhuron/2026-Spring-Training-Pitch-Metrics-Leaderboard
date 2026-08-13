@@ -2802,6 +2802,68 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
 
 
 _MLB_PICKLE_CACHE = None   # module-level: load the 382k-pitch pickle once per process
+_ARM_LOOKUP_CACHE = None   # {(pitcher, pitch type) -> mean AA}, ALL levels
+
+
+def _build_arm_lookup(all_pitches):
+    """Per-pitcher arm-angle averages from the FULL pitch cache — MLB *and*
+    ROC/AAA. Built before the MLB filter below precisely because the MiLB rows
+    are the point: a debut arm has no MLB history to average."""
+    pt_acc, all_acc = defaultdict(lambda: [0.0, 0]), defaultdict(lambda: [0.0, 0])
+    for p in all_pitches:
+        aa = sf(p.get('ArmAngle'))
+        if aa is None:
+            continue
+        nm, pt = p.get('Pitcher'), p.get('Pitch Type')
+        if not nm:
+            continue
+        if pt:
+            a = pt_acc[(nm, pt)]; a[0] += aa; a[1] += 1
+        a = all_acc[nm]; a[0] += aa; a[1] += 1
+    return {'pt': {k: v[0] / v[1] for k, v in pt_acc.items() if v[1]},
+            'all': {k: v[0] / v[1] for k, v in all_acc.items() if v[1]}}
+
+
+def _backfill_arm_angle(norm_by_pitcher, lookup):
+    """Fill missing ArmAngle from the pitcher's own history, per pitch type
+    first, then his overall average.
+
+    WHY THIS EXISTS. ArmAngle arrives ~2 days after a game via the Savant
+    supplement, and train_stuff_v11.build_df already fills gaps from the
+    pitcher's own average — but only from the frame it is handed. A daily card
+    hands it ONE game, so a debut or callup has nothing to average and drops to
+    the no-arm companion model. His MiLB arm angle is sitting right there in
+    the cache (ROC is 96-97% populated since the minors Statcast backfill), and
+    arm angle is near-constant per pitcher, so his own ROC average is
+    essentially the real value. Replaced by the actual number once the
+    supplement lands.
+
+    Per pitch type matters: a pitcher can vary a lot by type (Jackson Kent's
+    ROC CU sits at 50.3 degrees against 33.7 for his CH), so his overall
+    average would misstate both ends.
+    """
+    if not lookup:
+        return 0
+    filled, by_src = 0, defaultdict(int)
+    for nm, pl in norm_by_pitcher.items():
+        for p in pl:
+            if sf(p.get('ArmAngle')) is not None:
+                continue
+            v = lookup['pt'].get((nm, p.get('Pitch Type')))
+            src = 'pitch type'
+            if v is None:
+                v = lookup['all'].get(nm)
+                src = 'pitcher avg'
+            if v is not None:
+                p['ArmAngle'] = round(v, 2)
+                filled += 1
+                by_src[(nm, src)] += 1
+    if filled:
+        print(f"  [ctx] arm-angle backfill: {filled} pitches filled from cached "
+              f"history (incl. MiLB)")
+        for (nm, src), n in sorted(by_src.items()):
+            print(f"        {nm}: {n} from his {src} average")
+    return filled
 
 
 def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
@@ -2810,7 +2872,7 @@ def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
     config via the bundle),
     leaderboard percentile pools, nVAA/nHAA regressions. stuff_k_shrink is
     passed through to Stuff+ scoring (light for daily cards)."""
-    global _MLB_PICKLE_CACHE
+    global _MLB_PICKLE_CACHE, _ARM_LOOKUP_CACHE
     import pickle as _pickle
     from pipeline_compute import build_bip_count_means
     from pipeline_sdplus import build_bip_count_offsets
@@ -2819,13 +2881,19 @@ def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
     t0 = time_module.time()
     ctx = {'norm_by_pitcher': norm_by_pitcher}
 
-    if _MLB_PICKLE_CACHE is None:
+    if _MLB_PICKLE_CACHE is None or _ARM_LOOKUP_CACHE is None:
         print("  [ctx] Loading MLB pitch pickle for league baselines...")
         with open(os.path.join(os.path.dirname(METADATA_PATH), 'all_pitches_rs_cache.pkl'), 'rb') as f:
             _all = _pickle.load(f)
+        # Built from ALL sources before the MLB filter — see _build_arm_lookup.
+        _ARM_LOOKUP_CACHE = _build_arm_lookup(_all)
         _MLB_PICKLE_CACHE = [p for p in _all if p.get('_source') == 'MLB']
     mlb = _MLB_PICKLE_CACHE
     print(f"  [ctx] {len(mlb)} MLB pitches ready ({time_module.time()-t0:.0f}s)")
+
+    # Must run BEFORE Stuff+ scoring: build_df only sees this window's pitches,
+    # so a debut arm would otherwise fall to the no-arm companion model.
+    _backfill_arm_angle(norm_by_pitcher, _ARM_LOOKUP_CACHE)
 
     # xRV count anchoring — same currency as the leaderboard's xRV.
     ctx['count_offsets'] = build_bip_count_offsets(mlb, GUTS_LG_WOBA, GUTS_WOBA_SCALE)
@@ -3166,10 +3234,10 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "NEW"
-    start_date      = None    # Set to None for full season
-    end_date        = None             # Set to a date for date range, or None for single day
-    filter_pitchers = "Watson, Troy"                 # Semicolon-separated "Last, First" names, or "" for all
+    team            = "WSH"
+    start_date      = "2026-08-12"    # Set to None for full season
+    end_date        = "2026-08-12"             # Set to a date for date range, or None for single day
+    filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR
