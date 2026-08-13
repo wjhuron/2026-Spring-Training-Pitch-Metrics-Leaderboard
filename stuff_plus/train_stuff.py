@@ -1,4 +1,4 @@
-"""train_stuff_v11.py — Stuff+ v11 trainer.
+"""train_stuff.py — Stuff+ v11 trainer.
 
 A from-scratch rebuild validated against v10 (scripts/stuff_lab*.py). Key
 changes that won the experiments:
@@ -17,8 +17,8 @@ PITCH TYPE, aggregates to (pitcher, team, pitch_type), and (optionally, with
 --inject) writes stuffScore + stuffScore_pctl into the pitch leaderboard.
 
 Usage:
-    python3 stuff_plus_v11/train_stuff_v11.py            # train + save bundle/CSV
-    python3 stuff_plus_v11/train_stuff_v11.py --inject    # also write into leaderboard
+    python3 stuff_plus/train_stuff.py            # train + save bundle/CSV
+    python3 stuff_plus/train_stuff.py --inject    # also write into leaderboard
 """
 import os, sys, math, json, pickle, argparse, warnings
 from collections import defaultdict
@@ -747,7 +747,7 @@ def main():
     df_prior = None
     B = None
     if args.score_only:
-        _bp = os.path.join(HERE, 'stuff_models_v11.pkl')
+        _bp = os.path.join(HERE, 'stuff_models.pkl')
         with open(_bp, 'rb') as f:
             B = pickle.load(f)
         if 'fold_models' not in B:
@@ -899,7 +899,7 @@ def main():
         # (recomputing needs the 3.5M-row training pool). Unit centroids move
         # slowly, so days-stale flags are fine; new units default to unflagged
         # until the next retrain measures them.
-        _csv = os.path.join(HERE, 'pitcher_stuff_v11.csv')
+        _csv = os.path.join(HERE, 'pitcher_stuff.csv')
         if os.path.exists(_csv):
             sup = pd.read_csv(_csv)[['pitcher', 'team', 'pitch_type', 'support', 'low_support']]
             sup = sup.drop_duplicates(['pitcher', 'team', 'pitch_type'])
@@ -909,7 +909,7 @@ def main():
         sup = compute_support(df, df_prior)
     agg = agg.merge(sup, on=['pitcher', 'team', 'pitch_type'], how='left')
     agg['low_support'] = agg['low_support'].fillna(False).astype(bool)
-    agg.to_csv(os.path.join(HERE, 'pitcher_stuff_v11.csv'), index=False)
+    agg.to_csv(os.path.join(HERE, 'pitcher_stuff.csv'), index=False)
     # COHERENT CANON: overall Stuff+ = pitch-weighted mean of the per-type
     # atoms (100 + 10*(raw - mu_type)/sd_type per pitch), NOT a separately
     # anchored arsenal value — so averaging the sheet's Stuff+ column for a
@@ -1119,7 +1119,7 @@ def main():
     agg = _apply_atom_means(agg, ['pitcher', 'team', 'pitch_type'])
     overall = _apply_atom_means(overall, ['pitcher', 'team', 'throws'])
     # re-save the CSV so it carries the displayed (atom-mean) values
-    agg.to_csv(os.path.join(HERE, 'pitcher_stuff_v11.csv'), index=False)
+    agg.to_csv(os.path.join(HERE, 'pitcher_stuff.csv'), index=False)
 
     # Pitching+ atoms: pc = round(0.8·S + 0.2·L) of the two INTEGER atoms —
     # identical to the sheet's Z cells — averaged per unit / per pitcher.
@@ -1198,7 +1198,7 @@ def main():
     # (GroupKFold is deterministic for the same groups), so one
     # fold_pitchers list serves both model sets.
     if B is None:
-        with open(os.path.join(HERE, 'stuff_models_v11.pkl'), 'wb') as f:
+        with open(os.path.join(HERE, 'stuff_models.pkl'), 'wb') as f:
             pickle.dump({'model': model, 'features': list(X.columns), 'base_feats': BASE_FEATS,
                          'league': league, 'params': TUNED, 'version': 'v12',
                          'model_na': model_na, 'noarm_feats': NOARM_FEATS,
@@ -1213,7 +1213,7 @@ def main():
         # went stale between retrains (new data, or an ANCHOR_BORROW change),
         # fallback grades would drift from the sheet's, breaking exact-match.
         B['league'], B['na_pt_scale'], B['na_ov_scale'] = league, na_pt, na_ov
-        with open(os.path.join(HERE, 'stuff_models_v11.pkl'), 'wb') as f:
+        with open(os.path.join(HERE, 'stuff_models.pkl'), 'wb') as f:
             pickle.dump(B, f)
 
     # report + metric history (drift visibility: every retrain appends its
@@ -1253,7 +1253,7 @@ def main():
     top = agg[agg.n >= 200].sort_values('stuff_mean', ascending=False).head(10)
     for _, r in top.iterrows():
         print(f"    {r.pitcher:24s} {r.pitch_type:3s} {r.stuff_mean:5.1f}  (n={r.n})")
-    print(f'\n  saved bundle + pitcher_stuff_v11.csv to {HERE}')
+    print(f'\n  saved bundle + pitcher_stuff.csv to {HERE}')
 
     if args.inject:
         xrvoe_pt, xrvoe_ov = compute_xrvoe(df, pitches,

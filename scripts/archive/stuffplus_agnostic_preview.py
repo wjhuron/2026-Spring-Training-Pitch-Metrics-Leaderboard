@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Preview: pitch-type-AGNOSTIC Stuff+ anchors vs the current per-type anchors.
 
-Re-anchors the existing v11 output (stuff_plus_v11/pitcher_stuff_v11.csv —
+Re-anchors the existing v11 output (stuff_plus/pitcher_stuff.csv —
 rawmean/n per pitcher×team×pitch_type unit) against ONE global qualified pool
 instead of per-type pools, mirroring _standardize's math exactly
 (QUAL_N=50, K_SHRINK=100, K_SCALE=10, clip 40–180, fixed anchors from the
@@ -13,7 +13,7 @@ import os
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CSV = os.path.join(HERE, '..', 'stuff_plus_v11', 'pitcher_stuff_v11.csv')
+CSV = os.path.join(HERE, '..', 'stuff_plus', 'pitcher_stuff.csv')
 OUT = os.path.expanduser('~/Downloads/stuffplus_agnostic_preview.csv')
 
 K_SCALE, K_SHRINK, QUAL_N = 10, 100, 50

@@ -32,18 +32,18 @@ mlb = [p for p in D if p.get('_source', 'MLB') == 'MLB'
 print(f"MLB non-EP pitches: {len(mlb)}", flush=True)
 
 # ── Stuff per-pitch OOF predictions (exec-patch build_df to carry PitchID) ──
-src = open(os.path.join(ROOT, 'stuff_plus_v11', 'train_stuff_v11.py')).read()
+src = open(os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')).read()
 NEEDLE = "            'ivb_diff': ivb_diff, 'hb_diff': hb_diff, 'spin_rate': spin,"
 assert NEEDLE in src
 src = src.replace(NEEDLE, NEEDLE + "\n            'pid': p.get('PitchID'),")
-T = {'__name__': '_stuff_mod', '__file__': os.path.join(ROOT, 'stuff_plus_v11', 'train_stuff_v11.py')}
-exec(compile(src.split("def main()")[0], 'train_stuff_v11.py', 'exec'), T)
+T = {'__name__': '_stuff_mod', '__file__': os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')}
+exec(compile(src.split("def main()")[0], 'train_stuff.py', 'exec'), T)
 
 df = T['build_df'](mlb)
 df = df[df['target_xrv'].notna()].reset_index(drop=True)
 print(f"stuff rows with target: {len(df)}", flush=True)
 
-B = pickle.load(open(os.path.join(ROOT, 'stuff_plus_v11', 'stuff_models_v11.pkl'), 'rb'))
+B = pickle.load(open(os.path.join(ROOT, 'stuff_plus', 'stuff_models.pkl'), 'rb'))
 X = T['design'](df).reindex(columns=B['features'], fill_value=0)
 fold_of = {p: k for k, ps in enumerate(B['fold_pitchers']) for p in ps}
 pf = np.array([fold_of.get(p, 0) for p in df['pitcher'].values])

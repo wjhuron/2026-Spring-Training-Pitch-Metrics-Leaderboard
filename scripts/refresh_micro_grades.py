@@ -2,14 +2,14 @@
 """Regenerate micro_data_rs.json with CURRENT grade-atom dumps.
 
 process_data.py builds micro data mid-run, when the Stuff+ dump on disk is
-still the PREVIOUS train_stuff_v11 run's — so games newer than that run
+still the PREVIOUS train_stuff run's — so games newer than that run
 would carry no stuff atoms in the embedded micro data (filtered site views
 would silently omit them from windowed Stuff+/Pitching+). This script runs
-AFTER train_stuff_v11 --dump-pitch-grades and rebuilds micro data from the
+AFTER train_stuff --dump-pitch-grades and rebuilds micro data from the
 pitch cache (written by process_data at the exact point micro generation
 reads it, so inputs are bit-identical) with both dumps fresh.
 
-Pipeline order: process_data.py -> train_stuff_v11 --score-only --inject
+Pipeline order: process_data.py -> train_stuff --score-only --inject
 --dump-pitch-grades -> refresh_micro_grades.py -> rebuild_embed.py
 """
 import json

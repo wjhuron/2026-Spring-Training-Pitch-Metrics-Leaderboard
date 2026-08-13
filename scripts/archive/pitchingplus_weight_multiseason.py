@@ -11,7 +11,7 @@ every within-2026 test lost 5 of 5 across 2021-2025).
 DESIGN — per season, never pooled:
   Stuff+  from data/_pitches{yr}_training.pkl, which is in the pipeline's own
           format with Wally's retagged pitch types, scored through the shipped
-          v11 bundle (stuff_plus_v11/stuff_models_v11.pkl).
+          v11 bundle (stuff_plus/stuff_models.pkl).
   Loc+    from data/_statcast{yr}_cache.pkl via the adapter in
           locplus_constants_multiseason.py — the training pickles carry no
           SzTop/SzBot, so zone-normalized location has to come from the raw
@@ -39,7 +39,7 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
-sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
+sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
 import pipeline_locplus as lp
 from pipeline_sdplus import make_rv_xrv
@@ -48,7 +48,7 @@ from locplus_constants_multiseason import adapt
 LG, SCALE = 0.3169, 1.2393
 MIN_PITCH, MIN_ACTUAL = 200, 200
 W_GRID = [round(0.05 * i, 2) for i in range(21)]
-BUNDLE = os.path.join(ROOT, 'stuff_plus_v11', 'stuff_models_v11.pkl')
+BUNDLE = os.path.join(ROOT, 'stuff_plus', 'stuff_models.pkl')
 
 
 def pearson(xs, ys):
@@ -74,7 +74,7 @@ def stuff_by_pitcher(train_path, bundle, cutoff):
     """Mean predicted xRV per pitcher over pitches BEFORE cutoff (hitter
     perspective, so it is negated later to make higher = better)."""
     import pandas as pd
-    from train_stuff_v11 import build_df
+    from train_stuff import build_df
     pitches = pickle.load(open(train_path, 'rb'))
     early = [p for p in pitches if str(p.get('Game Date', ''))[:10] < cutoff]
     del pitches
@@ -93,7 +93,7 @@ def stuff_by_pitcher(train_path, bundle, cutoff):
         model = bundle['model']
     X = df[feats].astype(float)
     # LEAKAGE-FREE: score each pitcher with the fold model that held him out.
-    # fold_pitchers[k] is the TEST fold for fold_models[k] (train_stuff_v11
+    # fold_pitchers[k] is the TEST fold for fold_models[k] (train_stuff
     # _oof_predict / _cached_oof), so this reproduces the shipped OOF path
     # rather than scoring training data with the full model. Pitchers newer
     # than the retrain fall to fold 0, which never saw them either.

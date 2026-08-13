@@ -38,12 +38,12 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
-sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
+sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
 import pipeline_locplus as lp
 from pipeline_sdplus import make_rv_xrv
 from locplus_constants_multiseason import adapt
-import train_stuff_v11 as T
+import train_stuff as T
 
 LG, SCALE = 0.3169, 1.2393
 MIN_PITCH, MIN_ACTUAL = 200, 200
@@ -116,8 +116,8 @@ def stuff_plus_from_raw(df):
 
 def main():
     import pandas as pd, numpy as np, xgboost as xgb
-    bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus_v11',
-                                           'stuff_models_v11.pkl'), 'rb'))
+    bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus',
+                                           'stuff_models.pkl'), 'rb'))
     params = dict(bundle['params'])
 
     print("building per-season feature frames...", file=sys.stderr)

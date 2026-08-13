@@ -4,14 +4,14 @@ import os, sys, pickle
 import numpy as np
 import pandas as pd
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
-from train_stuff_v11 import build_df, design, BASE_FEATS  # noqa
+sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
+from train_stuff import build_df, design, BASE_FEATS  # noqa
 
 D = pickle.load(open(os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl'), 'rb'))
 pitches = [p for p in D if p.get('_source') == 'MLB']
 df = build_df(pitches)
 df = df[df['target_xrv'].notna()].reset_index(drop=True)
-bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus_v11', 'stuff_models_v11.pkl'), 'rb'))
+bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus', 'stuff_models.pkl'), 'rb'))
 model = bundle['model']
 X = design(df).reindex(columns=bundle['features'], fill_value=0)
 df['raw'] = -model.predict(X)

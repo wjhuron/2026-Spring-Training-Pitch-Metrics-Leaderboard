@@ -2939,7 +2939,7 @@ def render_card(config, pitches, output_file):
 # anything up. Instead we follow the ROC translation pattern: every derived
 # quantity is COMPUTED from the scratch pitches against MLB baselines, then
 # RANKED into the MLB leaderboard pools:
-#   Stuff+  — stuff_plus_v11 bundle, v12 config (full model when the pitcher has ArmAngle
+#   Stuff+  — stuff_plus bundle, v12 config (full model when the pitcher has ArmAngle
 #             data, else the no-arm companion + its MLB anchor scales)
 #   Loc+    — pipeline_locplus.compute_loc_plus with MLB pickle pitches as the
 #             baseline/pool and the scratch pitchers keyed under 'AAA' (scored
@@ -2967,11 +2967,11 @@ _SCRATCH_POOL_STATS = ['xRunValue', 'xRv100', 'xwOBA', 'kPct', 'bbPct', 'kbbPct'
 def _pitching_blend(stuff, loc):
     """Stuff+/Loc+ blend in z units — the trainer's _blend (single source of
     truth for the 70/30 weight; falls back to 0.70 if the import fails)."""
-    _sv_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stuff_plus_v11')
+    _sv_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stuff_plus')
     if _sv_dir not in sys.path:
         sys.path.insert(0, _sv_dir)
     try:
-        from train_stuff_v11 import _blend
+        from train_stuff import _blend
         return _blend(stuff, loc)
     except Exception:
         return 0.80 * (stuff - 100.0) / 10.0 + 0.20 * (loc - 100.0) / 10.0
@@ -2979,7 +2979,7 @@ def _pitching_blend(stuff, loc):
 
 def _pitching_scale(rows, min_pitches=25):
     """League (mu, sd) of the blend from leaderboard pool rows with >=25
-    pitches — mirrors train_stuff_v11._inject_pitching's pool convention."""
+    pitches — mirrors train_stuff._inject_pitching's pool convention."""
     bs = [_pitching_blend(r['stuffScore'], r['locPlus']) for r in rows
           if r.get('stuffScore') is not None and r.get('locPlus') is not None
           and (r.get('count') or 0) >= min_pitches]
@@ -2993,7 +2993,7 @@ def _pitching_scale(rows, min_pitches=25):
 def _pitching_score(stuff, loc, scale=None):
     # COHERENT CANON (2026-07-18): Pitching+ = the shared PITCHING_W_STUFF
     # blend of Stuff+ and Loc+ exactly (pipeline_utils holds the constant;
-    # train_stuff_v11.PITCHING_W_STUFF carries the derivation) — no
+    # train_stuff.PITCHING_W_STUFF carries the derivation) — no
     # restandardization, no clip. `scale` is accepted for call-site compat
     # and ignored.
     from pipeline_utils import PITCHING_W_STUFF
@@ -3054,7 +3054,7 @@ def _scratch_mlb_pool_rows(rows):
 
 
 # Stuff+ shrinkage for DAILY (single-game) cards. Season/scratch-season cards
-# use train_stuff_v11.K_SHRINK (=100) because they estimate a stable between-
+# use train_stuff.K_SHRINK (=100) because they estimate a stable between-
 # pitcher grade over hundreds of pitches. On one game that would compress every
 # pitch type toward 100. Stuff+ grades pitch SHAPES, which stabilize in ~10
 # pitches, so a daily card can grade the shapes he actually threw with light
@@ -3070,31 +3070,31 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
     """Stuff+ (v12 config since 2026-08-09) for scratch pitchers. Returns
     ({pitcher: overall}, {(pitcher, pitch_type): score}). The v12 features
     (nVAA, release-axis cross, FF/SI velo_diff mask) live inside
-    train_stuff_v11.build_df, so this path picks them up automatically —
+    train_stuff.build_df, so this path picks them up automatically —
     the guard below only enforces that the LOCAL bundle is a v12 retrain
     (a stale v11 bundle would score transformed features with models
     trained on raw ones, silently drifting every grade).
     Full model when the pitcher has any
     ArmAngle data (build_df fills gaps with his own average); otherwise the
     no-arm companion model anchored to its MLB (no-arm) scales — exactly the
-    ROC path in train_stuff_v11.main(). k_shrink overrides the season K_SHRINK
+    ROC path in train_stuff.main(). k_shrink overrides the season K_SHRINK
     (used lightly for daily cards)."""
     import pickle as _pickle
-    _sv_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stuff_plus_v11')
+    _sv_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stuff_plus')
     if _sv_dir not in sys.path:
         sys.path.insert(0, _sv_dir)
-    import train_stuff_v11 as _sv
+    import train_stuff as _sv
 
-    with open(os.path.join(_sv_dir, 'stuff_models_v11.pkl'), 'rb') as f:
+    with open(os.path.join(_sv_dir, 'stuff_models.pkl'), 'rb') as f:
         bundle = _pickle.load(f)
     if 'cross' not in bundle.get('features', []):
         raise RuntimeError(
-            'stuff_models_v11.pkl predates the v12 config — its models '
+            'stuff_models.pkl predates the v12 config — its models '
             'trained on different features than build_df now emits. Refresh '
             'it from the latest-data release:\n  curl -sL https://github.com/'
             'wjhuron/Huronalytics/releases/download/latest-data/'
-            'stuff_models_v11.pkl.gz | gunzip -c > '
-            'stuff_plus_v11/stuff_models_v11.pkl')
+            'stuff_models.pkl.gz | gunzip -c > '
+            'stuff_plus/stuff_models.pkl')
 
     all_pitches = [p for pl in norm_by_pitcher.values() for p in pl]
     df = _sv.build_df(all_pitches)
@@ -3186,7 +3186,7 @@ def _backfill_arm_angle(norm_by_pitcher, lookup):
     first, then his overall average.
 
     WHY THIS EXISTS. ArmAngle arrives ~2 days after a game via the Savant
-    supplement, and train_stuff_v11.build_df already fills gaps from the
+    supplement, and train_stuff.build_df already fills gaps from the
     pitcher's own average — but only from the frame it is handed. A daily card
     hands it ONE game, so a debut or callup has nothing to average and drops to
     the no-arm companion model. His MiLB arm angle is sitting right there in

@@ -32,8 +32,8 @@ import xgboost as xgb
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
-from train_stuff_v11 import (build_df, design, BASE_FEATS, _params_for,
+sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
+from train_stuff import (build_df, design, BASE_FEATS, _params_for,
                              sf, SUPPORTED)  # noqa: E402
 
 PICKLE = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')

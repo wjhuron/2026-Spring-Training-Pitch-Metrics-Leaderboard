@@ -21,7 +21,7 @@ parsed it again) and it left data_tables holding the PRE-injection pitch rows,
 so the Arsenal tab shipped Stuff+ a full cycle stale. validate_output's
 check_core_stays_lean catches the first; the second was silent.
 
-Run it right after train_stuff_v11.py --inject + refresh_micro_grades.py.
+Run it right after train_stuff.py --inject + refresh_micro_grades.py.
 """
 import json, gzip, os, sys
 

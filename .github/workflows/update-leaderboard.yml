@@ -73,7 +73,7 @@ jobs:
         # build_historical_training_set.py) — no retagged IP, so no
         # encryption needed, unlike the 2025 set above. Adopted 2026-07-13
         # (multi-season prior beat 2025-only on all three objectives; see
-        # train_stuff_v11.HIST_YEARS). Missing assets degrade gracefully —
+        # train_stuff.HIST_YEARS). Missing assets degrade gracefully —
         # the trainer skips absent seasons. Retrain runs only.
         if: ${{ inputs.retrain }}
         run: |
@@ -98,8 +98,8 @@ jobs:
           # 2026-08-12 and, with the old sheets_write_grades guard, blanked
           # the Stuff+/Pitching+ columns in every workbook.
           curl -sfL --retry 3 --retry-delay 5 --retry-all-errors -o /tmp/bundle.gz \
-            https://github.com/wjhuron/Huronalytics/releases/download/latest-data/stuff_models_v11.pkl.gz \
-            && gunzip -c /tmp/bundle.gz > stuff_plus_v11/stuff_models_v11.pkl \
+            https://github.com/wjhuron/Huronalytics/releases/download/latest-data/stuff_models.pkl.gz \
+            && gunzip -c /tmp/bundle.gz > stuff_plus/stuff_models.pkl \
             || echo "bundle unavailable — Stuff+ step will fall back to preserved scores"
 
       - name: Compute Stuff+ (retrain or cached-model scoring, inject into leaderboards)
@@ -110,13 +110,13 @@ jobs:
         run: |
           if [ "${{ inputs.retrain }}" = "true" ]; then
             if [ -f data/_pitches2025_training.pkl ]; then
-              python3 stuff_plus_v11/train_stuff_v11.py --inject --dump-pitch-grades data/pitch_stuff_grades.json
+              python3 stuff_plus/train_stuff.py --inject --dump-pitch-grades data/pitch_stuff_grades.json
             else
               echo "prior-season pickle absent — keeping preserved Stuff+ scores"
             fi
           else
-            if [ -f stuff_plus_v11/stuff_models_v11.pkl ]; then
-              python3 stuff_plus_v11/train_stuff_v11.py --score-only --inject --dump-pitch-grades data/pitch_stuff_grades.json
+            if [ -f stuff_plus/stuff_models.pkl ]; then
+              python3 stuff_plus/train_stuff.py --score-only --inject --dump-pitch-grades data/pitch_stuff_grades.json
             else
               echo "model bundle absent — keeping preserved Stuff+ scores"
             fi
@@ -214,8 +214,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gzip -c stuff_plus_v11/stuff_models_v11.pkl > /tmp/stuff_models_v11.pkl.gz
-          gh release upload latest-data /tmp/stuff_models_v11.pkl.gz --clobber
+          gzip -c stuff_plus/stuff_models.pkl > /tmp/stuff_models.pkl.gz
+          gh release upload latest-data /tmp/stuff_models.pkl.gz --clobber
 
       - name: Encrypt pickle for publication
         # The retagged pitch data ships as AES-256 ciphertext only

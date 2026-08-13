@@ -38,7 +38,7 @@ def sf(x):
 
 # FanGraphs Guts (lgwOBA, wOBAScale) per season — 2021-24 from
 # build_historical_training_set.GUTS (confirmed by Wally 2026-07-05),
-# 2025 from train_stuff_v11.PRIOR_* constants.
+# 2025 from train_stuff.PRIOR_* constants.
 GUTS = {
     2021: (0.314, 1.209), 2022: (0.310, 1.259),
     2023: (0.318, 1.204), 2024: (0.310, 1.242),

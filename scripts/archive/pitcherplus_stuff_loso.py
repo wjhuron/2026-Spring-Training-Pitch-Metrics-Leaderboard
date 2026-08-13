@@ -6,7 +6,7 @@ of 2021-2025 (prior rows join every fold), so scoring those seasons with it
 would be in-sample and inflate Stuff+ in the candidate search. This script
 holds each season out entirely: season Y is scored by a model trained on the
 other four seasons (v11 architecture verbatim: build_df/design/_params_for
-from stuff_plus_v11/train_stuff_v11.py, per-season FG Guts for targets).
+from stuff_plus/train_stuff.py, per-season FG Guts for targets).
 Cross-season same-pitcher rows remain in training — that matches the v11
 leakage standard (same-season outcomes are leakage; cross-season identity is
 real support).
@@ -32,10 +32,10 @@ from xgboost import XGBRegressor
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
+sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
 import leaderboard_metric_battery as bat        # noqa: E402
-import train_stuff_v11 as tv                    # noqa: E402
+import train_stuff as tv                    # noqa: E402
 
 OUT_CSV = os.path.join(ROOT, 'data', '_pplus_stuff_loso.csv')
 SEASONS = [2021, 2022, 2023, 2024, 2025]

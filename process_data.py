@@ -47,7 +47,7 @@ from pipeline_compute import (
 
 
 # Stuff-injected keys preserved across re-processing (values are computed by
-# train_stuff_v11 --inject; process_data only carries them over). Includes
+# train_stuff --inject; process_data only carries them over). Includes
 # Pitching+ — omitting it here once shipped an embed with a blank Pitching+
 # column whenever process_data ran without a subsequent --inject (2026-07-18).
 XRVOE_KEYS = ('xrvoe100', 'rvoe100', 'rvoe', 'xrvoe',
@@ -85,7 +85,7 @@ def _bip_woba_value(event):
 
 
 # compute_runexp_scale / runexp_factor moved to pipeline_utils
-# (2026-07-28) so train_stuff_v11 can apply the same MiLB RunExp
+# (2026-07-28) so train_stuff can apply the same MiLB RunExp
 # currency correction without importing this module.
 from pipeline_utils import (compute_runexp_scale, runexp_factor,
                             runexp_scale_to_json)
@@ -3545,7 +3545,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     }
 
     # --- Cache pitch-level data for downstream per-pitch analysis (SD+,
-    # train_stuff_v11, Cards, refresh_micro_grades). Written HERE — after the
+    # train_stuff, Cards, refresh_micro_grades). Written HERE — after the
     # CF remap and every other in-place normalization — so the cache is the
     # EXACT input generate_micro_data sees; scripts/refresh_micro_grades.py
     # depends on that fidelity to rebuild micro data bit-identically.
@@ -3558,7 +3558,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # them out preserves the fidelity contract above (the shared cache stays
     # exactly what generate_micro_data sees) and means every existing pickle
     # consumer — Cards, HitterCards, refresh_micro_grades, the scripts/ tools —
-    # is untouched by this feature. Only train_stuff_v11 opts in.
+    # is untouched by this feature. Only train_stuff opts in.
     if scoring_only:
         so_path = os.path.join(DATA_DIR, f'scoring_only_{label.lower()}_cache.pkl')
         with open(so_path, 'wb') as f:
@@ -3567,7 +3567,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
 
     # --- Generate micro-aggregate data ---
     # Grade-atom sources: the Loc+ dump was written earlier THIS run (fresh);
-    # the Stuff+ dump is the previous train_stuff_v11 run's (stale for any
+    # the Stuff+ dump is the previous train_stuff run's (stale for any
     # games newer than it). scripts/refresh_micro_grades.py re-runs this
     # generation after the train step so the embedded micro data never lags.
     print(f"\n--- Generating micro-aggregate data ({label}) ---")
@@ -4474,7 +4474,7 @@ def write_json_outputs(result, suffix):
         return [{k: v for k, v in row.items() if not k.startswith('_')} for row in rows]
 
     # Preserve Stuff+ scores from existing pitch leaderboard (injected by
-    # stuff_plus_v11/train_stuff_v11.py --inject; keyed by pitcher/team/pitchType)
+    # stuff_plus/train_stuff.py --inject; keyed by pitcher/team/pitchType)
     pitch_json_path = os.path.join(DATA_DIR, f'pitch_leaderboard{suffix}.json')
     if os.path.exists(pitch_json_path):
         try:

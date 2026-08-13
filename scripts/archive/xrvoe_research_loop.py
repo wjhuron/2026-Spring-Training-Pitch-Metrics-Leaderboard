@@ -18,10 +18,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 from pipeline_utils import break_tilt_to_minutes
 
-src = open(os.path.join(ROOT, 'stuff_plus_v11', 'train_stuff_v11.py')).read()
+src = open(os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')).read()
 T = {'__name__': '_stuff_mod',
-     '__file__': os.path.join(ROOT, 'stuff_plus_v11', 'train_stuff_v11.py')}
-exec(compile(src.split('def main()')[0], 'train_stuff_v11.py', 'exec'), T)
+     '__file__': os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')}
+exec(compile(src.split('def main()')[0], 'train_stuff.py', 'exec'), T)
 
 D = pickle.load(open(os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl'), 'rb'))
 ep = {(p.get('Pitcher'), p.get('PTeam')) for p in D if p.get('Pitch Type') == 'EP'}
@@ -30,7 +30,7 @@ mlb = [p for p in D if p.get('_source', 'MLB') == 'MLB'
 
 d = T['build_df'](mlb)
 d = d[d['target_xrv'].notna()].reset_index(drop=True)
-B = pickle.load(open(os.path.join(ROOT, 'stuff_plus_v11', 'stuff_models_v11.pkl'), 'rb'))
+B = pickle.load(open(os.path.join(ROOT, 'stuff_plus', 'stuff_models.pkl'), 'rb'))
 X = T['design'](d).reindex(columns=B['features'], fill_value=0)
 fold_of = {p: k for k, ps in enumerate(B['fold_pitchers']) for p in ps}
 pf = np.array([fold_of.get(p, 0) for p in d['pitcher'].values])

@@ -41,10 +41,10 @@ import build_historical_training_set as H
 from pipeline_utils import break_tilt_to_minutes
 
 # ── stuff module (exec, pre-main) with pid passthrough already in prod ──
-src = open(os.path.join(ROOT, 'stuff_plus_v11', 'train_stuff_v11.py')).read()
+src = open(os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')).read()
 T = {'__name__': '_stuff_mod',
-     '__file__': os.path.join(ROOT, 'stuff_plus_v11', 'train_stuff_v11.py')}
-exec(compile(src.split('def main()')[0], 'train_stuff_v11.py', 'exec'), T)
+     '__file__': os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')}
+exec(compile(src.split('def main()')[0], 'train_stuff.py', 'exec'), T)
 
 GUTS25 = (0.3131, 1.2317)
 

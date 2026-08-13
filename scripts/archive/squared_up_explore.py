@@ -25,7 +25,7 @@ warnings.filterwarnings('ignore')
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-import stuff_plus_v11.train_stuff_v11 as T
+import stuff_plus.train_stuff as T
 sf = T.sf
 
 

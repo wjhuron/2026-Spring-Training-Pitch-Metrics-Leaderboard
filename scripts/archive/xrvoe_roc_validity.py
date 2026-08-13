@@ -39,10 +39,10 @@ from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
+sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
 import numpy as np
-import train_stuff_v11 as T
+import train_stuff as T
 from process_data import compute_runexp_scale, runexp_factor
 from pipeline_utils import safe_float
 
@@ -137,8 +137,8 @@ def summarize(ov, roc_names, tag):
 def main():
     print("loading...", file=sys.stderr)
     D = pickle.load(open(PKL, 'rb'))
-    bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus_v11',
-                                           'stuff_models_v11.pkl'), 'rb'))
+    bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus',
+                                           'stuff_models.pkl'), 'rb'))
     mlb = [p for p in D if p.get('_source', 'MLB') == 'MLB']
     roc = [p for p in D if p.get('_source') in ('ROC', 'AAA')]
     roc_names = {p.get('Pitcher') for p in roc}

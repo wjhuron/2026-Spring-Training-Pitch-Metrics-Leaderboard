@@ -13,7 +13,7 @@ Per-pitch xRV mirrors pipeline_compute.compute_xrv exactly:
   BIP with xwOBA:    (xwOBA - lgWOBA)/wOBAScale + per-count anchor offset
   BIP without xwOBA: league mean anchored BIP value for that count
   everything else:   RunExp (delta_pitcher_run_exp), pitcher perspective
-Per-season FG Guts constants (2021-2024 from train_stuff_v11.HIST_GUTS,
+Per-season FG Guts constants (2021-2024 from train_stuff.HIST_GUTS,
 2025 from the v11 prior constants). Count offsets are rebuilt per season
 from that season's league BIPs (min 50 per side, matching
 build_bip_count_offsets); a count that misses the floor gets 0 and a
@@ -54,7 +54,7 @@ STUFF_CSV = os.path.join(DATA, '_pplus_stuff_loso.csv')
 
 SEASONS = [2021, 2022, 2023, 2024, 2025]
 
-# FG Guts (lgWOBA, wOBAScale): 21-24 = train_stuff_v11.HIST_GUTS,
+# FG Guts (lgWOBA, wOBAScale): 21-24 = train_stuff.HIST_GUTS,
 # 2025 = PRIOR_LG_WOBA/PRIOR_WOBA_SCALE (0.3131, 1.2317).
 GUTS = {
     2021: (0.314, 1.209), 2022: (0.310, 1.259),

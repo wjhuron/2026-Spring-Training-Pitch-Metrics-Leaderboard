@@ -36,7 +36,7 @@ FULL_MIN_DEC = sd.MIN_HITTER_DECISIONS   # 250
 FULL_MIN_SW = ct.MIN_HITTER_SWINGS       # 85
 SEASONS = [2021, 2022, 2023, 2024, 2025, 2026]
 PAIRS = [(2021, 2022), (2022, 2023), (2023, 2024), (2024, 2025)]
-GUTS_2026 = (0.3172, 1.2343)   # train_stuff_v11 fallback constants
+GUTS_2026 = (0.3172, 1.2343)   # train_stuff fallback constants
 
 
 def pearson(xs, ys):

@@ -123,13 +123,13 @@ def load_2026():
 
 
 # ── stuff-module functions with pid passthrough (in-memory exec patch) ──
-src = open(os.path.join(ROOT, 'stuff_plus_v11', 'train_stuff_v11.py')).read()
+src = open(os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')).read()
 NEEDLE = "            'ivb_diff': ivb_diff, 'hb_diff': hb_diff, 'spin_rate': spin,"
 assert NEEDLE in src
 src = src.replace(NEEDLE, NEEDLE + "\n            'pid': p.get('PitchID'),")
 T = {'__name__': '_stuff_mod',
-     '__file__': os.path.join(ROOT, 'stuff_plus_v11', 'train_stuff_v11.py')}
-exec(compile(src.split('def main()')[0], 'train_stuff_v11.py', 'exec'), T)
+     '__file__': os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')}
+exec(compile(src.split('def main()')[0], 'train_stuff.py', 'exec'), T)
 
 SEASONS = [2021, 2022, 2023, 2024, 2025, 2026]
 season_df = {}

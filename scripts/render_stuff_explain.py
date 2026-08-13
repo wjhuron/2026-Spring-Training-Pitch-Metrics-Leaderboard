@@ -37,12 +37,12 @@ from matplotlib.gridspec import GridSpec
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
-from train_stuff_v11 import (build_df, design, K_SCALE, sf, FB_TYPES,
+sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
+from train_stuff import (build_df, design, K_SCALE, sf, FB_TYPES,
                              FC_ANCHOR_PITCHERS)  # noqa: E402
 
 PICKLE = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
-BUNDLE = os.path.join(ROOT, 'stuff_plus_v11', 'stuff_models_v11.pkl')
+BUNDLE = os.path.join(ROOT, 'stuff_plus', 'stuff_models.pkl')
 OUT_ROOT = os.path.expanduser('~/Downloads/ArticleVisuals')
 
 for f in os.listdir(os.path.join(ROOT, 'assets', 'fonts')):

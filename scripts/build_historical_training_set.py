@@ -27,7 +27,7 @@ warnings.filterwarnings('ignore')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import scripts.build_2025_training_set as B
-import stuff_plus_v11.train_stuff_v11 as T
+import stuff_plus.train_stuff as T
 sf = B.sf
 
 # FanGraphs Guts (lgwOBA, wOBAScale), confirmed by Wally 2026-07-05 from the

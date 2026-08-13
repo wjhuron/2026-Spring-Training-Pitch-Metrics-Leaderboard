@@ -55,13 +55,13 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
-sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
+sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
 import pipeline_locplus as lp
 import pipeline_commandplus as cp
 from pipeline_sdplus import make_rv_xrv
 from locplus_constants_multiseason import adapt
-import train_stuff_v11 as T
+import train_stuff as T
 
 from pitchingplus_loso_full import (CACHE, GUTS, MIN_ACTUAL, MIN_PITCH,
                                     TRAIN_PKL, build_season_df, pearson, sd,
@@ -153,8 +153,8 @@ def main():
     deriv = [y for y in seasons if y in DERIV]
     confirm = [y for y in seasons if y in CONFIRM]
 
-    bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus_v11',
-                                           'stuff_models_v11.pkl'), 'rb'))
+    bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus',
+                                           'stuff_models.pkl'), 'rb'))
     params = dict(bundle['params'])
     print(f'Stuff+ features: {len(bundle["features"])}, v12 cross='
           f'{"cross" in bundle["features"]}', file=sys.stderr)

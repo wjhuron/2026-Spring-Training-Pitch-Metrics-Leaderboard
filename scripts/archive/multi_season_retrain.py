@@ -22,7 +22,7 @@ warnings.filterwarnings('ignore')
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-import stuff_plus_v11.train_stuff_v11 as T
+import stuff_plus.train_stuff as T
 import scripts.build_historical_training_set as H
 
 PKL26 = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')

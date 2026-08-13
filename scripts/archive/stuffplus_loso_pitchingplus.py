@@ -3,7 +3,7 @@ Pitching+ blend weight measured without leakage.
 
 WHY THIS EXISTS. scripts/pitchingplus_weight_multiseason.py could not answer
 the blend-weight question. 2021-2025 sit inside the v11 training set, and the
-bundle's OOF fold models do NOT help: in train_stuff_v11._oof_predict the
+bundle's OOF fold models do NOT help: in train_stuff._oof_predict the
 prior-season frame Xp is concatenated into EVERY fold's training set, so
 GroupKFold only holds out 2026 pitchers' 2026 pitches. Every fold model has
 seen all of 2021-2025, which is why OOF and full-model scoring agreed to three
@@ -37,13 +37,13 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
-sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
+sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
 import pipeline_locplus as lp
 from pipeline_sdplus import make_rv_xrv
 from locplus_constants_multiseason import adapt
 
-import train_stuff_v11 as T
+import train_stuff as T
 
 LG, SCALE = 0.3169, 1.2393
 MIN_PITCH, MIN_ACTUAL = 200, 200
@@ -93,8 +93,8 @@ def build_season_df(year):
 
 def main():
     import pandas as pd, numpy as np, xgboost as xgb
-    bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus_v11',
-                                           'stuff_models_v11.pkl'), 'rb'))
+    bundle = pickle.load(open(os.path.join(ROOT, 'stuff_plus',
+                                           'stuff_models.pkl'), 'rb'))
     params = dict(bundle['params'])
     print(f"params: {params}", file=sys.stderr)
 

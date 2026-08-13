@@ -37,7 +37,7 @@ import xgboost as xgb
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-import stuff_plus_v11.train_stuff_v11 as T
+import stuff_plus.train_stuff as T
 import scripts.stuff_feature_battery_2026_08 as BAT
 
 SEASONS = (2021, 2022, 2023, 2024, 2025)

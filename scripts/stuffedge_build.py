@@ -33,8 +33,8 @@ import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, '..', 'stuff_plus_v11'))
-import train_stuff_v11 as tv  # noqa: E402
+sys.path.insert(0, os.path.join(HERE, '..', 'stuff_plus'))
+import train_stuff as tv  # noqa: E402
 
 import xgboost as xgb  # noqa: E402
 

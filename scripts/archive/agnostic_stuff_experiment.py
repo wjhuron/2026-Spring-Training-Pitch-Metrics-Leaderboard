@@ -7,7 +7,7 @@ standardization ONLY. platoon_same stays; the fastball-reference differentials
 stay (FB_TYPES selection is independent of the model's feature design).
 
 Both configs run the EXACT production season-blocked scheme
-(stuff_plus_v11/train_stuff_v11.py):
+(stuff_plus/train_stuff.py):
   - 2025 training pickle tag-harmonized to 2026 labels (T._harmonize_tags)
   - 2025 joins EVERY fold's training set; 2025 targets use T.PRIOR_LG_WOBA /
     T.PRIOR_WOBA_SCALE
@@ -36,7 +36,7 @@ warnings.filterwarnings('ignore')
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-import stuff_plus_v11.train_stuff_v11 as T
+import stuff_plus.train_stuff as T
 
 PKL26 = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 PKL25 = os.path.join(ROOT, 'data', '_pitches2025_training.pkl')

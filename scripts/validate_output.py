@@ -152,7 +152,7 @@ def check_chunks_match_sources():
 
     The leaderboard JSONs are the post-injection source of truth: process_data
     builds the chunks from its in-memory result with the PREVIOUS run's Stuff+,
-    then train_stuff_v11 --inject rewrites the JSONs, then rebuild_embed swaps
+    then train_stuff --inject rewrites the JSONs, then rebuild_embed swaps
     them into the chunks. Any step that swaps into the wrong file, or forgets
     one, ships a stale table — and nothing about it looks wrong: right shape,
     right row count, plausible numbers, just last cycle's grades.
