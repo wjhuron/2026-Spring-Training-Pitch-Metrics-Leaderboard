@@ -38,7 +38,8 @@ from matplotlib.gridspec import GridSpec
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'stuff_plus_v11'))
-from train_stuff_v11 import build_df, design, K_SCALE, sf  # noqa: E402
+from train_stuff_v11 import (build_df, design, K_SCALE, sf, FB_TYPES,
+                             FC_ANCHOR_PITCHERS)  # noqa: E402
 
 PICKLE = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 BUNDLE = os.path.join(ROOT, 'stuff_plus_v11', 'stuff_models_v11.pkl')
@@ -65,6 +66,11 @@ PITCH_NAMES = {'FF': 'Fastball', 'SI': 'Sinker', 'FC': 'Cutter', 'SL': 'Slider',
                'ST': 'Sweeper', 'SV': 'Slurve', 'CU': 'Curveball',
                'KC': 'Knuckle-Curve', 'CH': 'Changeup', 'FS': 'Splitter'}
 MIN_TYPE_N = 25
+# Override hooks so any arm / any window can be rendered without editing the
+# article lists below. EXTRA_ARMS maps "Last, First" -> pitch dicts (already
+# in pipeline schema); SUBTITLE replaces the sample description in the header.
+EXTRA_ARMS = {}
+SUBTITLE = None
 
 FRIENDLY = {
     'velocity': ('Velocity', 'mph', 1),
@@ -85,6 +91,27 @@ FRIENDLY = {
     'cross_abs': ('|Cross-axis break|', 'in', 1),
     'platoon_same': ('Same-hand share', '', 2),
 }
+
+
+def reference_type(name, df):
+    """Which pitch type is this arm's fastball ANCHOR — the one the *_diff
+    features are measured against. Mirrors build_df: the most-thrown TRUE
+    fastball (FF/SI), with FC only when he throws neither, plus the
+    FC_ANCHOR_PITCHERS override.
+
+    Do NOT infer this from velo_diff ~= 0. That worked until v12 masked
+    velo_diff to None on FF/SI, after which the reference pitch's diff
+    features stopped folding into the base and showed up as real bars on
+    his own fastball ("HB gap off his FB" on the FB itself).
+    """
+    n = df.groupby('pitch_type').size().to_dict()
+    fb = {pt: c for pt, c in n.items() if pt in FB_TYPES}
+    if not fb:
+        return None
+    if name in FC_ANCHOR_PITCHERS and 'FC' in fb:
+        return 'FC'
+    true_fb = {pt: c for pt, c in fb.items() if pt in ('FF', 'SI')} or fb
+    return max(true_fb, key=lambda pt: true_fb[pt])
 
 
 def load_new_tab_pitches():
@@ -136,8 +163,11 @@ def main():
     for name, teams in ROC_ARMS.items():
         pitches_by_arm[name] = [p for p in allp
                                 if p.get('Pitcher') == name and p.get('PTeam') in teams]
-    print('Fetching NEW tab ...')
-    for name, plist in load_new_tab_pitches().items():
+    if NEW_TAB_ARMS:
+        print('Fetching NEW tab ...')
+        for name, plist in load_new_tab_pitches().items():
+            pitches_by_arm[name] = plist
+    for name, plist in EXTRA_ARMS.items():
         pitches_by_arm[name] = plist
 
     for name, plist in sorted(pitches_by_arm.items()):
@@ -159,6 +189,7 @@ def main():
         # pooled-model accounting for "this is the reference pitch", not a
         # trait of the pitch — so those contributions fold into the base.
         DIFF_FEATS = {'velo_diff', 'ivb_diff', 'hb_diff', 'vaa_diff'}
+        ref_pt = reference_type(name, df)
         panels = []
         for pt, sub in df.groupby('pitch_type'):
             if len(sub) < MIN_TYPE_N or pt not in league:
@@ -174,7 +205,7 @@ def main():
             pts = {feats[j]: float((np.mean(-fc[idx, j]) - lgc.get(feats[j], 0.0)) * k_sd)
                    for j in range(len(feats))}
             vals = {f: float(sub[f].mean()) for f in feats if f in sub.columns}
-            is_ref = abs(vals.get('velo_diff', 1.0)) < 0.05
+            is_ref = (pt == ref_pt)
             if is_ref:
                 for f in list(pts):
                     if f in DIFF_FEATS:
@@ -202,11 +233,14 @@ def main():
                 'the Way It Does', fontsize=22, color=INK, va='top', **TITLE_FONT)
         hd.text(0, 0.46,
                 'Bars: how many Stuff+ points each trait adds or subtracts VS THE LEAGUE-AVERAGE '
-                'PITCH OF THAT TYPE, from the v11 model’s own per-pitch attributions (SHAP).\n'
+                'PITCH OF THAT TYPE, from the v12 model’s own per-pitch attributions (SHAP).\n'
                 'Each panel starts at its BASE (what the league-average version of the pitch '
                 'grades, plus his share of interactions) and base + bars = his printed grade.\n'
                 'Values show his average trait vs the MLB average for the type. Red helps, blue hurts.',
                 fontsize=10.5, color=INK, va='top', linespacing=1.6)
+        if SUBTITLE:
+            hd.text(0, 0.06, SUBTITLE, fontsize=10.5, color=BRICK,
+                    va='top', fontweight=700)
 
         for i, d in enumerate(panels):
             r, c = divmod(i, ncols)
