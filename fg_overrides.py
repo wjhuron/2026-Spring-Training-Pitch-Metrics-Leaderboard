@@ -334,12 +334,20 @@ def main():
     parser = argparse.ArgumentParser(description='Refresh FG overrides cache')
     parser.add_argument('--year', type=int, default=2026)
     parser.add_argument('--out', default=CACHE_PATH)
+    parser.add_argument('--max-age-hours', type=float, default=0,
+                        help='skip the refresh when the cache is younger than '
+                             'this (default 0 = always refresh). Unlike the '
+                             'old direct-fetch-only main(), this goes through '
+                             'refresh_if_stale\'s full ladder — direct fetch '
+                             '-> release asset -> existing cache — so a '
+                             'Cloudflare-blocked morning degrades to the best '
+                             'available cache instead of crashing the cron.')
     args = parser.parse_args()
 
-    print(f'Fetching FanGraphs overrides for {args.year}...')
-    cache = build_cache(year=args.year, verbose=True)
-    save_cache(cache, args.out)
-    print(f'\nWrote cache to {args.out}')
+    print(f'Refreshing FanGraphs overrides for {args.year}...')
+    cache = refresh_if_stale(year=args.year, max_age_hours=args.max_age_hours,
+                             path=args.out, verbose=True)
+    print(f'\nCache at {args.out}')
     print(f'  MLB hitters:  {len(cache["mlbHitters"])}')
     print(f'  MLB pitchers: {len(cache["mlbPitchers"])}')
     print(f'  AAA hitters:  {len(cache["aaaHitters"])}')
