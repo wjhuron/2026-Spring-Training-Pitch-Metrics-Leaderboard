@@ -8,6 +8,7 @@ Usage:
 """
 
 import argparse
+import math
 import sys
 import os
 import json
@@ -104,6 +105,43 @@ PITCH_ORDER = ['FF','SI','FC','SL','ST','CU','SV','CH','FS','KN']
 # Whiff%/Chase%/Swing% use the same swing set as the leaderboard they're colored
 # against. STRIKE_DESC still counts Foul Bunt — a foul bunt is a strike.
 SWING_DESC = ['Swinging Strike','Foul','In Play']
+
+def _opponent_label(pitches):
+    """Opposing team for a single-game card, off the pitches themselves.
+
+    BTeam is the batting side on every pitch, so the modal value is the
+    opponent. No extra API call, unlike the score/decision, which would need
+    the linescore and is left off.
+    """
+    counts = defaultdict(int)
+    for p in pitches:
+        bt = str(p.get('BTeam', '') or '').strip()
+        if bt:
+            counts[bt] += 1
+    return max(counts, key=counts.get) if counts else None
+
+
+def _season_pitch_lb_for(pitcher_name, eff_team, pitch_lb_by_pitcher):
+    """The pitcher's OWN season per-pitch-type row, for daily cards.
+
+    Cannot reuse config['pitch_lb']: on a daily card scratch_ctx overwrites it
+    with values computed from THIS START's pitches, which would make every
+    delta identically zero. The team key can also disagree (card header says
+    WSH, the leaderboard row is filed under ROC), so fall back to the largest
+    by-name row set rather than returning nothing.
+
+    Caveat: if the pipeline has already run today, the season row INCLUDES
+    this start, which shrinks the delta slightly. Worst case is a fastball
+    thrown 34 times against a 386-pitch season, so ~9% self-reference.
+    """
+    hit = pitch_lb_by_pitcher.get((pitcher_name, eff_team))
+    if hit:
+        return hit
+    cands = [d for (nm, _tm), d in pitch_lb_by_pitcher.items() if nm == pitcher_name]
+    if not cands:
+        return {}
+    return max(cands, key=lambda d: sum((v or {}).get('count') or 0 for v in d.values()))
+
 
 def _normalize_name(name):
     """Case-fold for name matching (handles 'de Oca' vs 'De Oca')."""
@@ -248,6 +286,7 @@ GUTS_LG_WOBA, GUTS_WOBA_SCALE = _load_guts()
 
 # Mapping: card column header → metadata league average key
 PCT_COLOR_COLS = {
+    'CSW%': 'cswPct',
     'Zone%':   'izPct',
     'Whiff%':  'swStrPct',
     'Chase%':  'chasePct',
@@ -259,6 +298,33 @@ PCT_COLOR_COLS = {
 RAW_COLOR_COLS = {
     'Ext': ('extension', 0.5, True),
 }
+
+# DAILY CARDS — minimum season pitches of a type before that type gets a
+# "vs season" delta, a ghost movement centroid or a velo reference line. Set
+# at the measured flat per-pitch-type gate (50) rather than invented.
+SEASON_DELTA_MIN = 50
+# Pitch types whose job is separation from the fastball, so MORE ride and MORE
+# spin than his own norm read as worse rather than better on a daily card.
+SEPARATION_PITCH_TYPES = {'CH', 'FS'}
+# Approach-angle direction. On a four-seamer or cutter a FLATTER angle (closer
+# to zero) plays; on everything else steeper does. Same set as process_data's
+# VAA_NO_INVERT_TYPES so the card and the site agree on which pitches are the
+# flat-is-better ones — note that excludes sinkers, which want steep.
+FLAT_APPROACH_TYPES = {'FF', 'FC'}
+# Significance test for those deltas, in standard errors of THIS start's mean.
+# SE = (within-start pitch-to-pitch SD) / sqrt(n), computed per card from the
+# pitches in hand, so it self-adjusts to sample: measured on 187k pitcher-game
+# -pitchtype starts 2021-2025 (scripts/daily_delta_noise.py), within-start SD
+# runs 0.81 mph on a four-seam to 1.02 on a curveball, so a 34-pitch fastball
+# average carries 0.14 mph of error against 0.36 for an 8-pitch curveball. A
+# FIXED inch/mph threshold cannot express that, which is why this is in SE.
+# 1 SD of the start-vs-season delta is only ~0.74 mph, so ramping on that would
+# saturate ~2/3 of cells; 2 SE is the conventional bar. It is the point where
+# the shading reaches full colour, NOT a cutoff — smaller gaps still tint,
+# just faintly, which is what makes "faint = inside normal noise" readable.
+DELTA_MIN_SE = 2.0
+# Deltas render inside the parent cell — "92.7 (-0.9)" — so there are no
+# separate delta columns and the table gains no width.
 
 # Stat-line coloring for multi-game cards
 # Maps header → (pitcherLeagueAverages key, type, higher_is_better)
@@ -1110,6 +1176,50 @@ def _pitcher_stat_cell_color(value_str, league_avg, scale, higher_is_better,
     return f'#{r:02x}{g:02x}{b:02x}'
 
 
+def _z_cell_color(z, row_bg_hex, full_at=2.0):
+    """Cell tint from a SIGNED z-score, same blue->red family as the rest of
+    the card. Used only on daily cards, where the comparison is the pitcher's
+    OWN season baseline rather than the league. z>0 (better/more) -> red.
+
+    full_at is in standard errors: the ramp saturates at 2 SE, so a faint cell
+    is a gap inside normal game-to-game noise and a saturated one is not.
+    """
+    if z is None:
+        return None
+    intensity = max(-1.0, min(1.0, z / full_at))
+    anchor = _percentile_color(100 if intensity >= 0 else 0)[0]
+    target = tuple(int(round(ch * 255)) for ch in anchor)
+    alpha = abs(intensity) * 0.72
+    rb, rg, rbb = (int(row_bg_hex[1:3], 16), int(row_bg_hex[3:5], 16),
+                   int(row_bg_hex[5:7], 16))
+    r = int(rb * (1 - alpha) + target[0] * alpha)
+    g = int(rg * (1 - alpha) + target[1] * alpha)
+    b = int(rbb * (1 - alpha) + target[2] * alpha)
+    return f'#{r:02x}{g:02x}{b:02x}'
+
+
+def _blom_expected_max(n):
+    """E[max of n standard normals], Blom's approximation.
+
+    A max is not a mean. The max of 34 pitches sits systematically BELOW the
+    max of 386 purely from sample size (~0.75 mph on a fastball), so comparing
+    a start's Max Velo to a season Max Velo without this correction paints
+    almost every start blue. Bisects Phi rather than pulling in scipy for the
+    one call: math has erf but no erfinv.
+    """
+    if n is None or n < 2:
+        return None
+    q = (n - 0.375) / (n + 0.25)
+    lo, hi = -6.0, 6.0
+    for _ in range(80):
+        mid = (lo + hi) / 2.0
+        if 0.5 * (1.0 + math.erf(mid / math.sqrt(2.0))) < q:
+            lo = mid
+        else:
+            hi = mid
+    return (lo + hi) / 2.0
+
+
 def _pctl_cell_color(pctl, row_bg_hex):
     """Table-cell tint driven directly by an already-directional percentile
     (0-100, high = good), in the same blue→red family as _pitcher_stat_cell_color.
@@ -1339,7 +1449,7 @@ _BB_LABELS = {'ground_ball': 'Ground Ball', 'line_drive': 'Line Drive',
               'fly_ball': 'Fly Ball', 'popup': 'Popup'}
 
 
-def _render_single_game_panel(fig, pitches):
+def _render_single_game_panel(fig, pitches, config=None):
     """Single-game extras in the old layout (warm-paper palette): a batted-ball
     donut + per-pitch stacked bars top-left (below the stat strip), and per-hand
     usage bars on the right (below the movement plot). Location plots are placed
@@ -1348,88 +1458,67 @@ def _render_single_game_panel(fig, pitches):
     import matplotlib.patches as mpatches
     TRACK = '#d8ccb4'   # warm bar track
 
-    # Batted-ball counts per pitch type
-    bb = defaultdict(lambda: {**{k: 0 for k in _BB_TYPES}, 'brl': 0})
-    for p in pitches:
-        pt = p.get('Pitch Type', '')
-        if not pt or p.get('Description') != 'In Play':
-            continue
-        bbt = str(p.get('BBType', '')).strip()
-        if not bbt or bbt.startswith('bunt'):
-            continue
-        if bbt in _BB_TYPES:
-            bb[pt][bbt] += 1
-        if str(p.get('Barrel', '')).strip() == '6':
-            bb[pt]['brl'] += 1
-    overall = {t: sum(bb[pt][t] for pt in bb) for t in _BB_TYPES}
-    total_bip = sum(overall.values())
-    order = sorted([pt for pt in bb if sum(bb[pt][t] for t in _BB_TYPES) > 0],
-                   key=lambda pt: -sum(bb[pt][t] for t in _BB_TYPES))
-
-    # ── donut (top-left) ──
-    ax_d = fig.add_axes([0.012, 0.625, 0.115, 0.13]); ax_d.set_facecolor(BG)
-    if total_bip > 0:
-        vals = [overall[t] for t in _BB_TYPES]
-        ax_d.pie(vals, colors=[_BB_COLORS[t] for t in _BB_TYPES], startangle=90,
-                 counterclock=False, wedgeprops=dict(width=0.32, edgecolor=BG, linewidth=2.0))
-        ax_d.text(0, 0, f'{total_bip}\nBIP', ha='center', va='center', fontsize=10,
-                  fontweight='bold', color=TEXT_PRIMARY, linespacing=1.1)
-        ang = 90
-        for t, v in zip(_BB_TYPES, vals):
-            if not v:
+    # ── VELOCITY BY PITCH ──────────────────────────────────────────────
+    # Replaces the batted-ball donut AND the per-pitch-type stacked bars. Both
+    # described 8 batted balls across 2 categories, which is closer to
+    # decoration than information; the freed width is spent on the one thing a
+    # 78-pitch sample supports, which is the shape of his velocity through the
+    # start. Dashed lines are his own season average for that pitch, so a tired
+    # start is visible rather than inferred.
+    #
+    # ORDER MATTERS. `pitches` arrives grouped by pitch type, not
+    # chronological, so plotting it as received produced a tidy monotonic slide
+    # that was an artifact of the sort and not of his arm. PitchID is
+    # game_pk_atbat_pitch, zero-padded, so a lexicographic sort is exact game
+    # order.
+    _sl = (config or {}).get('season_pitch_lb') or {}
+    ax_v = fig.add_axes([0.012, 0.596, 0.458, 0.140]); ax_v.set_facecolor(PLOT_PANEL)
+    _ord = sorted(pitches, key=lambda q: str(q.get('PitchID') or ''))
+    _seq = [(i2 + 1, sf(q.get('Velocity')), q.get('Pitch Type', ''))
+            for i2, q in enumerate(_ord)]
+    _seq = [(i2, v, pt) for i2, v, pt in _seq if v is not None and pt]
+    if _seq:
+        _n_by_pt = defaultdict(int)
+        for _, _, pt in _seq:
+            _n_by_pt[pt] += 1
+        _xmax = max(i2 for i2, _, _ in _seq) + 1
+        # Reference line for every pitch type he threw today whose SEASON
+        # sample supports a baseline. There is deliberately no floor on today's
+        # count: an 8-pitch curveball still has a real season average, and
+        # suppressing the line just left the reader wondering where it went.
+        for pt, cnt in _n_by_pt.items():
+            _sb = _sl.get(pt) or {}
+            if (_sb.get('count') or 0) < SEASON_DELTA_MIN:
                 continue
-            span = v / total_bip * 360
-            mid = np.radians(ang - span / 2)
-            ax_d.text(0.84 * np.cos(mid), 0.84 * np.sin(mid), str(v), ha='center',
-                      va='center', fontsize=7.5, fontweight='bold',
-                      color=badge_text_color(_BB_COLORS[t]))
-            ang -= span
+            if _sb.get('velocity') is None:
+                continue
+            ax_v.axhline(_sb['velocity'], color=PITCH_COLORS.get(pt, '#999'),
+                         linewidth=1.1, linestyle='--', alpha=0.6, zorder=1)
+        for pt in PITCH_ORDER:
+            _pp2 = [(i2, v) for i2, v, q in _seq if q == pt]
+            if not _pp2:
+                continue
+            ax_v.scatter([i2 for i2, _ in _pp2], [v for _, v in _pp2],
+                         c=PITCH_COLORS.get(pt, '#999'), s=30, alpha=1.0,
+                         edgecolors=PLOT_PANEL, linewidths=0.4, zorder=3)
+        ax_v.set_xlim(0, _xmax)
+        ax_v.tick_params(labelsize=8, colors=TEXT_MUTED, length=2.5, pad=2)
+        ax_v.grid(True, alpha=0.4, color=GRID_COLOR, linewidth=0.6)
+        for _sp in ax_v.spines.values():
+            _sp.set_color(TEXT_FAINT)
+        ax_v.set_xlabel('pitch number', fontsize=8.5, color=TEXT_MUTED,
+                        fontweight='bold', fontfamily='IBM Plex Sans', labelpad=1.5)
+        ax_v.set_ylabel('MPH', fontsize=8.5, color=TEXT_MUTED, fontweight='bold',
+                        fontfamily='IBM Plex Sans', labelpad=2)
+        # Above the axes: inside, the pitch dots ran straight through it.
+        fig.text(0.012, 0.742, 'VELOCITY BY PITCH', fontsize=11,
+                 fontweight='bold', color=TEXT_SECONDARY,
+                 fontfamily='IBM Plex Sans', va='bottom', ha='left')
+        ax_v.text(0.992, 0.04, 'dashed = his season average',
+                  transform=ax_v.transAxes, fontsize=7.5, color=TEXT_MUTED,
+                  fontfamily='IBM Plex Sans', va='bottom', ha='right', zorder=6)
     else:
-        ax_d.axis('off')
-
-    # ── stacked bars (right of donut) ──
-    _bb_btm, _bb_h = 0.625, 0.13
-    ax_b = fig.add_axes([0.135, _bb_btm, 0.335, _bb_h])
-    ax_b.set_xlim(0, 1); ax_b.set_ylim(0, 1); ax_b.axis('off')
-    if order:
-        n = len(order); gap = 0.04
-        rh = min(0.16, (0.94 - (n - 1) * gap) / n)
-        for i, pt in enumerate(order):
-            y = 0.94 - i * (rh + gap) - rh / 2
-            color = PITCH_COLORS.get(pt, '#999'); tcb = badge_text_color(color)
-            tot_pt = sum(bb[pt][t] for t in _BB_TYPES); brl = bb[pt]['brl']
-            ax_b.add_patch(FancyBboxPatch((0.02, y - rh * 0.42), 0.085, rh * 0.84,
-                           boxstyle="round,pad=0.006", facecolor=color, edgecolor='none'))
-            ax_b.text(0.0625, y, pt, fontsize=8, ha='center', va='center', color=tcb, fontweight='bold')
-            tl, tw = 0.135, 0.50
-            ax_b.add_patch(Rectangle((tl, y - rh * 0.30), tw, rh * 0.60, facecolor=TRACK, edgecolor='none'))
-            left = tl
-            for t in _BB_TYPES:
-                cnt = bb[pt][t]
-                if cnt:
-                    w = tw * cnt / tot_pt
-                    ax_b.add_patch(Rectangle((left, y - rh * 0.30), w, rh * 0.60,
-                                   facecolor=_BB_COLORS[t], edgecolor=BG, linewidth=0.5))
-                    ax_b.text(left + w / 2, y, str(cnt), ha='center', va='center', fontsize=7,
-                              color=badge_text_color(_BB_COLORS[t]), fontweight='bold')
-                    left += w
-            lbl = str(tot_pt) + (f'  ({brl} Brl)' if brl else '')
-            ax_b.text(0.66, y, lbl, fontsize=8, va='center', ha='left', color=TEXT_PRIMARY, fontweight='bold')
-        # Bottom edge of the lowest bar in figure fraction, so the legend hugs
-        # the stack regardless of how many pitch types are shown.
-        y_last = 0.94 - (n - 1) * (rh + gap) - rh / 2
-        bars_bottom_fig = _bb_btm + (y_last - rh * 0.30) * _bb_h
-    else:
-        bars_bottom_fig = _bb_btm + _bb_h
-
-    # ── batted-ball legend (right below the stacked bars) ──
-    if total_bip > 0:
-        axl = fig.add_axes([0, 0, 1, 1]); axl.set_xlim(0, 1); axl.set_ylim(0, 1)
-        axl.axis('off'); axl.set_zorder(6)
-        pat = [mpatches.Patch(color=_BB_COLORS[t], label=f'{_BB_LABELS[t]} ({overall[t]})')
-               for t in _BB_TYPES if overall[t] > 0]
-        axl.legend(handles=pat, loc='upper left', bbox_to_anchor=(0.135, bars_bottom_fig - 0.012), ncol=2,
-                   fontsize=7.5, frameon=False, labelcolor=TEXT_MUTED, handlelength=1.0, columnspacing=0.8)
+        ax_v.axis('off')
 
     # ── usage bars (right, below the movement plot) ──
     usage = {'L': defaultdict(int), 'R': defaultdict(int)}
@@ -1442,7 +1531,10 @@ def _render_single_game_panel(fig, pitches):
     def _usage(rect, data, total, title):
         ax = fig.add_axes(rect); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
         ax.axis('off'); ax.set_facecolor(BG)
-        ax.text(0.5, 0.99, title, fontsize=12, fontweight='bold', ha='center', va='top',
+        # Pitch count in the title: the bars are percentages, so without it a
+        # 55.6% slider off 18 pitches looks the same as one off 180.
+        _ttl = title if not total else f'{title} ({total} pitch{"" if total == 1 else "es"})'
+        ax.text(0.5, 0.99, _ttl, fontsize=12, fontweight='bold', ha='center', va='top',
                 color=TEXT_SECONDARY, fontfamily='IBM Plex Sans')
         spts = sorted(data, key=lambda x: (-data[x], PITCH_ORDER.index(x) if x in PITCH_ORDER else 99))
         if not spts:
@@ -1557,7 +1649,15 @@ def render_card(config, pitches, output_file):
     ax_main.text(text_x, photo_top-0.1, config['display_name'], fontsize=28, fontfamily='Bitter', color=TEXT_PRIMARY, va='top', fontweight='black')
     hand_code = 'LHP' if config['hand'] == 'L' else 'RHP'
     ax_main.text(text_x, photo_top-0.85, f"{hand_code}  |  {config['team']}  |  Age: {config['age']}", fontsize=12, fontfamily='IBM Plex Sans', color=TEXT_MUTED, va='top')
-    ax_main.text(text_x, photo_top-1.5, config['game_date'], fontsize=24, fontfamily='IBM Plex Sans', color=ACCENT, va='top')
+    # Date line — single-game cards append the opponent to the SAME string, so
+    # it renders in one font, one size, one colour. A daily report that never
+    # says who he faced is missing the most basic frame. Score/decision would
+    # need the linescore endpoint and is deliberately left off.
+    _date_txt = config['game_date']
+    _opp = config.get('opponent')
+    if _opp and not bool(config.get('mvn_models')):
+        _date_txt = f"{_date_txt} vs. {_opp}"
+    ax_main.text(text_x, photo_top-1.5, _date_txt, fontsize=24, fontfamily='IBM Plex Sans', color=ACCENT, va='top')
 
     # Stat line — season cards widen the 5-cell strip so it spans the bubble
     # column beneath it. Single-game cards have no bubble column, so they use
@@ -1746,6 +1846,30 @@ def render_card(config, pitches, output_file):
             ax_plot.add_patch(Ellipse((np.mean(xs), np.mean(ys)), 2*1.5*np.sqrt(vals[1]), 2*1.5*np.sqrt(vals[0]),
                 angle=np.degrees(np.arctan2(vecs[1,1], vecs[0,1])), fill=False, edgecolor=color, linewidth=1.2, linestyle='--', alpha=0.7))
 
+    # DAILY ONLY — open marker at his SEASON centroid for the same pitch type,
+    # joined to today's centroid by a hairline. Same idea as the delta columns:
+    # on one start the readable quantity is drift, not level.
+    _season_lb = config.get('season_pitch_lb') or {}
+    _ghosted = False
+    if not config.get('mvn_models') and _season_lb:
+        for pt in PITCH_ORDER:
+            if pt not in groups:
+                continue
+            _sb = _season_lb.get(pt) or {}
+            if (_sb.get('count') or 0) < SEASON_DELTA_MIN:
+                continue
+            sx, sy = _sb.get('horzBrk'), _sb.get('indVertBrk')
+            if sx is None or sy is None:
+                continue
+            _xs, _ys = zip(*groups[pt])
+            _cx, _cy = float(np.mean(_xs)), float(np.mean(_ys))
+            _c = PITCH_COLORS[pt]
+            ax_plot.plot([sx, _cx], [sy, _cy], color=_c, linewidth=1.1,
+                         linestyle=':', alpha=0.85, zorder=2)
+            ax_plot.scatter([sx], [sy], s=110, facecolors='none', edgecolors=_c,
+                            linewidths=1.8, zorder=4)
+            _ghosted = True
+
     legend_handles = [mpatches.Patch(color=PITCH_COLORS[pt], label=f'{pt} - {PITCH_NAMES[pt]}') for pt in sorted_types]
     if config.get('mvn_models'):
         # Season: legend rides just above the plot, under the title.
@@ -1759,6 +1883,10 @@ def render_card(config, pitches, output_file):
                      fontsize=7, color=TEXT_MUTED, fontfamily='IBM Plex Sans', va='bottom')
     ax_plot.text(0.02, 0.005, 'Min. 6 pitches for ellipse', transform=ax_plot.transAxes,
                  fontsize=6.5, color=TEXT_FAINT, fontfamily='IBM Plex Sans', va='bottom', fontstyle='italic')
+    if _ghosted:
+        ax_plot.text(0.02, 0.035, 'Open ring = his season average for that pitch',
+                     transform=ax_plot.transAxes, fontsize=7, color=TEXT_MUTED,
+                     fontfamily='IBM Plex Sans', va='bottom')
 
     # Location plots. Season: lower-right quadrant under the movement plot (left
     # column holds the bubbles). Single-game: left side (old layout), with the
@@ -1919,19 +2047,32 @@ def render_card(config, pitches, output_file):
     # slots. Default keeps the two-panel layout every existing caller expects.
     _loc_hands = tuple(config.get('loc_hands') or ('R', 'L'))
     _hand_title = {'R': 'VS RHH', 'L': 'VS LHH'}
+
+    def _zone_title(h):
+        """'VS RHH (Loc+ 82)' when the per-hand grade is available.
+
+        Daily cards only: season location titles are left untouched. Falls back
+        to the bare title when the source is the pitch-level leaderboard, which
+        carries no per-hand split.
+        """
+        if is_season_loc:
+            return _hand_title[h]
+        v = (config.get('pitch_locplus') or {}).get(f'_vs{h}')
+        return _hand_title[h] if v is None else f'{_hand_title[h]} (Loc+ {int(round(v))})'
+
     if len(_loc_hands) == 1:
         _h = _loc_hands[0]
         _x = (LOC_L_X + LOC_R_X + LOC_W) / 2.0 - LOC_W / 2.0
         draw_zone(fig.add_axes([_x, LOC_BOTTOM, LOC_W, LOC_HEIGHT]), _h)
-        fig.text(_x + LOC_W / 2, LOC_TITLE_Y, _hand_title[_h], fontsize=14,
+        fig.text(_x + LOC_W / 2, LOC_TITLE_Y, _zone_title(_h), fontsize=14,
                  fontweight='bold', color=TEXT_SECONDARY,
                  fontfamily='IBM Plex Sans', ha='center', va='center')
     else:
         ax_loc_l = fig.add_axes([LOC_L_X, LOC_BOTTOM, LOC_W, LOC_HEIGHT])
         ax_loc_r = fig.add_axes([LOC_R_X, LOC_BOTTOM, LOC_W, LOC_HEIGHT])
         draw_zone(ax_loc_l, 'R'); draw_zone(ax_loc_r, 'L')
-        fig.text(LOC_L_X+LOC_W/2, LOC_TITLE_Y, 'VS RHH', fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
-        fig.text(LOC_R_X+LOC_W/2, LOC_TITLE_Y, 'VS LHH', fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
+        fig.text(LOC_L_X+LOC_W/2, LOC_TITLE_Y, _zone_title('R'), fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
+        fig.text(LOC_R_X+LOC_W/2, LOC_TITLE_Y, _zone_title('L'), fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
 
     # Footnote — single-game only (old layout): W/B legend + ellipse minimum
     # stacked to the right of the location plots. Season panels carry no
@@ -1974,7 +2115,7 @@ def render_card(config, pitches, output_file):
                                        grid_bot=(0.235 * FIG_H) / fig_h,
                                        columns=bubble_cols)
     else:
-        _render_single_game_panel(fig, pitches)
+        _render_single_game_panel(fig, pitches, config)
 
     # Metrics table — full-width bottom band. Season: classic-frame inches so
     # the band is physically identical on the taller card.
@@ -2027,6 +2168,7 @@ def render_card(config, pitches, output_file):
     _pt_qual_min = config.get('pitch_qual') or CARD_COLOR_MIN_PITCHES
     rv_qual_by_pt = {}   # pitch-type RV coloring gate (values always render)
     bip_by_pt = {}       # pitch-type BIP counts for the BIP coloring gates
+    self_z_by_pt = {}    # DAILY: per-type z vs HIS OWN season, drives shading
 
     # Sort pitch types by usage (descending), with PITCH_ORDER as tiebreaker
     pitch_counts = {}
@@ -2112,12 +2254,116 @@ def render_card(config, pitches, output_file):
         gb_pct = _gb_n / _bips_n if _bips_n else None
         bip_by_pt[pt] = _bips_n
         pt_name='Fastball' if pt=='FF' else PITCH_NAMES.get(pt,pt)
+        # DAILY ONLY — z-scores of this start against HIS OWN season baseline,
+        # for the Usage..HB block. These drive cell SHADING, not text, so the
+        # table gains no width and every cell keeps its plain value.
+        # season_pitch_lb is populated for every card, hence the is_season guard.
+        _sb = (config.get('season_pitch_lb') or {}).get(pt) or {}
+        _sb_ok = (not is_season) and (_sb.get('count') or 0) >= SEASON_DELTA_MIN
+        _zs = {}
+
+        def _z_mean(vals, key, flip_by_sign=False, invert=False, _sb=_sb, _ok=_sb_ok):
+            """(start mean - season mean) in SEs of that difference.
+
+            SE combines both samples, sqrt(1/n_today + 1/n_season), though the
+            season term is small at 95-386 pitches. flip_by_sign is for IVB/HB:
+            'better' there is MORE break in the direction the pitch already
+            moves, so a curveball dropping 2" more than usual must read red,
+            not blue, which a raw higher-is-red rule would get backwards.
+            """
+            base = _sb.get(key)
+            if not _ok or base is None or len(vals) < 2:
+                return None
+            sd = float(np.std(vals, ddof=1))
+            n_s = _sb.get('count') or 0
+            if not (sd > 0) or n_s < 2:
+                return None
+            se = sd * math.sqrt(1.0 / len(vals) + 1.0 / n_s)
+            z = (sum(vals) / len(vals) - base) / se
+            if flip_by_sign and base < 0:
+                z = -z
+            return -z if invert else z
+
+        # Changeups and splitters run the OTHER WAY on ride and spin (Wally,
+        # 2026-08-12): the pitch works by separating from the fastball, so more
+        # IVB and more spin both cut against it and have to shade blue.
+        # IVB uses a plain invert rather than the sign flip: on a changeup less
+        # ride is better whether its baseline IVB is positive or negative,
+        # whereas on a breaking ball 'better' really is more break in whatever
+        # direction the pitch already moves.
+        _soft = pt in SEPARATION_PITCH_TYPES
+        _zs['Avg Velo'] = _z_mean(velos, 'velocity')
+        _zs['Spin Rate'] = _z_mean(spins, 'spinRate', invert=_soft)
+        _zs['IVB'] = (_z_mean(ivbs, 'indVertBrk', invert=True) if _soft
+                      else _z_mean(ivbs, 'indVertBrk', flip_by_sign=True))
+        _zs['HB'] = _z_mean(hbs, 'horzBrk', flip_by_sign=True)
+        # Release block — no valence, so red simply reads higher (Wally).
+        _zs['RelZ'] = _z_mean(relzs, 'relPosZ')
+        _zs['RelX'] = _z_mean(relxs, 'relPosX')
+        _zs['Ext'] = _z_mean(exts, 'extension')
+
+        # Approach angles. Both are signed, and 'better' is about MAGNITUDE:
+        # flatter (toward zero) on a four-seam/cutter, steeper (away from zero)
+        # on everything else. Scale off the per-pitch VAA/HAA spread in this
+        # start -- nVAA is VAA shifted by a per-type constant, so their
+        # within-start SDs are the same.
+        def _z_abs(cur, key, vals, better_closer, _sb=_sb, _ok=_sb_ok):
+            base = _sb.get(key)
+            if not _ok or cur is None or base is None or len(vals) < 2:
+                return None
+            sd = float(np.std(vals, ddof=1))
+            n_s = _sb.get('count') or 0
+            if not (sd > 0) or n_s < 2:
+                return None
+            se = sd * math.sqrt(1.0 / len(vals) + 1.0 / n_s)
+            z = (abs(cur) - abs(base)) / se
+            return -z if better_closer else z
+
+        _flat = pt in FLAT_APPROACH_TYPES
+        _vaas = [v for v in (sf(q.get('VAA')) for q in pp) if v is not None]
+        _haas = [v for v in (sf(q.get('HAA')) for q in pp) if v is not None]
+        _zs['nVAA'] = _z_abs(nvaa_by_pt.get(pt), 'nVAA', _vaas, _flat)
+        _zs['nHAA'] = _z_abs(nhaa_by_pt.get(pt), 'nHAA', _haas, _flat)
+
+        # Max Velo — sample-size corrected (see _blom_expected_max), and scaled
+        # by the SD of a MAXIMUM, sd / (n * phi(b_n)), not sd/sqrt(n).
+        _mx_base = _sb.get('maxVelo')
+        if _sb_ok and _mx_base is not None and len(velos) >= 2:
+            _sd_v = float(np.std(velos, ddof=1))
+            _n_s = _sb.get('count') or 0
+            _b_t, _b_s = _blom_expected_max(len(velos)), _blom_expected_max(_n_s)
+            if _sd_v > 0 and _b_t is not None and _b_s is not None:
+                def _mx_f(_b, _n):
+                    _phi = math.exp(-0.5 * _b * _b) / math.sqrt(2 * math.pi)
+                    return 1.0 / (_n * _phi) if _n * _phi > 0 else None
+                _f_t, _f_s = _mx_f(_b_t, len(velos)), _mx_f(_b_s, _n_s)
+                if _f_t and _f_s:
+                    _se_mx = _sd_v * math.sqrt(_f_t ** 2 + _f_s ** 2)
+                    if _se_mx > 0:
+                        _zs['Max Velo'] = ((max(velos) - (_mx_base - _sd_v * (_b_s - _b_t)))
+                                           / _se_mx)
+
+        # Usage — binomial, against his season share of that pitch.
+        _u_base = _sb.get('usagePct')
+        if _sb_ok and _u_base is not None and tc:
+            _u_se = math.sqrt(max(_u_base * (1 - _u_base), 1e-9) / tc)
+            _zs['Usage'] = ((n / tc) - _u_base) / _u_se if _u_se > 0 else None
+
+        self_z_by_pt[pt] = _zs
+
+        _c_velo = sum(velos)/len(velos) if velos else None
+        _c_spin = sum(spins)/len(spins) if spins else None
+        _called_n = sum(1 for q in pp if q.get('Description') == 'Called Strike')
+        _c_ivb = sum(ivbs)/len(ivbs) if ivbs else None
+        _c_hb = sum(hbs)/len(hbs) if hbs else None
         _nvaa = nvaa_by_pt.get(pt)
         _nhaa = nhaa_by_pt.get(pt)
         row=[pt_name,str(n),("< 1%" if 0 < n/tc*100 < 1 else f"{n/tc*100:.1f}%"),
-            f"{sum(velos)/len(velos):.1f}" if velos else '—',f"{max(velos):.1f}" if velos else '—',
-            f"{int(sum(spins)/len(spins))}" if spins else '—',
-            f'{sum(ivbs)/len(ivbs):.1f}"' if ivbs else '—',f'{sum(hbs)/len(hbs):.1f}"' if hbs else '—',
+            f"{_c_velo:.1f}" if velos else '—',
+            f"{max(velos):.1f}" if velos else '—',
+            f"{int(_c_spin)}" if spins else '—',
+            f'{_c_ivb:.1f}"' if ivbs else '—',
+            f'{_c_hb:.1f}"' if hbs else '—',
             f"{_nvaa:.2f}" if _nvaa is not None else '—',
             f"{_nhaa:.2f}" if _nhaa is not None else '—',
             fmt_fi(sum(relzs)/len(relzs)) if relzs else '—',fmt_fi(sum(relxs)/len(relxs)) if relxs else '—',
@@ -2128,6 +2374,9 @@ def render_card(config, pitches, output_file):
             (f"{int(round(locplus_by_pt[pt]))}" if locplus_by_pt.get(pt) is not None else '—'),
             (f"{int(round(pitching_by_pt[pt]))}" if pitching_by_pt.get(pt) is not None else '—'),
             f"{iz_n/n*100:.1f}%" if n else '—',
+            # CSW% — called strikes plus whiffs over PITCHES (not swings), so
+            # unlike Whiff% it is defined on the full per-type sample.
+            f"{(_called_n + len(whiffs))/n*100:.1f}%" if n else '—',
             f"{len(whiffs)/len(swings)*100:.1f}%" if swings else '—',
             f"{chase_pct*100:.1f}%" if chase_pct is not None else '—',
             f"{xwobacon:.3f}".replace('0.', '.') if xwobacon is not None else '—',
@@ -2140,6 +2389,7 @@ def render_card(config, pitches, output_file):
     t_sw=[p for p in pitches if p.get('Description') in SWING_DESC]
     t_wh=[p for p in pitches if p.get('Description')=='Swinging Strike']
     t_iz=sum(1 for p in pitches if compute_iz(p)==True)
+    t_called=sum(1 for p in pitches if p.get('Description')=='Called Strike')
     # Expected run value for the Total row — cumulative + per-100.
     t_rvs_x = _compute_pitch_xrv(pitches)
     # Overall averages for RelZ, RelX, Ext
@@ -2197,6 +2447,7 @@ def render_card(config, pitches, output_file):
         (f"{int(round(_total_locplus))}" if _total_locplus is not None else '—'),
         (f"{int(round(_total_pitching))}" if _total_pitching is not None else '—'),
         f"{t_iz/tc*100:.1f}%" if tc else '—',
+        f"{(t_called + len(t_wh))/tc*100:.1f}%" if tc else '—',
         f"{len(t_wh)/len(t_sw)*100:.1f}%" if t_sw else '—',
         f"{t_chase*100:.1f}%" if t_chase is not None else '—',
         f"{t_xwobacon:.3f}".replace('0.', '.') if t_xwobacon is not None else '—',
@@ -2208,7 +2459,7 @@ def render_card(config, pitches, output_file):
     # Source-data presence check — RV needs RunExp on at least one pitch.
     has_pitchrv_data = any(p.get('RunExp') is not None and str(p.get('RunExp','')).strip() != '' for p in pitches)
 
-    all_col_headers=['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate','IVB','HB','nVAA','nHAA','RelZ','RelX','Ext','Arm Angle','Stuff+','Loc+','Pitching+','Zone%','Whiff%','Chase%','xwOBAcon','GB%'] + rv_cols
+    all_col_headers=['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate','IVB','HB','nVAA','nHAA','RelZ','RelX','Ext','Arm Angle','Stuff+','Loc+','Pitching+','Zone%','CSW%','Whiff%','Chase%','xwOBAcon','GB%'] + rv_cols
     all_cell_data=[r[1] for r in pitch_stats]+[total_row]
 
     # Daily cards use a different column ORDER than season (Wally's layout):
@@ -2220,19 +2471,20 @@ def render_card(config, pitches, output_file):
     if not is_season:
         _daily_order = ['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate',
                         'IVB','HB','RelZ','RelX','Ext','Arm Angle','nVAA','nHAA',
-                        'Zone%','Whiff%','Chase%','Stuff+','Loc+','Pitching+','xwOBAcon'] + rv_cols
+                        'Zone%','CSW%','Whiff%','Chase%','Stuff+','Loc+','Pitching+','xwOBAcon'] + rv_cols
         _perm = [all_col_headers.index(h) for h in _daily_order]
         all_col_headers = _daily_order
         all_cell_data = [[row[i] for i in _perm] for row in all_cell_data]
 
     # Columns to force-exclude based on data availability and card type.
     force_exclude = set()
-    # Per-pitch Pitching+ dropped on season/date-range cards (2026-07-30,
-    # Wally): it is the deterministic 0.8/0.2 blend of the adjacent
-    # Stuff+/Loc+ columns — zero new information. Daily layout keeps it.
+    # Per-pitch Pitching+ dropped EVERYWHERE (season 2026-07-30, daily
+    # 2026-08-12, both Wally): it is the deterministic 0.8/0.2 blend of the
+    # adjacent Stuff+/Loc+ columns — zero new information.
     # GB% is season/date-range only (not in the daily column order).
+    force_exclude.add('Pitching+')
     if is_season:
-        force_exclude.add('Pitching+')
+        force_exclude.add('CSW%')
     _have_xrv = any(v is not None for v in xrv100_by_pt.values()) if is_season else has_pitchrv_data
     if not _have_xrv:
         for _h in ('PitchRV', 'xPitchRV', 'PitchRV/100', 'xPitchRV/100'):
@@ -2329,6 +2581,9 @@ def render_card(config, pitches, output_file):
                 if not pc or pc not in league_avgs:
                     continue
                 # Flat outcome coloring gate (season/date-range cards).
+                # Deliberately NOT applied to daily cards: at one start almost
+                # nothing clears 50 pitches, so gating faded the whole table
+                # and the card lost more than the false precision was worth.
                 if is_season and pitch_counts.get(pc, 0) < CARD_COLOR_MIN_PITCHES:
                     _fade_cell(r, c)
                     continue
@@ -2345,6 +2600,11 @@ def render_card(config, pitches, output_file):
     for c, col_name in enumerate(col_headers):
         raw_cfg = RAW_COLOR_COLS.get(col_name)
         if not raw_cfg:
+            continue
+        # Ext tints on season/date-range cards only (2026-08-12, Wally). On a
+        # daily card the Total-row extension is one start's mean, and tinting
+        # it asserted a league judgement that sample cannot carry.
+        if not is_season:
             continue
         meta_key, scale, higher_is_better = raw_cfg
         # Total row only
@@ -2434,6 +2694,29 @@ def render_card(config, pitches, output_file):
             if tinted:
                 table.get_celld()[(r, c)].set_facecolor(tinted)
 
+    # DAILY ONLY — Usage through HB shade against HIS OWN season baseline
+    # rather than the league (2026-08-12, Wally). Deliberately scoped to that
+    # block: the outcome columns to its right keep league shading, so the two
+    # halves of the table answer two different questions and the note under it
+    # says which is which. Total row is skipped, having no per-type baseline.
+    SELF_BASELINE_COLS = ('Usage', 'Avg Velo', 'Max Velo', 'Spin Rate', 'IVB', 'HB',
+                          'RelZ', 'RelX', 'Ext', 'nVAA', 'nHAA')
+    _self_shaded = False
+    if not is_season and self_z_by_pt:
+        for c, col_name in enumerate(col_headers):
+            if col_name not in SELF_BASELINE_COLS:
+                continue
+            for r in range(1, len(cell_data)):
+                _pc = pt_codes[r - 1]
+                _z = (self_z_by_pt.get(_pc) or {}).get(col_name)
+                if _z is None:
+                    continue
+                _bg = DARK_CELL if r % 2 == 1 else ALT_ROW_BG
+                _tint = _z_cell_color(_z, _bg, full_at=DELTA_MIN_SE)
+                if _tint:
+                    table.get_celld()[(r, c)].set_facecolor(_tint)
+                    _self_shaded = True
+
     # Loc+ coloring — index centered at 100 (group avg), higher is better,
     # scale 10 (≈1 SD). Matches the Loc+ bubble's blue→red direction.
     if 'Loc+' in col_headers:
@@ -2479,9 +2762,13 @@ def render_card(config, pitches, output_file):
             if tinted:
                 table.get_celld()[(r, pp_col_idx)].set_facecolor(tinted)
 
-    # nVAA coloring — FF and SI only (per spec). nVAA_pctl is already directional
-    # (FF: flatter/closer-to-zero better; SI: steeper better), computed vs MLB.
-    if 'nVAA' in col_headers:
+    # nVAA coloring vs the LEAGUE — FF and SI only (per spec). nVAA_pctl is
+    # already directional (FF: flatter/closer-to-zero better; SI: steeper).
+    # SEASON/DATE-RANGE ONLY: this pass runs after the self-baseline block
+    # above, so on a daily card it silently overwrote FF and SI, leaving nVAA
+    # league-relative for two pitch types and self-relative for the rest while
+    # the note under the table claimed the whole block was self-relative.
+    if is_season and 'nVAA' in col_headers:
         nvaa_col_idx = col_headers.index('nVAA')
         for r in range(1, len(cell_data)):   # pitch rows only; skip Total
             pc = pt_codes[r - 1]
@@ -2553,8 +2840,26 @@ def render_card(config, pitches, output_file):
         fig.text(_sp_x, b - _below_off, _sp_note,
                  fontsize=8, color=TEXT_MUTED, va='top', ha='left', fontfamily='IBM Plex Sans', fontweight='bold', linespacing=1.5)
 
-    # Watermark — bottom-left of the card, just below the table border.
-    fig.text(l, b - _below_off, 'huronalytics.vercel.app', fontsize=9, ha='left', va='top', color=TEXT_PRIMARY, style='italic', fontfamily='IBM Plex Sans')
+    # Watermark — just below the table border. Bottom-LEFT on season cards
+    # (unchanged); bottom-RIGHT on daily, where the left of that band is now
+    # the shading note.
+    _wm_x, _wm_ha = ((l, 'left') if is_season else (r_, 'right'))
+    fig.text(_wm_x, b - _below_off, 'huronalytics.vercel.app', fontsize=9, ha=_wm_ha, va='top', color=TEXT_PRIMARY, style='italic', fontfamily='IBM Plex Sans')
+    if _self_shaded:
+        # Left edge aligned under the Usage column — the first column the note
+        # describes — so the note visually claims the block it explains.
+        _nx = l
+        if 'Usage' in col_headers:
+            _nx = (table.get_celld()[(0, col_headers.index('Usage'))]
+                   .get_window_extent(renderer).x0 / fig_bbox.width)
+        fig.text(_nx, b - _below_off,
+                 'Usage through nHAA are shaded against HIS OWN season average for that pitch; '
+                 'Zone% through Loc+ against LEAGUE average. Red = better, blue = worse.\n'
+                 'Usage, RelZ, RelX and Ext simply read red = higher. For changeups and splitters, LESS IVB and LESS spin count as better.\n'
+                 'For four-seamers and cutters, nVAA and nHAA closer to zero is better; for every other pitch, further from zero. '
+                 'Full colour = 2 standard errors, so a faint cell is a gap inside normal game-to-game noise.',
+                 fontsize=8.5, ha='left', va='top', color=TEXT_MUTED,
+                 fontfamily='IBM Plex Sans', linespacing=1.5)
     plt.savefig(output_file, dpi=SAVE_DPI, bbox_inches='tight', facecolor=BG, pad_inches=0.1)
     plt.close()
 
@@ -3178,6 +3483,22 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
         d['stuffScore_pctl'] = _rank_in_mlb_pool(d['stuffScore'], pools.get('stuffScore') or [])
         pitch_lb[pt] = d
 
+    # Per-hand Loc+ for the location-plot titles. Same integer atoms as every
+    # other displayed grade (coherent canon), just filtered by the batter's
+    # side. Rides on locplus_by_pt under keys no pitch type can collide with,
+    # so no call signature changes; consumers that don't know about them (the
+    # metrics table, which only ever does .get(pitch_type)) never see them.
+    for _h in ('R', 'L'):
+        _Lh = []
+        for _p3 in pitches:
+            if _p3.get('Bats') != _h:
+                continue
+            _s3, _l3, _pp3 = _pitch_atoms(_p3)
+            if _l3 is not None:
+                _Lh.append(_l3)
+        if _Lh:
+            locplus_by_pt[f'_vs{_h}'] = round(sum(_Lh) / len(_Lh), 1)
+
     return row, pitch_lb, locplus_by_pt
 
 
@@ -3428,6 +3749,17 @@ def main():
                         'stuffScore': _r.get('stuffScore'), 'stuffScore_pctl': _r.get('stuffScore_pctl'),
                         'pitchingScore': _r.get('pitchingScore'),
                         'xrvoe100': _r.get('xrvoe100'),
+                        # Season baselines the daily card reads back: the
+                        # self-baseline cell shading, the ghost movement
+                        # centroid, and the velocity reference lines.
+                        'indVertBrk': _r.get('indVertBrk'),
+                        'horzBrk': _r.get('horzBrk'),
+                        'spinRate': _r.get('spinRate'),
+                        'usagePct': _r.get('usagePct'),
+                        'maxVelo': _r.get('maxVelo'),
+                        'relPosZ': _r.get('relPosZ'),
+                        'relPosX': _r.get('relPosX'),
+                        'extension': _r.get('extension'),
                     }
         except Exception as _e:
             print(f"  WARNING: could not load pitch leaderboard for Loc+: {_e}")
@@ -3671,6 +4003,7 @@ def main():
             # PitchRV/xPitchRV in the metrics table; no need to duplicate it
             # in the box-score header.
             whiff_count = sum(1 for p in pitches if p.get('Description') == 'Swinging Strike')
+            # CSW% lives in the metrics table (per pitch type), not here.
             stat_headers = ['IP', 'P', 'TBF', 'R', 'ER', 'K', 'BB', 'Whiffs']
             stat_values = [ip_str, str(pitch_count), str(box['tbf']), str(box['r']),
                            str(box['er']), str(box['so']), str(box['bb']), str(whiff_count)]
@@ -3739,6 +4072,10 @@ def main():
                          else pitch_lb_by_pitcher.get((pitcher_name, eff_team), {})),
             'rv_mode': rv_mode,
             'pitch_qual': pitch_qual,
+            # DAILY ONLY — his own season baselines (see _season_pitch_lb_for).
+            'season_pitch_lb': _season_pitch_lb_for(pitcher_name, eff_team,
+                                                    pitch_lb_by_pitcher),
+            'opponent': _opponent_label(pitches),
         }
 
         # Output file — DateSlug-LastFirst format
