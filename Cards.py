@@ -329,17 +329,31 @@ LOW_SPIN_PITCH_TYPES = {'CH', 'FS'}
 # VAA_NO_INVERT_TYPES so the card and the site agree on which pitches are the
 # flat-is-better ones — note that excludes sinkers, which want steep.
 FLAT_APPROACH_TYPES = {'FF', 'FC'}
-# Significance test for those deltas, in standard errors of THIS start's mean.
-# SE = (within-start pitch-to-pitch SD) / sqrt(n), computed per card from the
-# pitches in hand, so it self-adjusts to sample: measured on 187k pitcher-game
-# -pitchtype starts 2021-2025 (scripts/daily_delta_noise.py), within-start SD
-# runs 0.81 mph on a four-seam to 1.02 on a curveball, so a 34-pitch fastball
-# average carries 0.14 mph of error against 0.36 for an 8-pitch curveball. A
-# FIXED inch/mph threshold cannot express that, which is why this is in SE.
-# 1 SD of the start-vs-season delta is only ~0.74 mph, so ramping on that would
-# saturate ~2/3 of cells; 2 SE is the conventional bar. It is the point where
-# the shading reaches full colour, NOT a cutoff — smaller gaps still tint,
-# just faintly, which is what makes "faint = inside normal noise" readable.
+# Shading scale for the self-baseline block (Usage, Avg Velo). The z the
+# tint ramps on is the delta in SDs of the OBSERVED start-vs-season delta:
+# sqrt(day-to-day component + this start's own sampling noise). The original
+# scale was sampling SE alone — (within-start SD)/sqrt(n) — which answers
+# "is this delta measurable?", not "is this start unusual for him?": past
+# n≈20 the SE is so small that perfectly ordinary starts saturate (+0.3 mph
+# on 44 four-seamers rendered full red, Gausman 2026-08-13, per Wally).
+# Day-to-day components measured on 2021-2025, 187k pitcher-game-pitchtype
+# starts (scripts/daily_delta_scale.py), stable within ±0.05 mph / ±0.005 c
+# across all five seasons as independent replicates:
+#   velo: SD_day in mph, the sampling-free spread of a start's true mean
+#         around his season mean;
+#   usage: game-plan variance modeled as c*u(1-u) — strategic mix choice is
+#         overdispersed ~2-5x vs the binomial term u(1-u)/tc, and c genuinely
+#         differs by type, so per-type constants.
+DAILY_VELO_SD_DAY = {'FF': 0.67, 'SI': 0.65, 'FC': 0.81, 'SL': 0.92,
+                     'ST': 0.80, 'CU': 0.80, 'CH': 0.77, 'FS': 0.80}
+DAILY_VELO_SD_DAY_DEFAULT = 0.80   # unlisted types: median of the measured 8
+DAILY_USAGE_C = {'FF': 0.0215, 'SI': 0.0301, 'FC': 0.0279, 'SL': 0.0241,
+                 'ST': 0.0266, 'CU': 0.0155, 'CH': 0.0160, 'FS': 0.0213}
+DAILY_USAGE_C_DEFAULT = 0.0227     # pooled across types
+# Full colour at 2 SD of that observed-delta scale = his own ~5% tails
+# (measured share of real starts with |z|>=2: 4.7-4.9% by type). NOT a
+# cutoff — smaller gaps still tint faintly, which is what makes
+# "faint = inside normal game-to-game noise" readable.
 DELTA_MIN_SE = 2.0
 # Deltas render inside the parent cell — "92.7 (-0.9)" — so there are no
 # separate delta columns and the table gains no width.
@@ -2302,7 +2316,16 @@ def render_card(config, pitches, output_file):
         # whereas on a breaking ball 'better' really is more break in whatever
         # direction the pitch already moves.
         _low_ivb = pt in LOW_IVB_PITCH_TYPES
-        _zs['Avg Velo'] = _z_mean(velos, 'velocity')
+        # Avg Velo — day-to-day scale, not sampling SE (see DAILY_VELO_SD_DAY):
+        # z = delta / sqrt(SD_day^2 + s^2/n), so a small start still needs a
+        # bigger delta to color while a long one bottoms out at the measured
+        # day-to-day floor instead of saturating on ordinary variation.
+        _v_base = _sb.get('velocity')
+        if _sb_ok and _v_base is not None and len(velos) >= 2:
+            _sd_day = DAILY_VELO_SD_DAY.get(pt, DAILY_VELO_SD_DAY_DEFAULT)
+            _s2 = float(np.std(velos, ddof=1)) ** 2
+            _zs['Avg Velo'] = ((sum(velos) / len(velos) - _v_base)
+                               / math.sqrt(_sd_day ** 2 + _s2 / len(velos)))
         _zs['Spin Rate'] = _z_mean(spins, 'spinRate',
                                    invert=(pt in LOW_SPIN_PITCH_TYPES))
         _zs['IVB'] = (_z_mean(ivbs, 'indVertBrk', invert=True) if _low_ivb
@@ -2354,10 +2377,15 @@ def render_card(config, pitches, output_file):
                         _zs['Max Velo'] = ((max(velos) - (_mx_base - _sd_v * (_b_s - _b_t)))
                                            / _se_mx)
 
-        # Usage — binomial, against his season share of that pitch.
+        # Usage — against his season share, on the OBSERVED game-to-game
+        # scale: var = u(1-u) * (c + 1/tc). The binomial term alone treats
+        # pitch mix as iid coin flips, but mix is a game-plan choice and the
+        # measured day variance is ~2-5x binomial (see DAILY_USAGE_C).
         _u_base = _sb.get('usagePct')
         if _sb_ok and _u_base is not None and tc:
-            _u_se = math.sqrt(max(_u_base * (1 - _u_base), 1e-9) / tc)
+            _u_c = DAILY_USAGE_C.get(pt, DAILY_USAGE_C_DEFAULT)
+            _u_se = math.sqrt(max(_u_base * (1 - _u_base), 1e-9)
+                              * (_u_c + 1.0 / tc))
             _zs['Usage'] = ((n / tc) - _u_base) / _u_se if _u_se > 0 else None
 
         self_z_by_pt[pt] = _zs
@@ -3597,10 +3625,10 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "WSH"
-    start_date      = "2026-08-12"    # Set to None for full season
-    end_date        = "2026-08-12"             # Set to a date for date range, or None for single day
-    filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
+    team            = "CHC"
+    start_date      = "2026-08-13"    # Set to None for full season
+    end_date        = "2026-08-13"             # Set to a date for date range, or None for single day
+    filter_pitchers = "Gausman, Kevin"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR
