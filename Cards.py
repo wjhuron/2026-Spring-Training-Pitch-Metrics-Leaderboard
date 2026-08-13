@@ -2169,6 +2169,7 @@ def render_card(config, pitches, output_file):
     rv_qual_by_pt = {}   # pitch-type RV coloring gate (values always render)
     bip_by_pt = {}       # pitch-type BIP counts for the BIP coloring gates
     self_z_by_pt = {}    # DAILY: per-type z vs HIS OWN season, drives shading
+    self_z_total = {}    # DAILY: same, for the Total row (release block only)
 
     # Sort pitch types by usage (descending), with PITCH_ORDER as tiebreaker
     pitch_counts = {}
@@ -2409,6 +2410,32 @@ def render_card(config, pitches, output_file):
     t_bips_n = sum(1 for p in pitches if p.get('BBType') and not str(p.get('BBType')).startswith('bunt'))
     t_gb_n = sum(1 for p in pitches if p.get('BBType') == 'ground_ball')
     t_gb_pct = t_gb_n / t_bips_n if t_bips_n else None
+    # DAILY — release baselines for the TOTAL row. Averaging velocity or break
+    # across pitch types is meaningless (those Total cells render '—'), but
+    # release point and extension are one delivery, so the Total row carries a
+    # real number and deserves the same self-comparison. Baseline = his season
+    # per-type values weighted by season pitch counts, which reconstructs his
+    # season overall mean from data already in hand.
+    _slb = config.get('season_pitch_lb') or {}
+    if not is_season and _slb:
+        def _tot_z(vals, key, _slb=_slb):
+            num = den = 0.0
+            for _d in _slb.values():
+                _v, _c = (_d or {}).get(key), (_d or {}).get('count') or 0
+                if _v is not None and _c > 0:
+                    num += _v * _c
+                    den += _c
+            if den <= 0 or len(vals) < 2:
+                return None
+            sd = float(np.std(vals, ddof=1))
+            if not (sd > 0):
+                return None
+            se = sd * math.sqrt(1.0 / len(vals) + 1.0 / den)
+            return (sum(vals) / len(vals) - num / den) / se
+        self_z_total['RelZ'] = _tot_z(t_relzs, 'relPosZ')
+        self_z_total['RelX'] = _tot_z(t_relxs, 'relPosX')
+        self_z_total['Ext'] = _tot_z(t_exts, 'extension')
+
     # Pitcher-level Loc+ for the Total row (from the bubble's leaderboard row).
     _total_locplus = (config.get('pctl_row') or {}).get('locPlus')
     _total_stuff = (config.get('pctl_row') or {}).get('stuffScore')
@@ -2706,12 +2733,17 @@ def render_card(config, pitches, output_file):
         for c, col_name in enumerate(col_headers):
             if col_name not in SELF_BASELINE_COLS:
                 continue
-            for r in range(1, len(cell_data)):
-                _pc = pt_codes[r - 1]
-                _z = (self_z_by_pt.get(_pc) or {}).get(col_name)
+            for r in range(1, len(cell_data) + 1):
+                if r == len(cell_data):
+                    # Total row: release block only — self_z_total carries no
+                    # key for the others, so they fall through untinted.
+                    _z, _bg = self_z_total.get(col_name), DARKER
+                else:
+                    _pc = pt_codes[r - 1]
+                    _z = (self_z_by_pt.get(_pc) or {}).get(col_name)
+                    _bg = DARK_CELL if r % 2 == 1 else ALT_ROW_BG
                 if _z is None:
                     continue
-                _bg = DARK_CELL if r % 2 == 1 else ALT_ROW_BG
                 _tint = _z_cell_color(_z, _bg, full_at=DELTA_MIN_SE)
                 if _tint:
                     table.get_celld()[(r, c)].set_facecolor(_tint)
