@@ -23,7 +23,7 @@ from pipeline_utils import (
     SWING_DESCRIPTIONS, HIT_EVENTS, K_EVENTS, BB_EVENTS, HBP_EVENTS,
     SF_EVENTS, SH_EVENTS, CI_EVENTS, NON_PA_EVENTS, BUNT_BB_TYPES,
     MLB_TEAMS, AAA_TEAMS, ALL_TEAMS, TEAM_ABBREV_TO_ID,
-    BALL_RADIUS_FT, ZONE_HALF_WIDTH, box_key,
+    BALL_RADIUS_FT, ZONE_HALF_WIDTH, box_key, PITCHING_W_STUFF,
 )
 from pipeline_fetch import (
     fetch_guts_constants, fetch_sprint_speed, fetch_park_factors,
@@ -134,8 +134,11 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
 
     def _grade_atoms(p):
         """(stuffAtom, locAtom, pitchingAtom) ints for one pitch, or Nones.
-        Pitching+ atom blends the two INTEGER atoms (matches the sheet's
-        =ROUND(0.7*X+0.3*Y,0) cells and Cards' cell-first atoms)."""
+        Pitching+ atom blends the two INTEGER atoms, at the shared
+        PITCHING_W_STUFF, so this matches the sheet cell and Cards' cell-first
+        atoms exactly. This atom is what js/aggregator averages for FILTERED
+        views, so a weight mismatch here silently splits filtered from
+        unfiltered Pitching+ — see the note on the constant in pipeline_utils."""
         tab, rownum = p.get('_sheet_tab'), p.get('_sheet_row')
         if not tab or not rownum:
             return None, None, None
@@ -144,7 +147,7 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
         lv = loc_grades.get(key) if loc_grades else None
         sa = int(round(sv)) if sv is not None else None
         la = int(round(lv)) if lv is not None else None
-        pa = (int(round(0.7 * sa + 0.3 * la))
+        pa = (int(round(PITCHING_W_STUFF * sa + (1.0 - PITCHING_W_STUFF) * la))
               if sa is not None and la is not None else None)
         return sa, la, pa
 

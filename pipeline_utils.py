@@ -12,6 +12,25 @@ DATA_DIR = os.path.join(_SCRIPT_DIR, 'data')
 
 
 # ── Strike zone constants ────────────────────────────────────────────────
+# Pitching+ blend weight, SINGLE SOURCE OF TRUTH. Lives here rather than in
+# train_stuff_v11 (where it is derived and documented) because process_data
+# must read it without importing xgboost/sklearn. Every surface that renders
+# a Pitching+ number imports THIS: train_stuff_v11, process_data's per-pitch
+# grade atoms, Cards, and scripts/sheets_write_grades.
+#
+# It is one constant with four consumers, and it has drifted before. The
+# 0.70 -> 0.80 move on 2026-07-25 updated three of them; process_data's atom
+# was missed and sat on 0.70 until 2026-08-12, so FILTERED Pitching+ on the
+# site (which averages those atoms) disagreed with the unfiltered value,
+# cards, and sheets for ~3 weeks — 41% of pitchers by a point or more, up to
+# 12 points. That breaks the coherent-canon invariant (sheets = cards = site,
+# filtered or not). Never hardcode the number again; import it.
+#
+# Derivation and the flat-region argument: train_stuff_v11.PITCHING_W_STUFF.
+# Re-audited 2026-08-12 under Stuff+ v12 (scripts/pitchingplus_command_loso.py):
+# kept at 0.80.
+PITCHING_W_STUFF = 0.80
+
 BALL_RADIUS_FT = 1.45 / 12   # 1.45 inches = ~0.121 ft
 ZONE_HALF_WIDTH = 0.83        # half plate (8.5") + ball radius (1.45") in feet,
                               # ROUNDED (exact is 9.95/12 = 0.82917). Kept as

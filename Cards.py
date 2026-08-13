@@ -2634,14 +2634,15 @@ def _pitching_scale(rows, min_pitches=25):
 
 
 def _pitching_score(stuff, loc, scale=None):
-    # COHERENT CANON (2026-07-18): Pitching+ = 0.8*Stuff+ + 0.2*Loc+ exactly
-    # (weight re-derived LOSO across 2021-2025 on 2026-07-25; see
-    # train_stuff_v11.PITCHING_W_STUFF) —
-    # no restandardization, no clip. `scale` is accepted for call-site compat
+    # COHERENT CANON (2026-07-18): Pitching+ = the shared PITCHING_W_STUFF
+    # blend of Stuff+ and Loc+ exactly (pipeline_utils holds the constant;
+    # train_stuff_v11.PITCHING_W_STUFF carries the derivation) — no
+    # restandardization, no clip. `scale` is accepted for call-site compat
     # and ignored.
+    from pipeline_utils import PITCHING_W_STUFF
     if stuff is None or loc is None:
         return None
-    return round(0.8 * stuff + 0.2 * loc, 1)
+    return round(PITCHING_W_STUFF * stuff + (1.0 - PITCHING_W_STUFF) * loc, 1)
 
 
 def _normalize_scratch_pitch(row):
@@ -3010,9 +3011,9 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
         if p_c is not None:
             P = int(round(p_c))
         elif S is not None and L is not None:
-            # Canon blend (train_stuff_v11.PITCHING_W_STUFF, re-derived
-            # 2026-07-25) — keep in lockstep with _pitching_score.
-            P = int(round(0.8 * S + 0.2 * L))
+            # Canon blend — same shared constant as _pitching_score.
+            from pipeline_utils import PITCHING_W_STUFF as _PW
+            P = int(round(_PW * S + (1.0 - _PW) * L))
         else:
             P = None
         return S, L, P
@@ -3168,7 +3169,7 @@ def main():
     team            = "NEW"
     start_date      = None    # Set to None for full season
     end_date        = None             # Set to a date for date range, or None for single day
-    filter_pitchers = "Rom, Drew"                 # Semicolon-separated "Last, First" names, or "" for all
+    filter_pitchers = "Watson, Troy"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR

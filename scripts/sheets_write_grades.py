@@ -28,6 +28,7 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 from pipeline_fetch import _gspread_client, DIVISION_WORKBOOK_IDS
+from pipeline_utils import PITCHING_W_STUFF
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, '..', 'data')
@@ -116,7 +117,8 @@ def _write_tab(ws, name, stuff, loc):
         # the site, which averages these per-pitch atoms — disagreed with the
         # unfiltered leaderboard value by about a point per 10 points of
         # Stuff+/Loc+ gap.
-        pc = int(round(0.8 * sc + 0.2 * lc)) if (sc != '' and lc != '') else ''
+        pc = (int(round(PITCHING_W_STUFF * sc + (1.0 - PITCHING_W_STUFF) * lc))
+              if (sc != '' and lc != '') else '')
         values.append([sc, lc, pc])
     rng = GRADE_COL_RANGE.format(first=2, last=n_rows)
     _retry(lambda: ws.update(rng, values, value_input_option='USER_ENTERED'),

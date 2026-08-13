@@ -1232,7 +1232,10 @@ def _pctl(sc, pool):
 # both axes (best joint: pred 0.373 / rel 0.756 vs composite 0.389 / 0.764;
 # adding count wrecks its reliability, same count-mix contamination as the
 # Loc+ anchoring lesson). Don't revisit joint without multi-season training data.
-PITCHING_W_STUFF = 0.80
+# DEFINED IN pipeline_utils (single source of truth — process_data, Cards and
+# sheets_write_grades all read the same constant without importing xgboost).
+# The derivation above is why it is 0.80; that note stays here.
+from pipeline_utils import PITCHING_W_STUFF  # noqa: E402
 
 def _blend(stuff, loc):
     return (PITCHING_W_STUFF * (stuff - 100.0) / 10.0
