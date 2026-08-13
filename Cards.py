@@ -3674,11 +3674,24 @@ def main():
     # workbook (never read by the pipeline, so it cannot reach the site);
     # --tab overrides for other scratch tab names.
     scratch_tab = args.tab or ('NEW' if str(team).strip().upper() == 'NEW' else None)
-    # Auto whole-season mode: --pitchers given but no --team. Resolve each
+    # Auto whole-season mode: pitchers given but no team. Resolve each
     # pitcher's stint team(s) from the leaderboard so multi-team arms combine
     # their full season automatically (see _resolve_pitcher_teams). Per-pitcher
     # lookups then use each arm's own leaderboard label via pitcher_team_label.
-    auto_team = (args.team is None and not scratch_tab and bool(filter_pitchers))
+    #
+    # WHO decides the team depends on HOW the script was invoked (2026-08-13,
+    # per Wally). A CLI run (`--pitchers` without `--team`) auto-resolves even
+    # though the Settings block always carries some leftover team. A
+    # settings-block run (no CLI args at all) treats the Settings team as
+    # authoritative: team="ROC" + filter_pitchers renders the ROC season, with
+    # auto mode only when team is left empty. Keying purely on args.team broke
+    # the day Jackson Kent debuted: team="ROC" in Settings was silently
+    # discarded because args.team was None, auto-resolution found his new MLB
+    # leaderboard row, and the "ROC season" run rendered his one WSH start.
+    _cli_run = len(sys.argv) > 1
+    auto_team = (not scratch_tab and bool(filter_pitchers)
+                 and (args.team is None if _cli_run
+                      else not str(team or '').strip()))
     # Cross-level combine (--all-levels): grades/bubbles must be computed from the
     # combined pitches (no leaderboard row spans MLB+AAA), via the scratch context.
     compute_from_pitches = bool(auto_team and args.all_levels)
