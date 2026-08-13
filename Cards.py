@@ -134,9 +134,16 @@ def _season_pitch_lb_for(pitcher_name, eff_team, pitch_lb_by_pitcher):
     this start, which shrinks the delta slightly. Worst case is a fastball
     thrown 34 times against a 386-pitch season, so ~9% self-reference.
     """
-    hit = pitch_lb_by_pitcher.get((pitcher_name, eff_team))
-    if hit:
-        return hit
+    # Largest row set by total pitches, NOT the exact (name, team) match.
+    # Preferring the team match looked right and was wrong for anyone traded
+    # mid-season: Jake Bird's WSH rows are 8 sweepers and 4 sinkers, while his
+    # actual season lives under the combined 2TM key at 208 and 200. The exact
+    # match succeeded, returned 12 pitches, and every pitch type then failed
+    # the sample floor, so the whole block rendered unshaded with no error.
+    #
+    # Caveat: this can cross levels for a prospect with a big AAA sample and a
+    # short MLB stint. That is still the best baseline available for "what does
+    # he normally do", and the SE below widens on thin samples either way.
     cands = [d for (nm, _tm), d in pitch_lb_by_pitcher.items() if nm == pitcher_name]
     if not cands:
         return {}
@@ -300,12 +307,23 @@ RAW_COLOR_COLS = {
 }
 
 # DAILY CARDS — minimum season pitches of a type before that type gets a
-# "vs season" delta, a ghost movement centroid or a velo reference line. Set
-# at the measured flat per-pitch-type gate (50) rather than invented.
-SEASON_DELTA_MIN = 50
-# Pitch types whose job is separation from the fastball, so MORE ride and MORE
-# spin than his own norm read as worse rather than better on a daily card.
-SEPARATION_PITCH_TYPES = {'CH', 'FS'}
+# baseline at all. Deliberately LOW, because the standard error below already
+# prices a thin baseline: se = sd * sqrt(1/n_today + 1/n_season), so a 14-pitch
+# season sample widens the error bar and shrinks the z on its own. A hard floor
+# on top of that double-penalises, and at 50 it silently blanked every
+# secondary pitch of every reliever (Cosgrove's fastball at 29, Cruz's at 42).
+# This floor now only guards against a baseline built on a handful of pitches.
+SEASON_DELTA_MIN = 10
+# Pitch types where extra RIDE works against the pitch, so more IVB than his
+# own norm reads as worse. Sinkers included (2026-08-13, Wally): a sinker's job
+# is to stay down, so extra ride cuts against it exactly as it does on a
+# changeup, even though the sinker is not a separation pitch.
+LOW_IVB_PITCH_TYPES = {'CH', 'FS', 'SI'}
+# Narrower set: pitches that also want LESS spin than his norm. Changeups and
+# splitters work by separating from the fastball and extra spin fights that;
+# a sinker's raw spin rate is not the same lever (efficiency is), so it is
+# deliberately NOT in here.
+LOW_SPIN_PITCH_TYPES = {'CH', 'FS'}
 # Approach-angle direction. On a four-seamer or cutter a FLATTER angle (closer
 # to zero) plays; on everything else steeper does. Same set as process_data's
 # VAA_NO_INVERT_TYPES so the card and the site agree on which pitches are the
@@ -2285,17 +2303,19 @@ def render_card(config, pitches, output_file):
                 z = -z
             return -z if invert else z
 
-        # Changeups and splitters run the OTHER WAY on ride and spin (Wally,
-        # 2026-08-12): the pitch works by separating from the fastball, so more
-        # IVB and more spin both cut against it and have to shade blue.
-        # IVB uses a plain invert rather than the sign flip: on a changeup less
-        # ride is better whether its baseline IVB is positive or negative,
+        # Sinkers, changeups and splitters run the OTHER WAY on ride: extra IVB
+        # works against a pitch whose job is to stay down or to separate from
+        # the fastball, so it has to shade blue. Changeups and splitters invert
+        # on spin as well; sinkers do not (see LOW_SPIN_PITCH_TYPES).
+        # IVB uses a plain invert rather than the sign flip: on these pitches
+        # less ride is better whether the baseline IVB is positive or negative,
         # whereas on a breaking ball 'better' really is more break in whatever
         # direction the pitch already moves.
-        _soft = pt in SEPARATION_PITCH_TYPES
+        _low_ivb = pt in LOW_IVB_PITCH_TYPES
         _zs['Avg Velo'] = _z_mean(velos, 'velocity')
-        _zs['Spin Rate'] = _z_mean(spins, 'spinRate', invert=_soft)
-        _zs['IVB'] = (_z_mean(ivbs, 'indVertBrk', invert=True) if _soft
+        _zs['Spin Rate'] = _z_mean(spins, 'spinRate',
+                                   invert=(pt in LOW_SPIN_PITCH_TYPES))
+        _zs['IVB'] = (_z_mean(ivbs, 'indVertBrk', invert=True) if _low_ivb
                       else _z_mean(ivbs, 'indVertBrk', flip_by_sign=True))
         _zs['HB'] = _z_mean(hbs, 'horzBrk', flip_by_sign=True)
         # Release block — no valence, so red simply reads higher (Wally).
@@ -2887,7 +2907,7 @@ def render_card(config, pitches, output_file):
         fig.text(_nx, b - _below_off,
                  'Usage through nHAA are shaded against HIS OWN season average for that pitch; '
                  'Zone% through Loc+ against LEAGUE average. Red = better, blue = worse.\n'
-                 'Usage, RelZ, RelX and Ext simply read red = higher. For changeups and splitters, LESS IVB and LESS spin count as better.\n'
+                 'Usage, RelZ, RelX and Ext simply read red = higher. For sinkers, changeups and splitters, LESS IVB is better (and less spin too on changeups/splitters).\n'
                  'For four-seamers and cutters, nVAA and nHAA closer to zero is better; for every other pitch, further from zero. '
                  'Full colour = 2 standard errors, so a faint cell is a gap inside normal game-to-game noise.',
                  fontsize=8.5, ha='left', va='top', color=TEXT_MUTED,
