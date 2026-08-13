@@ -1534,8 +1534,10 @@ def _render_single_game_panel(fig, pitches, config=None):
         fig.text(0.012, 0.742, 'VELOCITY BY PITCH', fontsize=11,
                  fontweight='bold', color=TEXT_SECONDARY,
                  fontfamily='IBM Plex Sans', va='bottom', ha='left')
+        # Notes render BLACK on every layout (2026-08-13, per Wally — the
+        # muted gray read too faint at card scale).
         ax_v.text(0.992, 0.04, 'dashed = his season average',
-                  transform=ax_v.transAxes, fontsize=7.5, color=TEXT_MUTED,
+                  transform=ax_v.transAxes, fontsize=7.5, color='#000000',
                   fontfamily='IBM Plex Sans', va='bottom', ha='right', zorder=6)
     else:
         ax_v.axis('off')
@@ -1900,12 +1902,15 @@ def render_card(config, pitches, output_file):
     # Add movement plot annotations
     if exp_movement:
         ax_plot.text(0.02, 0.035, 'Shaded = expected movement', transform=ax_plot.transAxes,
-                     fontsize=7, color=TEXT_MUTED, fontfamily='IBM Plex Sans', va='bottom')
+                     fontsize=7, color='#000000', fontfamily='IBM Plex Sans', va='bottom')
+    # Notes render BLACK on every layout (2026-08-13, per Wally — the muted
+    # gray read too faint at card scale).
     ax_plot.text(0.02, 0.005, 'Min. 6 pitches for ellipse', transform=ax_plot.transAxes,
-                 fontsize=6.5, color=TEXT_FAINT, fontfamily='IBM Plex Sans', va='bottom', fontstyle='italic')
+                 fontsize=6.5, color='#000000',
+                 fontfamily='IBM Plex Sans', va='bottom', fontstyle='italic')
     if _ghosted:
         ax_plot.text(0.02, 0.035, 'Open ring = his season average for that pitch',
-                     transform=ax_plot.transAxes, fontsize=7, color=TEXT_MUTED,
+                     transform=ax_plot.transAxes, fontsize=7, color='#000000',
                      fontfamily='IBM Plex Sans', va='bottom')
 
     # Location plots. Season: lower-right quadrant under the movement plot (left
@@ -2023,10 +2028,10 @@ def render_card(config, pitches, output_file):
                     angle = np.degrees(np.arctan2(vecs[1, 1], vecs[0, 1]))
                     mx, my = np.mean(xs), np.mean(ys)
                     _pc = PITCH_COLORS[pt]
-                    # Outline-only ellipse + center dot at the mean — one
-                    # format on both layouts (daily matched to season
-                    # 2026-08-13, per Wally; the filled daily look fought the
-                    # per-pitch dots layered on top of it).
+                    # Outline-only ellipse + center dot at the per-type mean —
+                    # one format on both layouts. The center dot is the ONLY
+                    # dot: per-pitch dots and W/B marks were removed
+                    # 2026-08-13, per Wally.
                     ax.add_patch(Ellipse(
                         (mx, my),
                         2 * 1.0 * np.sqrt(vals[1]), 2 * 1.0 * np.sqrt(vals[0]),
@@ -2036,20 +2041,6 @@ def render_card(config, pitches, output_file):
                     ))
                     ax.scatter([mx], [my], c=_pc, s=32, alpha=1.0,
                                edgecolors=TEXT_PRIMARY, linewidths=0.6, zorder=4)
-        # Pitch dots and W/B annotations — single-game cards only. Season
-        # panels show just the outline ellipses, per-type center dots,
-        # zone/plate, and the legend panel (no per-pitch marks).
-        if not is_season:
-            for pt in PITCH_ORDER:
-                if pt not in locations[hand]: continue
-                color = PITCH_COLORS[pt]
-                for px_val, pz_val, desc, barrel_flag in locations[hand][pt]:
-                    if desc == 'Swinging Strike':
-                        ax.text(px_val, pz_val, 'W', fontsize=8, fontweight='bold', color=color, ha='center', va='center', zorder=3)
-                    elif barrel_flag:
-                        ax.text(px_val, pz_val, 'B', fontsize=8, fontweight='bold', color=color, ha='center', va='center', zorder=3)
-                    else:
-                        ax.scatter([px_val], [pz_val], c=[color], s=55, alpha=1.0, edgecolors='none', zorder=3)
 
     # loc_hands restricts which zone panels are drawn. A platoon-split card
     # holds pitches to one side only, so the other panel would render as an
@@ -2090,15 +2081,16 @@ def render_card(config, pitches, output_file):
         fig.text(LOC_L_X+LOC_W/2, LOC_TITLE_Y, _zone_title('R'), fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
         fig.text(LOC_R_X+LOC_W/2, LOC_TITLE_Y, _zone_title('L'), fontsize=14, fontweight='bold', color=TEXT_SECONDARY, fontfamily='IBM Plex Sans', ha='center', va='center')
 
-    # Footnote — single-game only (old layout): W/B legend + ellipse minimum
-    # stacked to the right of the location plots. Season panels carry no
-    # footnote (the 10-pitch ellipse minimum still applies, just unlabeled).
+    # Footnote — single-game only: ellipse minimum under the bottom-left of
+    # the first (VS RHH) plot (moved from right of the plots 2026-08-13, per
+    # Wally; the W/B legend left with the per-pitch marks the same day).
+    # Season panels carry no footnote (the 10-pitch ellipse minimum still
+    # applies, just unlabeled).
     if not is_season_loc:
-        _wx = LOC_R_X + LOC_W + 0.012
-        for _dy, _txt in [(0.055, 'W = Whiff'), (0.033, 'B = Barrel'),
-                          (0.011, f'Min. {zone_ellipse_min} pitches for ellipse')]:
-            fig.text(_wx, LOC_BOTTOM + _dy, _txt, fontsize=8, color=TEXT_MUTED,
-                     va='bottom', ha='left', fontfamily='IBM Plex Sans', fontweight='bold')
+        _fx = _x if len(_loc_hands) == 1 else LOC_L_X
+        fig.text(_fx, LOC_BOTTOM - 0.006, f'Min. {zone_ellipse_min} pitches for ellipse',
+                 fontsize=8, color='#000000', va='top', ha='left',
+                 fontfamily='IBM Plex Sans', fontweight='bold')
 
     # ── Left column: season cards get the percentile bubble panel; single-game
     # cards (no season pool) get the batted-ball donut + stacked bars + usage. ──
@@ -2739,13 +2731,13 @@ def render_card(config, pitches, output_file):
             if tinted:
                 table.get_celld()[(r, c)].set_facecolor(tinted)
 
-    # DAILY ONLY — Usage through HB shade against HIS OWN season baseline
-    # rather than the league (2026-08-12, Wally). Deliberately scoped to that
-    # block: the outcome columns to its right keep league shading, so the two
-    # halves of the table answer two different questions and the note under it
-    # says which is which. Total row is skipped, having no per-type baseline.
-    SELF_BASELINE_COLS = ('Usage', 'Avg Velo', 'Max Velo', 'Spin Rate', 'IVB', 'HB',
-                          'RelZ', 'RelX', 'Ext', 'nVAA', 'nHAA')
+    # DAILY ONLY — Usage and Avg Velo shade against HIS OWN season baseline
+    # rather than the league (2026-08-12, Wally). Max Velo through nHAA ran
+    # self-shaded too until 2026-08-13, when Wally dropped their coloring:
+    # those columns now render untinted and the outcome columns to the right
+    # keep league shading, so the note under the table stays two-part.
+    # Total row is skipped, having no per-type baseline.
+    SELF_BASELINE_COLS = ('Usage', 'Avg Velo')
     _self_shaded = False
     if not is_season and self_z_by_pt:
         for c, col_name in enumerate(col_headers):
@@ -2888,13 +2880,14 @@ def render_card(config, pitches, output_file):
                     'Overall Stuff+ = pitch-weighted average of per-pitch grades\n'
                     'Faded values: sample too small to grade; they color in as pitches accumulate')
         fig.text(_sp_x, b - _below_off, _sp_note,
-                 fontsize=8, color=TEXT_MUTED, va='top', ha='left', fontfamily='IBM Plex Sans', fontweight='bold', linespacing=1.5)
+                 fontsize=8, color='#000000', va='top', ha='left', fontfamily='IBM Plex Sans', fontweight='bold', linespacing=1.5)
 
     # Watermark — just below the table border. Bottom-LEFT on season cards
     # (unchanged); bottom-RIGHT on daily, where the left of that band is now
     # the shading note.
     _wm_x, _wm_ha = ((l, 'left') if is_season else (r_, 'right'))
-    fig.text(_wm_x, b - _below_off, 'huronalytics.vercel.app', fontsize=9, ha=_wm_ha, va='top', color=TEXT_PRIMARY, style='italic', fontfamily='IBM Plex Sans')
+    fig.text(_wm_x, b - _below_off, 'huronalytics.vercel.app', fontsize=9, ha=_wm_ha, va='top',
+             color='#000000', style='italic', fontfamily='IBM Plex Sans')
     if _self_shaded:
         # Left edge aligned under the Usage column — the first column the note
         # describes — so the note visually claims the block it explains.
@@ -2903,12 +2896,11 @@ def render_card(config, pitches, output_file):
             _nx = (table.get_celld()[(0, col_headers.index('Usage'))]
                    .get_window_extent(renderer).x0 / fig_bbox.width)
         fig.text(_nx, b - _below_off,
-                 'Usage through nHAA are shaded against HIS OWN season average for that pitch; '
+                 'Usage and Avg Velo are shaded against HIS OWN season average for that pitch; '
                  'Zone% through Loc+ against LEAGUE average. Red = better, blue = worse.\n'
-                 'Usage, RelZ, RelX and Ext simply read red = higher. For sinkers, changeups and splitters, LESS IVB is better (and less spin too on changeups/splitters).\n'
-                 'For four-seamers and cutters, nVAA and nHAA closer to zero is better; for every other pitch, further from zero. '
+                 'Usage simply reads red = higher. '
                  'Full colour = 2 standard errors, so a faint cell is a gap inside normal game-to-game noise.',
-                 fontsize=8.5, ha='left', va='top', color=TEXT_MUTED,
+                 fontsize=8.5, ha='left', va='top', color='#000000',
                  fontfamily='IBM Plex Sans', linespacing=1.5)
     plt.savefig(output_file, dpi=SAVE_DPI, bbox_inches='tight', facecolor=BG, pad_inches=0.1)
     plt.close()
