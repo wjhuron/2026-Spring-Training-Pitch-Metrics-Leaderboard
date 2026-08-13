@@ -190,6 +190,52 @@ NVAA_SLOPES = {
     'SV': (1.0251, 1.8603),
 }
 # velo_diff is masked (None) on these types — see adoption note 2 above.
+#
+# WHAT THE PROBE RETURNED (scripts/stuff_velodiff_probe.py, re-run 2026-08-12).
+# The question was Wally's: "a curveball should not be dinged for being thrown
+# hard; separation logic belongs to changeups/splitters that mimic fastballs."
+#
+# STAGE 1 — +1 mph counterfactual, Stuff+ points per pitch. "joint" is the real
+# within-pitcher case (same fastball, harder secondary, so the gap shrinks too):
+#
+#     type       n     joint(+velo,+gap)   velo-only   gap term
+#     CH     54857           +0.20            +2.71      -2.51
+#     FS     21137           +1.53            +3.30      -1.77
+#     CU     40666           +2.64            +3.35      -0.72
+#     FC     42090           +2.66            +3.54      -0.88
+#     ST     49647           +2.91            +4.24      -1.34
+#     SL     67282           +3.69            +5.64      -1.95
+#     FF    163733           +3.73            +3.73       0.00   <- masked
+#     SI     87365           +3.51            +3.51       0.00   <- masked
+#
+# The concern does NOT materialize: every joint value is positive, so a harder
+# breaking ball still grades better, just by less than raw velocity alone would
+# give. The curveball is the LEAST penalized secondary (-0.72). The pitch where
+# separation nearly cancels velocity is the CHANGEUP (+0.20 net, the gap eating
+# 93% of the gain) — which is the right baseball answer, since velo separation
+# is most of what a changeup is. FF/SI show exactly 0.00, confirming the mask.
+#
+# STAGE 2 — the learned shape, mean SHAP in Stuff+ points by velo_diff bin:
+#
+#     family      [-18,-14) [-14,-11)  [-11,-8)   [-8,-5)   [-5,-2)   [-2,1)
+#     breaking      +12.26    +12.29     +7.71     +2.82     -5.86        -
+#     offspeed      +10.20    +11.61     +6.14     +1.77     -5.19        -
+#     cutter             -         -     +8.51     +0.71     -6.55   -10.62
+#     fastball           -         -         -         -         -        -
+#
+# Monotone, and worth ~18 Stuff+ points across the breaking-ball range. The
+# empty fastball row is the mask. This table is also the fastest way to explain
+# an individual arm's grades: a secondary's bin usually dominates its number
+# (Jackson Kent 2026-08-12 — CU at -13.6 sits in the +12.29 bin and grades his
+# best at 91, while his SL -6.3 and CH -6.9 sit in the +2.82/+1.77 bin at 89
+# and 82).
+#
+# Superseded/extends the 2026-07-08 per-type earned-value check
+# (scripts/velo_diff_by_type.py), which reached the same conclusion by
+# permutation: FS and CH earn the most from the gap, SL almost nothing (its
+# value is shape/gyro). Note that check's method warning — SHAP SHARE
+# overstates slider velo_diff; confirm with permutation or a counterfactual,
+# which is what Stage 1 above is.
 VD_MASK_TYPES = {'FF', 'SI'}
 
 
@@ -295,7 +341,23 @@ def _axis_dev_deg(p):
     return d * 0.5
 
 
-def build_df(pitches, prefer_true_fastball=True):
+def _arm_means(pitches):
+    """Per-pitcher arm-angle means {(pitcher, pitch_type): deg} + {pitcher: deg}
+    from a DIFFERENT frame than the one being built. Used as the debut-pitcher
+    fallback in build_df (see arm_fallback there)."""
+    pt = defaultdict(lambda: [0.0, 0])
+    al = defaultdict(lambda: [0.0, 0])
+    for p in pitches:
+        aa = sf(p.get('ArmAngle'))
+        if aa is None:
+            continue
+        pit, pt0 = p.get('Pitcher'), p.get('Pitch Type')
+        pt[(pit, pt0)][0] += aa; pt[(pit, pt0)][1] += 1
+        al[pit][0] += aa; al[pit][1] += 1
+    return {'pt': {k: s / n for k, (s, n) in pt.items() if n},
+            'all': {k: s / n for k, (s, n) in al.items() if n}}
+
+def build_df(pitches, prefer_true_fastball=True, arm_fallback=None):
     # pass 1: per-pitcher primary fastball reference (handedness-normalized).
     # VAA gets its own count: a pitch missing VAA must not dilute the mean
     # toward 0 by incrementing the shared n while contributing 0.0.
@@ -457,17 +519,38 @@ def build_df(pitches, prefer_true_fastball=True):
     # Arm-angle imputation (2026-07-18, per Wally): ArmAngle arrives ~2 days
     # after the game via the Savant supplement. While it's missing, use the
     # pitcher's average arm angle for that pitch type (fallback: his overall
-    # average); a debut pitcher with no history stays NaN (XGBoost native
-    # missing handling — prior behavior). Replaced by the actual value on the
-    # first run after the supplement lands.
+    # average). Replaced by the actual value on the first run after the
+    # supplement lands.
+    #
+    # arm_fallback (2026-08-13, per Wally): a DEBUT pitcher has no MLB history
+    # to impute from, so his whole first game rode XGBoost's missing-value
+    # branches — Jackson Kent 2026-08-12 graded CU 22 / FF 113 until the
+    # supplement landed. Pass _arm_means(roc_pitches) and rows still NaN after
+    # both same-frame fills use the pitcher's ROC/AAA arm angle instead (same
+    # Savant measurement, r=0.991 / 1.4 deg MAD across levels — see the ROC
+    # scoring block). Own-frame MLB always wins by construction: the fallback
+    # only touches rows with zero MLB arm angle anywhere (Jake Bird's handful
+    # of ROC pitches never override his NYY average).
     if len(out) and out['arm_angle'].isna().any():
         _n_miss = int(out['arm_angle'].isna().sum())
         by_pt = out.groupby(['pitcher', 'pitch_type'])['arm_angle'].transform('mean')
         by_p = out.groupby('pitcher')['arm_angle'].transform('mean')
         out['arm_angle'] = out['arm_angle'].fillna(by_pt).fillna(by_p)
+        _n_fb = 0
+        if arm_fallback and out['arm_angle'].isna().any():
+            na = out['arm_angle'].isna()
+            fill = [arm_fallback['pt'].get((pit, pt0),
+                    arm_fallback['all'].get(pit, np.nan))
+                    for pit, pt0 in zip(out.loc[na, 'pitcher'],
+                                        out.loc[na, 'pitch_type'])]
+            fill = pd.Series([np.nan if v is None else v for v in fill],
+                             index=out.index[na], dtype='float64')
+            _n_fb = int(fill.notna().sum())
+            out.loc[na, 'arm_angle'] = fill
         _n_left = int(out['arm_angle'].isna().sum())
         print(f'  arm-angle impute: {_n_miss - _n_left}/{_n_miss} missing filled '
-              f'from pitcher averages ({_n_left} left to model-missing)')
+              f'from pitcher averages ({_n_fb} of those from the ROC/AAA '
+              f'fallback; {_n_left} left to model-missing)')
     return out
 
 def design(df, feats=BASE_FEATS):
@@ -639,7 +722,9 @@ def main():
                     p['RunExp'] = _v / _f
                     _n_fx += 1
         print(f'  MiLB RunExp -> MLB currency: {_n_fx} ROC/AAA pitches rescaled')
-    df_full = build_df(pitches)
+    # roc_pitches is final here (incl. the scoring-only NEW-tab arms), so the
+    # debut fallback map sees every minor-league arm angle we hold.
+    df_full = build_df(pitches, arm_fallback=_arm_means(roc_pitches))
     df = df_full[df_full['target_xrv'].notna()].reset_index(drop=True)
     # Pitches with no outcome target yet (pre-supplement, non-BIP with RunExp
     # blank) can't train or enter the rawmean aggregation, but the model can
