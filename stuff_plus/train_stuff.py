@@ -174,7 +174,22 @@ def _harmonize_tags(prior, current):
 # +0.007) while gaining +0.05 reliability in all five.
 BASE_FEATS = ['velocity', 'ivb', 'hb', 'velo_diff', 'ivb_diff', 'hb_diff',
               'spin_rate', 'extension', 'arm_angle', 'vaa', 'vaa_diff',
-              'rel_x', 'cross', 'cross_abs']
+              'rel_x', 'cross', 'cross_abs', 'kin_eff__ff']
+
+# v13 (2026-08-14, per Wally): kin_eff__ff = measured active-spin fraction
+# (KinEff), TYPE-GATED to four-seamers — real on FF, NaN elsewhere. The
+# per-type atlas (scripts/stuff_pertype_atlas.py) showed kin_eff carries
+# reliance for every type but is only IRREPLACEABLE on FF (ride quality
+# beyond what ivb/spin/axis imply); gated adds on CU/SI/FC and the global
+# add all failed the LOSO gate, FF-gated passed (fut 4/5, mean +0.0042;
+# 2026 battery: fastball-family desc .3052->.3137, overall flat). Missing
+# values on FF impute like arm angle: pitcher's own FF mean, then the
+# frame's FF mean, then this frozen league constant — so fresh games
+# (sidecar lag) and ROC arms (no MiLB kinematics) never ride a
+# near-unconstrained missing branch (the Jackson Kent debut lesson).
+# Constant measured on 2021-2025 pooled FF (1.16M pitches, seasonal means
+# 0.689-0.721).
+KIN_FF_LEAGUE_MEAN = 0.7038
 
 # Frozen nVAA constants: per-type OLS slope of VAA on PlateZ + league mean
 # PlateZ, measured on 2021-2026 pooled (4.05M pitches; 2026-08-09). Frozen
@@ -551,7 +566,52 @@ def build_df(pitches, prefer_true_fastball=True, arm_fallback=None):
         print(f'  arm-angle impute: {_n_miss - _n_left}/{_n_miss} missing filled '
               f'from pitcher averages ({_n_fb} of those from the ROC/AAA '
               f'fallback; {_n_left} left to model-missing)')
+    # kin_eff__ff (v13): typed emission + arm-angle-style imputation. Non-FF
+    # rows are NaN BY DESIGN (that is the gating the battery validated); only
+    # FF rows impute, so the feature never rides the missing branch where the
+    # training data would leave it unconstrained.
+    if len(out):
+        out['kin_eff'] = pd.to_numeric(out['kin_eff'], errors='coerce')
+        out['kin_eff__ff'] = np.where(out['pitch_type'] == 'FF',
+                                      out['kin_eff'], np.nan)
+        _ff = (out['pitch_type'] == 'FF').values
+        _miss = _ff & out['kin_eff__ff'].isna().values
+        if _miss.any():
+            by_p = out.groupby('pitcher')['kin_eff__ff'].transform('mean')
+            out.loc[_miss, 'kin_eff__ff'] = by_p[_miss]
+            _frame = out.loc[_ff, 'kin_eff__ff'].mean()
+            _fill = _frame if np.isfinite(_frame) else KIN_FF_LEAGUE_MEAN
+            _still = _ff & out['kin_eff__ff'].isna().values
+            out.loc[_still, 'kin_eff__ff'] = _fill
+            print(f'  kin_eff__ff impute: {int(_miss.sum())} FF pitches missing '
+                  f'({int(_still.sum())} to frame/league mean '
+                  f'{_fill:.3f})')
     return out
+
+
+KIN_SIDECAR = os.path.join(DATA, 'kinematics_2026_sidecar.pkl')
+
+
+def apply_kin_sidecar(pitches, path=KIN_SIDECAR):
+    """Fill KinEff/KinDev/KinCd on pitch dicts from the PitchID-keyed 2026
+    sidecar (built by scripts/build_kinematics_2026.py, refreshed in CI).
+    Prior-season pickles carry kinematics natively; this is for 2026 pitches,
+    whose sheet-built cache has no kinematics columns. Returns the number of
+    pitches filled, or -1 if the sidecar file is absent (callers decide how
+    loudly to fail; retrain aborts, score-only degrades to imputation)."""
+    if not os.path.exists(path):
+        return -1
+    with open(path, 'rb') as f:
+        side = pickle.load(f)
+    n = 0
+    for p in pitches:
+        if p.get('KinEff') is not None:
+            continue
+        v = side.get(p.get('PitchID'))
+        if v:
+            p['KinEff'], p['KinDev'], p['KinCd'] = v
+            n += 1
+    return n
 
 def design(df, feats=BASE_FEATS):
     # PITCH-TYPE AGNOSTIC (2026-07-04, per Wally, FanGraphs-style): no pitch-
@@ -600,10 +660,13 @@ def compute_support(df, df_prior):
     """Support score + low_support flag per MLB (pitcher, team, pitch_type).
 
     Features: BASE_FEATS only (platoon_same excluded — averaging a binary
-    usage mix isn't a physical coordinate). z-scored by the FULL training
-    pool's mean/std; NaN dims imputed at the training median.
+    usage mix isn't a physical coordinate; kin_eff__ff excluded — it is NaN
+    by design off FF, and a median-filled type-gated column would inject a
+    constant fake dimension into every non-FF unit's centroid). z-scored by
+    the FULL training pool's mean/std; NaN dims imputed at the training
+    median.
     """
-    feats = list(BASE_FEATS)
+    feats = [f for f in BASE_FEATS if f != 'kin_eff__ff']
     parts = [df[feats].assign(_pitcher=df['pitcher'].values, _prior=0)]
     if df_prior is not None and len(df_prior):
         parts.append(df_prior[feats].assign(_pitcher=df_prior['pitcher'].values, _prior=1))
@@ -682,6 +745,24 @@ def main():
     _ep = {(p.get('Pitcher'), p.get('PTeam')) for p in D if p.get('Pitch Type') == 'EP'}
     pitches = [p for p in D if p.get('_source') == 'MLB'
                and (p.get('Pitcher'), p.get('PTeam')) not in _ep]
+    # v13: 2026 kinematics ride a PitchID sidecar (the sheet cache has no
+    # kinematics columns). Retrain REQUIRES it — training the FF gate on
+    # imputed-only 2026 rows would quietly unlearn the feature. Score-only
+    # degrades to the build_df imputation chain with a loud warning (fresh
+    # grades drift toward each pitcher's own FF mean until the sidecar
+    # lands, which is the designed behavior for sidecar lag).
+    _n_kin = apply_kin_sidecar(pitches)
+    if _n_kin < 0:
+        if args.score_only:
+            print('  WARNING: kinematics sidecar absent — kin_eff__ff scores '
+                  'from the imputation chain only')
+        else:
+            sys.exit('ABORT: kinematics sidecar absent '
+                     f'({KIN_SIDECAR}) — retrain would train kin_eff__ff on '
+                     'imputed 2026 rows. Run scripts/build_kinematics_2026.py '
+                     '(or download the release asset) first.')
+    else:
+        print(f'  kinematics sidecar: {_n_kin} 2026 pitches filled')
     roc_pitches = [p for p in D if p.get('_source') in ('ROC', 'AAA')
                    and (p.get('Pitcher'), p.get('PTeam')) not in _ep]
     # Scoring-only rows (the NEW tab — arms new to the org) live in their own
@@ -752,6 +833,10 @@ def main():
             B = pickle.load(f)
         if 'fold_models' not in B:
             sys.exit('--score-only needs a bundle with fold models — run a full retrain first')
+        if 'kin_eff__ff' not in B.get('features', []):
+            sys.exit('--score-only bundle predates the v13 config '
+                     '(kin_eff__ff) — refresh the bundle from the '
+                     'latest-data release or retrain')
         if 'cross' not in B.get('features', []):
             sys.exit('--score-only bundle predates the v12 config (cross/nVAA/'
                      'velo_diff-mask) — its fold models trained on different '
@@ -795,6 +880,17 @@ def main():
                          f'{_cov:.1%} (<90%) — training pickle likely predates '
                          f'the SpinAxis augmentation; refresh the release '
                          f'assets before retraining')
+            # v13 guard: kin_eff__ff needs KinEff on the prior rows (same
+            # season-shaped-hole logic). Measured on raw kin_eff before the
+            # FF imputation chain masks the gap.
+            _ffm = _d['pitch_type'] == 'FF'
+            _kcov = (_d.loc[_ffm, 'kin_eff'].notna().mean()
+                     if 'kin_eff' in _d.columns and _ffm.any() else 0.0)
+            if _kcov < 0.90:
+                sys.exit(f'ABORT: prior season index {_i} has FF kin_eff '
+                         f'coverage {_kcov:.1%} (<90%) — training pickle '
+                         f'predates the kinematics augmentation; refresh the '
+                         f'release assets before retraining')
     else:
         print('  (no prior-season pickle found — training on current season only)')
 
@@ -1200,7 +1296,7 @@ def main():
     if B is None:
         with open(os.path.join(HERE, 'stuff_models.pkl'), 'wb') as f:
             pickle.dump({'model': model, 'features': list(X.columns), 'base_feats': BASE_FEATS,
-                         'league': league, 'params': TUNED, 'version': 'v12',
+                         'league': league, 'params': TUNED, 'version': 'v13',
                          'model_na': model_na, 'noarm_feats': NOARM_FEATS,
                          'features_na': list(Xna.columns),
                          'na_pt_scale': na_pt, 'na_ov_scale': na_ov,

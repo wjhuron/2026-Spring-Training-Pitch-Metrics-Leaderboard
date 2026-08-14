@@ -102,6 +102,26 @@ jobs:
             && gunzip -c /tmp/bundle.gz > stuff_plus/stuff_models.pkl \
             || echo "bundle unavailable — Stuff+ step will fall back to preserved scores"
 
+      - name: Refresh 2026 kinematics sidecar (v13 kin_eff__ff)
+        # The sheets carry no kinematics, so 2026 KinEff rides a PitchID
+        # sidecar. Fetch the published cache + sidecar, then top up only the
+        # dates Savant has that the cache lacks (a couple of small CSV pulls
+        # on a normal day). A refresh failure degrades to the downloaded
+        # sidecar (scores drift toward each pitcher's own FF mean for the
+        # newest games only); an absent sidecar aborts retrains in the
+        # trainer itself.
+        run: |
+          curl -sfL --retry 3 --retry-delay 5 --retry-all-errors -o /tmp/kin_cache.gz \
+            https://github.com/wjhuron/Huronalytics/releases/download/latest-data/_statcast2026_kin_cache.pkl.gz \
+            && gunzip -c /tmp/kin_cache.gz > data/_statcast2026_kin_cache.pkl \
+            || echo "kin cache asset unavailable — builder will fetch from scratch"
+          curl -sfL --retry 3 --retry-delay 5 --retry-all-errors -o /tmp/kin_side.gz \
+            https://github.com/wjhuron/Huronalytics/releases/download/latest-data/kinematics_2026_sidecar.pkl.gz \
+            && gunzip -c /tmp/kin_side.gz > data/kinematics_2026_sidecar.pkl \
+            || echo "sidecar asset unavailable"
+          python3 scripts/build_kinematics_2026.py \
+            || echo "kinematics refresh failed — using downloaded sidecar as-is"
+
       - name: Compute Stuff+ (retrain or cached-model scoring, inject into leaderboards)
         # Retrain path needs the 2025 pickle (retraining without it would
         # silently regress to the weaker 2026-only config). Score-only path
@@ -216,6 +236,19 @@ jobs:
         run: |
           gzip -c stuff_plus/stuff_models.pkl > /tmp/stuff_models.pkl.gz
           gh release upload latest-data /tmp/stuff_models.pkl.gz --clobber
+
+      - name: Publish refreshed kinematics sidecar
+        # Public-Statcast-derived (like the 2021-24 training assets), so
+        # plain gzip, no encryption. Published every run so the next run's
+        # incremental top-up stays a couple of CSV pulls.
+        if: ${{ success() && hashFiles('data/kinematics_2026_sidecar.pkl') != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gzip -c data/kinematics_2026_sidecar.pkl > /tmp/kinematics_2026_sidecar.pkl.gz
+          gzip -c data/_statcast2026_kin_cache.pkl > /tmp/_statcast2026_kin_cache.pkl.gz
+          gh release upload latest-data /tmp/kinematics_2026_sidecar.pkl.gz --clobber
+          gh release upload latest-data /tmp/_statcast2026_kin_cache.pkl.gz --clobber
 
       - name: Encrypt pickle for publication
         # The retagged pitch data ships as AES-256 ciphertext only

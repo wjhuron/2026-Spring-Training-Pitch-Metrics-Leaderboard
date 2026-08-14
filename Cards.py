@@ -3105,9 +3105,10 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
 
     with open(os.path.join(_sv_dir, 'stuff_models.pkl'), 'rb') as f:
         bundle = _pickle.load(f)
-    if 'cross' not in bundle.get('features', []):
+    if 'kin_eff__ff' not in bundle.get('features', []) \
+            or 'cross' not in bundle.get('features', []):
         raise RuntimeError(
-            'stuff_models.pkl predates the v12 config — its models '
+            'stuff_models.pkl predates the v13 config — its models '
             'trained on different features than build_df now emits. Refresh '
             'it from the latest-data release:\n  curl -sL https://github.com/'
             'wjhuron/Huronalytics/releases/download/latest-data/'
@@ -3115,6 +3116,15 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
             'stuff_plus/stuff_models.pkl')
 
     all_pitches = [p for pl in norm_by_pitcher.values() for p in pl]
+    # v13: 2026 kinematics ride the PitchID sidecar; daily/scratch pitches
+    # come off the sheets without KinEff. Absent sidecar degrades to the
+    # build_df imputation chain (pitcher FF mean -> frame -> league const).
+    _n_kin = _sv.apply_kin_sidecar(all_pitches)
+    if _n_kin >= 0:
+        print(f"  [ctx] kinematics sidecar: {_n_kin} pitches filled")
+    else:
+        print("  [ctx] WARNING: kinematics sidecar absent — kin_eff__ff "
+              "scores from the imputation chain")
     df = _sv.build_df(all_pitches)
     overall, per_pt, atoms_by_pid = {}, {}, {}
     if not len(df):
