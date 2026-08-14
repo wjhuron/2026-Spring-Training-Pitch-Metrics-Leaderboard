@@ -779,6 +779,14 @@ def main():
         _so = [p for p in _so if (p.get('Pitcher'), p.get('PTeam')) not in _ep]
         roc_pitches += _so
         print(f'  + {len(_so)} scoring-only pitches from {_so_path}')
+    # v13 ROC parity: the sidecar carries measured ROC kinematics from the
+    # club-534 minors pull — apply it to the ROC scoring list too, or every
+    # Rochester four-seamer imputes to the league constant. (Caught
+    # 2026-08-14: the first parity deploy applied it to the MLB list only
+    # and ROC grades moved exactly 0.0 — always verify the re-stamp moved.)
+    _n_kin_roc = apply_kin_sidecar(roc_pitches)
+    if _n_kin_roc > 0:
+        print(f'  kinematics sidecar: {_n_kin_roc} ROC/AAA pitches filled')
     # MiLB RunExp currency correction (2026-07-28). Statcast's delta_run_exp
     # is built on each league's own RE matrix, so ROC/AAA RunExp in the raw
     # cache is MiLB-denominated (~1.27x MLB for the identical event).
