@@ -1066,7 +1066,18 @@ BUBBLE_COLUMNS = [
         ('BABIP',      'babip',            'babip_pctl',            '3dec'),
         ('Hard-Hit%',  'hardHitPct',       'hardHitPct_pctl',       'pct1'),
         ('Barrel%',    'barrelPctAgainst', 'barrelPctAgainst_pctl', 'pct1'),
+        # HR/FB% under Barrel% (2026-08-14, per Wally): damage quality vs
+        # damage REALIZED — the pair reads HR fortune the way xwOBAcon/BABIP
+        # reads batted-ball fortune. Measured split-half reliability in 2026
+        # is ~0 (r=-0.09 at 20+ FB/half; the xFIP thesis), so this bubble is
+        # a fortune flag by design, never a skill grade. Lower = better.
+        ('HR/FB%',     'hrFbPct',          'hrFbPct_pctl',          'pct1'),
         ('GB%',        'gbPct',            'gbPct_pctl',            'pct1'),
+        # PU% under GB% (2026-08-14, per Wally): the other free out. Real
+        # skill: split-half r=0.43-0.45 vs GB%'s 0.59 on the same protocol.
+        # Higher = better. (FanGraphs calls the cousin stat IFFB%; this is
+        # popups per BIP, matching the sheets' BBType currency.)
+        ('PU%',        'puPct',            'puPct_pctl',            'pct1'),
     ]),
     ('COMMAND & SHAPE', [
         ('Velocity',   'fbVelo',    'fbVelo_pctl',    'mph'),
@@ -2109,6 +2120,29 @@ def render_card(config, pitches, output_file):
     # ── Left column: season cards get the percentile bubble panel; single-game
     # cards (no season pool) get the batted-ball donut + stacked bars + usage. ──
     p_row = config.get('pctl_row') or {}
+
+    def _batted_ball_line(pp):
+        """Fly-ball / FB-HR / popup / BIP tallies from pitch dicts. HR/FB is
+        the STRICT CONDITIONAL (2026-08-14, per Wally): fly-ball home runs
+        over outfield flies — numerator a subset of the denominator, so the
+        bubble reads "X% of his fly balls left the yard". Popups excluded
+        (structurally can't leave), line-drive HRs excluded (barrel-quality
+        events, already priced by Barrel%/xwOBAcon); bunts excluded."""
+        fb = hr = pu = bip = 0
+        for p in pp:
+            if p.get('Description') != 'In Play':
+                continue
+            bb = str(p.get('BBType') or '')
+            if not bb or bb.startswith('bunt'):
+                continue
+            bip += 1
+            if bb == 'fly_ball':
+                fb += 1
+                if p.get('Event') == 'Home Run':
+                    hr += 1
+            elif bb == 'popup':
+                pu += 1
+        return {'fb': fb, 'hr': hr, 'pu': pu, 'bip': bip} if bip else None
     if config.get('mvn_models'):
         if p_row:
             # Extension comes off the leaderboard rounded to 0.1 ft, which is
@@ -2122,6 +2156,23 @@ def render_card(config, pitches, output_file):
             if _ext_vals:
                 p_row = dict(p_row)
                 p_row['extension'] = sum(_ext_vals) / len(_ext_vals)
+            # HR/FB% + PU% (2026-08-14): computed from THIS card's pitches
+            # (same source as the table) against the all-MLB pickle pools.
+            # Leaderboard plumbing can replace this once the stats graduate;
+            # display floors keep micro-denominator garbage off the rail.
+            _bb = _batted_ball_line(pitches)
+            if _bb:
+                p_row = dict(p_row)
+                _pools = _hrfb_pu_pools()
+                if _bb['fb'] >= 10 and _pools.get('hrfb'):
+                    p_row['hrFbPct'] = _bb['hr'] / _bb['fb'] * 100
+                    # lower = better: percentile is share of pool ABOVE us
+                    p_row['hrFbPct_pctl'] = _pctl_of(
+                        p_row['hrFbPct'], _pools['hrfb'], invert=True)
+                if _bb['bip'] >= 25 and _pools.get('pu'):
+                    p_row['puPct'] = _bb['pu'] / _bb['bip'] * 100
+                    p_row['puPct_pctl'] = _pctl_of(
+                        p_row['puPct'], _pools['pu'], invert=False)
             bubble_cols = _bubble_columns_for(config, p_row)
             # Classic-frame inches (0.790/0.235 of the 17.5in card) so the
             # rail's physical geometry is untouched by the taller figure; the
@@ -3184,6 +3235,64 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
         overall[pitcher] = (round(float(_np.mean(atoms_all)), 1)
                             if atoms_all else None)
     return overall, per_pt, atoms_by_pid
+
+
+_HRFB_PU_POOLS = None      # lazy all-MLB pools for the HR/FB% + PU% bubbles
+
+
+def _hrfb_pu_pools():
+    """All-MLB per-pitcher HR/FB% and PU% value pools for the bubble
+    percentiles (min 20 FB / 50 BIP; the all-MLB pool convention). Reuses
+    the scratch context's pickle when it is already loaded."""
+    global _HRFB_PU_POOLS
+    if _HRFB_PU_POOLS is not None:
+        return _HRFB_PU_POOLS
+    import pickle as _pickle
+    from collections import defaultdict as _dd
+    try:
+        if _MLB_PICKLE_CACHE is not None:
+            _mlb = _MLB_PICKLE_CACHE
+        else:
+            with open(os.path.join(os.path.dirname(METADATA_PATH),
+                                   'all_pitches_rs_cache.pkl'), 'rb') as f:
+                _all = _pickle.load(f)
+            _mlb = [p for p in _all if p.get('_source') == 'MLB']
+        acc = _dd(lambda: [0, 0, 0, 0])   # fb, hr, pu, bip
+        for p in _mlb:
+            if p.get('Description') != 'In Play':
+                continue
+            bb = str(p.get('BBType') or '')
+            if not bb or bb.startswith('bunt'):
+                continue
+            a = acc[p.get('Pitcher')]
+            a[3] += 1
+            if bb == 'fly_ball':
+                a[0] += 1
+                # strict conditional: fly-ball HRs only (matches
+                # _batted_ball_line)
+                if p.get('Event') == 'Home Run':
+                    a[1] += 1
+            elif bb == 'popup':
+                a[2] += 1
+        _HRFB_PU_POOLS = {
+            'hrfb': sorted(a[1] / a[0] * 100 for a in acc.values()
+                           if a[0] >= 20),
+            'pu': sorted(a[2] / a[3] * 100 for a in acc.values()
+                         if a[3] >= 50),
+        }
+    except Exception as _e:
+        print(f"  WARNING: HR/FB-PU pools unavailable ({_e})")
+        _HRFB_PU_POOLS = {}
+    return _HRFB_PU_POOLS
+
+
+def _pctl_of(value, pool, invert=False):
+    """Percentile of value in a sorted pool; invert for lower-is-better."""
+    import bisect
+    if not pool:
+        return None
+    pct = bisect.bisect_left(pool, value) / len(pool) * 100
+    return round(100 - pct if invert else pct)
 
 
 _MLB_PICKLE_CACHE = None   # module-level: load the 382k-pitch pickle once per process
