@@ -2927,7 +2927,7 @@ def render_card(config, pitches, output_file):
                  'Usage and Avg Velo are shaded against HIS OWN season average for that pitch; '
                  'Zone% through Loc+ against LEAGUE average. Red = better, blue = worse.\n'
                  'Usage simply reads red = higher. '
-                 'Full colour = 2 standard errors, so a faint cell is a gap inside normal game-to-game noise.',
+                 'Full color on Usage/Avg Velo = 2 standard errors, so a faint cell there is a gap inside normal game-to-game noise.',
                  fontsize=8.5, ha='left', va='top', color='#000000',
                  fontfamily='IBM Plex Sans', linespacing=1.5)
     plt.savefig(output_file, dpi=SAVE_DPI, bbox_inches='tight', facecolor=BG, pad_inches=0.1)
