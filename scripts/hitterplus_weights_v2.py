@@ -88,7 +88,8 @@ def season_rows(yn, yn1):
                     nh += 1
                 elif z in ('chase', 'waste'):
                     ne += 1
-                swing_rv, _ = table[(z, sd.get_count(p), sd.cat_of(p), 'swing')]
+                # SD cells category-collapsed since 2026-08-15 ('ALL' key)
+                swing_rv, _ = table[(z, sd.get_count(p), 'ALL', 'swing')]
                 swrv.append(swing_rv)
             diet[h] = (nh / len(ps), ne / len(ps), sum(swrv) / len(swrv))
 

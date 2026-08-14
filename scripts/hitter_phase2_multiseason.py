@@ -162,7 +162,9 @@ def ct_score(by_hitter_sw, table, min_n, lift=True):
             lev, con = ct.compute_ct_swing(p, table)
             if lev <= 0:
                 continue
-            cell = table[(sd.classify_zone(p), sd.get_count(p))]
+            # 3-part key since CT+ cat3 shipped 2026-08-15 (pipeline tables
+            # are (zone, count, cat); sd.cat_of respects patched contexts)
+            cell = table[(sd.classify_zone(p), sd.get_count(p), sd.cat_of(p))]
             A_ += lev * con
             E += lev * (1.0 - cell['p_whiff'])
             W += lev
