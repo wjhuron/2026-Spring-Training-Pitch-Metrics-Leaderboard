@@ -398,9 +398,17 @@ def compute_pitcher_batted_ball(pitches):
     fb = sum(1 for p in bip if p.get('BBType') == 'fly_ball')
     pu = sum(1 for p in bip if p.get('BBType') == 'popup')
 
-    n_hr_bb = sum(1 for p in bip if p.get('Event') == 'Home Run')
-    fb_for_hrfb = fb + pu
-    hr_fb_pct = round(n_hr_bb / fb_for_hrfb, 4) if fb_for_hrfb > 0 else None
+    # HR/FB (2026-08-14, per Wally): STRICT CONDITIONAL — fly-ball home runs
+    # over outfield flies, so the stat reads "X% of fly balls left the yard".
+    # Popups out of the denominator (structurally can't leave the yard);
+    # line-drive HRs out of the numerator (barrel-quality events, already
+    # priced by Barrel%/xwOBAcon). FanGraphs' published HR/FB keeps popups in
+    # the denominator, so their figure reads lower by design (Nola 2026:
+    # 23.6 here vs 18.9 there). One definition everywhere: cards,
+    # leaderboards, aggregator mirrors.
+    n_hr_fb = sum(1 for p in bip if p.get('Event') == 'Home Run'
+                  and p.get('BBType') == 'fly_ball')
+    hr_fb_pct = round(n_hr_fb / fb, 4) if fb > 0 else None
 
     return {
         'avgEVAgainst': avg_ev,
@@ -520,9 +528,11 @@ def compute_hitter_stats(pitches):
     hard_hit = sum(1 for v in ev_valid if v >= 95)
     hard_hit_pct = hard_hit / len(ev_valid) if ev_valid else None
 
-    n_hr_fb = sum(1 for p in bip if p.get('Event') == 'Home Run')
-    fb_for_hrfb = fb + pu
-    hr_fb_pct = round(n_hr_fb / fb_for_hrfb, 4) if fb_for_hrfb > 0 else None
+    # strict-conditional HR/FB — same definition as the pitcher side (see
+    # compute_pitcher_batted_ball): fly-ball HRs over outfield flies.
+    n_hr_fb = sum(1 for p in bip if p.get('Event') == 'Home Run'
+                  and p.get('BBType') == 'fly_ball')
+    hr_fb_pct = round(n_hr_fb / fb, 4) if fb > 0 else None
 
     two_strike_pitches = [p for p in pitches if '-' in p.get('Count', '') and p['Count'].split('-')[1] == '2']
     # Exclude bunt-contact swings from the 2-strike whiff denominator to match

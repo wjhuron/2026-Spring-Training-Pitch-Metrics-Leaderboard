@@ -681,8 +681,10 @@ const Aggregator = {
     const fpsPct = firstPitches > 0 ? firstPitchStrikes / firstPitches : null;
     const oneOneWinPct = oneOneTotal > 0 ? oneOneWins / oneOneTotal : null;
     const earlyActionPct = pa > 0 ? earlyActionPAs / pa : null;
-    const fb_for_hrfb = fb_cnt + pu_cnt;
-    const hrFbPct = fb_for_hrfb > 0 ? nHrBip / fb_for_hrfb : null;
+    // Strict-conditional HR/FB (2026-08-14): fly-ball HRs / outfield flies.
+    // FB-HRs = all BIP HRs minus line-drive HRs (GB inside-the-park HRs are
+    // a couple per league-season — negligible). Mirrors pipeline_compute.
+    const hrFbPct = fb_cnt > 0 ? Math.max(nHrBip - ldHr, 0) / fb_cnt : null;
 
     // Grade atoms (fields 31-36): filtered overall Stuff+/Loc+/Pitching+ as
     // plain averages of the per-pitch integers (same digits as the Sheets
@@ -747,7 +749,7 @@ const Aggregator = {
 
     const mlbIdMap = this._getMlbIdMap('pitcher');
 
-    let STAT_KEYS = ['strikePct', 'izPct', 'cswPct', 'izWhiffPct', 'swStrPct', 'chasePct', 'gbPct', 'kPct', 'bbPct', 'kbbPct', 'babip', 'fpsPct', 'oneOneWinPct', 'earlyActionPct', 'hrFbPct',
+    let STAT_KEYS = ['strikePct', 'izPct', 'cswPct', 'izWhiffPct', 'swStrPct', 'chasePct', 'gbPct', 'puPct', 'kPct', 'bbPct', 'kbbPct', 'babip', 'fpsPct', 'oneOneWinPct', 'earlyActionPct', 'hrFbPct',
                      'avgAgainst', 'obpAgainst',
                      'avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'xwOBAsp',
                      'stuffScore', 'locPlus', 'pitchingScore'];
@@ -2339,8 +2341,8 @@ const Aggregator = {
         ? Math.round((izSwingPct - chasePct_val) * 10000) / 10000 : null;
       const contactPct = swingsNonBunt > 0 ? contactNonBunt / swingsNonBunt : null;
       const izContactPct = izSwNonBunt > 0 ? izContact / izSwNonBunt : null;
-      const fb_for_hrfb = fb + pu;
-      const hrFbPct_val = fb_for_hrfb > 0 ? nHrBip / fb_for_hrfb : null;
+      // strict-conditional HR/FB — mirrors pipeline_compute
+      const hrFbPct_val = fb > 0 ? Math.max(nHrBip - ldHr, 0) / fb : null;
 
       // BIP medians
       const bipRecords = bipByHitter[teamMode ? String(g.teamIdx) : (g.hitterIdx + '|' + g.teamIdx)] || [];
@@ -3004,8 +3006,8 @@ const Aggregator = {
       const chasePct_val = oozPitches > 0 ? oozSwings / oozPitches : null;
       const contactPct = swingsNonBunt > 0 ? contactNonBunt / swingsNonBunt : null;
       const izContactPct = izSwNonBunt > 0 ? izContact / izSwNonBunt : null;
-      const fb_for_hrfb = fb + pu;
-      const hrFbPct_val = fb_for_hrfb > 0 ? nHrBip / fb_for_hrfb : null;
+      // strict-conditional HR/FB — mirrors pipeline_compute
+      const hrFbPct_val = fb > 0 ? Math.max(nHrBip - ldHr, 0) / fb : null;
 
       // BIP medians — combine BIP records from all pitch types in this group
       const evsAll2 = [], allLA = [];
