@@ -38,6 +38,21 @@ PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 URL = ('https://baseballsavant.mlb.com/statcast_search/csv?all=true'
        '&hfSea=2026%7C&hfGT=R%7C&player_type=pitcher&type=details'
        '&game_date_gt={gt}&game_date_lt={lt}')
+
+# ROC/AAA (v13 parity, 2026-08-14): the minors Statcast Search serves the
+# full 9P kinematics on real ROC games (vx0..az/spin_axis 100%, verified
+# 918 pitches 2026-08-06..12), so ROC four-seamers get MEASURED kin_eff
+# instead of the league-constant imputation. Both player_types per the
+# supplement's quirk 1: pitcher-side = ROC pitchers' PAs, batter-side = the
+# opponent pitchers facing ROC bats (the AAA-source rows); the two PA sets
+# are disjoint so the concat cannot duplicate. team must be the NUMERIC
+# club id and minors=true is load-bearing (without it the CSV is empty).
+RAW_MILB = os.path.join(ROOT, 'data', '_statcast2026_roc_kin_cache.pkl')
+MILB_URL = ('https://baseballsavant.mlb.com/statcast-search-minors/csv'
+            '?all=true&type=details&team=534&player_type={ptype}'
+            '&min_pitches=0&min_results=0&sort_col=pitches'
+            '&sort_order=desc&minors=true'
+            '&game_date_gt={gt}&game_date_lt={lt}')
 COLS = ['game_pk', 'at_bat_number', 'pitch_number', 'game_date',
         'player_name', 'p_throws', 'pitch_type', 'release_speed',
         'plate_x', 'plate_z', 'vx0', 'vy0', 'vz0', 'ax', 'ay', 'az',
@@ -60,8 +75,11 @@ def daterange_windows(d0, d1, step=3):
         cur = end + timedelta(days=1)
 
 
-def fetch_missing(pitch_dates):
-    old = pd.read_pickle(RAW) if os.path.exists(RAW) else None
+def fetch_missing(pitch_dates, urls=(URL,), raw_path=RAW, step=3):
+    """Incrementally fetch the given date set for each URL template into
+    raw_path. urls is a tuple so the minors pull can hit both player_type
+    sides for the same window (disjoint PA sets, concat-safe)."""
+    old = pd.read_pickle(raw_path) if os.path.exists(raw_path) else None
     have = (set(old['game_date'].astype(str).str[:10].unique())
             if old is not None else set())
     todo = sorted(d for d in pitch_dates if d not in have)
@@ -71,21 +89,27 @@ def fetch_missing(pitch_dates):
     d0 = date.fromisoformat(todo[0])
     d1 = date.fromisoformat(todo[-1])
     frames = [] if old is None else [old]
-    for gt, lt in daterange_windows(d0, d1):
-        out = subprocess.run(['curl', '-s', '--fail', '-A', 'Mozilla/5.0',
-                              URL.format(gt=gt, lt=lt)],
-                             capture_output=True, text=True, timeout=300)
-        if out.returncode != 0:
-            print(f'  {gt}..{lt}: FETCH FAILED (curl {out.returncode})')
+    for gt, lt in daterange_windows(d0, d1, step):
+        got = []
+        for u in urls:
+            out = subprocess.run(['curl', '-s', '--fail', '-A', 'Mozilla/5.0',
+                                  u.format(gt=gt, lt=lt)],
+                                 capture_output=True, text=True, timeout=300)
+            if out.returncode != 0:
+                print(f'  {gt}..{lt}: FETCH FAILED (curl {out.returncode})')
+                continue
+            try:
+                d = pd.read_csv(StringIO(out.stdout), low_memory=False)
+            except Exception as e:
+                print(f'  {gt}..{lt}: parse failed ({e})')
+                continue
+            if len(d) >= 25000:
+                print(f'  {gt}..{lt}: *** at 25k cap — data lost, '
+                      f'narrow step ***')
+            got.append(d[[c for c in COLS if c in d.columns]])
+        if not got:
             continue
-        try:
-            d = pd.read_csv(StringIO(out.stdout), low_memory=False)
-        except Exception as e:
-            print(f'  {gt}..{lt}: parse failed ({e})')
-            continue
-        if len(d) >= 25000:
-            print(f'  {gt}..{lt}: *** at 25k cap — data lost, narrow step ***')
-        d = d[[c for c in COLS if c in d.columns]]
+        d = pd.concat(got, ignore_index=True)
         # drop dates already cached (window edges can overlap)
         d = d[~d['game_date'].astype(str).str[:10].isin(have)]
         print(f'  {gt}..{lt}: +{len(d)} rows')
@@ -93,27 +117,16 @@ def fetch_missing(pitch_dates):
             frames.append(d)
             have |= set(d['game_date'].astype(str).str[:10].unique())
     alld = pd.concat(frames, ignore_index=True)
-    tmp = RAW + '.tmp'
+    tmp = raw_path + '.tmp'
     alld.to_pickle(tmp)
-    os.replace(tmp, RAW)
-    print(f'raw cache: {len(alld)} rows -> {RAW}')
+    os.replace(tmp, raw_path)
+    print(f'raw cache: {len(alld)} rows -> {raw_path}')
     return alld
 
 
-def main():
-    print('loading 2026 pitch cache ...')
-    allp = pickle.load(open(PKL, 'rb'))
-    mlb = [p for p in allp if p.get('_source') == 'MLB' and p.get('PitchID')]
-    pitch_dates = sorted({str(p.get('Game Date'))[:10] for p in mlb
-                          if p.get('Game Date')})
-    print(f'{len(mlb)} MLB pitches, {len(pitch_dates)} game dates '
-          f'({pitch_dates[0]} .. {pitch_dates[-1]})')
-
-    raw = fetch_missing(pitch_dates)
-    kin = compute_kinematics(raw)
-    print(f'kinematics on {kin.kin_eff.notna().mean() * 100:.1f}% of raw rows')
-
-    # candidate lists per (game_pk, at_bat_number)
+def join_population(pitches, raw, kin, side, label):
+    """Fingerprint-join a pitch population to the raw kinematics frame and
+    add matches to the PitchID-keyed sidecar dict."""
     gpk = pd.to_numeric(raw['game_pk'], errors='coerce').values
     ab = pd.to_numeric(raw['at_bat_number'], errors='coerce').values
     v = pd.to_numeric(raw['release_speed'], errors='coerce').values
@@ -128,7 +141,7 @@ def main():
             cands[(int(gpk[i]), int(ab[i]))].append(i)
 
     by_pa = defaultdict(list)
-    for p in mlb:
+    for p in pitches:
         pid = p['PitchID']
         try:
             g, a, _ = pid.split('_')
@@ -136,7 +149,6 @@ def main():
         except ValueError:
             continue
 
-    side = {}
     matched = unmatched = 0
     for key, mine in by_pa.items():
         cl = cands.get(key, [])
@@ -163,13 +175,50 @@ def main():
             if np.isfinite(e[i]):
                 side[p['PitchID']] = (float(e[i]), float(dv[i]), float(cd[i]))
             matched += 1
+    print(f'{label} join: {matched} matched / {unmatched} unmatched '
+          f'({matched / max(matched + unmatched, 1):.1%})')
+
+
+def main():
+    print('loading 2026 pitch cache ...')
+    allp = pickle.load(open(PKL, 'rb'))
+    mlb = [p for p in allp if p.get('_source') == 'MLB' and p.get('PitchID')]
+    pitch_dates = sorted({str(p.get('Game Date'))[:10] for p in mlb
+                          if p.get('Game Date')})
+    print(f'{len(mlb)} MLB pitches, {len(pitch_dates)} game dates '
+          f'({pitch_dates[0]} .. {pitch_dates[-1]})')
+
+    side = {}
+    raw = fetch_missing(pitch_dates)
+    kin = compute_kinematics(raw)
+    print(f'kinematics on {kin.kin_eff.notna().mean() * 100:.1f}% of raw rows')
+    join_population(mlb, raw, kin, side, 'MLB')
+
+    # ROC/AAA (v13 parity): both sources ride the same PitchID convention,
+    # so the minors rows join with the identical fingerprint machinery and
+    # land in the same sidecar — no consumer changes anywhere.
+    roc = [p for p in allp
+           if p.get('_source') in ('ROC', 'AAA') and p.get('PitchID')]
+    if roc:
+        roc_dates = sorted({str(p.get('Game Date'))[:10] for p in roc
+                            if p.get('Game Date')})
+        print(f'{len(roc)} ROC/AAA pitches, {len(roc_dates)} game dates')
+        raw_m = fetch_missing(
+            roc_dates,
+            urls=(MILB_URL.replace('{ptype}', 'pitcher'),
+                  MILB_URL.replace('{ptype}', 'batter')),
+            raw_path=RAW_MILB)
+        if raw_m is not None and len(raw_m):
+            kin_m = compute_kinematics(raw_m)
+            print(f'minors kinematics on '
+                  f'{kin_m.kin_eff.notna().mean() * 100:.1f}% of raw rows')
+            join_population(roc, raw_m, kin_m, side, 'ROC/AAA')
+
     tmp = SIDE + '.tmp'
     with open(tmp, 'wb') as f:
         pickle.dump(side, f)
     os.replace(tmp, SIDE)
-    print(f'join: {matched} matched / {unmatched} unmatched '
-          f'({matched / max(matched + unmatched, 1):.1%}); sidecar '
-          f'{len(side)} PitchIDs -> {SIDE}')
+    print(f'sidecar {len(side)} PitchIDs -> {SIDE}')
 
 
 if __name__ == '__main__':

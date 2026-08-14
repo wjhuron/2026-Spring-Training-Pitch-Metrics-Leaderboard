@@ -115,6 +115,10 @@ jobs:
             https://github.com/wjhuron/Huronalytics/releases/download/latest-data/_statcast2026_kin_cache.pkl.gz \
             && gunzip -c /tmp/kin_cache.gz > data/_statcast2026_kin_cache.pkl \
             || echo "kin cache asset unavailable — builder will fetch from scratch"
+          curl -sfL --retry 3 --retry-delay 5 --retry-all-errors -o /tmp/kin_roc.gz \
+            https://github.com/wjhuron/Huronalytics/releases/download/latest-data/_statcast2026_roc_kin_cache.pkl.gz \
+            && gunzip -c /tmp/kin_roc.gz > data/_statcast2026_roc_kin_cache.pkl \
+            || echo "ROC kin cache asset unavailable — builder will fetch from scratch"
           curl -sfL --retry 3 --retry-delay 5 --retry-all-errors -o /tmp/kin_side.gz \
             https://github.com/wjhuron/Huronalytics/releases/download/latest-data/kinematics_2026_sidecar.pkl.gz \
             && gunzip -c /tmp/kin_side.gz > data/kinematics_2026_sidecar.pkl \
@@ -249,6 +253,10 @@ jobs:
           gzip -c data/_statcast2026_kin_cache.pkl > /tmp/_statcast2026_kin_cache.pkl.gz
           gh release upload latest-data /tmp/kinematics_2026_sidecar.pkl.gz --clobber
           gh release upload latest-data /tmp/_statcast2026_kin_cache.pkl.gz --clobber
+          if [ -f data/_statcast2026_roc_kin_cache.pkl ]; then
+            gzip -c data/_statcast2026_roc_kin_cache.pkl > /tmp/_statcast2026_roc_kin_cache.pkl.gz
+            gh release upload latest-data /tmp/_statcast2026_roc_kin_cache.pkl.gz --clobber
+          fi
 
       - name: Encrypt pickle for publication
         # The retagged pitch data ships as AES-256 ciphertext only
