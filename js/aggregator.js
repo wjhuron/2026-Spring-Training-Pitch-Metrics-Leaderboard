@@ -35,7 +35,7 @@ var QUAL = {
   // At 25 pitches an FF cell is only 25/(25+71) = 0.26 reliable and a cutter
   // 0.18; gating at k itself means "color only when >= half the variance is
   // signal". Keep in sync with pipeline_locplus.py STABILIZE_N_PT.
-  MIN_PITCH_LOCPLUS:         { FF: 81, SI: 96, FC: 122, SL: 70, CU: 93, CH: 72 },
+  MIN_PITCH_LOCPLUS:         { FF: 73, SI: 81, FC: 74, SL: 67, CU: 83, CH: 79 },
   // Pitch types with NO measured constant (today only EP: 40 cells, largest
   // 105 pitches, so k can't be measured). Policy, not a measurement: don't
   // color what we can't validate. Colors zero cells today either way.
@@ -57,7 +57,7 @@ QUAL.LOCPLUS_GROUP = {
 };
 // Category rows (PITCH_CATEGORIES) pool several types — take the stiffest
 // member gate. Mirrors pipeline_locplus.py STABILIZE_N_CATEGORY.
-QUAL.LOCPLUS_CATEGORY = { Hard: 96, Breaking: 122, Offspeed: 72 };
+QUAL.LOCPLUS_CATEGORY = { Hard: 81, Breaking: 83, Offspeed: 79 };
 
 // Minimum pitches for a pitch-type (or category) Loc+ cell to clear r >= 0.5.
 QUAL.locPlusMinPitches = function (pitchType) {

@@ -151,6 +151,38 @@ PHYS_BW_PT = {}
 K_WHIFF, K_FOUL, K_XWCON = 8, 8, 200
 K_SWING_COLL, K_SWING_COUNT, K_CS = 6, 20, 10
 
+# ── Count-level physical structure (2026-08-15) ─────────────────────────
+# WHIFF surfaces are count-specific, built exactly like the swing surfaces:
+# per-count grids from that count's own swings, shrunk toward the collapsed
+# shape scaled by the count's league whiff multiplier. Won the replicate
+# battery 5/5 on partial (scripts/locplus_countwhiff_multiseason.py),
+# passed a permuted-count placebo control, the 2026 retag replicate with a
+# partial|Stuff+ control, and a whiff-skill leak check. K swept {5..80}:
+# flat (max spread .0008), 20 kept as the convention matching the swing
+# surface. FOUL count grids were tested and REJECTED (1/5); the CONTACT
+# branch takes a per-count LEVEL offset instead (below).
+WH_COUNT_LEVEL = True
+K_WH_COUNT = 20
+# Contact-quality level by count: the BIP branch adds offset(c) = league
+# mean standardized xwOBA-value on BIP in count c minus the overall mean
+# (2-strike defensive contact is weaker, hitter-count contact louder).
+# Won 5/5 on partial with a ~.012 rel cost (accepted: real count physics,
+# prediction gain — the mirror of the CS-transform convention). This is
+# NOT the rejected BIP_COUNT_ANCHOR: the anchor bundled this quality term
+# with an RE-state currency term, and the currency half is what lost 0/5
+# (decomposition in scripts/locplus_count_stability.py). In-season
+# estimates need >= XW_CLEVEL_MIN_BIP per count; thinner counts fall back
+# to the pooled 2021-2026 means (cross-season spread .004-.019, near-
+# constants of baseball — same convention as FALLBACK_COUNT_OFFSETS).
+XW_COUNT_LEVEL = True
+XW_CLEVEL_MIN_BIP = 200
+XW_CLEVEL_FALLBACK = {
+    (0, 0): +0.012, (0, 1): -0.009, (0, 2): -0.032,
+    (1, 0): +0.018, (1, 1): +0.001, (1, 2): -0.023,
+    (2, 0): +0.036, (2, 1): +0.015, (2, 2): -0.014,
+    (3, 0): +0.090, (3, 1): +0.039, (3, 2): +0.006,
+}
+
 # Per-pitcher regression + normalization. n_prior values are the measured
 # split-half r=0.5 crossings (regression constant). Re-measured 2026-07-13
 # on the full season, 10 shuffle seeds (scripts/locplus_nprior_multiseed.py):
@@ -201,10 +233,13 @@ N_PRIOR_PT_DEFAULT = 0
 # anyone had validated at the cell level.) To start coloring a new type, measure
 # it with scripts/locplus_stabilize_celllevel.py and add it to STABILIZE_N_PT.
 STABILIZE_N_UNVALIDATED = float('inf')
-STABILIZE_N_PT = {'FF': 81, 'SI': 96, 'FC': 122, 'SL': 70, 'CU': 93, 'CH': 72}
+STABILIZE_N_PT = {'FF': 73, 'SI': 81, 'FC': 74, 'SL': 67, 'CU': 83, 'CH': 79}
+# Re-measured 2026-08-15 on the count-aware surfaces (WH_COUNT_LEVEL +
+# XW_COUNT_LEVEL): the new per-pitch atoms are less noisy, so five of six
+# groups stabilize faster (FC 122 -> 74 is the big mover; CH 72 -> 79).
 # Leaderboard pitch-CATEGORY rows pool several types (js/aggregator.js
 # PITCH_CATEGORIES), so they take the stiffest member gate.
-STABILIZE_N_CATEGORY = {'Hard': 96, 'Breaking': 122, 'Offspeed': 72}
+STABILIZE_N_CATEGORY = {'Hard': 81, 'Breaking': 83, 'Offspeed': 79}
 
 
 def stabilize_n(pitch_type):
@@ -386,10 +421,13 @@ def build_surfaces(baseline, lg_woba, woba_scale):
     def acc0():
         return {k: _zeros() for k in ('swn', 'swd', 'whn', 'fln', 'bipn', 'bipd')}
     A = defaultdict(acc0)                                   # [(grp,bh,ph)]
-    AC = defaultdict(lambda: {'swn': _zeros(), 'swd': _zeros()})   # [(grp,bh,ph,count)]
+    AC = defaultdict(lambda: {'swn': _zeros(), 'swd': _zeros(),
+                              'whn': _zeros()})   # [(grp,bh,ph,count)]
     csn = {h: _zeros() for h in HANDS}
     csd = {h: _zeros() for h in HANDS}
     cnt_sw = defaultdict(lambda: [0, 0])   # count -> [swings, pitches] (league)
+    cnt_wh = defaultdict(lambda: [0, 0])   # count -> [whiffs, swings] (league)
+    xw_cnt = defaultdict(lambda: [0.0, 0])  # count -> [std xw-value sum, n] (BIP)
     csd_hc = defaultdict(_zeros)           # (hand,count) -> take-count grid
     cs_obs_hc = defaultdict(int)           # (hand,count) -> observed called strikes
 
@@ -405,8 +443,10 @@ def build_surfaces(baseline, lg_woba, woba_scale):
         if d in SWING_DESC:
             a['swn'][i][j] += 1; ac['swn'][i][j] += 1
             cnt_sw[c][0] += 1
+            cnt_wh[c][1] += 1
             if d == 'Swinging Strike':
-                a['whn'][i][j] += 1
+                a['whn'][i][j] += 1; ac['whn'][i][j] += 1
+                cnt_wh[c][0] += 1
             elif d == 'Foul':
                 a['fln'][i][j] += 1
             elif d == 'In Play':
@@ -414,6 +454,8 @@ def build_surfaces(baseline, lg_woba, woba_scale):
                 if has_guts and xw is not None:
                     a['bipn'][i][j] += (xw - lg_woba) / woba_scale
                     a['bipd'][i][j] += 1
+                    xw_cnt[c][0] += (xw - lg_woba) / woba_scale
+                    xw_cnt[c][1] += 1
         if d in TAKE_DESC:
             csd[bh][i][j] += 1
             csd_hc[(bh, c)][i][j] += 1
@@ -471,11 +513,31 @@ def build_surfaces(baseline, lg_woba, woba_scale):
     cnt_mult = {c: ((v[0] / v[1]) / overall_rate if v[1] and overall_rate else 1.0)
                 for c, v in cnt_sw.items()}
 
+    # League per-count whiff multipliers for the count-level whiff prior.
+    tot_wh = sum(v[0] for v in cnt_wh.values())
+    tot_whsw = sum(v[1] for v in cnt_wh.values())
+    ov_wh = tot_wh / tot_whsw if tot_whsw else 0.0
+    wh_mult = {c: ((v[0] / v[1]) / ov_wh if v[1] and ov_wh else 1.0)
+               for c, v in cnt_wh.items()}
+
     WH, FL, XW, SW = {}, {}, {}, {}
     for key, a in A.items():
         kx, kz = _kernels_for(key[0])
         swn = _gsum(a['swn']); swd = _gsum(a['swd']); bipd = _gsum(a['bipd'])
-        WH[key] = _smooth(a['whn'], a['swn'], _gsum(a['whn']) / max(swn, 1), K_WHIFF, kx, kz)
+        wh_coll = _smooth(a['whn'], a['swn'], _gsum(a['whn']) / max(swn, 1),
+                          K_WHIFF, kx, kz)
+        if WH_COUNT_LEVEL:
+            WH[key] = {}
+            for c in COUNTS:
+                m = wh_mult.get(c, 1.0)
+                prior_c = [[min(1.0, wh_coll[i][j] * m) for j in range(NZ)]
+                           for i in range(NX)]
+                ac = AC.get((key, c))
+                WH[key][c] = (prior_c if ac is None else
+                              _smooth(ac['whn'], ac['swn'], prior_c,
+                                      K_WH_COUNT, kx, kz))
+        else:
+            WH[key] = {c: wh_coll for c in COUNTS}
         FL[key] = _smooth(a['fln'], a['swn'], _gsum(a['fln']) / max(swn, 1), K_FOUL, kx, kz)
         XW[key] = _smooth(a['bipn'], a['bipd'], _gsum(a['bipn']) / max(bipd, 1), K_XWCON, kx, kz)
         coll = _smooth(a['swn'], a['swd'], swn / swd if swd else 0.0, K_SWING_COLL, kx, kz)
@@ -496,8 +558,20 @@ def build_surfaces(baseline, lg_woba, woba_scale):
     BIPOFF = (build_bip_count_offsets(baseline, lg_woba, woba_scale)
               if (BIP_COUNT_ANCHOR and has_guts) else {})
 
+    # Contact-quality level offsets by count (XW_COUNT_LEVEL); thin counts
+    # fall back to the pooled 2021-2026 table.
+    XWOFF = {}
+    if XW_COUNT_LEVEL and has_guts:
+        tot_s = sum(s for s, _n in xw_cnt.values())
+        tot_n = sum(n for _s, n in xw_cnt.values())
+        overall = tot_s / tot_n if tot_n else 0.0
+        XWOFF = dict(XW_CLEVEL_FALLBACK)
+        for c, (s, n) in xw_cnt.items():
+            if n >= XW_CLEVEL_MIN_BIP:
+                XWOFF[c] = s / n - overall
+
     return {'RV': RV, 'PCS': PCS, 'WH': WH, 'FL': FL, 'XW': XW, 'SW': SW,
-            'BIPOFF': BIPOFF}
+            'BIPOFF': BIPOFF, 'XWOFF': XWOFF}
 
 
 # ═════════════════════════════════════════════════════════════════════════
@@ -515,12 +589,13 @@ def score_pitch(p, S):
         return None
     i = _xbin(px); j = _zbin(zn)
     psw = S['SW'][key][c][i][j]
-    pwh = S['WH'][key][i][j]
+    pwh = S['WH'][key][c][i][j]
     pfl = S['FL'][key][i][j]
     pbip = max(0.0, 1.0 - pwh - pfl)
-    # BIP value count-anchored into the same delta-RE currency as the other
-    # four outcome values (offset dict is empty when the option is off).
-    vbip = S['XW'][key][i][j] + S['BIPOFF'].get(c, 0.0)
+    # BIP value: contact-quality count offset (XWOFF, 2026-08-15) plus the
+    # legacy anchor slot (BIPOFF, empty while BIP_COUNT_ANCHOR is off).
+    vbip = (S['XW'][key][i][j] + S['XWOFF'].get(c, 0.0)
+            + S['BIPOFF'].get(c, 0.0))
     pcs = S['PCS'][p['Bats']][c][i][j]
     RV = S['RV']
     swing_val = pwh * RV['whiff'].get(c, 0.0) + pfl * RV['foul'].get(c, 0.0) + pbip * vbip
@@ -677,7 +752,9 @@ def serialize_surfaces(S):
                    'pcsByHand': PCS_BY_HAND,
                    'bipCountAnchor': BIP_COUNT_ANCHOR,
                    'swingPriorCountLevel': SWING_PRIOR_COUNT_LEVEL,
-                   'csCountTransform': CS_COUNT_TRANSFORM},
+                   'csCountTransform': CS_COUNT_TRANSFORM,
+                   'whCountLevel': WH_COUNT_LEVEL,
+                   'xwCountLevel': XW_COUNT_LEVEL},
         'countValues': {slot: {f"{c[0]}-{c[1]}": round(v, 5) for c, v in d.items()}
                         for slot, d in S['RV'].items()},
     }

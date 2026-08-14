@@ -426,7 +426,7 @@ STUFF_COLOR_MIN_PITCHES = 15
 # Loc+ rides the site's measured per-group gates (retested 2026-07-30, all
 # six inside fresh seed spreads) — keeps card/Arsenal-leaderboard parity.
 # Mirrors js/aggregator.js QUAL.MIN_PITCH_LOCPLUS + LOCPLUS_GROUP.
-LOCPLUS_COLOR_MIN = {'FF': 81, 'SI': 96, 'FC': 122, 'SL': 70, 'CU': 93, 'CH': 72}
+LOCPLUS_COLOR_MIN = {'FF': 73, 'SI': 81, 'FC': 74, 'SL': 67, 'CU': 83, 'CH': 79}
 LOCPLUS_COLOR_GROUP = {
     'FF': 'FF', 'FA': 'FF', 'SI': 'SI', 'FC': 'FC', 'CF': 'FC',
     'SL': 'SL', 'ST': 'SL', 'SW': 'SL', 'SV': 'SL',
