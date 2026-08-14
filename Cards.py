@@ -432,7 +432,12 @@ LOCPLUS_COLOR_GROUP = {
     'SL': 'SL', 'ST': 'SL', 'SW': 'SL', 'SV': 'SL',
     'CU': 'CU', 'KC': 'CU', 'CS': 'CU',
     'CH': 'CH', 'FS': 'CH', 'KN': 'CH', 'SC': 'CH'}
-LOCPLUS_COLOR_DEFAULT = 135   # overall crossing; unmapped types
+LOCPLUS_COLOR_DEFAULT = float('inf')   # unmapped types stay uncolored —
+                                       # matches pipeline_locplus
+                                       # STABILIZE_N_UNVALIDATED ("don't
+                                       # color what we can't validate");
+                                       # the old 135 fallback was the
+                                       # retired overall crossing
 
 # BIP-denominated coloring gates: GB% 25 BIP is the measured reliability-0.5
 # crossing (== site MIN_BIP_PCTL); xwOBAcon 25 BIP is an accepted convention
@@ -3744,10 +3749,10 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "CHC"
-    start_date      = "2026-08-13"    # Set to None for full season
-    end_date        = "2026-08-13"             # Set to a date for date range, or None for single day
-    filter_pitchers = "Gausman, Kevin"                 # Semicolon-separated "Last, First" names, or "" for all
+    team            = "NEW"
+    start_date      = None    # Set to None for full season
+    end_date        = None             # Set to a date for date range, or None for single day
+    filter_pitchers = "Martinez, Seth"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR

@@ -36,11 +36,14 @@ becoming markedly more stuff-independent.
 Pitch-type groups (validated by clustering value surfaces):
   FF | SI | FC | SL(+ST,SW,SV) | CU(+KC,CS) | CH(+FS,KN,SC) | OTHER
 
-Normalization: locPlus = 100 + 10·(mu - raw_adj)/sigma  (sign-flipped so
-higher = better). mu, sigma from qualified MLB pitchers; n_prior=135 overall,
-per-group dict per pitch type (N_PRIOR_OVERALL / N_PRIOR_PT below — measured
-split-half r=0.5 crossings, 10-seed re-measure 2026-07-13). ROC pitchers are
-scored against the MLB surfaces but excluded from the (mu, sigma) pool.
+Normalization: displayed Loc+ (overall and per-type) is the plain mean of
+per-pitch INTEGER atoms graded against per-group anchors (coherent canon,
+2026-07-18) — no reliability shrinkage: N_PRIOR_OVERALL / N_PRIOR_PT are
+ZEROED below (the measured r=0.5 crossings, overall 135 + per-group dict,
+are documented there but not applied). raw_loc_adj / locRuns100 / zone_loc
+still flow through _normalize (mu, sigma from qualified MLB pitchers). ROC
+pitchers are scored against the MLB surfaces but excluded from the
+(mu, sigma) pool.
 """
 import math
 from collections import defaultdict
