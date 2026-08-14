@@ -30,9 +30,17 @@ rv_contact ≈ high xwOBA on heart contact. The (rv_contact - rv_whiff)
 weighting makes high-stakes contact count more toward the hitter's score.
 
 Cell RVs are count-anchored (build_bip_count_offsets) so BIP and whiff
-values share the count-conditional delta-RE currency. The (zone × count)
-cell structure was validated as approximately optimal at current samples —
-pitch-type expansion added <1% residual variance.
+values share the count-conditional delta-RE currency. (SD+ dropped its
+anchor 2026-08-15; CT+ keeps it — the toggle was flat on reliability and
+slightly negative on prediction in the multi-season battery.)
+
+Cells are (zone × count × FB/BRK/OFF) since 2026-08-15, with the same
+cascade shrinkage as SD+: cell → (zone × cat) → zone, k=200 per level.
+The old "pitch-type expansion added <1% residual variance" claim did not
+survive replicate testing — cat3 won split-half reliability 6/6 seasons
+2021-2026 and next-season prediction 4/4 pairs (+0.005/+0.004), and wins
+at the Hitter+ composite level (scripts/hitter_phase2b_followup.py,
+hitterplus_weights_v2.py).
 """
 import math
 from collections import defaultdict
@@ -40,7 +48,7 @@ from collections import defaultdict
 from pipeline_utils import safe_float
 from pipeline_sdplus import (
     classify_zone, classify_decision, get_count, is_eligible,
-    make_rv_xrv, build_bip_count_offsets, ZONES, COUNTS,
+    make_rv_xrv, build_bip_count_offsets, ZONES, COUNTS, CATS, cat_of,
 )
 
 # ── Hyperparameters ─────────────────────────────────────────────────────
@@ -50,6 +58,10 @@ CELL_SHRINK_K  = 200      # cell → zone shrinkage pseudo-swings. Raised from
                           #   k-sweep showed reliability up (+.007 for CT+)
                           #   with prediction flat.
 HITTER_PRIOR_N = 65       # hitter → league regression pseudo-swings.
+                          #   Re-measured 2026-08-15 for the cat3 tables
+                          #   (scripts/n0_remeasure_2026_08.py: consensus
+                          #   66, implied 64-65 at core Ns) — unchanged
+                          #   within noise, 65 stands.
                           #   Set to the metric's stabilization constant n0.
                           #   For a shrinkage estimator adj=(n·obs+K·lg)/(n+K),
                           #   the MMSE-optimal pseudo-count is exactly K=n0.
@@ -98,14 +110,26 @@ def is_ct_eligible(p):
 
 # ── Weight table ────────────────────────────────────────────────────────
 
+def _cell_stats(c):
+    n_sw, n_wh = c['n_swings'], c['n_whiff']
+    n_ct = n_sw - n_wh
+    return {
+        'n_swings':  n_sw,
+        'n_whiff':   n_wh,
+        'p_whiff':   (n_wh / n_sw) if n_sw else 0.0,
+        'rv_contact': (c['sum_rv_contact'] / n_ct) if n_ct else 0.0,
+        'rv_whiff':   (c['sum_rv_whiff']   / n_wh) if n_wh else 0.0,
+    }
+
+
 def build_contact_cell_weights(swings, rv_fn):
-    """For each (zone, count) cell, compute:
+    """For each (zone, count, cat) cell, compute:
         n_swings, n_whiff,
         p_whiff    — league whiff rate in cell
         rv_contact — mean hitter-perspective xRV on contact pitches
         rv_whiff   — mean hitter-perspective xRV on whiff pitches
-    Returns dict keyed by (zone, count).
-    """
+    Returns dict keyed by (zone, count, cat). Cat dimension added
+    2026-08-15 (cat3, mirroring SD+)."""
     cells = defaultdict(lambda: {
         'n_swings': 0, 'n_whiff': 0,
         'sum_rv_contact': 0.0, 'sum_rv_whiff': 0.0,
@@ -117,88 +141,71 @@ def build_contact_cell_weights(swings, rv_fn):
         rv = rv_fn(p)
         if rv is None:
             continue
-        c = cells[(zone, count)]
+        c = cells[(zone, count, cat_of(p))]
         c['n_swings'] += 1
         if outcome == 'whiff':
             c['n_whiff'] += 1
             c['sum_rv_whiff'] += rv
         else:  # contact
             c['sum_rv_contact'] += rv
-
-    out = {}
-    for key, c in cells.items():
-        n_sw, n_wh = c['n_swings'], c['n_whiff']
-        n_ct = n_sw - n_wh
-        out[key] = {
-            'n_swings':  n_sw,
-            'n_whiff':   n_wh,
-            'p_whiff':   (n_wh / n_sw) if n_sw else 0.0,
-            'rv_contact': (c['sum_rv_contact'] / n_ct) if n_ct else 0.0,
-            'rv_whiff':   (c['sum_rv_whiff']   / n_wh) if n_wh else 0.0,
-        }
-    return out
+    return {key: _cell_stats(c) for key, c in cells.items()}
 
 
 def zone_level_contact_means(swings, rv_fn):
-    """Zone-level aggregates used as shrinkage priors for the cells."""
-    zones = defaultdict(lambda: {
-        'n_swings': 0, 'n_whiff': 0,
-        'sum_rv_contact': 0.0, 'sum_rv_whiff': 0.0,
-    })
+    """(zone × cat) and zone aggregates — the two levels of the shrinkage
+    cascade (mirrors pipeline_sdplus.zone_level_means)."""
+    def acc():
+        return {'n_swings': 0, 'n_whiff': 0,
+                'sum_rv_contact': 0.0, 'sum_rv_whiff': 0.0}
+    zc = defaultdict(acc)
+    zones = defaultdict(acc)
     for p in swings:
         zone = classify_zone(p)
         outcome = classify_contact_outcome(p)
         rv = rv_fn(p)
         if rv is None:
             continue
-        c = zones[zone]
-        c['n_swings'] += 1
-        if outcome == 'whiff':
-            c['n_whiff'] += 1
-            c['sum_rv_whiff'] += rv
-        else:
-            c['sum_rv_contact'] += rv
-
-    out = {}
-    for zone, c in zones.items():
-        n_sw, n_wh = c['n_swings'], c['n_whiff']
-        n_ct = n_sw - n_wh
-        out[zone] = {
-            'n_swings':   n_sw,
-            'p_whiff':    (n_wh / n_sw) if n_sw else 0.0,
-            'rv_contact': (c['sum_rv_contact'] / n_ct) if n_ct else 0.0,
-            'rv_whiff':   (c['sum_rv_whiff']   / n_wh) if n_wh else 0.0,
-        }
-    return out
+        for c in (zc[(zone, cat_of(p))], zones[zone]):
+            c['n_swings'] += 1
+            if outcome == 'whiff':
+                c['n_whiff'] += 1
+                c['sum_rv_whiff'] += rv
+            else:
+                c['sum_rv_contact'] += rv
+    return ({k: _cell_stats(c) for k, c in zc.items()},
+            {k: _cell_stats(c) for k, c in zones.items()})
 
 
 def shrink_contact_cells(raw, zone_means, k=CELL_SHRINK_K):
-    """Continuous Bayesian shrinkage of each cell toward its zone prior,
-    for all three quantities (p_whiff, rv_contact, rv_whiff). Handles
-    empty/missing cells gracefully (fall back to zone mean, then to
-    neutral default)."""
+    """Cascade Bayesian shrinkage cell → (zone × cat) → zone, k pseudo-obs
+    per level, for all three quantities (p_whiff, rv_contact, rv_whiff).
+    All 180 (zone, count, cat) cells populated; missing levels fall back
+    to the next level up, then to a neutral default."""
     DEFAULT = {'p_whiff': 0.25, 'rv_contact': 0.0, 'rv_whiff': -0.05,
                'n_swings': 0}
+    zc_means, z_means = zone_means
+    QS = ('p_whiff', 'rv_contact', 'rv_whiff')
     smoothed = {}
     for zone in ZONES:
-        zprior = zone_means.get(zone, DEFAULT)
-        for count in COUNTS:
-            key = (zone, count)
-            cell = raw.get(key) or {
-                'n_swings': 0, 'n_whiff': 0, 'p_whiff': 0.0,
-                'rv_contact': 0.0, 'rv_whiff': 0.0,
-            }
-            n = cell['n_swings']
-            def blend(cell_val, zone_val):
-                denom = n + k
-                return ((n * cell_val + k * zone_val) / denom) if denom else zone_val
-            smoothed[key] = {
-                'n_swings':   n,
-                'n_whiff':    cell['n_whiff'],
-                'p_whiff':    blend(cell['p_whiff'],   zprior['p_whiff']),
-                'rv_contact': blend(cell['rv_contact'], zprior['rv_contact']),
-                'rv_whiff':   blend(cell['rv_whiff'],   zprior['rv_whiff']),
-            }
+        zprior = z_means.get(zone, DEFAULT)
+        for cat in CATS:
+            zcst = zc_means.get((zone, cat), zprior)
+            n_zc = zcst.get('n_swings', 0)
+            zc_shrunk = {q: ((n_zc * zcst[q] + k * zprior[q]) / (n_zc + k)
+                             if (n_zc + k) else zprior[q]) for q in QS}
+            for count in COUNTS:
+                key = (zone, count, cat)
+                cell = raw.get(key) or {
+                    'n_swings': 0, 'n_whiff': 0, 'p_whiff': 0.0,
+                    'rv_contact': 0.0, 'rv_whiff': 0.0,
+                }
+                n = cell['n_swings']
+                smoothed[key] = {
+                    'n_swings': n,
+                    'n_whiff':  cell['n_whiff'],
+                    **{q: ((n * cell[q] + k * zc_shrunk[q]) / (n + k)
+                           if (n + k) else zc_shrunk[q]) for q in QS},
+                }
     return smoothed
 
 
@@ -210,7 +217,7 @@ def compute_ct_swing(p, table):
     made contact, 0 if whiff."""
     zone = classify_zone(p)
     count = get_count(p)
-    cell = table[(zone, count)]
+    cell = table[(zone, count, cat_of(p))]
     leverage = cell['rv_contact'] - cell['rv_whiff']
     is_contact = 1 if classify_contact_outcome(p) == 'contact' else 0
     return leverage, is_contact
@@ -239,7 +246,7 @@ def compute_hitter_ct(pitches_by_hitter, table):
                 # leverage in practice (contact there is worth less than the
                 # ball a whiff would concede); zero-stakes swings drop out.
                 continue
-            cell = table[(classify_zone(p), get_count(p))]
+            cell = table[(classify_zone(p), get_count(p), cat_of(p))]
             exp_con = lev * (1.0 - cell['p_whiff'])
             actual += lev * con
             expected += exp_con
@@ -305,10 +312,12 @@ def regress_and_normalize(hitter_raw, n_prior=HITTER_PRIOR_N,
 # ── Packaging ───────────────────────────────────────────────────────────
 
 def serialize_weight_table(smoothed):
-    """Cell table in JSON-friendly form for metadata output."""
+    """Cell table in JSON-friendly form for metadata output. Key format
+    `{zone}|{cat}|{b}-{s}` since cat3 (2026-08-15), matching SD+'s
+    zone|cat|count|decision convention."""
     out = {}
-    for (zone, count), cell in smoothed.items():
-        out[f"{zone}|{count[0]}-{count[1]}"] = {
+    for (zone, count, cat), cell in smoothed.items():
+        out[f"{zone}|{cat}|{count[0]}-{count[1]}"] = {
             'p_whiff':    round(cell['p_whiff'],    5),
             'rv_contact': round(cell['rv_contact'], 5),
             'rv_whiff':   round(cell['rv_whiff'],   5),

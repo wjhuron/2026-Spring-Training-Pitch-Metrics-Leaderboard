@@ -15,8 +15,15 @@ Design highlights (config validated 2026-07-02, scripts/phase2_sdct_harness.py
 - Counts: all 12 as-is. Pitch categories: FB / BRK / OFF (a 2-2 shadow
   slider and 2-2 shadow fastball have very different swing values).
 - RV for cell weights: luck-neutral (xwOBA-based for BIP, -RunExp for
-  non-BIP), with the BIP branch COUNT-ANCHORED into the same
-  count-conditional delta-RE currency (build_bip_count_offsets).
+  non-BIP), BIP branch NOT count-anchored (changed 2026-08-15). The
+  anchor was adopted 2026-07-02 on a single 2026 split-half; the
+  multi-season battery (scripts/hitter_phase2_multiseason.py +
+  hitter_phase2b_followup.py) showed removing it wins split-half
+  reliability 6/6 seasons 2021-2026 (+0.014-0.026) and next-season
+  prediction 3/4 pairs (+0.010), and the edge survives count-neutral
+  aggregation — the estimated offsets add noise beyond any count-mix
+  effect. CT+ KEEPS its anchor (flat/helpful there); Loc+ rejected the
+  same anchor 0/5, so all three models now agree.
 - Cell smoothing: cascade Bayesian shrinkage cell → (zone × cat) → zone,
   k=50 pseudo-obs per level.
 - Aggregation: MIX-NEUTRAL — per-zone mean dv reweighted to the league
@@ -88,16 +95,16 @@ CELL_SHRINK_K  = 200      # cell → zone shrinkage pseudo-obs. Raised from 50
                           # next-season prediction stayed dead flat — the
                           # count-level cell detail beyond k=200 was noise
                           # hitters were being scored against.
-HITTER_PRIOR_N = 200      # hitter → league regression pseudo-obs. Set to
+HITTER_PRIOR_N = 165      # hitter → league regression pseudo-obs. Set to
                           # the measured stabilization constant n0, i.e. the
                           # MMSE-optimal pseudo-count K=n0, matching CT+'s
-                          # convention. Re-measured 2026-07-13 for the k=200
-                          # tables (scripts/n0_remeasure_ship.py, 2024-2026:
-                          # implied n0 193-212 at every N, consensus 198);
-                          # the old 250 was measured on k=50 tables —
-                          # heavier cell smoothing removes table noise, so
-                          # the hitter estimate stabilizes faster.
-MIN_HITTER_DECISIONS = 200  # floor = split-half r=.50 point (signal=
+                          # convention. Re-measured 2026-08-15 for the
+                          # UN-ANCHORED definition (scripts/
+                          # n0_remeasure_2026_08.py, 2024-2026: implied n0
+                          # 157-173 across every N, consensus 166) — the
+                          # more reliable un-anchored metric stabilizes
+                          # faster than the anchored form's 198/200.
+MIN_HITTER_DECISIONS = 165  # floor = split-half r=.50 point (signal=
                             # noise), = n0 by construction; moves with the
                             # re-measure above. Leaderboard qualification
                             # (3.1 × TGP) is a separate stricter gate.
@@ -503,10 +510,9 @@ def compute_sd_plus(all_pitches, pitches_by_hitter, lg_woba, woba_scale):
     # hitters are looked up against this MLB table by compute_hitter_sd.
     eligible = [p for p in all_pitches if p.get('_source','MLB')=='MLB' and is_eligible(p)]
 
-    # Count-anchor the BIP branch so all outcomes share the count-conditional
-    # delta-RE currency (see build_bip_count_offsets).
-    offsets = build_bip_count_offsets(eligible, lg_woba, woba_scale)
-    rv_fn = make_rv_xrv(lg_woba, woba_scale, offsets)
+    # BIP branch un-anchored (2026-08-15, see module docstring). The
+    # count-anchor machinery stays exported for CT+ (which keeps it).
+    rv_fn = make_rv_xrv(lg_woba, woba_scale)
 
     raw_table = build_weight_table(eligible, rv_fn)
     zone_means = zone_level_means(eligible, rv_fn)

@@ -358,7 +358,8 @@ def main():
         return (100.0 * dv(p) / lg_mean_dv, classify_zone(p), st)
 
     def ct_tuple(p):
-        cell = ctw[f'{classify_zone(p)}|{get_count(p)[0]}-{get_count(p)[1]}']
+        # cat3 key format since 2026-08-15 (zone|cat|b-s)
+        cell = ctw[f'{classify_zone(p)}|{cat_of(p)}|{get_count(p)[0]}-{get_count(p)[1]}']
         lev = cell['rv_contact'] - cell['rv_whiff']
         E = 1.0 - cell['p_whiff']
         made = 1.0 if classify_contact_outcome(p) == 'contact' else 0.0
