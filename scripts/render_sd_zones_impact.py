@@ -346,9 +346,10 @@ def main():
     mlb = [p for p in allp if p.get('_source', 'MLB') == 'MLB' and is_eligible(p)]
 
     def dv(p):
-        z, c, cat = classify_zone(p), get_count(p), cat_of(p)
-        s = sdw[f'{z}|{cat}|{c[0]}-{c[1]}|swing']['rv']
-        t = sdw[f'{z}|{cat}|{c[0]}-{c[1]}|take']['rv']
+        # SD+ cells are category-collapsed since 2026-08-15 ('ALL' key)
+        z, c = classify_zone(p), get_count(p)
+        s = sdw[f'{z}|ALL|{c[0]}-{c[1]}|swing']['rv']
+        t = sdw[f'{z}|ALL|{c[0]}-{c[1]}|take']['rv']
         return (s - t) if classify_decision(p) == 'swing' else (t - s)
 
     lg_mean_dv = sum(dv(p) for p in mlb) / len(mlb)

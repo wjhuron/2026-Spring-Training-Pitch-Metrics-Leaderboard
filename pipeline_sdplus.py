@@ -1,7 +1,8 @@
 """SD+ (Swing Decisions+) — per-pitch decision-quality metric.
 
-Builds a 360-cell (5 zones × 12 counts × 3 pitch categories × 2 decisions)
-run-value weight table from league-wide MLB pitch data, then scores each
+Builds a 120-cell (5 zones × 12 counts × 2 decisions; category-collapsed
+since 2026-08-15, see the CATS block) run-value weight table from
+league-wide MLB pitch data, then scores each
 hitter on the decision-value of their own decisions (swing/take) using the
 league cell weights, reweighted to the league zone mix. 100 = league-average
 decision-maker.
@@ -12,8 +13,8 @@ Design highlights (config validated 2026-07-02, scripts/phase2_sdct_harness.py
   specific SzTop/SzBot (which already incorporate the ABS adjustment in
   this pipeline). Five buckets: heart / shadow_in / shadow_out / chase /
   waste. Shadow is split on whether the pitch is a strike (via compute_in_zone).
-- Counts: all 12 as-is. Pitch categories: FB / BRK / OFF (a 2-2 shadow
-  slider and 2-2 shadow fastball have very different swing values).
+- Counts: all 12 as-is. Pitch categories: NONE since 2026-08-15 — the
+  cat3 dimension failed its permuted-label placebo (see the CATS block).
 - RV for cell weights: luck-neutral (xwOBA-based for BIP, -RunExp for
   non-BIP), BIP branch NOT count-anchored (changed 2026-08-15). The
   anchor was adopted 2026-07-02 on a single 2026 split-half; the
@@ -24,15 +25,14 @@ Design highlights (config validated 2026-07-02, scripts/phase2_sdct_harness.py
   aggregation — the estimated offsets add noise beyond any count-mix
   effect. CT+ KEEPS its anchor (flat/helpful there); Loc+ rejected the
   same anchor 0/5, so all three models now agree.
-- Cell smoothing: cascade Bayesian shrinkage cell → (zone × cat) → zone,
-  k=50 pseudo-obs per level.
+- Cell smoothing: Bayesian shrinkage cell → zone, k=CELL_SHRINK_K.
 - Aggregation: MIX-NEUTRAL — per-zone mean dv reweighted to the league
   zone distribution, so opportunity (the pitch diet faced) doesn't leak
   into the decision score.
 - Per-hitter regression: Bayesian regression toward the league mean with
-  n_prior=250 pseudo-obs (= measured n0, MMSE-optimal).
+  n_prior=HITTER_PRIOR_N pseudo-obs (= measured n0, MMSE-optimal).
 - Normalization: ratio-to-league ×100 (see regress_and_normalize), NOT a
-  z-score scale. Floor: 250 decisions (measured split-half r=.50 point);
+  z-score scale. Floor: MIN_HITTER_DECISIONS (split-half r=.50 point);
   the MLB 3.1 PA × team_games_played qualification is applied separately
   by the leaderboard consumer.
 
@@ -68,14 +68,28 @@ TAKE_DESCRIPTIONS = {'Called Strike', 'Ball'}
 ZONES = ['heart', 'shadow_in', 'shadow_out', 'chase', 'waste']
 COUNTS = [(b, s) for b in range(4) for s in range(3)]
 
-# Pitch-category split of the cell table (2026-07-02): a 2-2 shadow slider
-# and a 2-2 shadow fastball carry very different swing values. 360 cells
-# (5 zones × 12 counts × 3 cats × 2 decisions) with a shrinkage cascade
-# cell → (zone × cat) → zone. Validated: split-half r +0.016/+0.006 vs the
-# zone×count table (scripts/phase2_sdplus_extensions.py).
+# Pitch categories. cat_of/CATS are the REAL three-way split, still used
+# by CT+ (whose cat3 cells survived a permuted-label placebo on predictive
+# evidence, 4/4 pairs) and other consumers.
+#
+# SD+'s OWN cells are CATEGORY-COLLAPSED (reverted 2026-08-15): the cat3
+# dimension added 2026-07-02 (+0.016 split-half on 2026) turned out to be
+# a flexibility artifact — a PERMUTED-label placebo beat the real cat3 on
+# split-half reliability (0.7218 vs 0.7190) while real cat3 was WORST on
+# next-season prediction (nocat +0.1723, placebo +0.1709, real +0.1684;
+# scripts/sd_cat3_placebo.py). Given zone + count, pitch category carries
+# no hitter-separating decision signal; split-half reliability is gameable
+# by added partition structure and cannot justify structure by itself.
 CATS = ('FB', 'BRK', 'OFF')
 FB_CAT_TYPES = {'FF', 'SI', 'FC', 'FA'}
 OFF_CAT_TYPES = {'CH', 'FS', 'SC', 'KN'}
+
+SD_CATS = ('ALL',)
+
+
+def _sd_cat(p):
+    """SD+ cell category: collapsed (see revert note above)."""
+    return 'ALL'
 
 
 def cat_of(p):
@@ -95,16 +109,16 @@ CELL_SHRINK_K  = 200      # cell → zone shrinkage pseudo-obs. Raised from 50
                           # next-season prediction stayed dead flat — the
                           # count-level cell detail beyond k=200 was noise
                           # hitters were being scored against.
-HITTER_PRIOR_N = 165      # hitter → league regression pseudo-obs. Set to
+HITTER_PRIOR_N = 180      # hitter → league regression pseudo-obs. Set to
                           # the measured stabilization constant n0, i.e. the
                           # MMSE-optimal pseudo-count K=n0, matching CT+'s
-                          # convention. Re-measured 2026-08-15 for the
-                          # UN-ANCHORED definition (scripts/
-                          # n0_remeasure_2026_08.py, 2024-2026: implied n0
-                          # 157-173 across every N, consensus 166) — the
-                          # more reliable un-anchored metric stabilizes
-                          # faster than the anchored form's 198/200.
-MIN_HITTER_DECISIONS = 165  # floor = split-half r=.50 point (signal=
+                          # convention. Re-measured 2026-08-15 for the final
+                          # definition (un-anchored, category-collapsed;
+                          # scripts/n0_remeasure_sd_revert.py, 2024-2026:
+                          # implied 170-186 across N, consensus 179). The
+                          # anchored cat3 form measured 198/200; un-anchored
+                          # cat3 measured 166.
+MIN_HITTER_DECISIONS = 180  # floor = split-half r=.50 point (signal=
                             # noise), = n0 by construction; moves with the
                             # re-measure above. Leaderboard qualification
                             # (3.1 × TGP) is a separate stricter gate.
@@ -317,7 +331,7 @@ def build_weight_table(pitches, rv_fn):
         rv = rv_fn(p)
         if rv is None:
             continue
-        key = (zone, count, cat_of(p), decision)
+        key = (zone, count, _sd_cat(p), decision)
         cells[key]['sum'] += rv
         cells[key]['n'] += 1
     return {k: (v['sum'] / v['n'], v['n']) for k, v in cells.items()}
@@ -334,8 +348,8 @@ def zone_level_means(pitches, rv_fn):
         rv = rv_fn(p)
         if rv is None:
             continue
-        zc_sum[(zone, cat_of(p), decision)] += rv
-        zc_n[(zone, cat_of(p), decision)] += 1
+        zc_sum[(zone, _sd_cat(p), decision)] += rv
+        zc_n[(zone, _sd_cat(p), decision)] += 1
         z_sum[(zone, decision)] += rv
         z_n[(zone, decision)] += 1
     return ({k: (zc_sum[k] / zc_n[k], zc_n[k]) for k in zc_sum},
@@ -350,7 +364,7 @@ def shrink_table(raw_table, zone_means, k=CELL_SHRINK_K):
     smoothed = {}
     for zone in ZONES:
         for count in COUNTS:
-            for cat in CATS:
+            for cat in SD_CATS:
                 for decision in ('swing', 'take'):
                     z_mean, _zn = z_means.get((zone, decision), (0.0, 0))
                     zc_mean, zc_n = zc_means.get((zone, cat, decision), (0.0, 0))
@@ -372,7 +386,7 @@ def compute_dv(p, table):
     zone = classify_zone(p)
     decision = classify_decision(p)
     count = get_count(p)
-    cat = cat_of(p)
+    cat = _sd_cat(p)
     swing_rv, _ = table[(zone, count, cat, 'swing')]
     take_rv,  _ = table[(zone, count, cat, 'take')]
     if decision == 'swing':
