@@ -43,6 +43,9 @@ VENUE_ELEVATION_FT_OVERRIDE = {
     4895: 16,    # London Stadium, London
     5355: 3010,  # Las Vegas Ballpark, Summerlin (Athletics temp. home) — high on
                  # the valley's western bench; MLB feed omits the elevation
+    5445: 994,   # Field of Dreams, Dyersville IA (2026 special event) — feed
+                 # returns an empty venue.location; DEM at the park's own
+                 # coordinates (USGS 994 ft, open-elevation cross-check 997)
     # ── Triple-A: ALL 30 parks ────────────────────────────────────────────
     # The MiLB feed omits elevation for every one of them, so an unlisted park
     # silently yields rho=None -> factor 1.0 -> completely un-adjusted xIVB/xHB.
