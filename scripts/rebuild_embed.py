@@ -60,6 +60,23 @@ def _write_gz(path, obj):
 def main(core_gz=CORE_GZ, heavy_gz=HEAVY_GZ, tables_gz=TABLES_GZ):
     obj = _read_gz(core_gz)
     obj['pitcherData'] = json.load(open(os.path.join(DATA, 'pitcher_leaderboard_rs.json')))
+    # The inject step also updates metadata (Pitcher+ baseline, dhERA/phERA
+    # anchors + constants). Merge the inject-owned keys so the embedded
+    # metadata never ships a cycle stale.
+    try:
+        _md = json.load(open(os.path.join(DATA, 'metadata_rs.json')))
+        _core_md = obj.setdefault('metadata', {})
+        for _k in ('pitcherPlusBaseline', 'eraPlusConstants'):
+            if _k in _md:
+                _core_md[_k] = _md[_k]
+        _pla = _md.get('pitcherLeagueAverages') or {}
+        if _pla:
+            _core_pla = _core_md.setdefault('pitcherLeagueAverages', {})
+            for _k in ('dhera', 'phera'):
+                if _k in _pla:
+                    _core_pla[_k] = _pla[_k]
+    except (OSError, json.JSONDecodeError):
+        pass
     _write_gz(core_gz, obj)
     n_stuff = sum(1 for r in obj['pitcherData'] if r.get('stuffScore') is not None)
     print(f"Rebuilt {os.path.basename(core_gz)}: {len(obj['pitcherData'])} pitchers "

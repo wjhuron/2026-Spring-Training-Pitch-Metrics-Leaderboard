@@ -52,6 +52,10 @@ const COLUMNS = {
     { key: 'ip',          label: 'IP',       format: function(v){ return v != null ? v : '—'; }, sortType: 'numeric', noPercentile: true, group: 'counting' },
     { key: 'era',         label: 'ERA',      format: Utils.formatDecimal(2), sortType: 'numeric', sectionStart: true, desc: 'Earned run average', group: 'advanced' },
     { key: 'siera',       label: 'SIERA',    format: Utils.formatDecimal(2), sortType: 'numeric', desc: 'ERA estimator built only from strikeouts, walks, and ground balls — the outcomes a pitcher controls most. Better than ERA or FIP at predicting future performance', group: 'advanced' },
+    { key: 'dhERA',       label: 'dhERA',    format: Utils.formatDecimal(2), sortType: 'numeric', desc: 'Deserved ERA — what this season deserves with defense, sequencing, ballpark, and batted-ball luck stripped: xwOBA against, shrunk for sample size and mapped to the ERA scale. Describes the season better than FIP once luck channels are excluded (the gap between dhERA and actual ERA IS the luck). Season-long metric: it does not react to leaderboard filters.', group: 'advanced' },
+    { key: 'phERA',       label: 'phERA',    format: Utils.formatDecimal(2), sortType: 'numeric', desc: 'Projected ERA going forward — the Pitcher+ component set (Stuff+, Loc+, K%, zone whiffs, xRV, ground balls) plus role and park, weighted by out-of-sample fit against future ERA, 2021-2026. Beats SIERA at predicting both rest-of-season and next-season ERA in every tested season. 30+ IP only. Season-long metric: it does not react to leaderboard filters.', group: 'advanced' },
+    { key: 'dhERAPlus',   label: 'dhERA+',   format: Utils.formatInt, sortType: 'numeric', desc: 'dhERA on the 100 scale (like wRC+): 100 = league average, higher = better, each point = 1% of league-average run prevention deserved. Same information as dhERA, reversed scale.', group: 'advanced' },
+    { key: 'phERAPlus',   label: 'phERA+',   format: Utils.formatInt, sortType: 'numeric', desc: 'phERA on the 100 scale (like wRC+): 100 = league average, higher = better, each point = 1% of league-average run prevention projected going forward. Same information as phERA, reversed scale.', group: 'advanced' },
     { key: 'stuffScore',  label: 'Stuff+',   format: Utils.formatInt, sortType: 'numeric', sectionStart: true, desc: 'Stuff+ — overall pitch quality from physical characteristics only (velocity, movement, release, arm angle), usage-weighted across the arsenal and independent of location or outcome. 100 = league avg. The per-pitch-type Stuff+ columns are standardized to +10 = 1 SD; this overall number is their usage-weighted mean, and averaging an arsenal compresses the spread, so 1 SD is about 8 points here.', group: 'run_value' },
     { key: 'locPlus',     label: 'Loc+',     format: Utils.formatInt, sortType: 'numeric', desc: 'Location+ — per-pitch location quality scored against an xRV-weighted (zone × count × pitch-type × handedness) model. Command independent of stuff or contact luck. 100 = league avg. The per-pitch-type Loc+ columns are standardized to +10 = 1 SD; this overall number is both averaged across the arsenal and shrunk toward 100 by its reliability prior, so 1 SD is about 6 points here.', group: 'run_value' },
     { key: 'commandPlus', label: 'Command+', format: Utils.formatInt, sortType: 'numeric', desc: "Command+ — execution repeatability: average miss distance from the pitcher's inferred targets (fit per pitch type, batter hand, and count situation, pooled coarser where he throws a pitch too rarely to read the situation). 100 = league avg, +10 = 1 SD tighter. Forecasts future walk rate beyond current BB%; it does NOT predict run prevention beyond Loc+ (command's run impact already lives in Loc+), and higher velocity trades against it. ROC pitchers scored against their own targets — no MLB translation.", group: 'run_value' },
@@ -281,7 +285,7 @@ const Leaderboard = {
 
   _TAB_HIDDEN_DEFAULTS: {
     pitchMetrics:          ['maxVelo', 'vaa', 'haa', 'cswPct', 'barrelPctAgainst', 'xwOBA', 'xBA', 'xSLG', 'rv100', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100', 'xrvoe100'],
-    pitcherStats:          ['w', 'l', 'sv', 'hld', 'tbf', 'fip', 'xFIP', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100'],
+    pitcherStats:          ['w', 'l', 'sv', 'hld', 'tbf', 'era', 'siera', 'fip', 'xFIP', 'pitchingScore', 'dhERAPlus', 'phERAPlus', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100'],
     pitcherSwingDecisions: ['twoStrikeWhiffPct', 'fpsPct', 'oneOneWinPct', 'earlyActionPct'],
     pitcherBattedBall:     ['hrFbPct', 'xwOBAsp', 'xBA', 'xSLG', 'maxEVAgainst'],
     hitterStats:           ['g', 'ab', 'ops', 'iso', 'babip', 'bbToK', 'xwOBAcon', 'xBA', 'xSLG', 'doubles', 'triples', 'cs', 'sbPct'],
@@ -526,6 +530,15 @@ const Leaderboard = {
     avg.pitchingScore = 100;
     avg.pitcherPlus = 100;
     avg.pitcherPlusProj = 100;
+    avg.dhERAPlus = 100;
+    avg.phERAPlus = 100;
+    // dhERA/phERA anchor at the 30+ IP pool mean ERA by construction;
+    // the pipeline publishes it in pitcherLeagueAverages.
+    try {
+      var _pla = (DataStore.active().metadata || {}).pitcherLeagueAverages || {};
+      if (_pla.dhera != null) avg.dhERA = _pla.dhera;
+      if (_pla.phera != null) avg.phERA = _pla.phera;
+    } catch (e) { /* metadata not loaded yet: leave blank */ }
     return avg;
   },
 

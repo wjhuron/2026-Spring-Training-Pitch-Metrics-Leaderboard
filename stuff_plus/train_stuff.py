@@ -1814,15 +1814,28 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None):
     n_pplus = sum(1 for row in pp if row.get('pitcherPlus') is not None)
     n_proj = sum(1 for row in pp if row.get('pitcherPlusProj') is not None)
 
+    # ── dhERA / phERA (after Pitcher+: phERA consumes the fresh
+    # stuffScore + locPlusRaw + rate stats). Also sets the default
+    # leaderboard row order (phERA good -> bad).
+    from pipeline_eraplus import apply_era_plus, sort_rows_default
+    _era_const = apply_era_plus(pp, pitches)
+    sort_rows_default(pp)
+
     json.dump(pp, open(pp_path, 'w'))
 
     # Baseline goes to metadata so the client can recompute Pitcher+ under
     # filters against the season-long league scale.
-    if _pp_base:
+    if _pp_base or _era_const:
         _md_path = os.path.join(DATA, 'metadata_rs.json')
         try:
             _md = json.load(open(_md_path))
-            _md['pitcherPlusBaseline'] = serialize_baseline(_pp_base)
+            if _pp_base:
+                _md['pitcherPlusBaseline'] = serialize_baseline(_pp_base)
+            if _era_const:
+                _md['eraPlusConstants'] = _era_const
+                _md.setdefault('pitcherLeagueAverages', {})
+                _md['pitcherLeagueAverages']['dhera'] = _era_const['anchor']
+                _md['pitcherLeagueAverages']['phera'] = _era_const['anchor']
             json.dump(_md, open(_md_path, 'w'))
         except Exception as _e:
             print(f'  (metadata baseline write skipped: {_e})')

@@ -820,6 +820,12 @@ const Aggregator = {
                      // the composite from half-filtered parts would be less
                      // honest than carrying the season value through.
                      'pitcherPlus', 'pitcherPlus_pctl', 'pitcherRuns100',
+                     // dhERA/phERA are season-level by definition (shrunk
+                     // inputs, 30+ IP z-pools): filtered views carry the
+                     // season value, same contract as Pitcher+.
+                     'dhERA', 'dhERA_pctl', 'phERA', 'phERA_pctl',
+                     'dhERAPlus', 'dhERAPlus_pctl',
+                     'phERAPlus', 'phERAPlus_pctl',
                      // Command+ is season-level like Pitcher+: targets are
                      // fit on the full season, so filtered views preserve
                      // rather than recompute it.
