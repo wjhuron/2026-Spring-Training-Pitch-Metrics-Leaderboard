@@ -2484,8 +2484,14 @@ const Aggregator = {
       const guts = (typeof DataStore !== 'undefined' && DataStore.metadata &&
                     DataStore.metadata.gutsConstants) || null;
       if (guts && guts.wOBAScale > 0 && guts.lgRPA > 0 && obj.xwOBA != null) {
-        obj.xWRCplus = Math.round((((obj.xwOBA - guts.lgWOBA) / guts.wOBAScale) + guts.lgRPA)
-                                  / guts.lgRPA * 100);
+        var _xw = (((obj.xwOBA - guts.lgWOBA) / guts.wOBAScale) + guts.lgRPA)
+                  / guts.lgRPA * 100;
+        // run-truth cap (2026-08-15): player rows ship rescaled from the
+        // pipeline; apply the same published factor here so team-mode
+        // formula values stay on the shipped scale.
+        var _xs = (DataStore.metadata.plusWrcScale || {}).xWRCplus;
+        if (_xs && _xs.factor) _xw = 100 + (_xw - 100) * _xs.factor + (_xs.shift || 0);
+        obj.xWRCplus = Math.round(_xw);
       }
 
       // BB+ (2026-07-13 definition): weighted xwOBAcon+ / sprayPlus indexed
