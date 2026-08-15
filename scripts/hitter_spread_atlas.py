@@ -239,6 +239,31 @@ def main():
     for y in SEASONS:
         data[y] = build_season_cached(y)
 
+    # ── 2026 key normalization (2026-08-15 fix) ──
+    # 2021-2025 come from the statcast adapter keyed by MLB id; 2026 comes
+    # from the sheet cache keyed by 'Last, First'. The 2025->2026
+    # predictive pair silently joined on ZERO common keys. Bridge via the
+    # hitter leaderboard (name + mlbId); ambiguous duplicate names dropped.
+    lb = json.load(open(os.path.join(ROOT, 'data',
+                                     'hitter_leaderboard_rs.json')))
+    nm, ambig = {}, set()
+    for r in lb:
+        n, mid = r.get('hitter'), r.get('mlbId')
+        if not n or not mid:
+            continue
+        if n in nm and nm[n] != str(mid):
+            ambig.add(n)
+        nm[n] = str(mid)
+    for n in ambig:
+        del nm[n]
+    f26, t26 = data[2026]
+    f_id = {nm[h]: v for h, v in f26.items() if h in nm}
+    t_id = {nm[h]: v for h, v in t26.items() if h in nm}
+    print(f'2026 keys remapped name->id: feats {len(f_id)}/{len(f26)}, '
+          f'targ {len(t_id)}/{len(t26)}'
+          + (f' ({len(ambig)} ambiguous names dropped)' if ambig else ''))
+    data[2026] = (f_id, t_id)
+
     METRICS = ['hitterplus', 'xwoba_pa', 'bb', 'sd', 'ct']
     res = {'desc': {}, 'pred': {}}
     print('\n=== DESCRIPTIVE: wRC+ points per 1 SD, per season ===')
