@@ -1,39 +1,41 @@
-# launchd jobs — current state and optional migration
+# launchd jobs — current state
 
-Four user LaunchAgents point at this repo:
+Three user LaunchAgents point at this repo:
 
-| Job | Runs | Status |
+| Job | Runs | Schedule |
 |---|---|---|
-| com.huronalytics.refreshpickle | `refresh_pickle.py` (root stub) | 7:00 daily |
-| com.huronalytics.refreshfg | `fg_overrides.py` (root stub) | 9:00 daily |
 | com.huronalytics.absdaily | `scripts/abs_daily.py` | 7:30 daily |
+| com.huronalytics.refreshfg | `fg_overrides.py` (root stub) | 9:00 daily |
 | com.huronalytics.autopull | `scripts/auto-pull.sh` | keep-alive |
 
-After the 2026-08 reorg, the first two root files are thin stubs that call
-`pipeline.refresh_pickle` and `pipeline.fg_overrides`. The stubs keep the
-old plists working. Nothing breaks if you never touch this.
+## Pickle refresh is manual-only (policy, 2026-08-15)
 
-To retire the stubs, install the replacement plists in this folder:
+The old com.huronalytics.refreshpickle job (7:00 daily) was removed at
+Wally's direction: the local pickle refreshes only on manual runs.
 
 ```bash
-cp docs/launchd/com.huronalytics.refreshpickle.plist ~/Library/LaunchAgents/
+python3 -m pipeline.refresh_pickle
+```
+
+(or `python3 refresh_pickle.py` via the root stub). HitterCards also
+self-heals: it downloads the CI release pickle when the local one is
+stale. History: the scheduled job had crashed on every run since install
+(env var held a path where the client expected JSON content, and the repo
+service_account.json 403s on a division workbook anyway); both defects
+are fixed in code, but the schedule itself is retired.
+
+## refreshfg
+
+Still scheduled, runs through the root `fg_overrides.py` stub, so it
+works unchanged after the 2026-08 reorg. To retire the stub, install the
+replacement plist in this folder:
+
+```bash
 cp docs/launchd/com.huronalytics.refreshfg.plist ~/Library/LaunchAgents/
-launchctl unload ~/Library/LaunchAgents/com.huronalytics.refreshpickle.plist
-launchctl load ~/Library/LaunchAgents/com.huronalytics.refreshpickle.plist
 launchctl unload ~/Library/LaunchAgents/com.huronalytics.refreshfg.plist
 launchctl load ~/Library/LaunchAgents/com.huronalytics.refreshfg.plist
 ```
 
-Then delete `refresh_pickle.py` and `fg_overrides.py` from the repo root.
-
-IMPORTANT (2026-08-15): the old refreshpickle plist exported
-`GOOGLE_SERVICE_ACCOUNT_JSON=<path to repo service_account.json>`. Two
-problems, both fixed:
-
-1. The client treated the env var as inline JSON, so a path crashed it.
-   The 7:00 job had failed on every run since it was installed. The
-   client now accepts a path or inline JSON.
-2. Even as a path, that credential (leaderboard-reader@st-leaderboard)
-   gets 403 on at least one division workbook. The default gspread
-   credential in `~/.config/gspread/service_account.json` is the one with
-   full access, so the replacement plist drops the env var entirely.
+Then `fg_overrides.py` (root stub) can be deleted. `refresh_pickle.py`
+(root stub) stays for manual runs, or use the `-m` form above and delete
+it too.
