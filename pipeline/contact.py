@@ -57,11 +57,17 @@ CELL_SHRINK_K  = 200      # cell → zone shrinkage pseudo-swings. Raised from
                           #   pipeline_sdplus.CELL_SHRINK_K): the 2021-2026
                           #   k-sweep showed reliability up (+.007 for CT+)
                           #   with prediction flat.
-HITTER_PRIOR_N = 65       # hitter → league regression pseudo-swings.
-                          #   Re-measured 2026-08-15 for the cat3 tables
-                          #   (scripts/research/hitter/n0_remeasure_2026_08.py: consensus
-                          #   66, implied 64-65 at core Ns) — unchanged
-                          #   within noise, 65 stands.
+HITTER_PRIOR_N = 61       # hitter → league regression pseudo-swings.
+                          #   Re-measured 2026-08-15 AFTER the per-quantity
+                          #   shrinkage-weight fix
+                          #   (scripts/research/hitter/n0_remeasure_2026_08.py:
+                          #   consensus 61, implied 55-63 across N/half
+                          #   40-180, seasons 2024-2026, 3 seeds). The prior
+                          #   65 was measured under the mis-weighted table.
+                          #   NOTE: CELL_SHRINK_K=200 was not re-swept after
+                          #   the weight fix (n0 barely moving suggests the
+                          #   table-noise structure is unchanged); fold a k
+                          #   re-sweep into the next constants battery.
                           #   Set to the metric's stabilization constant n0.
                           #   For a shrinkage estimator adj=(n·obs+K·lg)/(n+K),
                           #   the MMSE-optimal pseudo-count is exactly K=n0.
