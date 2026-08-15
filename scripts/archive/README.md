@@ -42,6 +42,6 @@ data with stale corrections:
 | Jul 5-6 corrective session (`fix_*`, `apply_*`, `restore_*`, `tracking_diff_*`, `spin_repair_review`, `show_8pa_details`, `missing_pa_breakdown`, `data_diff_savant`) | The data-quality repair sprint | corrections live in the Sheets |
 | `abs_metric_bakeoff`, `abs_research_round2/3` | ABS challenge metric research | `../abs_*` production chain |
 | misc (`accel_test`, `axis_retest`, `depth7_confirm`, `fb_anchor_experiment`, `squared_up_explore`, `velo_diff_by_type`, `midpa_*`, `count_sweep`, `changed_teams_holdout`, `multi_season_retrain`, `train_2526_experiment`, `v12_round2_battery`, `agnostic_stuff_experiment`, `rv_vs_xrv_reliability`, `verify_runexp_alignment`, `test_approach_angles`, `wsh_hitter_analysis`, `_characterize_revisions`, `_platexz_relationship`) | one-off experiments and session scratch | conclusions in memory/commit messages |
-| `stuff_data.py`, `stuff_v10_compare.py`, `validate_supabase_parity.py` | pre-v11 dataset builder; v10 comparison; Supabase-era parity checker | superseded / dormant |
+| `stuff_data.py`, `stuff_v10_compare.py` | pre-v11 dataset builder; v10 comparison | superseded |
 
 `results/` holds committed output artifacts that used to sit loose in scripts/.

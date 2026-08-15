@@ -3,7 +3,7 @@
 # .github/workflows/update-leaderboard.yml): gspread, google-auth, numpy,
 # pandas, scikit-learn, xgboost.
 
-# Pipeline (process_data.py + Stuff+ trainer)
+# Pipeline (pipeline/process_data.py + Stuff+ trainer)
 gspread>=6.0,<7.0
 google-auth>=2.0,<3.0
 numpy
@@ -11,14 +11,12 @@ pandas
 scikit-learn
 xgboost==3.3.0
 
-# Cards + report rendering (Cards.py, HitterCards.py)
+# Cards + report rendering (cards/pitcher.py, cards/hitter.py)
 matplotlib
 Pillow
 
-# Scrapers + Savant/MLB API pulls (Pitcher2026.py, MLBScraper.py, guts.py)
+# Scrapers + Savant/MLB API pulls (scrapers/pitcher2026.py,
+# scrapers/mlb_transactions.py, pipeline/guts.py)
 requests
 beautifulsoup4
 openpyxl
-
-# Dormant Supabase mirror (supabase_append.py; default off since 2026-06-23)
-psycopg2-binary

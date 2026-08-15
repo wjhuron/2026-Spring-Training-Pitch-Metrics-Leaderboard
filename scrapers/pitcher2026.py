@@ -1986,11 +1986,6 @@ def main():
 
     push_to_sheets  = True       # True → also append to AL/NL 2026 Google Sheets after CSV save
 
-    push_to_supabase = False     # Retired: moved back to Sheets (6 division workbooks).
-                                 # Left as a flag (and supabase_append.py kept) in case the
-                                 # Supabase mirror is ever revived; default off — Sheets is
-                                 # the source of truth again.
-
     # ── CLI overrides (optional — values above are used if no args passed) ──
     parser = argparse.ArgumentParser(description='Download pitch data from Baseball Savant')
     parser.add_argument('--team', default=None, help='Team abbreviation')
@@ -2007,10 +2002,6 @@ def main():
                              'in the AL 2026 / NL 2026 Google Sheets workbook (auth one-time '
                              'via ~/.config/gspread/credentials.json).')
     parser.add_argument('--no-push-to-sheets', dest='push_to_sheets', action='store_false')
-    parser.add_argument('--push-to-supabase', dest='push_to_supabase', action='store_true', default=None,
-                        help='After download, upsert the data into the Supabase `pitches` table '
-                             '(keyed on PitchID; idempotent). On by default.')
-    parser.add_argument('--no-push-to-supabase', dest='push_to_supabase', action='store_false')
     args = parser.parse_args()
 
     if args.team is not None: team_abbrev = args.team
@@ -2021,28 +2012,21 @@ def main():
     if args.filter_team is not None: filter_team = args.filter_team
     if args.player_id is not None: player_id = args.player_id
     if args.push_to_sheets is not None: push_to_sheets = args.push_to_sheets
-    if args.push_to_supabase is not None: push_to_supabase = args.push_to_supabase
     if args.output_name is not None: output_name = args.output_name
 
     downloader = BaseballSavantFocusedDownloader()
 
     # Player ID mode always writes a local CSV and never pushes to the remote
     # stores — a season-long single-player pull would duplicate rows the daily
-    # team pulls already appended to the Sheets. (Supabase upserts on PitchID so
-    # it wouldn't duplicate, but we keep player pulls CSV-only for parity unless
-    # --push-to-supabase is passed explicitly.)
+    # team pulls already appended to the Sheets.
     if player_id:
         if push_to_sheets:
             print("Player ID mode: skipping Sheets push — writing local CSV instead.")
             push_to_sheets = False
-        if args.push_to_supabase is None:
-            push_to_supabase = False
 
-    # When pushing to a remote store (Sheets and/or Supabase), the local CSV is
-    # redundant — skip writing it.
-    save_csv = not (push_to_sheets or push_to_supabase)
-    dests = [d for d, on in (("Sheets", push_to_sheets), ("Supabase", push_to_supabase)) if on]
-    dest_label = " + ".join(dests) if dests else "remote"
+    # When pushing to Sheets, the local CSV is redundant — skip writing it.
+    save_csv = not push_to_sheets
+    dest_label = "Sheets"
 
     # ── Logic: player_id first, then game_id, then team/date lookup ──
     if player_id:
@@ -2134,26 +2118,6 @@ def main():
                           f"team(s); wrote {len(unmapped_rows)} rows to: {csv_path}")
                 except Exception as e:
                     print(f"\nCould not write unmapped-team CSV: {e}")
-
-    # Dual-write: upsert the same data into Supabase (keyed on PitchID, so this
-    # is idempotent and safe to re-run). Independent of the Sheets push above.
-    if push_to_supabase and getattr(downloader, '_last_combined_df', None) is not None:
-        combined = downloader._last_combined_df
-        try:
-            from scrapers.supabase_append import push_csv_to_supabase
-            print("\nPushing to Supabase...")
-            n = push_csv_to_supabase(combined)
-            print(f"Supabase: upserted {n} rows into pitches.")
-        except Exception as e:
-            print(f"\nSupabase push failed: {e}")
-            # If Supabase was the only destination (Sheets off) and no CSV was
-            # written, dump a local CSV so the pull isn't lost.
-            if not save_csv and not push_to_sheets and result:
-                try:
-                    combined.to_csv(result, index=False)
-                    print(f"Wrote fallback CSV to: {result}")
-                except Exception as e2:
-                    print(f"Could not write fallback CSV either: {e2}")
 
 
 if __name__ == "__main__":

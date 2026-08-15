@@ -36,7 +36,7 @@ information (SD ~23 and ~19), landing naturally in wRC+ territory.
 Shrinkage constants were measured by scripts/research/era/era_shrinkage_sweep.py
 (split-half, interior optima in every replicate season); weights and
 slopes by scripts/research/era/era_weights_final.py; full provenance in
-data/_era_final_constants.json and the 2026-08-15 research notes.
+data/era_final_constants.json and the 2026-08-15 research notes.
 
 Called from stuff_plus/train_stuff.py --inject (needs the fresh
 stuffScore, like Pitcher+). Keys survive process_data-only runs via

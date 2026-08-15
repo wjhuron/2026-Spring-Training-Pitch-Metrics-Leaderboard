@@ -1,5 +1,5 @@
 # ---- Configuration ----
-input_file_path <- "FCL"  # Team code (e.g., "PIT", "WSH") or full path
+input_file_path <- "WSH"  # Team code (e.g., "PIT", "WSH") or full path
 output_directory <- path.expand("~/Downloads/")
 
 # ---- Optional Filtering Parameters ----

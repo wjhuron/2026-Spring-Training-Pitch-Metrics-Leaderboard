@@ -5,7 +5,7 @@ index (100 = neutral). The page embeds the table as `var data = [...]`;
 the csv=true param does not work on this endpoint, so parse the HTML.
 curl-style urllib with a browser UA is fine for Savant (unlike FanGraphs).
 
-Output: data/_park_factors.json  {season: {team_id: index_runs}}
+Output: data/park_factors.json  {season: {team_id: index_runs}}
 """
 import json
 import os
@@ -13,7 +13,7 @@ import re
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-OUT = os.path.join(ROOT, 'data', '_park_factors.json')
+OUT = os.path.join(ROOT, 'data', 'park_factors.json')
 SEASONS = [2021, 2022, 2023, 2024, 2025, 2026]
 URL = ('https://baseballsavant.mlb.com/leaderboard/statcast-park-factors'
        '?type=year&year={y}&batSide=&stat=index_wOBA&condition=All&rolling=3')

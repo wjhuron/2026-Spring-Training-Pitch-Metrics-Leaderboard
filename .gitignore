@@ -50,10 +50,6 @@ scripts/cache/
 scripts/outputs/
 
 # Biomech: keep the .py scripts but never the heavy assets/outputs
-biomech/clips/
-biomech/out/
-biomech/playid_cache.json
-biomech/pose_landmarker_heavy.task
 *.task
 
 # Stuff+ v10 model artifacts (only the training script is in git;

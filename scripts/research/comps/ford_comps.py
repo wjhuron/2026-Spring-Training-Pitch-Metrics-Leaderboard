@@ -1003,7 +1003,7 @@ def interactive():
     # — Settings (edit these directly, or pass command-line flags instead) —
     role       = "both"     # "hitter", "pitcher", or "both"
     player     = ""         # "Last, First" for one player, or "" for whole team
-    team       = "NEW"      # batch mode: team whose players get comped
+    team       = "ROC"      # batch mode: team whose players get comped
     level      = "both"     # which of the TARGET's stat lines to use: "mlb",
                             #   "aaa", or "both" (comp pool is ALWAYS MLB-only)
     tab        = None       # scratch tab (NLE2026 workbook) as the target's
@@ -1011,8 +1011,8 @@ def interactive():
     start_date = None       # "yyyy-mm-dd", or None for full season
     end_date   = None       # "yyyy-mm-dd", or None for through today
     exclude    = ""         # batch mode: semicolon-separated names to skip
-    min_pa     = 1        # batch mode: min PA to include a hitter
-    min_ip     = 1         # batch mode: min IP to include a pitcher
+    min_pa     = 150        # batch mode: min PA to include a hitter
+    min_ip     = 27         # batch mode: min IP to include a pitcher
     mix_w      = None       # arsenal share of distance (None = default 1/3;
                             #   1.0 = arsenal-only comps)
     mix_outcomes = True     # per-type whiff/zone/GB dims in the pair cost

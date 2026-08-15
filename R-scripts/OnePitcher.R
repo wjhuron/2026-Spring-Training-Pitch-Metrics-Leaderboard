@@ -1,10 +1,10 @@
 # ---- Configuration ----
-input_file_path <- "FCL"  # Team code (e.g., "PIT", "WSH") or full path
+input_file_path <- "WSH"  # Team code (e.g., "PIT", "WSH") or full path
 output_directory <- path.expand("~/Downloads/")
 
 # ---- Optional Filtering Parameters ----
 # Set these to NULL to disable filtering
-selected_pitcher_filter <- "Kuhns, Tegan"  # Example format: "Bieber, Shane"
+selected_pitcher_filter <- "Estrada, Lazaro"  # Example format: "Bieber, Shane"
 start_date_filter <- "2026-01-01"        # Example format: "2025-04-01"
 end_date_filter <- "2026-11-28"         # Example format: "2025-04-20"
 

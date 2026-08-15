@@ -217,9 +217,9 @@ HEADLINE_STATS_ROC = ['PA', 'HR', 'AVG', 'OBP', 'SLG', 'OPS', 'wOBA', 'wRC+']
 HEADLINE_STATS = HEADLINE_STATS_MLB  # default; render switches based on team
 
 # ─────────────────────────────────────────────────────────────────────
-# Theme variables — warm-paper defaults. Theme wrappers (e.g.
-# HitterCards_light_gray.py, HitterCards_vintage.py) can override these
-# for alternate looks.
+# Theme variables — warm-paper defaults. (The light-gray and vintage
+# theme wrappers that used to override these were deleted 2026-08-15;
+# a new theme can still monkey-patch these globals before rendering.)
 # ─────────────────────────────────────────────────────────────────────
 TEXT_PRIMARY       = '#1a1612'      # warm near-black (name, headline values)
 TEXT_SECONDARY     = '#3a3530'      # deep warm gray (section titles, headers)

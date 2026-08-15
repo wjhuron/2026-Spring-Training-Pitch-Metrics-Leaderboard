@@ -4,8 +4,8 @@ output_directory <- path.expand("~/Downloads/")
 # ---- Optional Filtering Parameters ----
 # Set these to NULL to disable filtering
 selected_pitcher_filter <- NULL          # Example format: "Bieber, Shane" - Set to NULL for all pitchers
-start_date_filter <- "2026-07-12"        # Example format: "2025-05-18" - Set to NULL for no date filter
-end_date_filter <- "2026-07-12"          # Example format: "2025-05-18" - Set to NULL for no date filter
+start_date_filter <- "2026-08-15"        # Example format: "2025-05-18" - Set to NULL for no date filter
+end_date_filter <- "2026-08-15"          # Example format: "2025-05-18" - Set to NULL for no date filter
 # ---- Required Libraries ----
 library(tidyverse)
 library(patchwork)

@@ -1,0 +1,10537 @@
+{
+"entries": {
+"Abbott, Andrew|L|CH": {
+"active": 95.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Abbott, Andrew|L|CU": {
+"active": 48.0,
+"purity": 0.947,
+"savant": "CU",
+"via": "direct"
+},
+"Abbott, Andrew|L|FF": {
+"active": 95.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Abbott, Andrew|L|ST": {
+"active": 35.1,
+"purity": 0.979,
+"savant": "ST",
+"via": "direct"
+},
+"Abel, Mick|R|CH": {
+"active": 68.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Abel, Mick|R|FF": {
+"active": 84.1,
+"purity": 0.987,
+"savant": "FF",
+"via": "direct"
+},
+"Abreu, Bryan|R|FC": {
+"active": 45.6,
+"purity": 0.968,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Abreu, Bryan|R|FF": {
+"active": 86.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Abreu, Bryan|R|SL": {
+"active": 58.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Adam, Jason|R|CH": {
+"active": 78.3,
+"purity": 0.994,
+"savant": "CH",
+"via": "direct"
+},
+"Adam, Jason|R|FF": {
+"active": 89.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Adam, Jason|R|SL": {
+"active": 20.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Adams, Travis|R|CH": {
+"active": 89.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Adams, Travis|R|FC": {
+"active": 46.5,
+"purity": 0.989,
+"savant": "FC",
+"via": "direct"
+},
+"Adams, Travis|R|FF": {
+"active": 80.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Adams, Travis|R|SL": {
+"active": 34.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Agnos, Zach|R|FC": {
+"active": 61.8,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Agnos, Zach|R|FF": {
+"active": 97.1,
+"purity": 0.983,
+"savant": "FF",
+"via": "direct"
+},
+"Agnos, Zach|R|FS": {
+"active": 90.6,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Agnos, Zach|R|SI": {
+"active": 94.4,
+"purity": 0.991,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Agnos, Zach|R|SL": {
+"active": 35.1,
+"purity": 0.982,
+"r2": 0.029,
+"savant": "SL",
+"via": "from_ST"
+},
+"Agnos, Zach|R|ST": {
+"active": 61.2,
+"purity": 0.939,
+"savant": "ST",
+"via": "direct"
+},
+"Akin, Keegan|L|CH": {
+"active": 98.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Akin, Keegan|L|FC": {
+"active": 25.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Akin, Keegan|L|FF": {
+"active": 95.7,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Alcantara, Sandy|R|CH": {
+"active": 94.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Alcantara, Sandy|R|FC": {
+"active": 24.0,
+"purity": 0.996,
+"savant": "FC",
+"via": "direct"
+},
+"Alcantara, Sandy|R|FF": {
+"active": 97.0,
+"purity": 0.954,
+"savant": "FF",
+"via": "direct"
+},
+"Alcantara, Sandy|R|SI": {
+"active": 96.3,
+"purity": 0.958,
+"savant": "SI",
+"via": "direct"
+},
+"Aldegheri, Sam|L|CH": {
+"active": 94.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Aldegheri, Sam|L|FC": {
+"active": 45.2,
+"purity": 1.0,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Aldegheri, Sam|L|FF": {
+"active": 85.7,
+"purity": 0.99,
+"savant": "FF",
+"via": "direct"
+},
+"Alexander, Jason|R|CH": {
+"active": 98.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Alexander, Jason|R|FF": {
+"active": 92.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Alexander, Jason|R|SI": {
+"active": 92.2,
+"purity": 0.972,
+"savant": "SI",
+"via": "direct"
+},
+"Alexander, Tyler|L|CH": {
+"active": 87.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Alexander, Tyler|L|FC": {
+"active": 49.0,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Alexander, Tyler|L|FF": {
+"active": 90.3,
+"purity": 0.971,
+"savant": "FF",
+"via": "direct"
+},
+"Alexander, Tyler|L|SI": {
+"active": 90.4,
+"purity": 0.985,
+"savant": "SI",
+"via": "direct"
+},
+"Alexander, Tyler|L|ST": {
+"active": 45.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Allard, Kolby|L|FF": {
+"active": 93.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Allen, Logan|L|FF": {
+"active": 90.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Alvarado, Elvis|R|FF": {
+"active": 97.9,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Alvarado, Elvis|R|SI": {
+"active": 97.1,
+"purity": 0.937,
+"savant": "SI",
+"via": "direct"
+},
+"Alvarado, Elvis|R|SL": {
+"active": 26.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Alvarado, Jos\u00e9|L|FC": {
+"active": 40.3,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Alvarado, Jos\u00e9|L|SI": {
+"active": 94.1,
+"purity": 0.988,
+"savant": "SI",
+"via": "direct"
+},
+"Alvarez, Andrew|L|CU": {
+"active": 61.1,
+"purity": 0.981,
+"savant": "CU",
+"via": "direct"
+},
+"Alvarez, Andrew|L|FF": {
+"active": 70.9,
+"purity": 0.957,
+"savant": "FF",
+"via": "direct"
+},
+"Alvarez, Andrew|L|SI": {
+"active": 63.1,
+"purity": 0.989,
+"savant": "SI",
+"via": "direct"
+},
+"Alvarez, Andrew|L|SL": {
+"active": 32.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Anderson, Grant|R|FF": {
+"active": 81.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Anderson, Grant|R|SI": {
+"active": 81.5,
+"purity": 0.984,
+"savant": "SI",
+"via": "direct"
+},
+"Anderson, Grant|R|ST": {
+"active": 62.8,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Anderson, Shaun|R|FF": {
+"active": 70.9,
+"purity": 0.987,
+"savant": "FF",
+"via": "direct"
+},
+"Anderson, Shaun|R|FS": {
+"active": 78.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Anderson, Shaun|R|SL": {
+"active": 40.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Armstrong, Shawn|R|FC": {
+"active": 54.1,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Armstrong, Shawn|R|FF": {
+"active": 80.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Armstrong, Shawn|R|SI": {
+"active": 87.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Armstrong, Shawn|R|ST": {
+"active": 44.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Arrighetti, Spencer|R|CH": {
+"active": 95.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Arrighetti, Spencer|R|CU": {
+"active": 76.9,
+"purity": 0.941,
+"savant": "CU",
+"via": "direct"
+},
+"Arrighetti, Spencer|R|FC": {
+"active": 44.8,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Arrighetti, Spencer|R|FF": {
+"active": 94.9,
+"purity": 0.97,
+"savant": "FF",
+"via": "direct"
+},
+"Arrighetti, Spencer|R|SI": {
+"active": 94.1,
+"purity": 0.976,
+"savant": "SI",
+"via": "direct"
+},
+"Arrighetti, Spencer|R|ST": {
+"active": 56.5,
+"purity": 0.855,
+"savant": "ST",
+"via": "direct"
+},
+"Ashby, Aaron|L|CH": {
+"active": 77.6,
+"purity": 0.99,
+"savant": "CH",
+"via": "direct"
+},
+"Ashby, Aaron|L|CU": {
+"active": 88.0,
+"purity": 0.978,
+"savant": "CU",
+"via": "direct"
+},
+"Ashby, Aaron|L|SI": {
+"active": 81.3,
+"purity": 0.996,
+"savant": "SI",
+"via": "direct"
+},
+"Ashby, Aaron|L|SL": {
+"active": 53.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Ashcraft, Braxton|R|CU": {
+"active": 72.3,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Ashcraft, Braxton|R|FC": {
+"active": 38.7,
+"purity": 0.997,
+"savant": "SL",
+"via": "direct"
+},
+"Ashcraft, Braxton|R|FF": {
+"active": 87.3,
+"purity": 0.992,
+"savant": "FF",
+"via": "direct"
+},
+"Ashcraft, Braxton|R|FS": {
+"active": 81.8,
+"purity": 1.0,
+"r2": 0.016,
+"savant": "FS",
+"via": "from_FF"
+},
+"Ashcraft, Braxton|R|SI": {
+"active": 83.8,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Ashcraft, Graham|R|FF": {
+"active": 48.1,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Ashcraft, Graham|R|SL": {
+"active": 37.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Assad, Javier|R|CH": {
+"active": 82.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Assad, Javier|R|CU": {
+"active": 69.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Assad, Javier|R|FC": {
+"active": 59.7,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Assad, Javier|R|FF": {
+"active": 89.9,
+"purity": 0.994,
+"savant": "FF",
+"via": "direct"
+},
+"Assad, Javier|R|SI": {
+"active": 88.4,
+"purity": 0.997,
+"savant": "SI",
+"via": "direct"
+},
+"Assad, Javier|R|ST": {
+"active": 52.5,
+"purity": 0.967,
+"savant": "ST",
+"via": "direct"
+},
+"Avila, Luinder|R|CH": {
+"active": 79.2,
+"purity": 1.0,
+"r2": 0.224,
+"savant": "CH",
+"via": "from_SI"
+},
+"Avila, Luinder|R|CU": {
+"active": 65.7,
+"purity": 0.823,
+"savant": "CU",
+"via": "direct"
+},
+"Avila, Luinder|R|FF": {
+"active": 71.6,
+"purity": 0.985,
+"savant": "FF",
+"via": "direct"
+},
+"Avila, Luinder|R|SI": {
+"active": 71.2,
+"purity": 0.984,
+"savant": "SI",
+"via": "direct"
+},
+"Avila, Luinder|R|SL": {
+"active": 46.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Bachar, Lake|R|CU": {
+"active": 68.7,
+"purity": 0.969,
+"r2": 0.155,
+"savant": "CU",
+"via": "from_ST"
+},
+"Bachar, Lake|R|FF": {
+"active": 90.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Bachar, Lake|R|FS": {
+"active": 96.1,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Bachar, Lake|R|SL": {
+"active": 19.1,
+"purity": 0.995,
+"savant": "SL",
+"via": "direct"
+},
+"Bachar, Lake|R|ST": {
+"active": 41.6,
+"purity": 0.95,
+"savant": "ST",
+"via": "direct"
+},
+"Bachman, Sam|R|CH": {
+"active": 85.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Bachman, Sam|R|SI": {
+"active": 95.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Bachman, Sam|R|SL": {
+"active": 17.9,
+"purity": 0.994,
+"savant": "SL",
+"via": "direct"
+},
+"Backhus, Kyle|L|SI": {
+"active": 96.0,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Backhus, Kyle|L|ST": {
+"active": 48.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Baker, Bryan|R|CH": {
+"active": 87.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Baker, Bryan|R|FF": {
+"active": 95.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Banda, Anthony|L|FF": {
+"active": 95.9,
+"purity": 0.906,
+"savant": "FF",
+"via": "direct"
+},
+"Banda, Anthony|L|SI": {
+"active": 94.2,
+"purity": 0.973,
+"savant": "SI",
+"via": "direct"
+},
+"Banda, Anthony|L|SL": {
+"active": 27.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Banks, Tanner|L|FF": {
+"active": 78.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Banks, Tanner|L|SI": {
+"active": 79.2,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Banks, Tanner|L|SL": {
+"active": 33.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Banks, Tanner|L|ST": {
+"active": 35.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Barlow, Scott|R|CU": {
+"active": 86.2,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Barlow, Scott|R|FF": {
+"active": 66.4,
+"purity": 0.95,
+"savant": "FF",
+"via": "direct"
+},
+"Barlow, Scott|R|SI": {
+"active": 69.0,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Barlow, Scott|R|ST": {
+"active": 54.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Barnett, Mason|R|CU": {
+"active": 82.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Barnett, Mason|R|FF": {
+"active": 84.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Barnett, Mason|R|SL": {
+"active": 31.0,
+"purity": 1.0,
+"r2": 0.029,
+"savant": "SL",
+"via": "from_ST"
+},
+"Barnett, Mason|R|ST": {
+"active": 44.4,
+"purity": 0.984,
+"savant": "ST",
+"via": "direct"
+},
+"Bassitt, Chris|R|CU": {
+"active": 96.1,
+"purity": 0.996,
+"savant": "CU",
+"via": "direct"
+},
+"Bassitt, Chris|R|FC": {
+"active": 46.2,
+"purity": 0.942,
+"savant": "FC",
+"via": "direct"
+},
+"Bassitt, Chris|R|SI": {
+"active": 76.3,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Bassitt, Chris|R|ST": {
+"active": 87.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Basso, Brady|L|FF": {
+"active": 90.4,
+"purity": 0.939,
+"savant": "FF",
+"via": "direct"
+},
+"Baz, Shane|R|CH": {
+"active": 95.7,
+"purity": 0.992,
+"savant": "CH",
+"via": "direct"
+},
+"Baz, Shane|R|CU": {
+"active": 71.5,
+"purity": 0.998,
+"savant": "CU",
+"via": "direct"
+},
+"Baz, Shane|R|FC": {
+"active": 49.0,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Baz, Shane|R|FF": {
+"active": 94.4,
+"purity": 0.958,
+"savant": "FF",
+"via": "direct"
+},
+"Baz, Shane|R|SI": {
+"active": 92.2,
+"purity": 0.981,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Bazardo, Eduard|R|SI": {
+"active": 92.2,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Bazardo, Eduard|R|ST": {
+"active": 59.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Beck, Tristan|R|FF": {
+"active": 97.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Beck, Tristan|R|ST": {
+"active": 63.5,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Bednar, David|R|CU": {
+"active": 65.0,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Bednar, David|R|FF": {
+"active": 98.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Bednar, David|R|FS": {
+"active": 74.2,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Beeks, Jalen|L|CH": {
+"active": 91.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Beeks, Jalen|L|FF": {
+"active": 93.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Beeter, Clayton|R|FF": {
+"active": 89.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Beeter, Clayton|R|SL": {
+"active": 43.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Bello, Brayan|R|CH": {
+"active": 95.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Bello, Brayan|R|FF": {
+"active": 80.8,
+"purity": 0.984,
+"savant": "FF",
+"via": "direct"
+},
+"Bello, Brayan|R|SI": {
+"active": 87.5,
+"purity": 0.995,
+"savant": "SI",
+"via": "direct"
+},
+"Bello, Brayan|R|SL": {
+"active": 13.2,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Bello, Brayan|R|ST": {
+"active": 50.2,
+"purity": 0.991,
+"savant": "ST",
+"via": "direct"
+},
+"Bender, Anthony|R|SI": {
+"active": 83.3,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Bender, Anthony|R|SL": {
+"active": 31.1,
+"purity": 0.92,
+"savant": "SL",
+"via": "direct"
+},
+"Bender, Anthony|R|ST": {
+"active": 55.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Bernardino, Brennan|L|CH": {
+"active": 88.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Bernardino, Brennan|L|FC": {
+"active": 25.8,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Bernardino, Brennan|L|SI": {
+"active": 75.5,
+"purity": 0.978,
+"savant": "SI",
+"via": "direct"
+},
+"Bernardino, Brennan|L|ST": {
+"active": 54.4,
+"purity": 0.951,
+"savant": "CU",
+"via": "direct"
+},
+"Bibee, Tanner|R|CH": {
+"active": 82.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Bibee, Tanner|R|CU": {
+"active": 73.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Bibee, Tanner|R|FF": {
+"active": 86.3,
+"purity": 0.992,
+"savant": "FF",
+"via": "direct"
+},
+"Bibee, Tanner|R|SI": {
+"active": 86.6,
+"purity": 0.98,
+"savant": "SI",
+"via": "direct"
+},
+"Bibee, Tanner|R|SL": {
+"active": 31.8,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Bido, Osvaldo|R|FF": {
+"active": 92.3,
+"purity": 0.968,
+"savant": "FF",
+"via": "direct"
+},
+"Bido, Osvaldo|R|SI": {
+"active": 89.6,
+"purity": 0.954,
+"savant": "SI",
+"via": "direct"
+},
+"Bido, Osvaldo|R|ST": {
+"active": 48.7,
+"purity": 0.913,
+"r2": 0.068,
+"savant": "ST",
+"via": "from_SI"
+},
+"Bieber, Shane|R|CH": {
+"active": 89.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Bieber, Shane|R|CU": {
+"active": 81.6,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Bieber, Shane|R|FC": {
+"active": 33.9,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Bieber, Shane|R|FF": {
+"active": 95.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Bieber, Shane|R|SL": {
+"active": 13.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Bigge, Hunter|R|FF": {
+"active": 92.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Bigge, Hunter|R|SL": {
+"active": 30.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Bird, Jake|R|CU": {
+"active": 85.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Bird, Jake|R|FF": {
+"active": 75.5,
+"purity": 0.985,
+"r2": 0.764,
+"savant": "FF",
+"via": "from_SI"
+},
+"Bird, Jake|R|SI": {
+"active": 73.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Bird, Jake|R|ST": {
+"active": 53.0,
+"purity": 0.995,
+"savant": "ST",
+"via": "direct"
+},
+"Blackburn, Paul|R|CU": {
+"active": 87.3,
+"purity": 0.988,
+"savant": "CU",
+"via": "direct"
+},
+"Blackburn, Paul|R|FC": {
+"active": 44.8,
+"purity": 0.982,
+"savant": "FC",
+"via": "direct"
+},
+"Blackburn, Paul|R|FS": {
+"active": 75.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Blackburn, Paul|R|SI": {
+"active": 83.7,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Blackburn, Paul|R|ST": {
+"active": 67.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Blubaugh, AJ|R|CH": {
+"active": 86.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Blubaugh, AJ|R|FC": {
+"active": 49.8,
+"purity": 0.98,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Blubaugh, AJ|R|FF": {
+"active": 99.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Blubaugh, AJ|R|ST": {
+"active": 55.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Booser, Cam|L|FF": {
+"active": 95.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Booser, Cam|L|SL": {
+"active": 21.6,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Borucki, Ryan|L|FS": {
+"active": 89.9,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Borucki, Ryan|L|SI": {
+"active": 95.4,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Borucki, Ryan|L|SL": {
+"active": 15.7,
+"purity": 0.993,
+"savant": "SL",
+"via": "direct"
+},
+"Bowlan, Jonathan|R|CH": {
+"active": 69.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Bowlan, Jonathan|R|FF": {
+"active": 93.8,
+"purity": 0.99,
+"savant": "FF",
+"via": "direct"
+},
+"Bowlan, Jonathan|R|SI": {
+"active": 92.9,
+"purity": 0.957,
+"savant": "SI",
+"via": "direct"
+},
+"Bowlan, Jonathan|R|SL": {
+"active": 25.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Bowlan, Jonathan|R|ST": {
+"active": 47.3,
+"purity": 0.981,
+"r2": 0.135,
+"savant": "ST",
+"via": "from_CU"
+},
+"Boyd, Matthew|L|CH": {
+"active": 90.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Boyd, Matthew|L|CU": {
+"active": 74.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Boyd, Matthew|L|FF": {
+"active": 94.6,
+"purity": 0.987,
+"savant": "FF",
+"via": "direct"
+},
+"Boyd, Matthew|L|SL": {
+"active": 23.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Boyle, Joe|R|FF": {
+"active": 79.6,
+"purity": 0.964,
+"savant": "FF",
+"via": "direct"
+},
+"Boyle, Joe|R|SI": {
+"active": 79.9,
+"purity": 0.98,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Boyle, Joe|R|SL": {
+"active": 26.4,
+"purity": 0.989,
+"savant": "SL",
+"via": "direct"
+},
+"Bradish, Kyle|R|CU": {
+"active": 72.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Bradish, Kyle|R|FF": {
+"active": 77.9,
+"purity": 0.98,
+"savant": "FF",
+"via": "direct"
+},
+"Bradish, Kyle|R|SI": {
+"active": 77.5,
+"purity": 0.995,
+"savant": "SI",
+"via": "direct"
+},
+"Bradish, Kyle|R|ST": {
+"active": 41.2,
+"purity": 0.993,
+"savant": "SL",
+"via": "direct"
+},
+"Bradley, Taj|R|CU": {
+"active": 78.9,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Bradley, Taj|R|FF": {
+"active": 96.8,
+"purity": 0.999,
+"savant": "FF",
+"via": "direct"
+},
+"Bradley, Taj|R|FS": {
+"active": 92.8,
+"purity": 0.997,
+"savant": "FS",
+"via": "direct"
+},
+"Bradley, Taj|R|SL": {
+"active": 46.1,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Brash, Matt|R|SI": {
+"active": 90.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Brash, Matt|R|ST": {
+"active": 50.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Brazob\u00e1n, Huascar|R|CH": {
+"active": 83.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Brazob\u00e1n, Huascar|R|SI": {
+"active": 91.3,
+"purity": 0.991,
+"savant": "SI",
+"via": "direct"
+},
+"Brieske, Beau|R|FF": {
+"active": 90.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Brogdon, Connor|R|CH": {
+"active": 97.4,
+"purity": 0.99,
+"savant": "CH",
+"via": "direct"
+},
+"Brogdon, Connor|R|FF": {
+"active": 96.7,
+"purity": 0.992,
+"savant": "FF",
+"via": "direct"
+},
+"Brown, Ben|R|CH": {
+"active": 92.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Brown, Ben|R|FF": {
+"active": 95.5,
+"purity": 0.973,
+"savant": "FF",
+"via": "direct"
+},
+"Brown, Ben|R|SI": {
+"active": 93.1,
+"purity": 0.952,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Brown, Ben|R|SL": {
+"active": 26.3,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Brown, Hunter|R|CH": {
+"active": 96.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Brown, Hunter|R|CU": {
+"active": 81.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Brown, Hunter|R|FF": {
+"active": 95.0,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Brown, Hunter|R|SI": {
+"active": 88.0,
+"purity": 0.968,
+"savant": "SI",
+"via": "direct"
+},
+"Brown, Hunter|R|SL": {
+"active": 45.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Brubaker, JT|R|CH": {
+"active": 84.6,
+"purity": 0.988,
+"savant": "CH",
+"via": "direct"
+},
+"Brubaker, JT|R|CU": {
+"active": 49.3,
+"purity": 0.98,
+"savant": "CU",
+"via": "direct"
+},
+"Brubaker, JT|R|FF": {
+"active": 87.2,
+"purity": 0.909,
+"r2": 0.764,
+"savant": "FF",
+"via": "from_SI"
+},
+"Brubaker, JT|R|SI": {
+"active": 86.2,
+"purity": 0.997,
+"savant": "SI",
+"via": "direct"
+},
+"Brubaker, JT|R|SL": {
+"active": 12.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Bruihl, Justin|L|FF": {
+"active": 81.4,
+"purity": 0.957,
+"r2": 0.764,
+"savant": "FF",
+"via": "from_SI"
+},
+"Bruihl, Justin|L|FS": {
+"active": 84.1,
+"purity": 1.0,
+"r2": 0.224,
+"savant": "CH",
+"via": "from_SI"
+},
+"Bruihl, Justin|L|SI": {
+"active": 80.0,
+"purity": 0.994,
+"savant": "SI",
+"via": "direct"
+},
+"Bruihl, Justin|L|ST": {
+"active": 65.2,
+"purity": 0.988,
+"savant": "ST",
+"via": "direct"
+},
+"Bubic, Kris|L|CH": {
+"active": 74.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Bubic, Kris|L|FF": {
+"active": 84.6,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Bubic, Kris|L|SI": {
+"active": 83.1,
+"purity": 0.99,
+"savant": "SI",
+"via": "direct"
+},
+"Bubic, Kris|L|SL": {
+"active": 18.8,
+"purity": 0.96,
+"savant": "SL",
+"via": "direct"
+},
+"Bubic, Kris|L|ST": {
+"active": 48.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Buehler, Walker|R|CH": {
+"active": 94.8,
+"purity": 0.984,
+"savant": "CH",
+"via": "direct"
+},
+"Buehler, Walker|R|CU": {
+"active": 93.8,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Buehler, Walker|R|FC": {
+"active": 58.2,
+"purity": 0.977,
+"savant": "FC",
+"via": "direct"
+},
+"Buehler, Walker|R|FF": {
+"active": 91.5,
+"purity": 0.976,
+"savant": "FF",
+"via": "direct"
+},
+"Buehler, Walker|R|SI": {
+"active": 89.2,
+"purity": 0.996,
+"savant": "SI",
+"via": "direct"
+},
+"Buehler, Walker|R|SL": {
+"active": 45.0,
+"purity": 0.81,
+"savant": "SL",
+"via": "direct"
+},
+"Buehler, Walker|R|ST": {
+"active": 62.4,
+"purity": 0.97,
+"savant": "ST",
+"via": "direct"
+},
+"Bummer, Aaron|L|CU": {
+"active": 76.1,
+"purity": 0.955,
+"savant": "CU",
+"via": "direct"
+},
+"Bummer, Aaron|L|SI": {
+"active": 75.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Bummer, Aaron|L|ST": {
+"active": 68.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Burke, Brock|L|CH": {
+"active": 77.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Burke, Brock|L|FF": {
+"active": 92.6,
+"purity": 0.985,
+"savant": "FF",
+"via": "direct"
+},
+"Burke, Brock|L|SI": {
+"active": 88.2,
+"purity": 0.881,
+"savant": "SI",
+"via": "direct"
+},
+"Burke, Brock|L|SL": {
+"active": 45.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Burke, Sean|R|CU": {
+"active": 82.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Burke, Sean|R|FC": {
+"active": 45.9,
+"purity": 0.903,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Burke, Sean|R|FF": {
+"active": 88.0,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Burke, Sean|R|SI": {
+"active": 94.3,
+"purity": 0.976,
+"savant": "SI",
+"via": "direct"
+},
+"Burke, Sean|R|SL": {
+"active": 33.0,
+"purity": 0.989,
+"savant": "SL",
+"via": "direct"
+},
+"Burns, Chase|R|CH": {
+"active": 92.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Burns, Chase|R|FF": {
+"active": 90.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Burns, Chase|R|SL": {
+"active": 23.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Burrows, Mike|R|CH": {
+"active": 97.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Burrows, Mike|R|CU": {
+"active": 85.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Burrows, Mike|R|FC": {
+"active": 30.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Burrows, Mike|R|FF": {
+"active": 92.5,
+"purity": 0.947,
+"savant": "FF",
+"via": "direct"
+},
+"Burrows, Mike|R|SI": {
+"active": 92.9,
+"purity": 0.935,
+"savant": "SI",
+"via": "direct"
+},
+"Cabrera, Edward|R|CH": {
+"active": 92.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Cabrera, Edward|R|CU": {
+"active": 76.6,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Cabrera, Edward|R|FF": {
+"active": 91.9,
+"purity": 0.938,
+"savant": "FF",
+"via": "direct"
+},
+"Cabrera, Edward|R|SI": {
+"active": 87.8,
+"purity": 0.968,
+"savant": "SI",
+"via": "direct"
+},
+"Cabrera, Edward|R|SL": {
+"active": 22.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Cameron, Noah|L|CH": {
+"active": 98.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Cameron, Noah|L|CU": {
+"active": 69.6,
+"purity": 0.996,
+"savant": "CU",
+"via": "direct"
+},
+"Cameron, Noah|L|FC": {
+"active": 43.3,
+"purity": 0.976,
+"savant": "FC",
+"via": "direct"
+},
+"Cameron, Noah|L|FF": {
+"active": 88.7,
+"purity": 0.983,
+"savant": "FF",
+"via": "direct"
+},
+"Cameron, Noah|L|SI": {
+"active": 87.4,
+"purity": 0.885,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Cameron, Noah|L|SL": {
+"active": 24.6,
+"purity": 0.985,
+"savant": "SL",
+"via": "direct"
+},
+"Canning, Griffin|R|CH": {
+"active": 85.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Canning, Griffin|R|CU": {
+"active": 50.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Canning, Griffin|R|FC": {
+"active": 39.4,
+"purity": 0.92,
+"savant": "FC",
+"via": "direct"
+},
+"Canning, Griffin|R|FF": {
+"active": 93.5,
+"purity": 0.996,
+"savant": "FF",
+"via": "direct"
+},
+"Canning, Griffin|R|SI": {
+"active": 91.4,
+"purity": 1.0,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Canning, Griffin|R|SL": {
+"active": 27.9,
+"purity": 0.971,
+"savant": "SL",
+"via": "direct"
+},
+"Cano, Yennier|R|FS": {
+"active": 92.1,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Cano, Yennier|R|SI": {
+"active": 86.7,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Cano, Yennier|R|ST": {
+"active": 36.1,
+"purity": 0.944,
+"savant": "ST",
+"via": "direct"
+},
+"Cantillo, Joey|L|CH": {
+"active": 98.1,
+"purity": 0.998,
+"savant": "CH",
+"via": "direct"
+},
+"Cantillo, Joey|L|CU": {
+"active": 95.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Cantillo, Joey|L|FC": {
+"active": 49.7,
+"purity": 1.0,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Cantillo, Joey|L|FF": {
+"active": 99.3,
+"purity": 0.998,
+"savant": "FF",
+"via": "direct"
+},
+"Cantillo, Joey|L|SL": {
+"active": 39.2,
+"purity": 0.974,
+"savant": "SL",
+"via": "direct"
+},
+"Carrasco, Carlos|R|FS": {
+"active": 61.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Carrasco, Carlos|R|SI": {
+"active": 71.9,
+"purity": 0.971,
+"savant": "SI",
+"via": "direct"
+},
+"Castillo, Luis|R|CH": {
+"active": 91.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Castillo, Luis|R|FF": {
+"active": 91.3,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Castillo, Luis|R|SI": {
+"active": 92.4,
+"purity": 0.983,
+"savant": "SI",
+"via": "direct"
+},
+"Castillo, Luis|R|SL": {
+"active": 13.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Cavalli, Cade|R|CH": {
+"active": 94.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Cavalli, Cade|R|CU": {
+"active": 83.3,
+"purity": 0.975,
+"savant": "CU",
+"via": "direct"
+},
+"Cavalli, Cade|R|FC": {
+"active": 53.4,
+"purity": 0.868,
+"savant": "FC",
+"via": "direct"
+},
+"Cavalli, Cade|R|FF": {
+"active": 81.1,
+"purity": 0.996,
+"savant": "FF",
+"via": "direct"
+},
+"Cavalli, Cade|R|SI": {
+"active": 82.1,
+"purity": 0.973,
+"savant": "SI",
+"via": "direct"
+},
+"Cavalli, Cade|R|ST": {
+"active": 53.4,
+"purity": 0.899,
+"r2": 0.135,
+"savant": "ST",
+"via": "from_CU"
+},
+"Cease, Dylan|R|CU": {
+"active": 75.7,
+"purity": 0.987,
+"savant": "CU",
+"via": "direct"
+},
+"Cease, Dylan|R|FF": {
+"active": 88.9,
+"purity": 0.998,
+"savant": "FF",
+"via": "direct"
+},
+"Cease, Dylan|R|FS": {
+"active": 91.5,
+"purity": 0.994,
+"savant": "CH",
+"via": "direct"
+},
+"Cease, Dylan|R|SI": {
+"active": 82.7,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Cease, Dylan|R|SL": {
+"active": 24.8,
+"purity": 0.998,
+"savant": "SL",
+"via": "direct"
+},
+"Cease, Dylan|R|ST": {
+"active": 59.5,
+"purity": 0.986,
+"savant": "ST",
+"via": "direct"
+},
+"Cecconi, Slade|R|CU": {
+"active": 82.0,
+"purity": 0.996,
+"savant": "CU",
+"via": "direct"
+},
+"Cecconi, Slade|R|FC": {
+"active": 38.5,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Cecconi, Slade|R|FF": {
+"active": 95.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Cecconi, Slade|R|SI": {
+"active": 96.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Cecconi, Slade|R|SL": {
+"active": 30.5,
+"purity": 0.895,
+"savant": "SL",
+"via": "direct"
+},
+"Cecconi, Slade|R|ST": {
+"active": 53.0,
+"purity": 1.0,
+"r2": 0.135,
+"savant": "ST",
+"via": "from_CU"
+},
+"Chandler, Bubba|R|CH": {
+"active": 97.5,
+"purity": 0.988,
+"savant": "CH",
+"via": "direct"
+},
+"Chandler, Bubba|R|CU": {
+"active": 33.1,
+"purity": 0.915,
+"savant": "CU",
+"via": "direct"
+},
+"Chandler, Bubba|R|FF": {
+"active": 94.9,
+"purity": 0.99,
+"savant": "FF",
+"via": "direct"
+},
+"Chandler, Bubba|R|SI": {
+"active": 92.6,
+"purity": 0.924,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Chandler, Bubba|R|SL": {
+"active": 20.2,
+"purity": 0.958,
+"savant": "SL",
+"via": "direct"
+},
+"Chandler, Bubba|R|ST": {
+"active": 36.7,
+"purity": 1.0,
+"r2": 0.135,
+"savant": "ST",
+"via": "from_CU"
+},
+"Chapman, Aroldis|L|FF": {
+"active": 90.4,
+"purity": 0.975,
+"savant": "FF",
+"via": "direct"
+},
+"Chapman, Aroldis|L|FS": {
+"active": 40.0,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Chapman, Aroldis|L|SI": {
+"active": 88.0,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Chapman, Aroldis|L|ST": {
+"active": 44.2,
+"purity": 0.973,
+"savant": "SL",
+"via": "direct"
+},
+"Chivilli, Angel|R|CH": {
+"active": 93.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Chivilli, Angel|R|FC": {
+"active": 25.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Chivilli, Angel|R|FF": {
+"active": 99.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Civale, Aaron|R|CH": {
+"active": 91.6,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Civale, Aaron|R|CU": {
+"active": 79.3,
+"purity": 0.997,
+"savant": "CU",
+"via": "direct"
+},
+"Civale, Aaron|R|FC": {
+"active": 55.9,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Civale, Aaron|R|FF": {
+"active": 94.4,
+"purity": 0.981,
+"savant": "FF",
+"via": "direct"
+},
+"Civale, Aaron|R|SI": {
+"active": 91.6,
+"purity": 0.996,
+"savant": "SI",
+"via": "direct"
+},
+"Clarke, Taylor|R|CH": {
+"active": 87.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Clarke, Taylor|R|FF": {
+"active": 47.0,
+"purity": 0.906,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Clarke, Taylor|R|SI": {
+"active": 88.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Clarke, Taylor|R|SL": {
+"active": 30.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Cleavinger, Garrett|L|FF": {
+"active": 91.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Cleavinger, Garrett|L|SI": {
+"active": 84.9,
+"purity": 0.991,
+"savant": "SI",
+"via": "direct"
+},
+"Cleavinger, Garrett|L|SL": {
+"active": 35.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Cleavinger, Garrett|L|ST": {
+"active": 68.7,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Corbin, Patrick|L|FC": {
+"active": 40.3,
+"purity": 0.995,
+"savant": "FC",
+"via": "direct"
+},
+"Corbin, Patrick|L|FF": {
+"active": 87.9,
+"purity": 0.95,
+"savant": "FF",
+"via": "direct"
+},
+"Corbin, Patrick|L|FS": {
+"active": 96.9,
+"purity": 0.996,
+"savant": "CH",
+"via": "direct"
+},
+"Corbin, Patrick|L|SI": {
+"active": 84.3,
+"purity": 0.978,
+"savant": "SI",
+"via": "direct"
+},
+"Corbin, Patrick|L|SL": {
+"active": 19.3,
+"purity": 0.952,
+"savant": "SL",
+"via": "direct"
+},
+"Coulombe, Danny|L|SI": {
+"active": 69.3,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Coulombe, Danny|L|SL": {
+"active": 29.6,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Coulombe, Danny|L|ST": {
+"active": 45.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Criswell, Cooper|R|CH": {
+"active": 87.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Criswell, Cooper|R|FC": {
+"active": 44.8,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Criswell, Cooper|R|SI": {
+"active": 74.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Criswell, Cooper|R|ST": {
+"active": 74.9,
+"purity": 0.957,
+"savant": "ST",
+"via": "direct"
+},
+"Crochet, Garrett|L|FC": {
+"active": 39.1,
+"purity": 0.992,
+"savant": "FC",
+"via": "direct"
+},
+"Crochet, Garrett|L|FF": {
+"active": 86.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Crochet, Garrett|L|SI": {
+"active": 86.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Crochet, Garrett|L|ST": {
+"active": 55.6,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Cruz, Fernando|R|FF": {
+"active": 91.3,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Cruz, Fernando|R|FS": {
+"active": 39.3,
+"purity": 0.994,
+"savant": "FS",
+"via": "direct"
+},
+"Cruz, Fernando|R|ST": {
+"active": 43.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Cruz, Steven|R|FC": {
+"active": 63.2,
+"purity": 0.981,
+"savant": "FC",
+"via": "direct"
+},
+"Cruz, Steven|R|FF": {
+"active": 94.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Cruz, Steven|R|SL": {
+"active": 49.8,
+"purity": 0.867,
+"savant": "SL",
+"via": "direct"
+},
+"Curvelo, Luis|R|SL": {
+"active": 24.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"De Los Santos, Enyel|R|CH": {
+"active": 96.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"De Los Santos, Enyel|R|FC": {
+"active": 33.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"De Los Santos, Enyel|R|FF": {
+"active": 88.4,
+"purity": 0.996,
+"savant": "FF",
+"via": "direct"
+},
+"De los Santos, Yerry|R|SI": {
+"active": 97.5,
+"purity": 0.902,
+"savant": "SI",
+"via": "direct"
+},
+"Detmers, Reid|L|CH": {
+"active": 94.4,
+"purity": 0.995,
+"r2": 0.224,
+"savant": "CH",
+"via": "from_SI"
+},
+"Detmers, Reid|L|CU": {
+"active": 90.8,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Detmers, Reid|L|FF": {
+"active": 99.0,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Detmers, Reid|L|SL": {
+"active": 30.0,
+"purity": 0.998,
+"savant": "SL",
+"via": "direct"
+},
+"Dobbins, Hunter|R|CH": {
+"active": 85.9,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Dobbins, Hunter|R|FF": {
+"active": 76.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Dobbins, Hunter|R|SI": {
+"active": 82.8,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Dobbins, Hunter|R|SL": {
+"active": 39.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Dobbins, Hunter|R|ST": {
+"active": 48.2,
+"purity": 0.974,
+"savant": "ST",
+"via": "direct"
+},
+"Dodd, Dylan|L|FC": {
+"active": 48.2,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Dodd, Dylan|L|SI": {
+"active": 98.2,
+"purity": 0.995,
+"savant": "SI",
+"via": "direct"
+},
+"Dollander, Chase|R|CH": {
+"active": 97.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Dollander, Chase|R|CU": {
+"active": 77.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Dollander, Chase|R|FF": {
+"active": 94.3,
+"purity": 0.996,
+"savant": "FF",
+"via": "direct"
+},
+"Dollander, Chase|R|SI": {
+"active": 85.8,
+"purity": 0.989,
+"savant": "SI",
+"via": "direct"
+},
+"Dollander, Chase|R|SL": {
+"active": 36.8,
+"purity": 0.962,
+"savant": "SL",
+"via": "direct"
+},
+"Dom\u00ednguez, Seranthony|R|FF": {
+"active": 83.2,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Dom\u00ednguez, Seranthony|R|FS": {
+"active": 94.7,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Dom\u00ednguez, Seranthony|R|SI": {
+"active": 82.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Dom\u00ednguez, Seranthony|R|ST": {
+"active": 40.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Doval, Camilo|R|FF": {
+"active": 55.0,
+"purity": 0.851,
+"savant": "FC",
+"via": "direct"
+},
+"Doval, Camilo|R|SI": {
+"active": 49.0,
+"purity": 0.978,
+"savant": "SI",
+"via": "direct"
+},
+"Doval, Camilo|R|SL": {
+"active": 40.0,
+"purity": 0.993,
+"savant": "SL",
+"via": "direct"
+},
+"Dreyer, Jack|L|CU": {
+"active": 90.8,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Dreyer, Jack|L|FF": {
+"active": 99.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Dreyer, Jack|L|SL": {
+"active": 23.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Duran, Jhoan|R|CU": {
+"active": 60.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Duran, Jhoan|R|FF": {
+"active": 99.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Duran, Jhoan|R|SI": {
+"active": 87.7,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Duran, Jhoan|R|ST": {
+"active": 55.5,
+"purity": 0.979,
+"savant": "ST",
+"via": "direct"
+},
+"D\u00edaz, Edwin|R|FF": {
+"active": 94.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"D\u00edaz, Edwin|R|SL": {
+"active": 23.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Early, Connelly|L|CH": {
+"active": 87.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Early, Connelly|L|CU": {
+"active": 71.0,
+"purity": 0.988,
+"savant": "CU",
+"via": "direct"
+},
+"Early, Connelly|L|FC": {
+"active": 32.0,
+"purity": 0.992,
+"savant": "SL",
+"via": "direct"
+},
+"Early, Connelly|L|FF": {
+"active": 86.6,
+"purity": 0.994,
+"savant": "FF",
+"via": "direct"
+},
+"Early, Connelly|L|SI": {
+"active": 91.0,
+"purity": 0.99,
+"savant": "SI",
+"via": "direct"
+},
+"Early, Connelly|L|ST": {
+"active": 35.4,
+"purity": 0.96,
+"savant": "ST",
+"via": "direct"
+},
+"Eisert, Brandon|L|CH": {
+"active": 88.1,
+"purity": 0.981,
+"savant": "CH",
+"via": "direct"
+},
+"Eisert, Brandon|L|FF": {
+"active": 95.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Eisert, Brandon|L|SL": {
+"active": 41.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Elder, Bryce|R|CH": {
+"active": 63.9,
+"purity": 0.992,
+"savant": "CH",
+"via": "direct"
+},
+"Elder, Bryce|R|FC": {
+"active": 43.8,
+"purity": 1.0,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Elder, Bryce|R|FF": {
+"active": 81.5,
+"purity": 0.983,
+"savant": "FF",
+"via": "direct"
+},
+"Elder, Bryce|R|SI": {
+"active": 76.2,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Elder, Bryce|R|SL": {
+"active": 23.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Englert, Mason|R|CH": {
+"active": 60.8,
+"purity": 0.993,
+"savant": "CH",
+"via": "direct"
+},
+"Englert, Mason|R|CU": {
+"active": 84.2,
+"purity": 0.918,
+"savant": "CU",
+"via": "direct"
+},
+"Englert, Mason|R|FC": {
+"active": 19.9,
+"purity": 0.918,
+"savant": "FC",
+"via": "direct"
+},
+"Englert, Mason|R|FF": {
+"active": 91.8,
+"purity": 0.977,
+"savant": "FF",
+"via": "direct"
+},
+"Englert, Mason|R|SI": {
+"active": 83.5,
+"purity": 0.98,
+"savant": "SI",
+"via": "direct"
+},
+"Enns, Dietrich|L|CH": {
+"active": 98.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Enns, Dietrich|L|FF": {
+"active": 96.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Eovaldi, Nathan|R|CU": {
+"active": 79.6,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Eovaldi, Nathan|R|FC": {
+"active": 64.6,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Eovaldi, Nathan|R|FF": {
+"active": 94.3,
+"purity": 0.931,
+"savant": "FF",
+"via": "direct"
+},
+"Eovaldi, Nathan|R|FS": {
+"active": 83.1,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Eovaldi, Nathan|R|SI": {
+"active": 93.7,
+"purity": 0.941,
+"savant": "SI",
+"via": "direct"
+},
+"Erceg, Lucas|R|CH": {
+"active": 95.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Erceg, Lucas|R|FF": {
+"active": 97.8,
+"purity": 0.945,
+"savant": "FF",
+"via": "direct"
+},
+"Erceg, Lucas|R|SI": {
+"active": 98.2,
+"purity": 0.914,
+"savant": "SI",
+"via": "direct"
+},
+"Erceg, Lucas|R|SL": {
+"active": 20.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Estrada, Jeremiah|R|CH": {
+"active": 97.5,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Estrada, Jeremiah|R|FF": {
+"active": 98.7,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Estrada, Lazaro|R|FF": {
+"active": 98.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Fairbanks, Pete|R|CU": {
+"active": 48.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Fairbanks, Pete|R|FF": {
+"active": 88.7,
+"purity": 0.992,
+"savant": "FF",
+"via": "direct"
+},
+"Fairbanks, Pete|R|SL": {
+"active": 29.5,
+"purity": 0.992,
+"savant": "FC",
+"via": "direct"
+},
+"Falter, Bailey|L|FF": {
+"active": 98.9,
+"purity": 0.961,
+"savant": "FF",
+"via": "direct"
+},
+"Farris, Mitch|L|CH": {
+"active": 99.1,
+"purity": 0.987,
+"savant": "CH",
+"via": "direct"
+},
+"Farris, Mitch|L|FC": {
+"active": 49.6,
+"purity": 0.988,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Farris, Mitch|L|FF": {
+"active": 99.0,
+"purity": 0.996,
+"savant": "FF",
+"via": "direct"
+},
+"Farris, Mitch|L|SL": {
+"active": 15.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Faucher, Calvin|R|CU": {
+"active": 72.9,
+"purity": 0.98,
+"savant": "CU",
+"via": "direct"
+},
+"Faucher, Calvin|R|FC": {
+"active": 21.2,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Faucher, Calvin|R|FF": {
+"active": 79.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Faucher, Calvin|R|SI": {
+"active": 79.5,
+"purity": 0.978,
+"savant": "SI",
+"via": "direct"
+},
+"Faucher, Calvin|R|ST": {
+"active": 49.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Fedde, Erick|R|CH": {
+"active": 71.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Fedde, Erick|R|FC": {
+"active": 57.9,
+"purity": 0.986,
+"savant": "FC",
+"via": "direct"
+},
+"Fedde, Erick|R|SI": {
+"active": 77.0,
+"purity": 0.934,
+"savant": "SI",
+"via": "direct"
+},
+"Fedde, Erick|R|ST": {
+"active": 47.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Feltner, Ryan|R|CH": {
+"active": 63.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Feltner, Ryan|R|CU": {
+"active": 71.5,
+"purity": 0.933,
+"savant": "CU",
+"via": "direct"
+},
+"Feltner, Ryan|R|FF": {
+"active": 71.6,
+"purity": 0.967,
+"savant": "FF",
+"via": "direct"
+},
+"Feltner, Ryan|R|SI": {
+"active": 64.9,
+"purity": 0.983,
+"savant": "SI",
+"via": "direct"
+},
+"Feltner, Ryan|R|SL": {
+"active": 36.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Feltner, Ryan|R|ST": {
+"active": 47.9,
+"purity": 0.971,
+"savant": "ST",
+"via": "direct"
+},
+"Ferguson, Caleb|L|CU": {
+"active": 64.9,
+"purity": 1.0,
+"savant": "SV",
+"via": "direct"
+},
+"Ferguson, Caleb|L|FF": {
+"active": 84.9,
+"purity": 0.957,
+"savant": "FF",
+"via": "direct"
+},
+"Ferguson, Caleb|L|SI": {
+"active": 82.5,
+"purity": 0.988,
+"savant": "SI",
+"via": "direct"
+},
+"Ferguson, Caleb|L|SL": {
+"active": 27.3,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Ferguson, Tyler|R|FF": {
+"active": 84.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Fermin, Jos\u00e9|R|SI": {
+"active": 91.7,
+"purity": 0.97,
+"savant": "SI",
+"via": "direct"
+},
+"Fermin, Jos\u00e9|R|SL": {
+"active": 9.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Fernandez, Ryan|R|FF": {
+"active": 98.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Fernandez, Ryan|R|SL": {
+"active": 20.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Ferrer, Jos\u00e9 A.|L|CH": {
+"active": 93.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Ferrer, Jos\u00e9 A.|L|SI": {
+"active": 99.3,
+"purity": 0.995,
+"savant": "SI",
+"via": "direct"
+},
+"Ferrer, Jos\u00e9 A.|L|SL": {
+"active": 16.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Festa, Matt|R|ST": {
+"active": 53.3,
+"purity": 0.996,
+"savant": "ST",
+"via": "direct"
+},
+"Finnegan, Kyle|R|FF": {
+"active": 99.2,
+"purity": 0.994,
+"savant": "FF",
+"via": "direct"
+},
+"Finnegan, Kyle|R|FS": {
+"active": 91.7,
+"purity": 0.995,
+"savant": "FS",
+"via": "direct"
+},
+"Finnegan, Kyle|R|SL": {
+"active": 23.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Fisher, Braydon|R|CU": {
+"active": 77.2,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Fisher, Braydon|R|FF": {
+"active": 94.4,
+"purity": 0.992,
+"savant": "FF",
+"via": "direct"
+},
+"Fisher, Braydon|R|SL": {
+"active": 18.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Flaherty, Jack|R|CU": {
+"active": 77.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Flaherty, Jack|R|FF": {
+"active": 86.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Flaherty, Jack|R|SI": {
+"active": 81.7,
+"purity": 0.938,
+"savant": "SI",
+"via": "direct"
+},
+"Flaherty, Jack|R|SL": {
+"active": 41.8,
+"purity": 0.997,
+"savant": "SL",
+"via": "direct"
+},
+"Fluharty, Mason|L|FC": {
+"active": 42.2,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Fluharty, Mason|L|ST": {
+"active": 57.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Freeland, Kyle|L|CH": {
+"active": 96.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Freeland, Kyle|L|CU": {
+"active": 52.6,
+"purity": 0.934,
+"savant": "CU",
+"via": "direct"
+},
+"Freeland, Kyle|L|FC": {
+"active": 33.0,
+"purity": 0.996,
+"savant": "FC",
+"via": "direct"
+},
+"Freeland, Kyle|L|FF": {
+"active": 89.0,
+"purity": 0.982,
+"savant": "FF",
+"via": "direct"
+},
+"Freeland, Kyle|L|SI": {
+"active": 83.1,
+"purity": 0.965,
+"savant": "SI",
+"via": "direct"
+},
+"Freeland, Kyle|L|ST": {
+"active": 43.7,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Fried, Max|L|CH": {
+"active": 78.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Fried, Max|L|CU": {
+"active": 87.2,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Fried, Max|L|FC": {
+"active": 54.1,
+"purity": 0.99,
+"savant": "FC",
+"via": "direct"
+},
+"Fried, Max|L|FF": {
+"active": 80.9,
+"purity": 0.987,
+"savant": "FF",
+"via": "direct"
+},
+"Fried, Max|L|SI": {
+"active": 65.0,
+"purity": 0.99,
+"savant": "SI",
+"via": "direct"
+},
+"Fried, Max|L|ST": {
+"active": 61.8,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Fuentes, Didier|R|FF": {
+"active": 97.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Fuentes, Didier|R|SL": {
+"active": 32.5,
+"purity": 1.0,
+"r2": 0.029,
+"savant": "SL",
+"via": "from_ST"
+},
+"Funderburk, Kody|L|FF": {
+"active": 63.5,
+"purity": 0.992,
+"savant": "FC",
+"via": "direct"
+},
+"Funderburk, Kody|L|SI": {
+"active": 79.2,
+"purity": 0.984,
+"savant": "SI",
+"via": "direct"
+},
+"Funderburk, Kody|L|ST": {
+"active": 59.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Gaddis, Hunter|R|CH": {
+"active": 96.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Gaddis, Hunter|R|FF": {
+"active": 95.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Gaddis, Hunter|R|SL": {
+"active": 50.0,
+"purity": 0.996,
+"savant": "SL",
+"via": "direct"
+},
+"Gage, Matt|L|FF": {
+"active": 80.9,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Gage, Matt|L|FS": {
+"active": 87.4,
+"purity": 0.987,
+"savant": "CH",
+"via": "direct"
+},
+"Gage, Matt|L|SL": {
+"active": 29.7,
+"purity": 0.996,
+"savant": "SL",
+"via": "direct"
+},
+"Gallen, Zac|R|CH": {
+"active": 86.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Gallen, Zac|R|CU": {
+"active": 68.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Gallen, Zac|R|FF": {
+"active": 86.1,
+"purity": 0.981,
+"savant": "FF",
+"via": "direct"
+},
+"Gallen, Zac|R|SI": {
+"active": 83.9,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Gallen, Zac|R|SL": {
+"active": 41.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Garcia, Brandyn|L|FC": {
+"active": 45.9,
+"purity": 1.0,
+"r2": 0.026,
+"savant": "FC",
+"via": "from_SI"
+},
+"Garcia, Brandyn|L|SI": {
+"active": 85.2,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Garcia, Brandyn|L|ST": {
+"active": 65.7,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Garcia, Rico|R|CH": {
+"active": 98.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Garcia, Rico|R|CU": {
+"active": 54.5,
+"purity": 0.989,
+"savant": "CU",
+"via": "direct"
+},
+"Garcia, Rico|R|FC": {
+"active": 14.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Garcia, Rico|R|FF": {
+"active": 99.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Garcia, Robert|L|FF": {
+"active": 87.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Garc\u00eda, Luis|R|FS": {
+"active": 82.0,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Garc\u00eda, Luis|R|SI": {
+"active": 85.2,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Garc\u00eda, Luis|R|ST": {
+"active": 52.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Gausman, Kevin|R|CH": {
+"active": 85.0,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Gausman, Kevin|R|FF": {
+"active": 98.2,
+"purity": 0.999,
+"savant": "FF",
+"via": "direct"
+},
+"Gausman, Kevin|R|FS": {
+"active": 85.0,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Gausman, Kevin|R|SL": {
+"active": 19.4,
+"purity": 0.994,
+"savant": "SL",
+"via": "direct"
+},
+"Gervase, Paul|R|FF": {
+"active": 93.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Gibson, Cade|L|CU": {
+"active": 85.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Gibson, Cade|L|SI": {
+"active": 83.3,
+"purity": 0.988,
+"savant": "SI",
+"via": "direct"
+},
+"Gibson, Cade|L|SL": {
+"active": 23.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Gibson, Cade|L|ST": {
+"active": 50.8,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Gil, Luis|R|CH": {
+"active": 84.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Gil, Luis|R|FF": {
+"active": 76.8,
+"purity": 0.993,
+"savant": "FF",
+"via": "direct"
+},
+"Gil, Luis|R|SL": {
+"active": 34.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Gilbert, Logan|R|CH": {
+"active": 93.6,
+"purity": 1.0,
+"r2": 0.224,
+"savant": "CH",
+"via": "from_SI"
+},
+"Gilbert, Logan|R|FC": {
+"active": 48.9,
+"purity": 1.0,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Gilbert, Logan|R|FF": {
+"active": 96.9,
+"purity": 0.998,
+"savant": "FF",
+"via": "direct"
+},
+"Gilbert, Logan|R|FS": {
+"active": 57.2,
+"purity": 0.983,
+"savant": "FS",
+"via": "direct"
+},
+"Gilbert, Logan|R|SL": {
+"active": 16.9,
+"purity": 0.992,
+"savant": "SL",
+"via": "direct"
+},
+"Gilbert, Logan|R|ST": {
+"active": 82.1,
+"purity": 1.0,
+"r2": 0.155,
+"savant": "CU",
+"via": "from_ST"
+},
+"Ginkel, Kevin|R|FF": {
+"active": 89.8,
+"purity": 0.984,
+"savant": "FF",
+"via": "direct"
+},
+"Ginkel, Kevin|R|SL": {
+"active": 34.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Ginn, J.T.|R|CH": {
+"active": 77.4,
+"purity": 0.996,
+"savant": "CH",
+"via": "direct"
+},
+"Ginn, J.T.|R|FC": {
+"active": 63.5,
+"purity": 0.996,
+"savant": "FC",
+"via": "direct"
+},
+"Ginn, J.T.|R|FF": {
+"active": 76.6,
+"purity": 0.972,
+"r2": 0.764,
+"savant": "FF",
+"via": "from_SI"
+},
+"Ginn, J.T.|R|SI": {
+"active": 74.8,
+"purity": 0.994,
+"savant": "SI",
+"via": "direct"
+},
+"Ginn, J.T.|R|SL": {
+"active": 22.0,
+"purity": 0.992,
+"savant": "SL",
+"via": "direct"
+},
+"Giolito, Lucas|R|CH": {
+"active": 99.0,
+"purity": 0.979,
+"savant": "CH",
+"via": "direct"
+},
+"Giolito, Lucas|R|FF": {
+"active": 99.5,
+"purity": 0.987,
+"savant": "FF",
+"via": "direct"
+},
+"Giolito, Lucas|R|SL": {
+"active": 29.7,
+"purity": 0.989,
+"savant": "SL",
+"via": "direct"
+},
+"Glasnow, Tyler|R|CU": {
+"active": 81.6,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Glasnow, Tyler|R|FF": {
+"active": 75.4,
+"purity": 0.971,
+"savant": "FF",
+"via": "direct"
+},
+"Glasnow, Tyler|R|SI": {
+"active": 73.6,
+"purity": 0.968,
+"savant": "SI",
+"via": "direct"
+},
+"Glasnow, Tyler|R|SL": {
+"active": 22.9,
+"purity": 0.989,
+"savant": "SL",
+"via": "direct"
+},
+"Gordon, Colton|L|FF": {
+"active": 98.6,
+"purity": 0.934,
+"savant": "FF",
+"via": "direct"
+},
+"Gordon, Colton|L|ST": {
+"active": 40.7,
+"purity": 0.947,
+"savant": "ST",
+"via": "direct"
+},
+"Gordon, Tanner|R|CH": {
+"active": 94.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Gordon, Tanner|R|FC": {
+"active": 20.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Gordon, Tanner|R|FF": {
+"active": 99.3,
+"purity": 0.864,
+"savant": "FF",
+"via": "direct"
+},
+"Gordon, Tanner|R|SL": {
+"active": 69.1,
+"purity": 0.934,
+"r2": 0.001,
+"savant": "CU",
+"via": "from_FF"
+},
+"Gore, MacKenzie|L|CH": {
+"active": 92.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Gore, MacKenzie|L|CU": {
+"active": 74.8,
+"purity": 0.997,
+"savant": "CU",
+"via": "direct"
+},
+"Gore, MacKenzie|L|FC": {
+"active": 52.5,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Gore, MacKenzie|L|FF": {
+"active": 91.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Gore, MacKenzie|L|SL": {
+"active": 11.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Graceffo, Gordon|R|CH": {
+"active": 95.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Graceffo, Gordon|R|CU": {
+"active": 76.8,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Graceffo, Gordon|R|FF": {
+"active": 94.2,
+"purity": 0.968,
+"savant": "FF",
+"via": "direct"
+},
+"Graceffo, Gordon|R|SI": {
+"active": 92.0,
+"purity": 0.962,
+"savant": "SI",
+"via": "direct"
+},
+"Graceffo, Gordon|R|SL": {
+"active": 21.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Granillo, Andre|R|FF": {
+"active": 90.4,
+"purity": 0.98,
+"savant": "FF",
+"via": "direct"
+},
+"Granillo, Andre|R|SL": {
+"active": 24.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Gray, Sonny|R|CH": {
+"active": 75.1,
+"purity": 0.984,
+"savant": "CH",
+"via": "direct"
+},
+"Gray, Sonny|R|CU": {
+"active": 89.7,
+"purity": 0.991,
+"savant": "CU",
+"via": "direct"
+},
+"Gray, Sonny|R|FF": {
+"active": 58.3,
+"purity": 0.992,
+"savant": "FF",
+"via": "direct"
+},
+"Gray, Sonny|R|SI": {
+"active": 57.0,
+"purity": 0.988,
+"savant": "SI",
+"via": "direct"
+},
+"Gray, Sonny|R|SL": {
+"active": 31.7,
+"purity": 0.985,
+"savant": "FC",
+"via": "direct"
+},
+"Gray, Sonny|R|ST": {
+"active": 56.6,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Greene, Hunter|R|FF": {
+"active": 96.9,
+"purity": 0.958,
+"savant": "FF",
+"via": "direct"
+},
+"Greene, Hunter|R|SL": {
+"active": 42.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Gusto, Ryan|R|CH": {
+"active": 98.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Gusto, Ryan|R|FC": {
+"active": 46.8,
+"purity": 0.965,
+"savant": "FC",
+"via": "direct"
+},
+"Gusto, Ryan|R|FF": {
+"active": 90.4,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Gusto, Ryan|R|SI": {
+"active": 83.5,
+"purity": 0.984,
+"savant": "SI",
+"via": "direct"
+},
+"Gusto, Ryan|R|SL": {
+"active": 30.7,
+"purity": 0.925,
+"r2": 0.029,
+"savant": "SL",
+"via": "from_ST"
+},
+"Gusto, Ryan|R|ST": {
+"active": 43.3,
+"purity": 0.98,
+"savant": "ST",
+"via": "direct"
+},
+"G\u00f3mez, Yoendrys|R|FC": {
+"active": 63.6,
+"purity": 0.99,
+"savant": "FC",
+"via": "direct"
+},
+"G\u00f3mez, Yoendrys|R|FF": {
+"active": 89.4,
+"purity": 0.979,
+"savant": "FF",
+"via": "direct"
+},
+"G\u00f3mez, Yoendrys|R|SI": {
+"active": 90.1,
+"purity": 0.975,
+"savant": "SI",
+"via": "direct"
+},
+"G\u00f3mez, Yoendrys|R|ST": {
+"active": 53.1,
+"purity": 0.981,
+"savant": "ST",
+"via": "direct"
+},
+"Hader, Josh|L|SI": {
+"active": 99.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Hader, Josh|L|SL": {
+"active": 18.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Hall, DL|L|CH": {
+"active": 96.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Hall, DL|L|CU": {
+"active": 70.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Hall, DL|L|FF": {
+"active": 90.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Hall, DL|L|SI": {
+"active": 87.5,
+"purity": 0.985,
+"savant": "SI",
+"via": "direct"
+},
+"Hall, DL|L|ST": {
+"active": 49.2,
+"purity": 0.983,
+"r2": 0.135,
+"savant": "ST",
+"via": "from_CU"
+},
+"Halvorsen, Seth|R|FF": {
+"active": 99.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Halvorsen, Seth|R|SL": {
+"active": 32.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Hamilton, Ian|R|SL": {
+"active": 37.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Hancock, Emerson|R|CH": {
+"active": 98.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Hancock, Emerson|R|CU": {
+"active": 79.0,
+"purity": 0.952,
+"r2": 0.155,
+"savant": "CU",
+"via": "from_ST"
+},
+"Hancock, Emerson|R|FF": {
+"active": 90.5,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Hancock, Emerson|R|SI": {
+"active": 91.7,
+"purity": 0.986,
+"savant": "SI",
+"via": "direct"
+},
+"Hancock, Emerson|R|SL": {
+"active": 46.8,
+"purity": 1.0,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Hancock, Emerson|R|ST": {
+"active": 60.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Hanifee, Brenan|R|SI": {
+"active": 92.6,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Hanifee, Brenan|R|SL": {
+"active": 18.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Harris, Hogan|L|CU": {
+"active": 95.9,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Harris, Hogan|L|FF": {
+"active": 98.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Harris, Hogan|L|SL": {
+"active": 34.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Harrison, Kyle|L|CH": {
+"active": 95.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Harrison, Kyle|L|FF": {
+"active": 98.5,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Harrison, Kyle|L|ST": {
+"active": 41.1,
+"purity": 1.0,
+"savant": "SV",
+"via": "direct"
+},
+"Hart, Kyle|L|FC": {
+"active": 49.3,
+"purity": 0.988,
+"savant": "SL",
+"via": "direct"
+},
+"Hart, Kyle|L|FF": {
+"active": 88.1,
+"purity": 0.914,
+"savant": "FF",
+"via": "direct"
+},
+"Hart, Kyle|L|FS": {
+"active": 72.5,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Hart, Kyle|L|SI": {
+"active": 86.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Hart, Kyle|L|ST": {
+"active": 44.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Hartlieb, Geoff|R|FF": {
+"active": 84.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Hartlieb, Geoff|R|SL": {
+"active": 9.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Headrick, Brent|L|FF": {
+"active": 96.8,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Headrick, Brent|L|FS": {
+"active": 97.8,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Headrick, Brent|L|SI": {
+"active": 94.2,
+"purity": 0.986,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Headrick, Brent|L|SL": {
+"active": 21.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Helsley, Ryan|R|FF": {
+"active": 89.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Helsley, Ryan|R|SL": {
+"active": 22.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Henderson, Logan|R|CH": {
+"active": 94.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Henderson, Logan|R|FC": {
+"active": 58.2,
+"purity": 0.986,
+"savant": "FC",
+"via": "direct"
+},
+"Henderson, Logan|R|FF": {
+"active": 97.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Henriquez, Edgardo|R|FC": {
+"active": 57.2,
+"purity": 0.961,
+"savant": "FC",
+"via": "direct"
+},
+"Henriquez, Edgardo|R|FF": {
+"active": 95.4,
+"purity": 0.994,
+"savant": "FF",
+"via": "direct"
+},
+"Henriquez, Edgardo|R|SI": {
+"active": 95.5,
+"purity": 0.98,
+"savant": "SI",
+"via": "direct"
+},
+"Henriquez, Edgardo|R|SL": {
+"active": 31.5,
+"purity": 0.992,
+"savant": "SL",
+"via": "direct"
+},
+"Henry, Cole|R|FF": {
+"active": 95.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Henry, Cole|R|ST": {
+"active": 53.7,
+"purity": 0.988,
+"savant": "ST",
+"via": "direct"
+},
+"Herget, Jimmy|R|FC": {
+"active": 22.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Herget, Jimmy|R|SI": {
+"active": 87.6,
+"purity": 0.957,
+"savant": "SI",
+"via": "direct"
+},
+"Herget, Jimmy|R|ST": {
+"active": 57.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Herrin, Tim|L|FF": {
+"active": 70.1,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Herrin, Tim|L|SI": {
+"active": 70.4,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Herrin, Tim|L|SL": {
+"active": 12.7,
+"purity": 0.993,
+"savant": "SL",
+"via": "direct"
+},
+"Herrin, Tim|L|ST": {
+"active": 53.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Hicks, Jordan|R|SI": {
+"active": 86.8,
+"purity": 0.893,
+"savant": "SI",
+"via": "direct"
+},
+"Hicks, Jordan|R|SL": {
+"active": 48.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Hill, Jaden|R|CH": {
+"active": 99.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Hill, Jaden|R|FF": {
+"active": 94.8,
+"purity": 0.993,
+"savant": "FF",
+"via": "direct"
+},
+"Hill, Jaden|R|SI": {
+"active": 96.4,
+"purity": 0.99,
+"savant": "SI",
+"via": "direct"
+},
+"Hill, Jaden|R|SL": {
+"active": 28.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Hill, Tim|L|SI": {
+"active": 93.0,
+"purity": 0.991,
+"savant": "SI",
+"via": "direct"
+},
+"Hill, Tim|L|ST": {
+"active": 30.9,
+"purity": 1.0,
+"r2": 0.006,
+"savant": "SL",
+"via": "from_FF"
+},
+"Hoffman, Jeff|R|FF": {
+"active": 97.5,
+"purity": 0.919,
+"savant": "FF",
+"via": "direct"
+},
+"Hoffman, Jeff|R|FS": {
+"active": 95.0,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Hoffman, Jeff|R|SL": {
+"active": 19.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Hoffmann, Andrew|R|CH": {
+"active": 95.6,
+"purity": 0.955,
+"savant": "CH",
+"via": "direct"
+},
+"Hoffmann, Andrew|R|FF": {
+"active": 97.5,
+"purity": 0.992,
+"savant": "FF",
+"via": "direct"
+},
+"Holderman, Colin|R|CU": {
+"active": 71.2,
+"purity": 1.0,
+"r2": 0.155,
+"savant": "CU",
+"via": "from_ST"
+},
+"Holderman, Colin|R|SI": {
+"active": 86.7,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Holderman, Colin|R|ST": {
+"active": 46.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Hollowell, Gavin|R|FF": {
+"active": 75.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Hollowell, Gavin|R|SI": {
+"active": 84.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Hollowell, Gavin|R|ST": {
+"active": 53.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Holmes, Clay|R|CH": {
+"active": 86.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Holmes, Clay|R|CU": {
+"active": 78.8,
+"purity": 0.986,
+"r2": 0.155,
+"savant": "CU",
+"via": "from_ST"
+},
+"Holmes, Clay|R|SI": {
+"active": 68.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Holmes, Clay|R|SL": {
+"active": 27.9,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Holmes, Clay|R|ST": {
+"active": 59.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Holmes, Grant|R|CH": {
+"active": 75.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Holmes, Grant|R|FC": {
+"active": 54.8,
+"purity": 0.95,
+"savant": "FC",
+"via": "direct"
+},
+"Holmes, Grant|R|FF": {
+"active": 81.3,
+"purity": 0.97,
+"savant": "FF",
+"via": "direct"
+},
+"Holmes, Grant|R|SI": {
+"active": 81.3,
+"purity": 0.944,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Holmes, Grant|R|SL": {
+"active": 29.3,
+"purity": 0.825,
+"savant": "SL",
+"via": "direct"
+},
+"Holton, Tyler|L|CH": {
+"active": 96.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Holton, Tyler|L|FC": {
+"active": 49.3,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Holton, Tyler|L|FF": {
+"active": 85.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Holton, Tyler|L|SI": {
+"active": 87.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Holton, Tyler|L|ST": {
+"active": 48.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Houser, Adrian|R|CH": {
+"active": 88.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Houser, Adrian|R|CU": {
+"active": 96.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Houser, Adrian|R|FF": {
+"active": 91.7,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Houser, Adrian|R|SI": {
+"active": 88.9,
+"purity": 0.993,
+"savant": "SI",
+"via": "direct"
+},
+"Houser, Adrian|R|SL": {
+"active": 32.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Hudson, Bryan|L|FF": {
+"active": 78.6,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Hudson, Bryan|L|ST": {
+"active": 81.3,
+"purity": 0.994,
+"savant": "ST",
+"via": "direct"
+},
+"Hurter, Brant|L|SI": {
+"active": 78.4,
+"purity": 0.986,
+"savant": "SI",
+"via": "direct"
+},
+"Hurter, Brant|L|ST": {
+"active": 50.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Iglesias, Raisel|R|CH": {
+"active": 83.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Iglesias, Raisel|R|FF": {
+"active": 86.5,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Iglesias, Raisel|R|SI": {
+"active": 89.3,
+"purity": 0.975,
+"savant": "SI",
+"via": "direct"
+},
+"Imanaga, Shota|L|CU": {
+"active": 80.2,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Imanaga, Shota|L|FF": {
+"active": 99.3,
+"purity": 0.999,
+"savant": "FF",
+"via": "direct"
+},
+"Imanaga, Shota|L|FS": {
+"active": 95.1,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Imanaga, Shota|L|SI": {
+"active": 91.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Imanaga, Shota|L|ST": {
+"active": 35.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Irvin, Jake|R|CH": {
+"active": 79.2,
+"purity": 0.953,
+"savant": "CH",
+"via": "direct"
+},
+"Irvin, Jake|R|CU": {
+"active": 75.4,
+"purity": 0.92,
+"savant": "CU",
+"via": "direct"
+},
+"Irvin, Jake|R|FC": {
+"active": 43.8,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Irvin, Jake|R|FF": {
+"active": 85.9,
+"purity": 0.97,
+"savant": "FF",
+"via": "direct"
+},
+"Irvin, Jake|R|SI": {
+"active": 80.5,
+"purity": 0.995,
+"savant": "SI",
+"via": "direct"
+},
+"Irvin, Jake|R|ST": {
+"active": 50.8,
+"purity": 0.93,
+"r2": 0.135,
+"savant": "ST",
+"via": "from_CU"
+},
+"Jansen, Kenley|R|FC": {
+"active": 81.8,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Javier, Cristian|R|CH": {
+"active": 78.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Javier, Cristian|R|FF": {
+"active": 89.7,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Javier, Cristian|R|ST": {
+"active": 50.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Jax, Griffin|R|CH": {
+"active": 76.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Jax, Griffin|R|CU": {
+"active": 72.3,
+"purity": 1.0,
+"r2": 0.155,
+"savant": "CU",
+"via": "from_ST"
+},
+"Jax, Griffin|R|FC": {
+"active": 40.3,
+"purity": 0.98,
+"savant": "FC",
+"via": "direct"
+},
+"Jax, Griffin|R|FF": {
+"active": 81.9,
+"purity": 0.994,
+"savant": "FF",
+"via": "direct"
+},
+"Jax, Griffin|R|SI": {
+"active": 79.3,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Jax, Griffin|R|ST": {
+"active": 48.1,
+"purity": 0.996,
+"savant": "ST",
+"via": "direct"
+},
+"Johnson, Pierce|R|FF": {
+"active": 94.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Johnson, Pierce|R|SL": {
+"active": 41.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Johnson, Ryan|R|CH": {
+"active": 82.4,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Johnson, Ryan|R|FC": {
+"active": 42.4,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Johnson, Ryan|R|SI": {
+"active": 67.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Johnson, Ryan|R|ST": {
+"active": 53.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Johnson, Seth|R|FF": {
+"active": 95.4,
+"purity": 0.979,
+"savant": "FF",
+"via": "direct"
+},
+"Johnson, Seth|R|SL": {
+"active": 32.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Junis, Jakob|R|CH": {
+"active": 70.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Junis, Jakob|R|FF": {
+"active": 75.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Junis, Jakob|R|SI": {
+"active": 71.0,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Junis, Jakob|R|ST": {
+"active": 43.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Junk, Janson|R|CH": {
+"active": 88.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Junk, Janson|R|CU": {
+"active": 64.3,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Junk, Janson|R|FF": {
+"active": 88.1,
+"purity": 0.981,
+"savant": "FF",
+"via": "direct"
+},
+"Junk, Janson|R|SL": {
+"active": 42.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Junk, Janson|R|ST": {
+"active": 45.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Kahnle, Tommy|R|CH": {
+"active": 98.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Kahnle, Tommy|R|FF": {
+"active": 93.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Keller, Brad|R|CU": {
+"active": 46.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Keller, Brad|R|FF": {
+"active": 74.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Keller, Brad|R|FS": {
+"active": 84.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Keller, Brad|R|SI": {
+"active": 77.7,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Keller, Brad|R|ST": {
+"active": 47.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Keller, Mitch|R|CU": {
+"active": 93.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Keller, Mitch|R|FC": {
+"active": 45.2,
+"purity": 0.926,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Keller, Mitch|R|FF": {
+"active": 85.8,
+"purity": 0.963,
+"savant": "FF",
+"via": "direct"
+},
+"Keller, Mitch|R|FS": {
+"active": 71.6,
+"purity": 0.993,
+"savant": "CH",
+"via": "direct"
+},
+"Keller, Mitch|R|SI": {
+"active": 73.4,
+"purity": 0.985,
+"savant": "SI",
+"via": "direct"
+},
+"Keller, Mitch|R|SL": {
+"active": 27.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Keller, Mitch|R|ST": {
+"active": 61.7,
+"purity": 0.993,
+"savant": "ST",
+"via": "direct"
+},
+"Kelly, Kevin|R|CH": {
+"active": 86.0,
+"purity": 1.0,
+"r2": 0.224,
+"savant": "CH",
+"via": "from_SI"
+},
+"Kelly, Kevin|R|SI": {
+"active": 83.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Kelly, Kevin|R|ST": {
+"active": 74.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Kelly, Merrill|R|CH": {
+"active": 79.9,
+"purity": 0.997,
+"savant": "CH",
+"via": "direct"
+},
+"Kelly, Merrill|R|CU": {
+"active": 62.0,
+"purity": 0.994,
+"savant": "CU",
+"via": "direct"
+},
+"Kelly, Merrill|R|FC": {
+"active": 66.7,
+"purity": 0.957,
+"savant": "FC",
+"via": "direct"
+},
+"Kelly, Merrill|R|FF": {
+"active": 84.5,
+"purity": 0.896,
+"savant": "FF",
+"via": "direct"
+},
+"Kelly, Merrill|R|SI": {
+"active": 82.4,
+"purity": 0.972,
+"savant": "SI",
+"via": "direct"
+},
+"Kelly, Merrill|R|SL": {
+"active": 21.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Kelly, Michael|R|ST": {
+"active": 65.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Kelly, Zack|R|FC": {
+"active": 56.5,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Kelly, Zack|R|ST": {
+"active": 56.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Kent, Zak|R|FF": {
+"active": 52.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Kent, Zak|R|SL": {
+"active": 47.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Kerkering, Orion|R|FF": {
+"active": 97.4,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Kerkering, Orion|R|SI": {
+"active": 92.0,
+"purity": 0.966,
+"savant": "SI",
+"via": "direct"
+},
+"Kerkering, Orion|R|ST": {
+"active": 45.8,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Kikuchi, Yusei|L|FF": {
+"active": 91.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Kikuchi, Yusei|L|FS": {
+"active": 83.0,
+"purity": 1.0,
+"r2": 0.016,
+"savant": "FS",
+"via": "from_FF"
+},
+"Kikuchi, Yusei|L|SL": {
+"active": 28.7,
+"purity": 0.966,
+"savant": "SL",
+"via": "direct"
+},
+"Kimbrel, Craig|R|CU": {
+"active": 65.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Kimbrel, Craig|R|FF": {
+"active": 95.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Kimbrel, Craig|R|ST": {
+"active": 58.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"King, Bryan|L|FF": {
+"active": 75.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"King, Bryan|L|SI": {
+"active": 76.0,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"King, Bryan|L|ST": {
+"active": 65.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"King, John|L|CH": {
+"active": 83.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"King, John|L|CU": {
+"active": 77.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"King, John|L|SI": {
+"active": 73.2,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"King, John|L|SL": {
+"active": 32.4,
+"purity": 0.989,
+"savant": "SL",
+"via": "direct"
+},
+"King, Michael|R|CH": {
+"active": 96.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"King, Michael|R|FF": {
+"active": 84.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"King, Michael|R|SI": {
+"active": 77.3,
+"purity": 0.97,
+"savant": "SI",
+"via": "direct"
+},
+"King, Michael|R|SL": {
+"active": 31.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"King, Michael|R|ST": {
+"active": 52.6,
+"purity": 0.984,
+"savant": "ST",
+"via": "direct"
+},
+"Kinley, Tyler|R|CU": {
+"active": 51.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Kinley, Tyler|R|FF": {
+"active": 79.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Kinley, Tyler|R|SL": {
+"active": 21.9,
+"purity": 0.997,
+"savant": "SL",
+"via": "direct"
+},
+"Kirby, George|R|CH": {
+"active": 95.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Kirby, George|R|CU": {
+"active": 82.3,
+"purity": 0.987,
+"savant": "CU",
+"via": "direct"
+},
+"Kirby, George|R|FC": {
+"active": 46.5,
+"purity": 1.0,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Kirby, George|R|FF": {
+"active": 89.6,
+"purity": 0.981,
+"savant": "FF",
+"via": "direct"
+},
+"Kirby, George|R|SI": {
+"active": 87.2,
+"purity": 0.982,
+"savant": "SI",
+"via": "direct"
+},
+"Kirby, George|R|ST": {
+"active": 52.5,
+"purity": 0.998,
+"savant": "ST",
+"via": "direct"
+},
+"Kittredge, Andrew|R|FF": {
+"active": 74.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Kittredge, Andrew|R|SI": {
+"active": 82.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Kittredge, Andrew|R|SL": {
+"active": 34.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Klein, Will|R|CU": {
+"active": 82.8,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Klein, Will|R|FF": {
+"active": 98.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Klein, Will|R|ST": {
+"active": 38.2,
+"purity": 0.983,
+"savant": "ST",
+"via": "direct"
+},
+"Kochanowicz, Jack|R|CH": {
+"active": 63.2,
+"purity": 0.996,
+"savant": "CH",
+"via": "direct"
+},
+"Kochanowicz, Jack|R|FF": {
+"active": 81.8,
+"purity": 0.898,
+"savant": "FF",
+"via": "direct"
+},
+"Kochanowicz, Jack|R|SI": {
+"active": 76.9,
+"purity": 0.983,
+"savant": "SI",
+"via": "direct"
+},
+"Kochanowicz, Jack|R|SL": {
+"active": 18.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Koenig, Jared|L|SI": {
+"active": 80.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Kolek, Stephen|R|CH": {
+"active": 72.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Kolek, Stephen|R|FC": {
+"active": 40.0,
+"purity": 0.981,
+"savant": "FC",
+"via": "direct"
+},
+"Kolek, Stephen|R|FF": {
+"active": 88.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Kolek, Stephen|R|SI": {
+"active": 75.7,
+"purity": 0.995,
+"savant": "SI",
+"via": "direct"
+},
+"Kolek, Stephen|R|SL": {
+"active": 24.8,
+"purity": 0.993,
+"savant": "SL",
+"via": "direct"
+},
+"Kolek, Stephen|R|ST": {
+"active": 45.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Kremer, Dean|R|CU": {
+"active": 63.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Kremer, Dean|R|FC": {
+"active": 45.5,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Kremer, Dean|R|FF": {
+"active": 97.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Kremer, Dean|R|FS": {
+"active": 96.3,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Kremer, Dean|R|SI": {
+"active": 92.1,
+"purity": 0.977,
+"savant": "SI",
+"via": "direct"
+},
+"Latz, Jacob|L|CH": {
+"active": 97.0,
+"purity": 0.991,
+"savant": "CH",
+"via": "direct"
+},
+"Latz, Jacob|L|CU": {
+"active": 76.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Latz, Jacob|L|FF": {
+"active": 98.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Latz, Jacob|L|SL": {
+"active": 31.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Lauer, Eric|L|CH": {
+"active": 96.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Lauer, Eric|L|CU": {
+"active": 69.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Lauer, Eric|L|FC": {
+"active": 38.0,
+"purity": 0.923,
+"savant": "FC",
+"via": "direct"
+},
+"Lauer, Eric|L|FF": {
+"active": 93.6,
+"purity": 0.996,
+"savant": "FF",
+"via": "direct"
+},
+"Lauer, Eric|L|SL": {
+"active": 27.8,
+"purity": 0.955,
+"savant": "SL",
+"via": "direct"
+},
+"Lawrence, Justin|R|FF": {
+"active": 79.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Lawrence, Justin|R|SI": {
+"active": 78.7,
+"purity": 0.993,
+"savant": "SI",
+"via": "direct"
+},
+"Lawrence, Justin|R|ST": {
+"active": 54.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Leahy, Kyle|R|CH": {
+"active": 79.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Leahy, Kyle|R|CU": {
+"active": 84.2,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Leahy, Kyle|R|FF": {
+"active": 85.9,
+"purity": 0.983,
+"savant": "FF",
+"via": "direct"
+},
+"Leahy, Kyle|R|SI": {
+"active": 84.1,
+"purity": 0.995,
+"savant": "SI",
+"via": "direct"
+},
+"Leahy, Kyle|R|SL": {
+"active": 43.7,
+"purity": 0.996,
+"savant": "SL",
+"via": "direct"
+},
+"Leahy, Kyle|R|ST": {
+"active": 47.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Leasure, Jordan|R|FF": {
+"active": 95.6,
+"purity": 0.982,
+"savant": "FF",
+"via": "direct"
+},
+"Leasure, Jordan|R|SL": {
+"active": 35.7,
+"purity": 0.992,
+"savant": "SL",
+"via": "direct"
+},
+"Lee, Dylan|L|CH": {
+"active": 98.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Lee, Dylan|L|FF": {
+"active": 99.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Lee, Dylan|L|SL": {
+"active": 43.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Legumina, Casey|R|CH": {
+"active": 89.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Legumina, Casey|R|FF": {
+"active": 97.0,
+"purity": 0.951,
+"savant": "FF",
+"via": "direct"
+},
+"Legumina, Casey|R|SI": {
+"active": 96.1,
+"purity": 0.964,
+"savant": "SI",
+"via": "direct"
+},
+"Legumina, Casey|R|SL": {
+"active": 31.1,
+"purity": 1.0,
+"r2": 0.029,
+"savant": "SL",
+"via": "from_ST"
+},
+"Legumina, Casey|R|ST": {
+"active": 44.8,
+"purity": 0.988,
+"savant": "ST",
+"via": "direct"
+},
+"Leiter Jr., Mark|R|CU": {
+"active": 97.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Leiter Jr., Mark|R|FC": {
+"active": 59.7,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Leiter Jr., Mark|R|FF": {
+"active": 93.2,
+"purity": 0.952,
+"r2": 0.764,
+"savant": "FF",
+"via": "from_SI"
+},
+"Leiter Jr., Mark|R|FS": {
+"active": 86.6,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Leiter Jr., Mark|R|SI": {
+"active": 92.8,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Leiter, Jack|R|CH": {
+"active": 79.6,
+"purity": 0.996,
+"savant": "CH",
+"via": "direct"
+},
+"Leiter, Jack|R|CU": {
+"active": 62.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Leiter, Jack|R|FC": {
+"active": 48.3,
+"purity": 0.993,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Leiter, Jack|R|FF": {
+"active": 95.1,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Leiter, Jack|R|SI": {
+"active": 94.8,
+"purity": 0.909,
+"savant": "SI",
+"via": "direct"
+},
+"Leiter, Jack|R|SL": {
+"active": 27.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Liberatore, Matthew|L|CH": {
+"active": 96.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Liberatore, Matthew|L|CU": {
+"active": 94.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Liberatore, Matthew|L|FC": {
+"active": 51.6,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Liberatore, Matthew|L|FF": {
+"active": 96.8,
+"purity": 0.99,
+"savant": "FF",
+"via": "direct"
+},
+"Liberatore, Matthew|L|SI": {
+"active": 92.9,
+"purity": 0.977,
+"savant": "SI",
+"via": "direct"
+},
+"Liberatore, Matthew|L|SL": {
+"active": 22.6,
+"purity": 0.997,
+"savant": "SL",
+"via": "direct"
+},
+"Littell, Zack|R|FC": {
+"active": 50.3,
+"purity": 0.988,
+"savant": "SL",
+"via": "direct"
+},
+"Littell, Zack|R|FF": {
+"active": 95.8,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Littell, Zack|R|FS": {
+"active": 77.3,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Littell, Zack|R|SI": {
+"active": 94.4,
+"purity": 0.975,
+"savant": "SI",
+"via": "direct"
+},
+"Littell, Zack|R|ST": {
+"active": 50.5,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Little, Brendon|L|CU": {
+"active": 76.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Little, Brendon|L|SI": {
+"active": 70.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Little, Brendon|L|SL": {
+"active": 34.6,
+"purity": 0.909,
+"r2": 0.002,
+"savant": "SL",
+"via": "from_SI"
+},
+"Lodolo, Nick|L|CH": {
+"active": 96.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Lodolo, Nick|L|FF": {
+"active": 98.2,
+"purity": 0.889,
+"savant": "FF",
+"via": "direct"
+},
+"Lodolo, Nick|L|SI": {
+"active": 98.9,
+"purity": 0.852,
+"savant": "SI",
+"via": "direct"
+},
+"Lodolo, Nick|L|SL": {
+"active": 41.2,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Lopez, Jacob|L|CH": {
+"active": 97.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Lopez, Jacob|L|FC": {
+"active": 59.0,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Lopez, Jacob|L|FF": {
+"active": 94.0,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Lopez, Jacob|L|SI": {
+"active": 94.1,
+"purity": 0.881,
+"savant": "SI",
+"via": "direct"
+},
+"Lopez, Jacob|L|ST": {
+"active": 50.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Lord, Brad|R|CH": {
+"active": 98.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Lord, Brad|R|FF": {
+"active": 98.1,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Lord, Brad|R|SI": {
+"active": 98.6,
+"purity": 0.918,
+"savant": "SI",
+"via": "direct"
+},
+"Lord, Brad|R|SL": {
+"active": 13.8,
+"purity": 0.973,
+"savant": "SL",
+"via": "direct"
+},
+"Lord, Brad|R|ST": {
+"active": 45.6,
+"purity": 0.979,
+"r2": 0.068,
+"savant": "ST",
+"via": "from_SI"
+},
+"Lorenzen, Michael|R|CH": {
+"active": 97.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Lorenzen, Michael|R|CU": {
+"active": 65.0,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Lorenzen, Michael|R|FC": {
+"active": 50.3,
+"purity": 0.983,
+"savant": "FC",
+"via": "direct"
+},
+"Lorenzen, Michael|R|FF": {
+"active": 95.4,
+"purity": 0.975,
+"savant": "FF",
+"via": "direct"
+},
+"Lorenzen, Michael|R|SI": {
+"active": 90.9,
+"purity": 0.971,
+"savant": "SI",
+"via": "direct"
+},
+"Lorenzen, Michael|R|SL": {
+"active": 20.1,
+"purity": 0.884,
+"savant": "SL",
+"via": "direct"
+},
+"Lorenzen, Michael|R|ST": {
+"active": 35.2,
+"purity": 0.981,
+"savant": "ST",
+"via": "direct"
+},
+"Lovelady, Richard|L|FF": {
+"active": 69.3,
+"purity": 0.934,
+"savant": "FF",
+"via": "direct"
+},
+"Lovelady, Richard|L|SI": {
+"active": 68.6,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Lovelady, Richard|L|ST": {
+"active": 43.1,
+"purity": 0.996,
+"savant": "ST",
+"via": "direct"
+},
+"Lo\u00e1isiga, Jonathan|R|CH": {
+"active": 96.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Lo\u00e1isiga, Jonathan|R|FF": {
+"active": 88.5,
+"purity": 0.965,
+"savant": "FF",
+"via": "direct"
+},
+"Lo\u00e1isiga, Jonathan|R|SI": {
+"active": 89.4,
+"purity": 0.975,
+"savant": "SI",
+"via": "direct"
+},
+"Lo\u00e1isiga, Jonathan|R|SL": {
+"active": 36.2,
+"purity": 0.989,
+"savant": "CU",
+"via": "direct"
+},
+"Lucchesi, Joey|L|SI": {
+"active": 80.2,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Lugo, Seth|R|CH": {
+"active": 87.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Lugo, Seth|R|CU": {
+"active": 80.6,
+"purity": 0.991,
+"savant": "CU",
+"via": "direct"
+},
+"Lugo, Seth|R|FC": {
+"active": 60.3,
+"purity": 0.954,
+"savant": "FC",
+"via": "direct"
+},
+"Lugo, Seth|R|FF": {
+"active": 84.9,
+"purity": 0.973,
+"savant": "FF",
+"via": "direct"
+},
+"Lugo, Seth|R|SI": {
+"active": 83.0,
+"purity": 0.987,
+"savant": "SI",
+"via": "direct"
+},
+"Lugo, Seth|R|SL": {
+"active": 31.4,
+"purity": 0.985,
+"savant": "SL",
+"via": "direct"
+},
+"Luzardo, Jes\u00fas|L|FF": {
+"active": 95.0,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Luzardo, Jes\u00fas|L|FS": {
+"active": 99.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Luzardo, Jes\u00fas|L|SI": {
+"active": 95.0,
+"purity": 0.987,
+"savant": "SI",
+"via": "direct"
+},
+"Luzardo, Jes\u00fas|L|ST": {
+"active": 37.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Lynch IV, Daniel|L|CH": {
+"active": 93.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Lynch IV, Daniel|L|CU": {
+"active": 31.5,
+"purity": 0.9,
+"savant": "CU",
+"via": "direct"
+},
+"Lynch IV, Daniel|L|FF": {
+"active": 94.2,
+"purity": 0.979,
+"savant": "FF",
+"via": "direct"
+},
+"Lynch IV, Daniel|L|SI": {
+"active": 90.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Lynch IV, Daniel|L|SL": {
+"active": 17.0,
+"purity": 0.992,
+"savant": "SL",
+"via": "direct"
+},
+"Mahle, Tyler|R|FC": {
+"active": 46.7,
+"purity": 0.815,
+"savant": "FC",
+"via": "direct"
+},
+"Mahle, Tyler|R|FF": {
+"active": 99.7,
+"purity": 0.956,
+"savant": "FF",
+"via": "direct"
+},
+"Mahle, Tyler|R|FS": {
+"active": 91.1,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Mahle, Tyler|R|SL": {
+"active": 28.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Manaea, Sean|L|CH": {
+"active": 91.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Manaea, Sean|L|FC": {
+"active": 48.9,
+"purity": 1.0,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Manaea, Sean|L|FF": {
+"active": 96.9,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Manaea, Sean|L|SI": {
+"active": 94.2,
+"purity": 0.964,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Manaea, Sean|L|ST": {
+"active": 46.3,
+"purity": 0.987,
+"savant": "ST",
+"via": "direct"
+},
+"Mantiply, Joe|L|CH": {
+"active": 98.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Mantiply, Joe|L|SI": {
+"active": 90.3,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Mantiply, Joe|L|SL": {
+"active": 50.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Marinaccio, Ron|R|CH": {
+"active": 92.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Marinaccio, Ron|R|FC": {
+"active": 46.2,
+"purity": 0.993,
+"savant": "FC",
+"via": "direct"
+},
+"Marinaccio, Ron|R|FF": {
+"active": 99.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Marinaccio, Ron|R|ST": {
+"active": 45.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Martin, Chris|R|FC": {
+"active": 54.0,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Martin, Chris|R|FF": {
+"active": 92.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Martin, Corbin|R|FF": {
+"active": 83.1,
+"purity": 0.982,
+"savant": "FF",
+"via": "direct"
+},
+"Martin, Davis|R|CH": {
+"active": 70.7,
+"purity": 0.977,
+"savant": "CH",
+"via": "direct"
+},
+"Martin, Davis|R|CU": {
+"active": 75.7,
+"purity": 0.995,
+"savant": "CU",
+"via": "direct"
+},
+"Martin, Davis|R|FC": {
+"active": 40.9,
+"purity": 0.919,
+"savant": "FC",
+"via": "direct"
+},
+"Martin, Davis|R|FF": {
+"active": 84.0,
+"purity": 0.965,
+"savant": "FF",
+"via": "direct"
+},
+"Martin, Davis|R|SI": {
+"active": 83.4,
+"purity": 0.966,
+"savant": "SI",
+"via": "direct"
+},
+"Martin, Davis|R|SL": {
+"active": 27.3,
+"purity": 0.925,
+"savant": "SL",
+"via": "direct"
+},
+"Martinez, Nick|R|CH": {
+"active": 77.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Martinez, Nick|R|CU": {
+"active": 82.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Martinez, Nick|R|FC": {
+"active": 59.1,
+"purity": 0.993,
+"savant": "FC",
+"via": "direct"
+},
+"Martinez, Nick|R|FF": {
+"active": 91.5,
+"purity": 0.987,
+"savant": "FF",
+"via": "direct"
+},
+"Martinez, Nick|R|SI": {
+"active": 90.2,
+"purity": 0.991,
+"savant": "SI",
+"via": "direct"
+},
+"Martinez, Nick|R|SL": {
+"active": 12.7,
+"purity": 0.973,
+"savant": "SL",
+"via": "direct"
+},
+"Maton, Phil|R|CU": {
+"active": 91.8,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Maton, Phil|R|FC": {
+"active": 60.5,
+"purity": 0.995,
+"savant": "FC",
+"via": "direct"
+},
+"Maton, Phil|R|SI": {
+"active": 72.0,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Maton, Phil|R|ST": {
+"active": 43.7,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Matsui, Yuki|L|FF": {
+"active": 94.5,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Matsui, Yuki|L|FS": {
+"active": 74.8,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Matsui, Yuki|L|SL": {
+"active": 36.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Matthews, Zebby|R|CH": {
+"active": 98.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Matthews, Zebby|R|CU": {
+"active": 49.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Matthews, Zebby|R|FC": {
+"active": 52.5,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Matthews, Zebby|R|FF": {
+"active": 95.7,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Matthews, Zebby|R|SI": {
+"active": 95.5,
+"purity": 0.977,
+"savant": "SI",
+"via": "direct"
+},
+"Matthews, Zebby|R|SL": {
+"active": 18.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Mattson, Isaac|R|CH": {
+"active": 94.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Mattson, Isaac|R|FF": {
+"active": 98.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Matz, Steven|L|CH": {
+"active": 81.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Matz, Steven|L|CU": {
+"active": 81.1,
+"purity": 0.831,
+"savant": "CU",
+"via": "direct"
+},
+"Matz, Steven|L|SI": {
+"active": 99.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Matz, Steven|L|SL": {
+"active": 37.1,
+"purity": 0.961,
+"savant": "SL",
+"via": "direct"
+},
+"Maxwell, Zach|R|FF": {
+"active": 98.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"May, Dustin|R|CH": {
+"active": 98.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"May, Dustin|R|CU": {
+"active": 81.0,
+"purity": 1.0,
+"r2": 0.155,
+"savant": "CU",
+"via": "from_ST"
+},
+"May, Dustin|R|FC": {
+"active": 37.3,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"May, Dustin|R|FF": {
+"active": 89.2,
+"purity": 0.986,
+"savant": "FF",
+"via": "direct"
+},
+"May, Dustin|R|SI": {
+"active": 84.7,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"May, Dustin|R|ST": {
+"active": 64.0,
+"purity": 0.996,
+"savant": "ST",
+"via": "direct"
+},
+"Mayza, Tim|L|SI": {
+"active": 87.3,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Mayza, Tim|L|SL": {
+"active": 15.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"McCullers Jr., Lance|R|CH": {
+"active": 82.3,
+"purity": 0.989,
+"savant": "CH",
+"via": "direct"
+},
+"McCullers Jr., Lance|R|CU": {
+"active": 76.9,
+"purity": 0.991,
+"savant": "CU",
+"via": "direct"
+},
+"McCullers Jr., Lance|R|FC": {
+"active": 36.2,
+"purity": 0.989,
+"savant": "FC",
+"via": "direct"
+},
+"McCullers Jr., Lance|R|SI": {
+"active": 69.6,
+"purity": 0.987,
+"savant": "SI",
+"via": "direct"
+},
+"McCullers Jr., Lance|R|ST": {
+"active": 53.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"McDonald, Trevor|R|CH": {
+"active": 96.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"McDonald, Trevor|R|SI": {
+"active": 85.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"McDonald, Trevor|R|ST": {
+"active": 31.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"McGreevy, Michael|R|CH": {
+"active": 75.2,
+"purity": 0.997,
+"savant": "CH",
+"via": "direct"
+},
+"McGreevy, Michael|R|CU": {
+"active": 78.6,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"McGreevy, Michael|R|FC": {
+"active": 40.5,
+"purity": 0.988,
+"savant": "FC",
+"via": "direct"
+},
+"McGreevy, Michael|R|FF": {
+"active": 86.0,
+"purity": 0.899,
+"savant": "FF",
+"via": "direct"
+},
+"McGreevy, Michael|R|SI": {
+"active": 76.8,
+"purity": 0.99,
+"savant": "SI",
+"via": "direct"
+},
+"McGreevy, Michael|R|SL": {
+"active": 32.1,
+"purity": 0.984,
+"r2": 0.029,
+"savant": "SL",
+"via": "from_ST"
+},
+"McGreevy, Michael|R|ST": {
+"active": 48.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"McLean, Nolan|R|CH": {
+"active": 79.9,
+"purity": 0.991,
+"savant": "CH",
+"via": "direct"
+},
+"McLean, Nolan|R|CU": {
+"active": 96.7,
+"purity": 0.981,
+"savant": "CU",
+"via": "direct"
+},
+"McLean, Nolan|R|FC": {
+"active": 30.2,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"McLean, Nolan|R|FF": {
+"active": 86.4,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"McLean, Nolan|R|SI": {
+"active": 77.2,
+"purity": 0.99,
+"savant": "SI",
+"via": "direct"
+},
+"McLean, Nolan|R|ST": {
+"active": 58.6,
+"purity": 0.983,
+"savant": "ST",
+"via": "direct"
+},
+"Mears, Nick|R|FF": {
+"active": 95.2,
+"purity": 0.976,
+"savant": "FF",
+"via": "direct"
+},
+"Mears, Nick|R|SL": {
+"active": 19.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Mederos, Victor|R|FC": {
+"active": 37.0,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Mederos, Victor|R|FF": {
+"active": 91.4,
+"purity": 1.0,
+"r2": 0.764,
+"savant": "FF",
+"via": "from_SI"
+},
+"Megill, Trevor|R|FF": {
+"active": 93.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Megill, Trevor|R|SL": {
+"active": 40.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Mejia, Juan|R|FF": {
+"active": 72.3,
+"purity": 0.959,
+"savant": "FF",
+"via": "direct"
+},
+"Mejia, Juan|R|SI": {
+"active": 73.8,
+"purity": 0.821,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Mejia, Juan|R|ST": {
+"active": 63.7,
+"purity": 0.997,
+"savant": "ST",
+"via": "direct"
+},
+"Melton, Troy|R|CU": {
+"active": 87.9,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Melton, Troy|R|FC": {
+"active": 45.3,
+"purity": 0.991,
+"savant": "FC",
+"via": "direct"
+},
+"Melton, Troy|R|FF": {
+"active": 89.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Melton, Troy|R|FS": {
+"active": 70.7,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Melton, Troy|R|SI": {
+"active": 87.6,
+"purity": 0.944,
+"savant": "SI",
+"via": "direct"
+},
+"Melton, Troy|R|SL": {
+"active": 54.5,
+"purity": 0.991,
+"savant": "SL",
+"via": "direct"
+},
+"Messick, Parker|L|CH": {
+"active": 77.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Messick, Parker|L|CU": {
+"active": 57.5,
+"purity": 0.995,
+"savant": "CU",
+"via": "direct"
+},
+"Messick, Parker|L|FC": {
+"active": 47.5,
+"purity": 0.846,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Messick, Parker|L|FF": {
+"active": 92.6,
+"purity": 0.993,
+"savant": "FF",
+"via": "direct"
+},
+"Messick, Parker|L|SI": {
+"active": 87.3,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Messick, Parker|L|SL": {
+"active": 46.4,
+"purity": 0.989,
+"savant": "SL",
+"via": "direct"
+},
+"Mey, Luis|R|SI": {
+"active": 72.3,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Mey, Luis|R|ST": {
+"active": 32.2,
+"purity": 0.987,
+"savant": "SL",
+"via": "direct"
+},
+"Meyer, Max|R|CH": {
+"active": 86.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Meyer, Max|R|CU": {
+"active": 41.7,
+"purity": 0.985,
+"savant": "ST",
+"via": "direct"
+},
+"Meyer, Max|R|FF": {
+"active": 77.8,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Meyer, Max|R|SI": {
+"active": 77.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Meyer, Max|R|SL": {
+"active": 22.0,
+"purity": 0.911,
+"savant": "SL",
+"via": "direct"
+},
+"Mikolas, Miles|R|CH": {
+"active": 92.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Mikolas, Miles|R|CU": {
+"active": 81.3,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Mikolas, Miles|R|FC": {
+"active": 38.0,
+"purity": 0.989,
+"savant": "SL",
+"via": "direct"
+},
+"Mikolas, Miles|R|FF": {
+"active": 90.9,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Mikolas, Miles|R|SI": {
+"active": 85.2,
+"purity": 0.982,
+"savant": "SI",
+"via": "direct"
+},
+"Mikolas, Miles|R|SL": {
+"active": 45.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Miller, Bryce|R|FC": {
+"active": 55.4,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Miller, Bryce|R|FF": {
+"active": 93.3,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Miller, Bryce|R|FS": {
+"active": 68.0,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Miller, Bryce|R|SI": {
+"active": 90.2,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Miller, Bryce|R|SL": {
+"active": 25.9,
+"purity": 0.956,
+"savant": "SL",
+"via": "direct"
+},
+"Miller, Bryce|R|ST": {
+"active": 62.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Miller, Erik|L|FF": {
+"active": 93.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Miller, Erik|L|SI": {
+"active": 96.2,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Miller, Erik|L|SL": {
+"active": 17.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Miller, Mason|R|FF": {
+"active": 92.8,
+"purity": 0.996,
+"savant": "FF",
+"via": "direct"
+},
+"Miller, Mason|R|ST": {
+"active": 48.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Milner, Hoby|L|CH": {
+"active": 95.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Milner, Hoby|L|FF": {
+"active": 95.6,
+"purity": 0.899,
+"savant": "FF",
+"via": "direct"
+},
+"Milner, Hoby|L|SI": {
+"active": 92.1,
+"purity": 0.971,
+"savant": "SI",
+"via": "direct"
+},
+"Milner, Hoby|L|ST": {
+"active": 63.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Minter, A.J.|L|FC": {
+"active": 32.6,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Minter, A.J.|L|FF": {
+"active": 84.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Misiorowski, Jacob|R|CU": {
+"active": 70.4,
+"purity": 0.869,
+"savant": "CU",
+"via": "direct"
+},
+"Misiorowski, Jacob|R|FF": {
+"active": 90.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Mize, Casey|R|FF": {
+"active": 98.1,
+"purity": 0.926,
+"savant": "FF",
+"via": "direct"
+},
+"Mize, Casey|R|FS": {
+"active": 94.7,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Mize, Casey|R|SI": {
+"active": 96.7,
+"purity": 0.947,
+"savant": "SI",
+"via": "direct"
+},
+"Mize, Casey|R|SL": {
+"active": 41.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Mize, Casey|R|ST": {
+"active": 32.6,
+"purity": 1.0,
+"savant": "SV",
+"via": "direct"
+},
+"Mlodzinski, Carmen|R|CU": {
+"active": 75.1,
+"purity": 0.975,
+"savant": "CU",
+"via": "direct"
+},
+"Mlodzinski, Carmen|R|FC": {
+"active": 18.4,
+"purity": 0.848,
+"savant": "SL",
+"via": "direct"
+},
+"Mlodzinski, Carmen|R|FF": {
+"active": 91.4,
+"purity": 0.986,
+"savant": "FF",
+"via": "direct"
+},
+"Mlodzinski, Carmen|R|FS": {
+"active": 65.5,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Mlodzinski, Carmen|R|SI": {
+"active": 90.7,
+"purity": 0.991,
+"savant": "SI",
+"via": "direct"
+},
+"Mlodzinski, Carmen|R|ST": {
+"active": 29.7,
+"purity": 0.972,
+"savant": "ST",
+"via": "direct"
+},
+"Moll, Sam|L|CH": {
+"active": 83.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Moll, Sam|L|FF": {
+"active": 70.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Moll, Sam|L|SI": {
+"active": 75.1,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Moll, Sam|L|ST": {
+"active": 49.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Montero, Keider|R|CH": {
+"active": 87.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Montero, Keider|R|CU": {
+"active": 73.1,
+"purity": 0.979,
+"savant": "CU",
+"via": "direct"
+},
+"Montero, Keider|R|FF": {
+"active": 85.8,
+"purity": 0.998,
+"savant": "FF",
+"via": "direct"
+},
+"Montero, Keider|R|SI": {
+"active": 82.9,
+"purity": 0.983,
+"savant": "SI",
+"via": "direct"
+},
+"Montero, Keider|R|SL": {
+"active": 37.8,
+"purity": 0.995,
+"savant": "SL",
+"via": "direct"
+},
+"Montgomery, Mason|L|CU": {
+"active": 69.3,
+"purity": 0.943,
+"r2": 0.001,
+"savant": "CU",
+"via": "from_FF"
+},
+"Montgomery, Mason|L|FF": {
+"active": 98.0,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Montgomery, Mason|L|SI": {
+"active": 95.2,
+"purity": 0.905,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Montgomery, Mason|L|SL": {
+"active": 14.6,
+"purity": 0.99,
+"savant": "SL",
+"via": "direct"
+},
+"Morales, Luis|R|FF": {
+"active": 86.3,
+"purity": 0.977,
+"savant": "FF",
+"via": "direct"
+},
+"Morales, Luis|R|SL": {
+"active": 42.0,
+"purity": 0.953,
+"savant": "SL",
+"via": "direct"
+},
+"Morejon, Adrian|L|CH": {
+"active": 95.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Morejon, Adrian|L|FF": {
+"active": 87.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Morejon, Adrian|L|SI": {
+"active": 81.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Morejon, Adrian|L|SL": {
+"active": 41.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Morgan, David|R|CU": {
+"active": 69.8,
+"purity": 0.99,
+"savant": "CU",
+"via": "direct"
+},
+"Morgan, David|R|FF": {
+"active": 82.2,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Morgan, David|R|SI": {
+"active": 87.7,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Morgan, David|R|SL": {
+"active": 25.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Morgan, Eli|R|CH": {
+"active": 92.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Morgan, Eli|R|FF": {
+"active": 98.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Morgan, Eli|R|SL": {
+"active": 17.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Morillo, Juan|R|CH": {
+"active": 97.5,
+"purity": 0.991,
+"savant": "CH",
+"via": "direct"
+},
+"Morillo, Juan|R|CU": {
+"active": 40.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Morillo, Juan|R|FF": {
+"active": 92.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Morillo, Juan|R|SI": {
+"active": 91.1,
+"purity": 0.964,
+"savant": "SI",
+"via": "direct"
+},
+"Murphy, Chris|L|CU": {
+"active": 91.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Murphy, Chris|L|FC": {
+"active": 37.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Murphy, Chris|L|FF": {
+"active": 88.5,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Murray, Jayden|R|FF": {
+"active": 82.3,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Murray, Jayden|R|ST": {
+"active": 62.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Mu\u00f1oz, Andr\u00e9s|R|FF": {
+"active": 90.7,
+"purity": 0.98,
+"savant": "FF",
+"via": "direct"
+},
+"Mu\u00f1oz, Andr\u00e9s|R|SI": {
+"active": 88.3,
+"purity": 0.982,
+"savant": "SI",
+"via": "direct"
+},
+"Mu\u00f1oz, Andr\u00e9s|R|SL": {
+"active": 39.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Myers, Tobias|R|FC": {
+"active": 71.3,
+"purity": 0.959,
+"savant": "FC",
+"via": "direct"
+},
+"Myers, Tobias|R|FF": {
+"active": 99.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Myers, Tobias|R|FS": {
+"active": 90.9,
+"purity": 0.994,
+"savant": "FS",
+"via": "direct"
+},
+"Myers, Tobias|R|SL": {
+"active": 42.1,
+"purity": 0.979,
+"savant": "SL",
+"via": "direct"
+},
+"M\u00e1rquez, Germ\u00e1n|R|FC": {
+"active": 35.0,
+"purity": 0.85,
+"savant": "SL",
+"via": "direct"
+},
+"M\u00e1rquez, Germ\u00e1n|R|FF": {
+"active": 96.5,
+"purity": 0.874,
+"savant": "FF",
+"via": "direct"
+},
+"M\u00e1rquez, Germ\u00e1n|R|SL": {
+"active": 19.3,
+"purity": 0.957,
+"savant": "CU",
+"via": "direct"
+},
+"Nance, Tommy|R|CU": {
+"active": 78.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Nance, Tommy|R|SI": {
+"active": 83.6,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Nance, Tommy|R|SL": {
+"active": 14.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Nelson, Ryne|R|CU": {
+"active": 63.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Nelson, Ryne|R|FC": {
+"active": 62.2,
+"purity": 0.898,
+"savant": "FC",
+"via": "direct"
+},
+"Nelson, Ryne|R|FF": {
+"active": 98.9,
+"purity": 0.972,
+"savant": "FF",
+"via": "direct"
+},
+"Nelson, Ryne|R|SL": {
+"active": 34.4,
+"purity": 0.996,
+"savant": "SL",
+"via": "direct"
+},
+"Newcomb, Sean|L|FF": {
+"active": 90.4,
+"purity": 0.99,
+"savant": "FF",
+"via": "direct"
+},
+"Newcomb, Sean|L|SI": {
+"active": 82.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Newcomb, Sean|L|ST": {
+"active": 67.9,
+"purity": 1.0,
+"savant": "SV",
+"via": "direct"
+},
+"Nicolas, Kyle|R|FF": {
+"active": 95.8,
+"purity": 0.99,
+"savant": "FF",
+"via": "direct"
+},
+"Nicolas, Kyle|R|SL": {
+"active": 27.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Nola, Aaron|R|CH": {
+"active": 99.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Nola, Aaron|R|CU": {
+"active": 82.0,
+"purity": 0.998,
+"savant": "CU",
+"via": "direct"
+},
+"Nola, Aaron|R|FC": {
+"active": 47.3,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Nola, Aaron|R|FF": {
+"active": 95.2,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Nola, Aaron|R|SI": {
+"active": 92.7,
+"purity": 0.971,
+"savant": "SI",
+"via": "direct"
+},
+"O'Brien, Riley|R|FC": {
+"active": 23.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"O'Brien, Riley|R|SI": {
+"active": 85.0,
+"purity": 0.983,
+"savant": "SI",
+"via": "direct"
+},
+"O'Brien, Riley|R|ST": {
+"active": 67.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Ober, Bailey|R|CH": {
+"active": 99.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Ober, Bailey|R|FF": {
+"active": 90.4,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Ober, Bailey|R|SL": {
+"active": 46.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Ober, Bailey|R|ST": {
+"active": 46.1,
+"purity": 0.991,
+"savant": "ST",
+"via": "direct"
+},
+"Ohtani, Shohei|R|CU": {
+"active": 82.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Ohtani, Shohei|R|FF": {
+"active": 78.4,
+"purity": 0.987,
+"savant": "FF",
+"via": "direct"
+},
+"Ohtani, Shohei|R|FS": {
+"active": 77.9,
+"purity": 0.991,
+"savant": "FS",
+"via": "direct"
+},
+"Ohtani, Shohei|R|SI": {
+"active": 77.7,
+"purity": 0.958,
+"savant": "SI",
+"via": "direct"
+},
+"Ohtani, Shohei|R|ST": {
+"active": 48.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Okert, Steven|L|FF": {
+"active": 92.8,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Okert, Steven|L|SL": {
+"active": 38.6,
+"purity": 0.998,
+"savant": "SL",
+"via": "direct"
+},
+"Orze, Eric|R|FF": {
+"active": 99.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Orze, Eric|R|FS": {
+"active": 75.3,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Orze, Eric|R|SL": {
+"active": 40.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Orze, Eric|R|ST": {
+"active": 69.2,
+"purity": 1.0,
+"r2": 0.001,
+"savant": "CU",
+"via": "from_FF"
+},
+"Paddack, Chris|R|CH": {
+"active": 97.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Paddack, Chris|R|CU": {
+"active": 89.1,
+"purity": 0.991,
+"savant": "CU",
+"via": "direct"
+},
+"Paddack, Chris|R|FC": {
+"active": 58.4,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Paddack, Chris|R|FF": {
+"active": 99.5,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Paddack, Chris|R|SI": {
+"active": 99.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Paddack, Chris|R|ST": {
+"active": 55.4,
+"purity": 1.0,
+"r2": 0.135,
+"savant": "ST",
+"via": "from_CU"
+},
+"Pag\u00e1n, Emilio|R|FF": {
+"active": 94.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Pag\u00e1n, Emilio|R|FS": {
+"active": 79.4,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Pag\u00e1n, Emilio|R|SL": {
+"active": 34.6,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Palencia, Daniel|R|FF": {
+"active": 99.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Palencia, Daniel|R|SL": {
+"active": 23.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Pallante, Andre|R|CU": {
+"active": 79.0,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Pallante, Andre|R|FF": {
+"active": 68.6,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Pallante, Andre|R|FS": {
+"active": 75.7,
+"purity": 1.0,
+"r2": 0.016,
+"savant": "FS",
+"via": "from_FF"
+},
+"Pallante, Andre|R|SI": {
+"active": 78.6,
+"purity": 0.986,
+"savant": "SI",
+"via": "direct"
+},
+"Pallante, Andre|R|SL": {
+"active": 32.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Palmquist, Carson|L|SI": {
+"active": 91.4,
+"purity": 1.0,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Palmquist, Carson|L|ST": {
+"active": 49.5,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Parker, Mitchell|L|CU": {
+"active": 51.7,
+"purity": 0.981,
+"savant": "CU",
+"via": "direct"
+},
+"Parker, Mitchell|L|FF": {
+"active": 99.4,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Parker, Mitchell|L|SL": {
+"active": 20.4,
+"purity": 0.991,
+"savant": "SL",
+"via": "direct"
+},
+"Patrick, Chad|R|FC": {
+"active": 37.4,
+"purity": 0.996,
+"savant": "FC",
+"via": "direct"
+},
+"Patrick, Chad|R|FF": {
+"active": 91.6,
+"purity": 0.985,
+"savant": "FF",
+"via": "direct"
+},
+"Patrick, Chad|R|SI": {
+"active": 85.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Patrick, Chad|R|SL": {
+"active": 45.3,
+"purity": 1.0,
+"savant": "SV",
+"via": "direct"
+},
+"Payamps, Joel|R|FF": {
+"active": 74.4,
+"purity": 0.984,
+"savant": "FF",
+"via": "direct"
+},
+"Payamps, Joel|R|ST": {
+"active": 52.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Pearson, Nate|R|FF": {
+"active": 94.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Pearson, Nate|R|SL": {
+"active": 36.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Peguero, Joel|R|FF": {
+"active": 86.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Peguero, Joel|R|SI": {
+"active": 80.7,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Peralta, Freddy|R|CH": {
+"active": 87.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Peralta, Freddy|R|CU": {
+"active": 54.5,
+"purity": 0.838,
+"savant": "CU",
+"via": "direct"
+},
+"Peralta, Freddy|R|FF": {
+"active": 85.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Peralta, Freddy|R|ST": {
+"active": 49.4,
+"purity": 0.859,
+"savant": "ST",
+"via": "direct"
+},
+"Peralta, Wandy|L|CH": {
+"active": 84.1,
+"purity": 0.996,
+"savant": "CH",
+"via": "direct"
+},
+"Peralta, Wandy|L|FC": {
+"active": 27.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Peralta, Wandy|L|FF": {
+"active": 95.3,
+"purity": 0.912,
+"savant": "FF",
+"via": "direct"
+},
+"Peralta, Wandy|L|SI": {
+"active": 94.8,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Perkins, Jack|R|CH": {
+"active": 96.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Perkins, Jack|R|FC": {
+"active": 52.4,
+"purity": 0.935,
+"savant": "FC",
+"via": "direct"
+},
+"Perkins, Jack|R|FF": {
+"active": 95.6,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Perkins, Jack|R|ST": {
+"active": 37.6,
+"purity": 0.986,
+"savant": "ST",
+"via": "direct"
+},
+"Petersen, Michael|R|CH": {
+"active": 93.6,
+"purity": 1.0,
+"r2": 0.175,
+"savant": "CH",
+"via": "from_FF"
+},
+"Petersen, Michael|R|FF": {
+"active": 99.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Petersen, Michael|R|SL": {
+"active": 29.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Peterson, David|L|CH": {
+"active": 91.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Peterson, David|L|CU": {
+"active": 69.3,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Peterson, David|L|FF": {
+"active": 71.7,
+"purity": 0.968,
+"savant": "FF",
+"via": "direct"
+},
+"Peterson, David|L|SI": {
+"active": 75.3,
+"purity": 0.995,
+"savant": "SI",
+"via": "direct"
+},
+"Peterson, David|L|SL": {
+"active": 17.6,
+"purity": 0.997,
+"savant": "SL",
+"via": "direct"
+},
+"Petty, Chase|R|CH": {
+"active": 99.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Petty, Chase|R|ST": {
+"active": 36.8,
+"purity": 0.981,
+"savant": "ST",
+"via": "direct"
+},
+"Pfaadt, Brandon|R|CH": {
+"active": 86.6,
+"purity": 0.986,
+"savant": "CH",
+"via": "direct"
+},
+"Pfaadt, Brandon|R|CU": {
+"active": 69.3,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Pfaadt, Brandon|R|FC": {
+"active": 33.9,
+"purity": 0.969,
+"savant": "FC",
+"via": "direct"
+},
+"Pfaadt, Brandon|R|FF": {
+"active": 75.7,
+"purity": 0.986,
+"savant": "FF",
+"via": "direct"
+},
+"Pfaadt, Brandon|R|SI": {
+"active": 79.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Pfaadt, Brandon|R|ST": {
+"active": 36.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Phillips, Connor|R|FF": {
+"active": 90.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Phillips, Connor|R|ST": {
+"active": 54.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Phillips, Tyler|R|CU": {
+"active": 59.2,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Phillips, Tyler|R|FF": {
+"active": 73.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Phillips, Tyler|R|FS": {
+"active": 91.2,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Phillips, Tyler|R|SI": {
+"active": 91.0,
+"purity": 0.996,
+"savant": "SI",
+"via": "direct"
+},
+"Phillips, Tyler|R|ST": {
+"active": 31.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Pivetta, Nick|R|CU": {
+"active": 82.3,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Pivetta, Nick|R|FF": {
+"active": 95.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Pomeranz, Drew|L|CU": {
+"active": 68.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Pomeranz, Drew|L|FF": {
+"active": 71.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Pop, Zach|R|SI": {
+"active": 85.0,
+"purity": 0.988,
+"savant": "SI",
+"via": "direct"
+},
+"Poulin, PJ|L|CH": {
+"active": 98.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Poulin, PJ|L|FF": {
+"active": 96.5,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Poulin, PJ|L|SI": {
+"active": 95.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Poulin, PJ|L|ST": {
+"active": 30.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Povich, Cade|L|CU": {
+"active": 83.0,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Povich, Cade|L|FC": {
+"active": 38.2,
+"purity": 0.98,
+"savant": "SL",
+"via": "direct"
+},
+"Povich, Cade|L|FF": {
+"active": 94.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"P\u00e9rez, Cionel|L|CU": {
+"active": 71.0,
+"purity": 0.983,
+"r2": 0.001,
+"savant": "CU",
+"via": "from_FF"
+},
+"P\u00e9rez, Cionel|L|FF": {
+"active": 87.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"P\u00e9rez, Cionel|L|SI": {
+"active": 80.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"P\u00e9rez, Cionel|L|ST": {
+"active": 57.0,
+"purity": 0.993,
+"savant": "SV",
+"via": "direct"
+},
+"P\u00e9rez, Eury|R|CH": {
+"active": 99.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"P\u00e9rez, Eury|R|CU": {
+"active": 59.2,
+"purity": 0.987,
+"savant": "CU",
+"via": "direct"
+},
+"P\u00e9rez, Eury|R|FF": {
+"active": 96.2,
+"purity": 0.975,
+"savant": "FF",
+"via": "direct"
+},
+"P\u00e9rez, Eury|R|SI": {
+"active": 94.8,
+"purity": 0.969,
+"savant": "SI",
+"via": "direct"
+},
+"P\u00e9rez, Eury|R|SL": {
+"active": 24.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"P\u00e9rez, Eury|R|ST": {
+"active": 37.0,
+"purity": 0.99,
+"savant": "ST",
+"via": "direct"
+},
+"P\u00e9rez, Mart\u00edn|L|CH": {
+"active": 99.5,
+"purity": 0.997,
+"savant": "CH",
+"via": "direct"
+},
+"P\u00e9rez, Mart\u00edn|L|FC": {
+"active": 66.1,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"P\u00e9rez, Mart\u00edn|L|FF": {
+"active": 96.6,
+"purity": 0.985,
+"savant": "FF",
+"via": "direct"
+},
+"P\u00e9rez, Mart\u00edn|L|SI": {
+"active": 96.3,
+"purity": 0.998,
+"savant": "SI",
+"via": "direct"
+},
+"P\u00e9rez, Mart\u00edn|L|SL": {
+"active": 35.8,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Quantrill, Cal|R|CU": {
+"active": 47.0,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Quantrill, Cal|R|FC": {
+"active": 42.3,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Quantrill, Cal|R|FF": {
+"active": 99.1,
+"purity": 0.887,
+"savant": "FF",
+"via": "direct"
+},
+"Quantrill, Cal|R|FS": {
+"active": 94.7,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Quantrill, Cal|R|SI": {
+"active": 98.2,
+"purity": 0.965,
+"savant": "SI",
+"via": "direct"
+},
+"Quintana, Jose|L|CH": {
+"active": 89.1,
+"purity": 0.993,
+"savant": "CH",
+"via": "direct"
+},
+"Quintana, Jose|L|CU": {
+"active": 55.5,
+"purity": 0.936,
+"savant": "CU",
+"via": "direct"
+},
+"Quintana, Jose|L|FF": {
+"active": 87.4,
+"purity": 0.985,
+"savant": "FF",
+"via": "direct"
+},
+"Quintana, Jose|L|SI": {
+"active": 85.5,
+"purity": 0.955,
+"savant": "SI",
+"via": "direct"
+},
+"Quintana, Jose|L|SL": {
+"active": 53.3,
+"purity": 0.947,
+"savant": "SV",
+"via": "direct"
+},
+"Ragans, Cole|L|CH": {
+"active": 99.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Ragans, Cole|L|CU": {
+"active": 92.0,
+"purity": 0.982,
+"savant": "CU",
+"via": "direct"
+},
+"Ragans, Cole|L|FF": {
+"active": 98.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Ragans, Cole|L|SL": {
+"active": 26.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Raley, Brooks|L|CH": {
+"active": 86.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Raley, Brooks|L|FC": {
+"active": 37.6,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Raley, Brooks|L|SI": {
+"active": 77.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Raley, Brooks|L|ST": {
+"active": 51.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Ram\u00edrez, Yohan|R|CU": {
+"active": 77.7,
+"purity": 0.958,
+"savant": "CU",
+"via": "direct"
+},
+"Ram\u00edrez, Yohan|R|FF": {
+"active": 87.1,
+"purity": 0.985,
+"savant": "FF",
+"via": "direct"
+},
+"Ram\u00edrez, Yohan|R|SI": {
+"active": 88.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Ram\u00edrez, Yohan|R|ST": {
+"active": 61.4,
+"purity": 0.979,
+"savant": "ST",
+"via": "direct"
+},
+"Rangel, Alan|R|CH": {
+"active": 93.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Rangel, Alan|R|CU": {
+"active": 98.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Rangel, Alan|R|FF": {
+"active": 98.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Rangel, Alan|R|SL": {
+"active": 44.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Rasmussen, Drew|R|CH": {
+"active": 87.4,
+"purity": 0.994,
+"savant": "CH",
+"via": "direct"
+},
+"Rasmussen, Drew|R|CU": {
+"active": 68.9,
+"purity": 0.985,
+"savant": "CU",
+"via": "direct"
+},
+"Rasmussen, Drew|R|FC": {
+"active": 30.0,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Rasmussen, Drew|R|FF": {
+"active": 91.2,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Rasmussen, Drew|R|SI": {
+"active": 89.2,
+"purity": 0.997,
+"savant": "SI",
+"via": "direct"
+},
+"Rasmussen, Drew|R|SL": {
+"active": 30.0,
+"purity": 0.964,
+"savant": "FC",
+"via": "direct"
+},
+"Rasmussen, Drew|R|ST": {
+"active": 47.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Ray, Robbie|L|CH": {
+"active": 94.3,
+"purity": 0.997,
+"savant": "CH",
+"via": "direct"
+},
+"Ray, Robbie|L|CU": {
+"active": 42.6,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Ray, Robbie|L|FC": {
+"active": 50.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Ray, Robbie|L|FF": {
+"active": 95.8,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Ray, Robbie|L|SI": {
+"active": 93.3,
+"purity": 0.988,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Rea, Colin|R|CH": {
+"active": 90.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Rea, Colin|R|CU": {
+"active": 72.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Rea, Colin|R|FC": {
+"active": 51.2,
+"purity": 0.957,
+"savant": "FC",
+"via": "direct"
+},
+"Rea, Colin|R|FF": {
+"active": 87.4,
+"purity": 0.941,
+"savant": "FF",
+"via": "direct"
+},
+"Rea, Colin|R|SI": {
+"active": 78.9,
+"purity": 0.99,
+"savant": "SI",
+"via": "direct"
+},
+"Rea, Colin|R|SL": {
+"active": 31.2,
+"purity": 0.994,
+"savant": "SL",
+"via": "direct"
+},
+"Rea, Colin|R|ST": {
+"active": 54.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Ribalta, Orlando|R|CH": {
+"active": 85.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Ribalta, Orlando|R|FF": {
+"active": 87.1,
+"purity": 0.97,
+"savant": "FF",
+"via": "direct"
+},
+"Ribalta, Orlando|R|SI": {
+"active": 86.8,
+"purity": 0.956,
+"savant": "SI",
+"via": "direct"
+},
+"Ribalta, Orlando|R|SL": {
+"active": 25.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Richards, Trevor|R|CH": {
+"active": 61.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Richards, Trevor|R|FF": {
+"active": 99.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Richards, Trevor|R|SL": {
+"active": 22.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Roberts, Ethan|R|FF": {
+"active": 47.6,
+"purity": 0.995,
+"savant": "FC",
+"via": "direct"
+},
+"Roberts, Ethan|R|SI": {
+"active": 79.0,
+"purity": 1.0,
+"r2": 0.06,
+"savant": "SI",
+"via": "from_ST"
+},
+"Roberts, Ethan|R|ST": {
+"active": 70.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Rock, Joe|L|FF": {
+"active": 94.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Rock, Joe|L|SL": {
+"active": 19.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Rocker, Kumar|R|CH": {
+"active": 98.9,
+"purity": 0.988,
+"savant": "CH",
+"via": "direct"
+},
+"Rocker, Kumar|R|FC": {
+"active": 31.2,
+"purity": 0.995,
+"savant": "FC",
+"via": "direct"
+},
+"Rocker, Kumar|R|FF": {
+"active": 89.3,
+"purity": 0.962,
+"savant": "FF",
+"via": "direct"
+},
+"Rocker, Kumar|R|SI": {
+"active": 90.7,
+"purity": 0.975,
+"savant": "SI",
+"via": "direct"
+},
+"Rocker, Kumar|R|SL": {
+"active": 19.4,
+"purity": 0.996,
+"savant": "SL",
+"via": "direct"
+},
+"Rodriguez, Bradgley|R|CH": {
+"active": 98.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Rodriguez, Bradgley|R|FF": {
+"active": 94.0,
+"purity": 0.969,
+"savant": "FF",
+"via": "direct"
+},
+"Rodriguez, Bradgley|R|SI": {
+"active": 90.6,
+"purity": 0.924,
+"savant": "SI",
+"via": "direct"
+},
+"Rodriguez, Bradgley|R|SL": {
+"active": 31.3,
+"purity": 1.0,
+"r2": 0.006,
+"savant": "SL",
+"via": "from_FF"
+},
+"Rodriguez, Carlos|R|CH": {
+"active": 98.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Rodriguez, Eduardo|L|CH": {
+"active": 86.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Rodriguez, Eduardo|L|CU": {
+"active": 52.9,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Rodriguez, Eduardo|L|FC": {
+"active": 60.2,
+"purity": 0.995,
+"savant": "FC",
+"via": "direct"
+},
+"Rodriguez, Eduardo|L|FF": {
+"active": 80.2,
+"purity": 0.973,
+"savant": "FF",
+"via": "direct"
+},
+"Rodriguez, Eduardo|L|SI": {
+"active": 78.0,
+"purity": 0.904,
+"savant": "SI",
+"via": "direct"
+},
+"Rodr\u00edguez, Yariel|R|SL": {
+"active": 23.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Rod\u00f3n, Carlos|L|CH": {
+"active": 79.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Rod\u00f3n, Carlos|L|FF": {
+"active": 97.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Rod\u00f3n, Carlos|L|SI": {
+"active": 80.8,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Rod\u00f3n, Carlos|L|SL": {
+"active": 20.0,
+"purity": 0.995,
+"savant": "SL",
+"via": "direct"
+},
+"Rogers, Taylor|L|FC": {
+"active": 47.1,
+"purity": 1.0,
+"r2": 0.026,
+"savant": "FC",
+"via": "from_SI"
+},
+"Rogers, Taylor|L|SI": {
+"active": 89.3,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Rogers, Taylor|L|ST": {
+"active": 67.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Rogers, Trevor|L|FF": {
+"active": 87.9,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Rogers, Trevor|L|FS": {
+"active": 87.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Rogers, Trevor|L|SI": {
+"active": 89.1,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Rogers, Trevor|L|SL": {
+"active": 27.3,
+"purity": 0.805,
+"savant": "FC",
+"via": "direct"
+},
+"Rogers, Trevor|L|ST": {
+"active": 32.6,
+"purity": 0.985,
+"savant": "ST",
+"via": "direct"
+},
+"Rogers, Tyler|R|SI": {
+"active": 73.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Rogers, Tyler|R|ST": {
+"active": 59.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Rolison, Ryan|L|CU": {
+"active": 76.6,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Rolison, Ryan|L|FF": {
+"active": 67.4,
+"purity": 0.986,
+"savant": "FF",
+"via": "direct"
+},
+"Rolison, Ryan|L|SI": {
+"active": 69.7,
+"purity": 1.0,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Rolison, Ryan|L|SL": {
+"active": 34.6,
+"purity": 0.99,
+"savant": "SL",
+"via": "direct"
+},
+"Rolison, Ryan|L|ST": {
+"active": 51.2,
+"purity": 0.981,
+"r2": 0.135,
+"savant": "ST",
+"via": "from_CU"
+},
+"Romano, Jordan|R|FF": {
+"active": 97.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Romano, Jordan|R|SL": {
+"active": 18.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Romero, JoJo|L|FS": {
+"active": 94.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Romero, JoJo|L|SI": {
+"active": 83.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Romero, JoJo|L|ST": {
+"active": 41.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Ross, Joe|R|FC": {
+"active": 31.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Ross, Joe|R|SI": {
+"active": 78.5,
+"purity": 0.98,
+"savant": "SI",
+"via": "direct"
+},
+"Roupp, Landen|R|CH": {
+"active": 88.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Roupp, Landen|R|CU": {
+"active": 79.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Roupp, Landen|R|FC": {
+"active": 49.1,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Roupp, Landen|R|FF": {
+"active": 89.5,
+"purity": 0.986,
+"savant": "FF",
+"via": "direct"
+},
+"Roupp, Landen|R|SI": {
+"active": 87.2,
+"purity": 0.997,
+"savant": "SI",
+"via": "direct"
+},
+"Roycroft, Chris|R|FF": {
+"active": 68.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Roycroft, Chris|R|SI": {
+"active": 93.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Roycroft, Chris|R|SL": {
+"active": 31.5,
+"purity": 0.949,
+"savant": "FC",
+"via": "direct"
+},
+"Ryan, Joe|R|CU": {
+"active": 73.3,
+"purity": 0.985,
+"savant": "CU",
+"via": "direct"
+},
+"Ryan, Joe|R|FF": {
+"active": 96.9,
+"purity": 0.978,
+"savant": "FF",
+"via": "direct"
+},
+"Ryan, Joe|R|FS": {
+"active": 80.1,
+"purity": 0.975,
+"savant": "FS",
+"via": "direct"
+},
+"Ryan, Joe|R|SI": {
+"active": 95.5,
+"purity": 0.94,
+"savant": "SI",
+"via": "direct"
+},
+"Ryan, Joe|R|SL": {
+"active": 33.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Ryan, Joe|R|ST": {
+"active": 63.1,
+"purity": 0.968,
+"savant": "ST",
+"via": "direct"
+},
+"Sabrowski, Erik|L|CU": {
+"active": 79.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Sabrowski, Erik|L|FF": {
+"active": 97.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Sabrowski, Erik|L|SL": {
+"active": 28.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Sale, Chris|L|CH": {
+"active": 98.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Sale, Chris|L|FF": {
+"active": 94.4,
+"purity": 0.986,
+"savant": "FF",
+"via": "direct"
+},
+"Sale, Chris|L|SI": {
+"active": 93.1,
+"purity": 0.969,
+"savant": "SI",
+"via": "direct"
+},
+"Sale, Chris|L|ST": {
+"active": 55.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Sanders, Cam|R|FF": {
+"active": 83.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Sanders, Cam|R|SL": {
+"active": 19.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Sandlin, Nick|R|ST": {
+"active": 53.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Sands, Cole|R|FF": {
+"active": 85.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Santana, Dennis|R|CH": {
+"active": 86.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Santana, Dennis|R|FC": {
+"active": 50.1,
+"purity": 0.953,
+"savant": "FC",
+"via": "direct"
+},
+"Santana, Dennis|R|FF": {
+"active": 92.2,
+"purity": 0.976,
+"savant": "FF",
+"via": "direct"
+},
+"Santana, Dennis|R|SI": {
+"active": 89.1,
+"purity": 0.984,
+"savant": "SI",
+"via": "direct"
+},
+"Santana, Dennis|R|SL": {
+"active": 21.4,
+"purity": 0.995,
+"savant": "SL",
+"via": "direct"
+},
+"Santillan, Tony|R|FF": {
+"active": 93.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Santillan, Tony|R|ST": {
+"active": 38.3,
+"purity": 0.932,
+"savant": "SV",
+"via": "direct"
+},
+"Sasaki, Roki|R|FF": {
+"active": 95.6,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Sasaki, Roki|R|FS": {
+"active": 91.6,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Sasaki, Roki|R|SL": {
+"active": 30.8,
+"purity": 1.0,
+"r2": 0.029,
+"savant": "SL",
+"via": "from_ST"
+},
+"Scherzer, Max|R|CH": {
+"active": 99.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Scherzer, Max|R|CU": {
+"active": 66.4,
+"purity": 0.983,
+"savant": "CU",
+"via": "direct"
+},
+"Scherzer, Max|R|FC": {
+"active": 28.7,
+"purity": 0.906,
+"savant": "SL",
+"via": "direct"
+},
+"Scherzer, Max|R|FF": {
+"active": 93.0,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Scherzer, Max|R|SL": {
+"active": 28.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Schlittler, Cam|R|CU": {
+"active": 82.3,
+"purity": 0.991,
+"savant": "CU",
+"via": "direct"
+},
+"Schlittler, Cam|R|FC": {
+"active": 48.9,
+"purity": 0.982,
+"savant": "FC",
+"via": "direct"
+},
+"Schlittler, Cam|R|FF": {
+"active": 88.7,
+"purity": 0.979,
+"savant": "FF",
+"via": "direct"
+},
+"Schlittler, Cam|R|SI": {
+"active": 80.9,
+"purity": 0.984,
+"savant": "SI",
+"via": "direct"
+},
+"Scholtens, Jesse|R|FC": {
+"active": 36.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Scholtens, Jesse|R|FF": {
+"active": 94.7,
+"purity": 0.978,
+"savant": "FF",
+"via": "direct"
+},
+"Scholtens, Jesse|R|FS": {
+"active": 84.1,
+"purity": 1.0,
+"r2": 0.016,
+"savant": "FS",
+"via": "from_FF"
+},
+"Scholtens, Jesse|R|SI": {
+"active": 92.4,
+"purity": 0.993,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Scholtens, Jesse|R|ST": {
+"active": 47.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Schreiber, John|R|CH": {
+"active": 81.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Schreiber, John|R|FC": {
+"active": 28.7,
+"purity": 0.974,
+"savant": "FC",
+"via": "direct"
+},
+"Schreiber, John|R|FF": {
+"active": 79.8,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Schreiber, John|R|SI": {
+"active": 78.4,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Schreiber, John|R|ST": {
+"active": 65.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Schultz, Paxton|R|CH": {
+"active": 45.8,
+"purity": 0.989,
+"savant": "CH",
+"via": "direct"
+},
+"Schultz, Paxton|R|FC": {
+"active": 56.9,
+"purity": 0.992,
+"savant": "FC",
+"via": "direct"
+},
+"Schultz, Paxton|R|FF": {
+"active": 91.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Scott, Tanner|L|FF": {
+"active": 81.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Scott, Tanner|L|SL": {
+"active": 27.8,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Seabold, Connor|R|CH": {
+"active": 82.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Seabold, Connor|R|FF": {
+"active": 99.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Seabold, Connor|R|SL": {
+"active": 30.5,
+"purity": 0.974,
+"r2": 0.006,
+"savant": "SL",
+"via": "from_FF"
+},
+"Sears, JP|L|CH": {
+"active": 95.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Sears, JP|L|FF": {
+"active": 97.7,
+"purity": 0.881,
+"savant": "FF",
+"via": "direct"
+},
+"Sears, JP|L|SI": {
+"active": 97.3,
+"purity": 0.875,
+"savant": "SI",
+"via": "direct"
+},
+"Sears, JP|L|SL": {
+"active": 30.9,
+"purity": 0.885,
+"savant": "SL",
+"via": "direct"
+},
+"Sears, JP|L|ST": {
+"active": 38.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Senga, Kodai|R|FC": {
+"active": 52.5,
+"purity": 0.985,
+"savant": "FC",
+"via": "direct"
+},
+"Senga, Kodai|R|FF": {
+"active": 87.9,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Senga, Kodai|R|FS": {
+"active": 73.3,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Senga, Kodai|R|ST": {
+"active": 27.8,
+"purity": 0.934,
+"savant": "ST",
+"via": "direct"
+},
+"Senzatela, Antonio|R|CH": {
+"active": 67.5,
+"purity": 0.979,
+"savant": "CH",
+"via": "direct"
+},
+"Senzatela, Antonio|R|FC": {
+"active": 53.9,
+"purity": 0.985,
+"savant": "FC",
+"via": "direct"
+},
+"Senzatela, Antonio|R|FF": {
+"active": 84.3,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Senzatela, Antonio|R|SI": {
+"active": 86.1,
+"purity": 0.973,
+"savant": "SI",
+"via": "direct"
+},
+"Senzatela, Antonio|R|SL": {
+"active": 50.7,
+"purity": 0.971,
+"savant": "CU",
+"via": "direct"
+},
+"Severino, Luis|R|CH": {
+"active": 98.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Severino, Luis|R|FC": {
+"active": 62.9,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Severino, Luis|R|FF": {
+"active": 92.5,
+"purity": 0.942,
+"savant": "FF",
+"via": "direct"
+},
+"Severino, Luis|R|SI": {
+"active": 91.3,
+"purity": 0.984,
+"savant": "SI",
+"via": "direct"
+},
+"Severino, Luis|R|ST": {
+"active": 61.0,
+"purity": 0.937,
+"savant": "ST",
+"via": "direct"
+},
+"Sewald, Paul|R|FF": {
+"active": 78.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Sewald, Paul|R|ST": {
+"active": 35.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Seymour, Ian|L|CH": {
+"active": 97.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Seymour, Ian|L|FF": {
+"active": 94.0,
+"purity": 0.981,
+"savant": "FF",
+"via": "direct"
+},
+"Seymour, Ian|L|SI": {
+"active": 93.1,
+"purity": 0.969,
+"savant": "SI",
+"via": "direct"
+},
+"Seymour, Ian|L|ST": {
+"active": 33.4,
+"purity": 0.868,
+"savant": "ST",
+"via": "direct"
+},
+"Sheehan, Emmet|R|CH": {
+"active": 98.5,
+"purity": 0.995,
+"savant": "CH",
+"via": "direct"
+},
+"Sheehan, Emmet|R|CU": {
+"active": 85.0,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Sheehan, Emmet|R|FF": {
+"active": 98.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Sheehan, Emmet|R|SL": {
+"active": 26.4,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Shugart, Chase|R|FC": {
+"active": 36.9,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Shugart, Chase|R|FF": {
+"active": 91.1,
+"purity": 0.983,
+"savant": "FF",
+"via": "direct"
+},
+"Shugart, Chase|R|SI": {
+"active": 91.0,
+"purity": 0.993,
+"savant": "SI",
+"via": "direct"
+},
+"Shugart, Chase|R|ST": {
+"active": 62.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Shuster, Jared|L|FF": {
+"active": 93.0,
+"purity": 0.978,
+"savant": "FF",
+"via": "direct"
+},
+"Silseth, Chase|R|FF": {
+"active": 87.9,
+"purity": 0.974,
+"savant": "FF",
+"via": "direct"
+},
+"Silseth, Chase|R|FS": {
+"active": 79.3,
+"purity": 0.99,
+"savant": "FS",
+"via": "direct"
+},
+"Silseth, Chase|R|SI": {
+"active": 87.4,
+"purity": 0.979,
+"savant": "SI",
+"via": "direct"
+},
+"Silseth, Chase|R|SL": {
+"active": 37.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Sims, Lucas|R|FF": {
+"active": 91.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Singer, Brady|R|FC": {
+"active": 43.9,
+"purity": 0.922,
+"savant": "FC",
+"via": "direct"
+},
+"Singer, Brady|R|FF": {
+"active": 73.0,
+"purity": 0.978,
+"savant": "FF",
+"via": "direct"
+},
+"Singer, Brady|R|SI": {
+"active": 83.1,
+"purity": 0.991,
+"savant": "SI",
+"via": "direct"
+},
+"Singer, Brady|R|SL": {
+"active": 35.9,
+"purity": 0.948,
+"savant": "SL",
+"via": "direct"
+},
+"Singer, Brady|R|ST": {
+"active": 39.0,
+"purity": 0.969,
+"savant": "ST",
+"via": "direct"
+},
+"Sisk, Evan|L|CH": {
+"active": 80.0,
+"purity": 1.0,
+"r2": 0.224,
+"savant": "CH",
+"via": "from_SI"
+},
+"Sisk, Evan|L|CU": {
+"active": 78.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Sisk, Evan|L|FF": {
+"active": 74.1,
+"purity": 0.965,
+"savant": "FF",
+"via": "direct"
+},
+"Sisk, Evan|L|SI": {
+"active": 72.6,
+"purity": 0.989,
+"savant": "SI",
+"via": "direct"
+},
+"Sisk, Evan|L|ST": {
+"active": 59.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Skenes, Paul|R|CH": {
+"active": 97.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Skenes, Paul|R|FF": {
+"active": 97.1,
+"purity": 0.977,
+"savant": "FF",
+"via": "direct"
+},
+"Skenes, Paul|R|FS": {
+"active": 89.9,
+"purity": 0.994,
+"savant": "FS",
+"via": "direct"
+},
+"Skenes, Paul|R|SI": {
+"active": 96.4,
+"purity": 0.989,
+"savant": "SI",
+"via": "direct"
+},
+"Skenes, Paul|R|SL": {
+"active": 28.9,
+"purity": 0.925,
+"savant": "SL",
+"via": "direct"
+},
+"Skenes, Paul|R|ST": {
+"active": 36.8,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Skubal, Tarik|L|CH": {
+"active": 79.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Skubal, Tarik|L|CU": {
+"active": 53.8,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Skubal, Tarik|L|FF": {
+"active": 90.1,
+"purity": 0.994,
+"savant": "FF",
+"via": "direct"
+},
+"Skubal, Tarik|L|SI": {
+"active": 86.8,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Skubal, Tarik|L|SL": {
+"active": 32.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Slaten, Justin|R|FC": {
+"active": 51.9,
+"purity": 0.987,
+"savant": "FC",
+"via": "direct"
+},
+"Slaten, Justin|R|FF": {
+"active": 86.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Slaten, Justin|R|SI": {
+"active": 85.3,
+"purity": 0.938,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Slaten, Justin|R|ST": {
+"active": 48.8,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Smith, Cade|R|FF": {
+"active": 96.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Smith, Cade|R|FS": {
+"active": 93.1,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Smith, Cade|R|ST": {
+"active": 38.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Smith, Dylan|R|FF": {
+"active": 91.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Smith, Dylan|R|ST": {
+"active": 35.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Smith, Shane|R|CU": {
+"active": 80.6,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Smith, Shane|R|FF": {
+"active": 80.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Soriano, George|R|CH": {
+"active": 73.1,
+"purity": 0.994,
+"savant": "CH",
+"via": "direct"
+},
+"Soriano, George|R|FF": {
+"active": 83.7,
+"purity": 0.957,
+"savant": "FF",
+"via": "direct"
+},
+"Soriano, George|R|SI": {
+"active": 80.0,
+"purity": 0.982,
+"savant": "SI",
+"via": "direct"
+},
+"Soriano, George|R|SL": {
+"active": 15.0,
+"purity": 0.94,
+"savant": "SL",
+"via": "direct"
+},
+"Soriano, George|R|ST": {
+"active": 28.6,
+"purity": 0.983,
+"savant": "ST",
+"via": "direct"
+},
+"Soriano, Jos\u00e9|R|CU": {
+"active": 70.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Soriano, Jos\u00e9|R|FF": {
+"active": 82.2,
+"purity": 0.992,
+"savant": "FF",
+"via": "direct"
+},
+"Soriano, Jos\u00e9|R|FS": {
+"active": 76.5,
+"purity": 0.988,
+"savant": "FS",
+"via": "direct"
+},
+"Soriano, Jos\u00e9|R|SI": {
+"active": 82.0,
+"purity": 0.96,
+"savant": "SI",
+"via": "direct"
+},
+"Soriano, Jos\u00e9|R|SL": {
+"active": 17.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Soroka, Michael|R|CH": {
+"active": 94.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Soroka, Michael|R|CU": {
+"active": 67.2,
+"purity": 1.0,
+"savant": "SV",
+"via": "direct"
+},
+"Soroka, Michael|R|FC": {
+"active": 45.2,
+"purity": 0.993,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Soroka, Michael|R|FF": {
+"active": 85.7,
+"purity": 0.993,
+"savant": "FF",
+"via": "direct"
+},
+"Soroka, Michael|R|SI": {
+"active": 85.9,
+"purity": 0.985,
+"savant": "SI",
+"via": "direct"
+},
+"Soto, Gregory|L|FF": {
+"active": 89.6,
+"purity": 0.947,
+"savant": "FF",
+"via": "direct"
+},
+"Soto, Gregory|L|SI": {
+"active": 91.9,
+"purity": 0.978,
+"savant": "SI",
+"via": "direct"
+},
+"Soto, Gregory|L|SL": {
+"active": 19.6,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Soto, Gregory|L|ST": {
+"active": 25.8,
+"purity": 0.814,
+"savant": "ST",
+"via": "direct"
+},
+"Sousa, Bennett|L|SL": {
+"active": 23.9,
+"purity": 0.93,
+"savant": "SL",
+"via": "direct"
+},
+"Speier, Gabe|L|FF": {
+"active": 93.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Speier, Gabe|L|SI": {
+"active": 92.8,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Speier, Gabe|L|SL": {
+"active": 33.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Spence, Mitch|R|FC": {
+"active": 27.1,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Springs, Jeffrey|L|CH": {
+"active": 95.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Springs, Jeffrey|L|FF": {
+"active": 99.1,
+"purity": 0.999,
+"savant": "FF",
+"via": "direct"
+},
+"Springs, Jeffrey|L|SL": {
+"active": 30.0,
+"purity": 0.998,
+"savant": "SL",
+"via": "direct"
+},
+"Springs, Jeffrey|L|ST": {
+"active": 55.8,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Sproat, Brandon|R|CH": {
+"active": 99.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Sproat, Brandon|R|CU": {
+"active": 82.7,
+"purity": 0.993,
+"savant": "CU",
+"via": "direct"
+},
+"Sproat, Brandon|R|FC": {
+"active": 47.5,
+"purity": 0.994,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Sproat, Brandon|R|FF": {
+"active": 92.6,
+"purity": 0.99,
+"savant": "FF",
+"via": "direct"
+},
+"Sproat, Brandon|R|SI": {
+"active": 85.4,
+"purity": 0.991,
+"savant": "SI",
+"via": "direct"
+},
+"Sproat, Brandon|R|ST": {
+"active": 49.9,
+"purity": 0.992,
+"savant": "ST",
+"via": "direct"
+},
+"Stanek, Ryne|R|FF": {
+"active": 99.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Stanek, Ryne|R|FS": {
+"active": 94.5,
+"purity": 0.989,
+"savant": "FS",
+"via": "direct"
+},
+"Stanek, Ryne|R|SI": {
+"active": 96.4,
+"purity": 0.913,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Stanek, Ryne|R|SL": {
+"active": 21.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Sterner, Justin|R|FC": {
+"active": 31.7,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Sterner, Justin|R|FF": {
+"active": 95.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Sterner, Justin|R|ST": {
+"active": 49.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Stewart, Brock|R|FF": {
+"active": 72.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Stewart, Brock|R|ST": {
+"active": 52.7,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Strahm, Matt|L|CH": {
+"active": 94.2,
+"purity": 1.0,
+"r2": 0.224,
+"savant": "CH",
+"via": "from_SI"
+},
+"Strahm, Matt|L|FF": {
+"active": 98.0,
+"purity": 0.95,
+"savant": "FF",
+"via": "direct"
+},
+"Strahm, Matt|L|SI": {
+"active": 98.5,
+"purity": 0.917,
+"savant": "SI",
+"via": "direct"
+},
+"Strahm, Matt|L|SL": {
+"active": 19.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Strider, Spencer|R|CH": {
+"active": 78.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Strider, Spencer|R|CU": {
+"active": 58.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Strider, Spencer|R|FF": {
+"active": 96.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Strider, Spencer|R|SL": {
+"active": 32.2,
+"purity": 0.995,
+"savant": "SL",
+"via": "direct"
+},
+"Suarez, Jos\u00e9|L|CH": {
+"active": 86.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Suarez, Jos\u00e9|L|FF": {
+"active": 93.1,
+"purity": 0.978,
+"savant": "FF",
+"via": "direct"
+},
+"Suarez, Jos\u00e9|L|SI": {
+"active": 91.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Suarez, Jos\u00e9|L|SL": {
+"active": 30.2,
+"purity": 0.995,
+"savant": "SL",
+"via": "direct"
+},
+"Suarez, Ranger|L|CH": {
+"active": 70.5,
+"purity": 0.995,
+"savant": "CH",
+"via": "direct"
+},
+"Suarez, Ranger|L|CU": {
+"active": 87.2,
+"purity": 0.976,
+"savant": "CU",
+"via": "direct"
+},
+"Suarez, Ranger|L|FC": {
+"active": 37.8,
+"purity": 0.99,
+"savant": "FC",
+"via": "direct"
+},
+"Suarez, Ranger|L|FF": {
+"active": 80.2,
+"purity": 0.966,
+"savant": "FF",
+"via": "direct"
+},
+"Suarez, Ranger|L|SI": {
+"active": 72.5,
+"purity": 0.997,
+"savant": "SI",
+"via": "direct"
+},
+"Suarez, Robert|R|CH": {
+"active": 93.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Suarez, Robert|R|FC": {
+"active": 48.1,
+"purity": 0.985,
+"r2": 0.047,
+"savant": "FC",
+"via": "from_FF"
+},
+"Suarez, Robert|R|FF": {
+"active": 94.5,
+"purity": 0.978,
+"savant": "FF",
+"via": "direct"
+},
+"Sugano, Tomoyuki|R|CU": {
+"active": 68.7,
+"purity": 0.978,
+"savant": "CU",
+"via": "direct"
+},
+"Sugano, Tomoyuki|R|FC": {
+"active": 39.7,
+"purity": 0.957,
+"savant": "FC",
+"via": "direct"
+},
+"Sugano, Tomoyuki|R|FF": {
+"active": 86.5,
+"purity": 0.964,
+"savant": "FF",
+"via": "direct"
+},
+"Sugano, Tomoyuki|R|FS": {
+"active": 78.3,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Sugano, Tomoyuki|R|SI": {
+"active": 83.2,
+"purity": 0.966,
+"savant": "SI",
+"via": "direct"
+},
+"Sugano, Tomoyuki|R|ST": {
+"active": 37.9,
+"purity": 0.964,
+"savant": "ST",
+"via": "direct"
+},
+"Sulser, Cole|R|CH": {
+"active": 83.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Sulser, Cole|R|FC": {
+"active": 44.8,
+"purity": 0.987,
+"savant": "FC",
+"via": "direct"
+},
+"Sulser, Cole|R|FF": {
+"active": 97.1,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Suter, Brent|L|CH": {
+"active": 94.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Suter, Brent|L|FF": {
+"active": 70.5,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Suter, Brent|L|SI": {
+"active": 88.3,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Suter, Brent|L|ST": {
+"active": 47.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Su\u00e1rez, Albert|R|CH": {
+"active": 96.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Su\u00e1rez, Albert|R|CU": {
+"active": 50.9,
+"purity": 0.978,
+"savant": "CU",
+"via": "direct"
+},
+"Su\u00e1rez, Albert|R|FC": {
+"active": 52.4,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Su\u00e1rez, Albert|R|FF": {
+"active": 86.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Svanson, Matt|R|FC": {
+"active": 38.4,
+"purity": 0.993,
+"savant": "FC",
+"via": "direct"
+},
+"Svanson, Matt|R|SI": {
+"active": 86.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Svanson, Matt|R|ST": {
+"active": 34.0,
+"purity": 0.991,
+"savant": "ST",
+"via": "direct"
+},
+"S\u00e1nchez, Cristopher|L|CH": {
+"active": 84.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"S\u00e1nchez, Cristopher|L|SI": {
+"active": 92.7,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"S\u00e1nchez, Cristopher|L|SL": {
+"active": 21.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Taillon, Jameson|R|CH": {
+"active": 86.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Taillon, Jameson|R|CU": {
+"active": 71.9,
+"purity": 0.976,
+"savant": "CU",
+"via": "direct"
+},
+"Taillon, Jameson|R|FC": {
+"active": 49.3,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Taillon, Jameson|R|FF": {
+"active": 93.9,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Taillon, Jameson|R|SI": {
+"active": 92.6,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Taillon, Jameson|R|ST": {
+"active": 53.6,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Taylor, Grant|R|CU": {
+"active": 79.2,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Taylor, Grant|R|FF": {
+"active": 85.4,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Taylor, Grant|R|SI": {
+"active": 84.7,
+"purity": 1.0,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Taylor, Grant|R|SL": {
+"active": 33.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Teng, Kai-Wei|R|CU": {
+"active": 72.0,
+"purity": 0.981,
+"savant": "CU",
+"via": "direct"
+},
+"Teng, Kai-Wei|R|FF": {
+"active": 77.8,
+"purity": 0.983,
+"savant": "FF",
+"via": "direct"
+},
+"Teng, Kai-Wei|R|FS": {
+"active": 87.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Teng, Kai-Wei|R|SI": {
+"active": 76.4,
+"purity": 0.965,
+"savant": "SI",
+"via": "direct"
+},
+"Teng, Kai-Wei|R|ST": {
+"active": 43.9,
+"purity": 0.995,
+"savant": "ST",
+"via": "direct"
+},
+"Thielbar, Caleb|L|CU": {
+"active": 81.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Thielbar, Caleb|L|FF": {
+"active": 91.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Thielbar, Caleb|L|SL": {
+"active": 46.9,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Thielbar, Caleb|L|ST": {
+"active": 44.9,
+"purity": 0.964,
+"savant": "ST",
+"via": "direct"
+},
+"Thompson, Ryan|R|SI": {
+"active": 75.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Thompson, Ryan|R|ST": {
+"active": 72.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Thornton, Trent|R|CU": {
+"active": 64.6,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Thornton, Trent|R|FC": {
+"active": 31.5,
+"purity": 0.981,
+"savant": "FC",
+"via": "direct"
+},
+"Thornton, Trent|R|FF": {
+"active": 74.4,
+"purity": 0.984,
+"savant": "FF",
+"via": "direct"
+},
+"Thornton, Trent|R|SL": {
+"active": 31.5,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Thornton, Trent|R|ST": {
+"active": 52.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Tidwell, Blade|R|FF": {
+"active": 93.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Tidwell, Blade|R|ST": {
+"active": 46.3,
+"purity": 0.987,
+"savant": "ST",
+"via": "direct"
+},
+"Tolle, Payton|L|CH": {
+"active": 67.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Tolle, Payton|L|CU": {
+"active": 45.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Tolle, Payton|L|FC": {
+"active": 54.4,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Tolle, Payton|L|FF": {
+"active": 91.5,
+"purity": 0.996,
+"savant": "FF",
+"via": "direct"
+},
+"Tolle, Payton|L|SI": {
+"active": 89.8,
+"purity": 1.0,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Tong, Jonah|R|CH": {
+"active": 98.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Tong, Jonah|R|FF": {
+"active": 98.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Topa, Justin|R|CH": {
+"active": 81.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Topa, Justin|R|FC": {
+"active": 41.9,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Topa, Justin|R|SI": {
+"active": 89.5,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Topa, Justin|R|ST": {
+"active": 46.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Treinen, Blake|R|SI": {
+"active": 82.2,
+"purity": 0.993,
+"savant": "SI",
+"via": "direct"
+},
+"Treinen, Blake|R|ST": {
+"active": 49.1,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Uribe, Abner|R|SI": {
+"active": 70.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Uribe, Abner|R|ST": {
+"active": 36.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Valdez, Framber|L|CH": {
+"active": 77.6,
+"purity": 0.991,
+"savant": "CH",
+"via": "direct"
+},
+"Valdez, Framber|L|CU": {
+"active": 82.3,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Valdez, Framber|L|FF": {
+"active": 77.2,
+"purity": 1.0,
+"r2": 0.764,
+"savant": "FF",
+"via": "from_SI"
+},
+"Valdez, Framber|L|SI": {
+"active": 75.4,
+"purity": 0.999,
+"savant": "SI",
+"via": "direct"
+},
+"Valdez, Framber|L|SL": {
+"active": 29.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Varland, Louis|R|CH": {
+"active": 85.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Varland, Louis|R|CU": {
+"active": 51.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Varland, Louis|R|FF": {
+"active": 92.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Varland, Louis|R|SL": {
+"active": 40.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Vesia, Alex|L|CH": {
+"active": 99.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Vesia, Alex|L|FF": {
+"active": 98.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Vesia, Alex|L|SL": {
+"active": 43.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Vest, Will|R|CH": {
+"active": 90.3,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Vest, Will|R|FF": {
+"active": 88.7,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Vest, Will|R|SI": {
+"active": 86.7,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Vest, Will|R|SL": {
+"active": 19.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Vodnik, Victor|R|CH": {
+"active": 87.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Vodnik, Victor|R|FF": {
+"active": 89.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Vodnik, Victor|R|SL": {
+"active": 33.7,
+"purity": 0.992,
+"savant": "SL",
+"via": "direct"
+},
+"V\u00e1squez, Randy|R|CH": {
+"active": 93.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"V\u00e1squez, Randy|R|FC": {
+"active": 56.1,
+"purity": 0.971,
+"savant": "FC",
+"via": "direct"
+},
+"V\u00e1squez, Randy|R|FF": {
+"active": 87.4,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"V\u00e1squez, Randy|R|SI": {
+"active": 86.5,
+"purity": 0.994,
+"savant": "SI",
+"via": "direct"
+},
+"Wacha, Michael|R|CH": {
+"active": 78.2,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Wacha, Michael|R|CU": {
+"active": 86.8,
+"purity": 0.994,
+"savant": "CU",
+"via": "direct"
+},
+"Wacha, Michael|R|FC": {
+"active": 62.4,
+"purity": 0.899,
+"savant": "FC",
+"via": "direct"
+},
+"Wacha, Michael|R|FF": {
+"active": 98.6,
+"purity": 0.915,
+"savant": "FF",
+"via": "direct"
+},
+"Wacha, Michael|R|SI": {
+"active": 96.3,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Wacha, Michael|R|SL": {
+"active": 29.8,
+"purity": 0.96,
+"savant": "SL",
+"via": "direct"
+},
+"Waldrep, Hurston|R|SI": {
+"active": 81.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Walker, Ryan|R|SI": {
+"active": 78.0,
+"purity": 0.993,
+"savant": "SI",
+"via": "direct"
+},
+"Walker, Ryan|R|ST": {
+"active": 52.7,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Walker, Taijuan|R|CU": {
+"active": 68.1,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Walker, Taijuan|R|FC": {
+"active": 57.3,
+"purity": 0.988,
+"savant": "FC",
+"via": "direct"
+},
+"Walker, Taijuan|R|FS": {
+"active": 79.9,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Walker, Taijuan|R|SI": {
+"active": 96.2,
+"purity": 0.969,
+"savant": "SI",
+"via": "direct"
+},
+"Walker, Taijuan|R|SL": {
+"active": 30.9,
+"purity": 0.98,
+"savant": "SL",
+"via": "direct"
+},
+"Warren, Austin|R|CU": {
+"active": 73.0,
+"purity": 0.893,
+"r2": 0.155,
+"savant": "CU",
+"via": "from_ST"
+},
+"Warren, Austin|R|FF": {
+"active": 96.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Warren, Austin|R|SI": {
+"active": 96.6,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Warren, Austin|R|ST": {
+"active": 49.4,
+"purity": 0.967,
+"savant": "ST",
+"via": "direct"
+},
+"Warren, Will|R|CH": {
+"active": 86.2,
+"purity": 0.993,
+"savant": "CH",
+"via": "direct"
+},
+"Warren, Will|R|CU": {
+"active": 70.4,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Warren, Will|R|FF": {
+"active": 76.2,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Warren, Will|R|SI": {
+"active": 72.6,
+"purity": 0.986,
+"savant": "SI",
+"via": "direct"
+},
+"Warren, Will|R|ST": {
+"active": 61.9,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Weathers, Ryan|L|CH": {
+"active": 69.6,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Weathers, Ryan|L|FF": {
+"active": 93.2,
+"purity": 0.995,
+"savant": "FF",
+"via": "direct"
+},
+"Weathers, Ryan|L|SI": {
+"active": 93.2,
+"purity": 0.993,
+"savant": "SI",
+"via": "direct"
+},
+"Weathers, Ryan|L|SL": {
+"active": 26.1,
+"purity": 0.974,
+"savant": "SL",
+"via": "direct"
+},
+"Weathers, Ryan|L|ST": {
+"active": 33.3,
+"purity": 0.987,
+"savant": "ST",
+"via": "direct"
+},
+"Weaver, Luke|R|CH": {
+"active": 88.4,
+"purity": 0.99,
+"savant": "CH",
+"via": "direct"
+},
+"Weaver, Luke|R|FC": {
+"active": 67.6,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Weaver, Luke|R|FF": {
+"active": 96.0,
+"purity": 0.985,
+"savant": "FF",
+"via": "direct"
+},
+"Webb, Jacob|R|CH": {
+"active": 99.4,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Webb, Jacob|R|CU": {
+"active": 74.8,
+"purity": 0.978,
+"r2": 0.155,
+"savant": "CU",
+"via": "from_ST"
+},
+"Webb, Jacob|R|FF": {
+"active": 87.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Webb, Jacob|R|SL": {
+"active": 33.0,
+"purity": 1.0,
+"r2": 0.029,
+"savant": "SL",
+"via": "from_ST"
+},
+"Webb, Logan|R|FC": {
+"active": 47.7,
+"purity": 0.955,
+"savant": "FC",
+"via": "direct"
+},
+"Webb, Logan|R|FF": {
+"active": 76.0,
+"purity": 0.971,
+"savant": "FF",
+"via": "direct"
+},
+"Webb, Logan|R|FS": {
+"active": 76.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Webb, Logan|R|SI": {
+"active": 78.0,
+"purity": 0.995,
+"savant": "SI",
+"via": "direct"
+},
+"Webb, Logan|R|ST": {
+"active": 48.2,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Weissert, Greg|R|CH": {
+"active": 93.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Weissert, Greg|R|FF": {
+"active": 74.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Weissert, Greg|R|SI": {
+"active": 78.2,
+"purity": 0.981,
+"savant": "SI",
+"via": "direct"
+},
+"Weissert, Greg|R|SL": {
+"active": 38.6,
+"purity": 0.976,
+"savant": "SL",
+"via": "direct"
+},
+"Weissert, Greg|R|ST": {
+"active": 68.4,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Wells, Tyler|R|CH": {
+"active": 93.8,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Wells, Tyler|R|FC": {
+"active": 70.3,
+"purity": 0.97,
+"savant": "FC",
+"via": "direct"
+},
+"Wells, Tyler|R|FF": {
+"active": 90.9,
+"purity": 0.99,
+"savant": "FF",
+"via": "direct"
+},
+"Wells, Tyler|R|SL": {
+"active": 43.5,
+"purity": 0.876,
+"savant": "SL",
+"via": "direct"
+},
+"Wheeler, Zack|R|CU": {
+"active": 68.5,
+"purity": 0.99,
+"savant": "CU",
+"via": "direct"
+},
+"Wheeler, Zack|R|FC": {
+"active": 46.7,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Wheeler, Zack|R|FF": {
+"active": 86.2,
+"purity": 0.998,
+"savant": "FF",
+"via": "direct"
+},
+"Wheeler, Zack|R|FS": {
+"active": 85.3,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Wheeler, Zack|R|SI": {
+"active": 86.4,
+"purity": 0.99,
+"savant": "SI",
+"via": "direct"
+},
+"Wheeler, Zack|R|ST": {
+"active": 45.9,
+"purity": 0.989,
+"savant": "ST",
+"via": "direct"
+},
+"Whisenhunt, Carson|L|CH": {
+"active": 93.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Whisenhunt, Carson|L|FF": {
+"active": 98.8,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Whisenhunt, Carson|L|SL": {
+"active": 29.0,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Whitlock, Garrett|R|CH": {
+"active": 86.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Whitlock, Garrett|R|SI": {
+"active": 99.4,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Whitlock, Garrett|R|SL": {
+"active": 53.3,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Wicks, Jordan|L|CH": {
+"active": 95.0,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Wicks, Jordan|L|FF": {
+"active": 78.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Williams, Devin|R|CH": {
+"active": 87.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Williams, Devin|R|FF": {
+"active": 97.1,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Williams, Gavin|R|CU": {
+"active": 87.3,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Williams, Gavin|R|FC": {
+"active": 59.0,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Williams, Gavin|R|FF": {
+"active": 95.8,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Williams, Gavin|R|SI": {
+"active": 98.7,
+"purity": 0.95,
+"savant": "SI",
+"via": "direct"
+},
+"Williams, Gavin|R|ST": {
+"active": 52.0,
+"purity": 0.998,
+"savant": "ST",
+"via": "direct"
+},
+"Wilson, Bryse|R|FC": {
+"active": 49.7,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Wilson, Bryse|R|FF": {
+"active": 89.4,
+"purity": 0.978,
+"savant": "FF",
+"via": "direct"
+},
+"Wilson, Bryse|R|SI": {
+"active": 86.7,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Winn, Cole|R|FC": {
+"active": 48.0,
+"purity": 0.993,
+"savant": "FC",
+"via": "direct"
+},
+"Winn, Cole|R|FF": {
+"active": 92.2,
+"purity": 0.994,
+"savant": "FF",
+"via": "direct"
+},
+"Winn, Cole|R|FS": {
+"active": 92.9,
+"purity": 0.985,
+"savant": "FS",
+"via": "direct"
+},
+"Winn, Cole|R|SL": {
+"active": 34.3,
+"purity": 0.981,
+"savant": "SL",
+"via": "direct"
+},
+"Winn, Keaton|R|FF": {
+"active": 91.0,
+"purity": 0.955,
+"savant": "FF",
+"via": "direct"
+},
+"Winn, Keaton|R|FS": {
+"active": 87.2,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Winn, Keaton|R|SI": {
+"active": 84.1,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Wolfram, Grant|L|CU": {
+"active": 55.8,
+"purity": 0.918,
+"savant": "CU",
+"via": "direct"
+},
+"Wolfram, Grant|L|FF": {
+"active": 81.0,
+"purity": 0.988,
+"savant": "FF",
+"via": "direct"
+},
+"Wolfram, Grant|L|SI": {
+"active": 81.6,
+"purity": 0.983,
+"savant": "SI",
+"via": "direct"
+},
+"Woo, Bryan|R|CH": {
+"active": 87.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Woo, Bryan|R|FF": {
+"active": 90.6,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"Woo, Bryan|R|SI": {
+"active": 84.8,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Woo, Bryan|R|SL": {
+"active": 27.4,
+"purity": 0.986,
+"savant": "SL",
+"via": "direct"
+},
+"Woo, Bryan|R|ST": {
+"active": 36.5,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Woodford, Jake|R|FC": {
+"active": 48.9,
+"purity": 1.0,
+"savant": "FC",
+"via": "direct"
+},
+"Woodford, Jake|R|FS": {
+"active": 86.7,
+"purity": 1.0,
+"r2": 0.224,
+"savant": "CH",
+"via": "from_SI"
+},
+"Woodford, Jake|R|SI": {
+"active": 84.8,
+"purity": 0.991,
+"savant": "SI",
+"via": "direct"
+},
+"Woodford, Jake|R|ST": {
+"active": 50.8,
+"purity": 0.983,
+"savant": "ST",
+"via": "direct"
+},
+"Woodruff, Brandon|R|CH": {
+"active": 83.9,
+"purity": 0.993,
+"savant": "CH",
+"via": "direct"
+},
+"Woodruff, Brandon|R|FC": {
+"active": 64.8,
+"purity": 0.928,
+"savant": "FC",
+"via": "direct"
+},
+"Woodruff, Brandon|R|FF": {
+"active": 87.2,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Woodruff, Brandon|R|SI": {
+"active": 87.3,
+"purity": 0.992,
+"savant": "SI",
+"via": "direct"
+},
+"Woods Richardson, Simeon|R|CU": {
+"active": 82.7,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Woods Richardson, Simeon|R|FF": {
+"active": 96.3,
+"purity": 0.989,
+"savant": "FF",
+"via": "direct"
+},
+"Woods Richardson, Simeon|R|FS": {
+"active": 92.1,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Woods Richardson, Simeon|R|SL": {
+"active": 46.0,
+"purity": 0.996,
+"savant": "SL",
+"via": "direct"
+},
+"Wrobleski, Justin|L|CU": {
+"active": 66.9,
+"purity": 0.928,
+"savant": "CU",
+"via": "direct"
+},
+"Wrobleski, Justin|L|FF": {
+"active": 87.1,
+"purity": 0.99,
+"savant": "FF",
+"via": "direct"
+},
+"Wrobleski, Justin|L|FS": {
+"active": 72.5,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Wrobleski, Justin|L|SI": {
+"active": 87.5,
+"purity": 0.988,
+"savant": "SI",
+"via": "direct"
+},
+"Wrobleski, Justin|L|SL": {
+"active": 28.5,
+"purity": 0.995,
+"savant": "SL",
+"via": "direct"
+},
+"Yamamoto, Yoshinobu|R|CU": {
+"active": 94.9,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Yamamoto, Yoshinobu|R|FC": {
+"active": 45.8,
+"purity": 0.949,
+"savant": "FC",
+"via": "direct"
+},
+"Yamamoto, Yoshinobu|R|FF": {
+"active": 91.0,
+"purity": 0.977,
+"savant": "FF",
+"via": "direct"
+},
+"Yamamoto, Yoshinobu|R|FS": {
+"active": 78.4,
+"purity": 0.998,
+"savant": "FS",
+"via": "direct"
+},
+"Yamamoto, Yoshinobu|R|SI": {
+"active": 87.4,
+"purity": 0.984,
+"savant": "SI",
+"via": "direct"
+},
+"Yamamoto, Yoshinobu|R|SL": {
+"active": 38.2,
+"purity": 0.969,
+"savant": "SL",
+"via": "direct"
+},
+"Yarbrough, Ryan|L|CH": {
+"active": 92.1,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Yarbrough, Ryan|L|FC": {
+"active": 46.4,
+"purity": 0.994,
+"savant": "FC",
+"via": "direct"
+},
+"Yarbrough, Ryan|L|FF": {
+"active": 99.0,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Yarbrough, Ryan|L|SI": {
+"active": 98.6,
+"purity": 0.935,
+"savant": "SI",
+"via": "direct"
+},
+"Yarbrough, Ryan|L|ST": {
+"active": 62.0,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Yates, Kirby|R|FF": {
+"active": 95.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Yates, Kirby|R|FS": {
+"active": 98.1,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Yesavage, Trey|R|FF": {
+"active": 99.5,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Yesavage, Trey|R|FS": {
+"active": 90.2,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Yesavage, Trey|R|SL": {
+"active": 53.2,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Yoho, Craig|R|CH": {
+"active": 88.7,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"Yoho, Craig|R|FF": {
+"active": 98.3,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Young, Brandon|R|CU": {
+"active": 88.5,
+"purity": 1.0,
+"savant": "CU",
+"via": "direct"
+},
+"Young, Brandon|R|FF": {
+"active": 95.2,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Young, Brandon|R|FS": {
+"active": 81.0,
+"purity": 1.0,
+"savant": "FS",
+"via": "direct"
+},
+"Young, Brandon|R|SI": {
+"active": 92.8,
+"purity": 0.994,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Young, Brandon|R|SL": {
+"active": 29.1,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"Young, Danny|L|SI": {
+"active": 85.3,
+"purity": 1.0,
+"savant": "SI",
+"via": "direct"
+},
+"Young, Danny|L|ST": {
+"active": 57.3,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"Zeferjahn, Ryan|R|FF": {
+"active": 86.6,
+"purity": 0.991,
+"savant": "FF",
+"via": "direct"
+},
+"Zeferjahn, Ryan|R|SI": {
+"active": 85.7,
+"purity": 0.993,
+"r2": 0.762,
+"savant": "SI",
+"via": "from_FF"
+},
+"Zeferjahn, Ryan|R|SL": {
+"active": 36.9,
+"purity": 0.989,
+"savant": "SL",
+"via": "direct"
+},
+"Zeferjahn, Ryan|R|ST": {
+"active": 55.4,
+"purity": 0.996,
+"savant": "ST",
+"via": "direct"
+},
+"Zerpa, Angel|L|SI": {
+"active": 84.5,
+"purity": 0.993,
+"savant": "SI",
+"via": "direct"
+},
+"Zuber, Tyler|R|FF": {
+"active": 89.6,
+"purity": 1.0,
+"savant": "FF",
+"via": "direct"
+},
+"Zuber, Tyler|R|ST": {
+"active": 57.7,
+"purity": 1.0,
+"savant": "ST",
+"via": "direct"
+},
+"deGrom, Jacob|R|CH": {
+"active": 87.9,
+"purity": 1.0,
+"savant": "CH",
+"via": "direct"
+},
+"deGrom, Jacob|R|FF": {
+"active": 90.6,
+"purity": 0.997,
+"savant": "FF",
+"via": "direct"
+},
+"deGrom, Jacob|R|SL": {
+"active": 32.5,
+"purity": 1.0,
+"savant": "SL",
+"via": "direct"
+},
+"deGrom, Jacob|R|ST": {
+"active": 60.1,
+"purity": 0.989,
+"savant": "CU",
+"via": "direct"
+}
+},
+"leagueMeanByPitchType": {
+"CH": 88.51,
+"CU": 70.78,
+"FC": 46.51,
+"FF": 89.09,
+"FS": 83.41,
+"SI": 85.5,
+"SL": 31.98,
+"ST": 50.64,
+"SV": 54.87
+},
+"priorSeason": 2025,
+"season": 2026
+}

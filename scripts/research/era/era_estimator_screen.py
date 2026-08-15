@@ -13,7 +13,7 @@ Savant rolling-3 runs index for the team's home park; missing park -> 1.0.
 
 Inputs (built by companion scripts):
   data/_era_targets.json          official season/half lines + ASG dates
-  data/_park_factors.json         per-team runs park factors
+  data/park_factors.json         per-team runs park factors
   data/_era_battery.json          pitch-derived candidate battery
   data/_era_internal_cmdloc.json  Loc+ raw / Command+ raw miss
   data/_era_internal_stuff.json   LOSO Stuff+ raw (2021-2025)
@@ -35,7 +35,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 D = lambda n: json.load(open(os.path.join(ROOT, 'data', n)))
 
 TARGETS = D('_era_targets.json')
-PF = D('_park_factors.json')
+PF = D('park_factors.json')
 BATTERY = D('_era_battery.json')
 CMDLOC = D('_era_internal_cmdloc.json')
 try:
