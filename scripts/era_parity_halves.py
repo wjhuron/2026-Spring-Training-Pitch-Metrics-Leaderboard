@@ -47,6 +47,9 @@ SEASONS = [(2021, 'data/_statcast2021_cache.pkl'),
 def tally_halves(pitches):
     dates = sorted({p['Game Date'] for p in pitches if p['Game Date']})
     par = {d: ('a' if i % 2 == 0 else 'b') for i, d in enumerate(dates)}
+    from pipeline_utils import compute_in_zone, SWING_DESCRIPTIONS
+    from pipeline_sdplus import make_rv_xrv
+    rv_fn = make_rv_xrv(0.3169, 1.2393)   # frozen, matches pipeline_eraplus
     acc = defaultdict(lambda: defaultdict(float))
     for p in pitches:
         d = p['Game Date']
@@ -54,6 +57,21 @@ def tally_halves(pitches):
             continue
         half = par[d]
         c = acc[(p['Pitcher'], half)]
+        # hpERA channel components (added 2026-08-15 for the sub-30-IP
+        # shrinkage measurement): in-zone whiffs, GB, per-pitch xRV
+        _desc = p.get('Description')
+        if compute_in_zone(p) == 'Yes' and _desc in SWING_DESCRIPTIONS:
+            c['izsw'] += 1
+            if _desc == 'Swinging Strike':
+                c['izwh'] += 1
+        _bbt = p.get('BBType')
+        if _bbt and _bbt not in BUNT_BB_TYPES:
+            if _bbt == 'ground_ball':
+                c['gb'] += 1
+        _rv = rv_fn(p)
+        if _rv is not None:
+            c['xrv_sum'] += _rv
+            c['xrv_n'] += 1
         for src, key in (('StuffPlus', 'st'), ('LocPlus', 'lo'),
                          ('PitchingPlus', 'pp')):
             v = p.get(src)

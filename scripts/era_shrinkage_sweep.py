@@ -126,6 +126,11 @@ def main():
     res['bb_pct'] = run('bb', 'pa', 'BB% (PA), league target', seasons)
     res['xwobacon'] = run('xwc_sum', 'xwc_n', 'xwOBAcon (BIP), league',
                           seasons)
+    res['izwhiff'] = run('izwh', 'izsw', 'izWhiff% (iz swings), league',
+                         seasons)
+    res['gb'] = run('gb', 'bip', 'GB% (BIP), league', seasons)
+    res['xrv'] = run('xrv_sum', 'xrv_n', 'xRV/pitch (pitches), league',
+                     seasons)
     res['stuff26'] = run('st_sum', 'st_n', 'Stuff+ (pitches, 2026 only)',
                          ['2026'])
     res['loc26'] = run('lo_sum', 'lo_n', 'Loc+ (pitches, 2026 only)',

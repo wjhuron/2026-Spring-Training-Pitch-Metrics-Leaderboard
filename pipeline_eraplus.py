@@ -55,6 +55,16 @@ QUAL_OUTS = 180             # 60 IP: percentile pool (site convention)
 # measured shrinkage (era_shrinkage_sweep.py; PA-denominated)
 N0_XW = 250.0
 N0_K = 90.0
+# measured 2026-08-15 (same split-half sweep, interior optima 6/6 seasons)
+# so hpERA can score EVERY pitcher, SIERA-style, without small-sample
+# extrapolation: below these samples the channels shrink to league and
+# hpERA pulls to the anchor instead of printing garbage.
+N0_IZWH = 130.0        # in-zone swings (plateau 110-170)
+N0_GB = 55.0           # BIP
+N0_XRV = 800.0         # pitches (flat 500-1500)
+IZSW_PER_PITCH = 0.33  # league iz-swings per pitch (.32-.34, 2021-2026);
+                       # rows carry izWhiffPct but not the iz-swing count,
+                       # so the shrink denominator is count * this ratio
 
 DH_B = 0.917                # LOSO slope, 30+ IP display population
 
@@ -112,12 +122,12 @@ def compute_xrv_map(pitches, aaa_teams):
     pooled = defaultdict(lambda: [0.0, 0])
     for (name, team), (s, n) in acc.items():
         if n > 0:
-            out[(name, team)] = 100.0 * s / n
+            out[(name, team)] = (100.0 * s / n, n)
         pooled[name][0] += s
         pooled[name][1] += n
     for name, (s, n) in pooled.items():
         if n > 0:
-            out[(name, None)] = 100.0 * s / n
+            out[(name, None)] = (100.0 * s / n, n)
     return out
 
 
@@ -139,11 +149,26 @@ def _channels(row, xrv_map, park, is_combined):
     lr = row.get('locPlusRaw')
     ch['loc'] = lr if lr is not None else None
     iz = row.get('izWhiffPct')
-    ch['izwh'] = -iz if iz is not None else None
+    if iz is not None:
+        n_izsw = (row.get('count') or 0) * IZSW_PER_PITCH
+        ch['izwh'] = -((iz * n_izsw + N0_IZWH * _channels.lg_izwh)
+                       / (n_izsw + N0_IZWH))
+    else:
+        ch['izwh'] = None
     gb = row.get('gbPct')
-    ch['gb'] = -gb if gb is not None else None
+    if gb is not None:
+        n_bip = row.get('nBip') or 0
+        ch['gb'] = -((gb * n_bip + N0_GB * _channels.lg_gb)
+                     / (n_bip + N0_GB))
+    else:
+        ch['gb'] = None
     key = (row.get('pitcher'), None if is_combined else row.get('team'))
-    ch['xrv'] = xrv_map.get(key)
+    xr = xrv_map.get(key)
+    if xr is not None:
+        xv, xn = xr
+        ch['xrv'] = (xv * xn + N0_XRV * _channels.lg_xrv) / (xn + N0_XRV)
+    else:
+        ch['xrv'] = None
     g = row.get('g') or 0
     ch['gs'] = ((row.get('gs') or 0) / g) if g > 0 else None
     ch['park'] = park.get(row.get('team'), 100.0) / 100.0
@@ -181,12 +206,31 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
                 r[k + '_pctl'] = None
         return None
 
-    # league rates for the shrink targets (PA-weighted over the pool)
+    # league rates for the shrink targets (denominator-weighted over the pool)
     tot_pa = sum(r.get('pa') or 0 for r in pool_rows)
     _channels.lg_xw = sum((r.get('xwOBA') or 0) * (r.get('pa') or 0)
                           for r in pool_rows) / tot_pa
     _channels.lg_k = sum((r.get('kPct') or 0) * (r.get('pa') or 0)
                          for r in pool_rows) / tot_pa
+    _tc = sum(r.get('count') or 0 for r in pool_rows
+              if r.get('izWhiffPct') is not None)
+    _channels.lg_izwh = (sum((r['izWhiffPct']) * (r.get('count') or 0)
+                             for r in pool_rows
+                             if r.get('izWhiffPct') is not None) / _tc
+                         if _tc else 0.19)
+    _tb = sum(r.get('nBip') or 0 for r in pool_rows
+              if r.get('gbPct') is not None)
+    _channels.lg_gb = (sum((r['gbPct']) * (r.get('nBip') or 0)
+                           for r in pool_rows
+                           if r.get('gbPct') is not None) / _tb
+                       if _tb else 0.42)
+    _xs = _xn = 0.0
+    for r in pool_rows:
+        xr = xrv_map.get((r.get('pitcher'), r.get('team')))
+        if xr is not None:
+            _xs += xr[0] * xr[1]
+            _xn += xr[1]
+    _channels.lg_xrv = (_xs / _xn) if _xn else 0.0
 
     anchor = sum(r['era'] for r in pool_rows) / len(pool_rows)
 
@@ -217,15 +261,16 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
         ch = raw[id(r)]
         zxw = z('xw', ch['xw'])
         dh = (anchor + DH_B * zxw) if zxw is not None else None
-        # hpERA only inside its calibrated domain (30+ IP): its pitch-level
-        # channels (izWhiff/GB/xRV) are unshrunk, so tiny samples would
-        # extrapolate garbage. hdERA's single channel is fully shrunk and
-        # safe at any n.
+        # Every pitcher scores (SIERA convention, per Wally 2026-08-15):
+        # all channels are now shrunk at measured constants (izWhiff n0=130
+        # iz-swings, GB n0=55 BIP, xRV n0=800 pitches), so tiny samples
+        # pull toward league/anchor instead of extrapolating outside the
+        # calibrated domain. Qualification stays a render-time coloring
+        # gate, exactly like SIERA.
         ph = None
-        if _ip_outs(r.get('ip')) >= POOL_MIN_OUTS:
-            zs = {c: z(c, ch[c]) for c in W_PH}
-            if all(zs[c] is not None for c in W_PH):
-                ph = anchor + sum(W_PH[c] * zs[c] for c in W_PH)
+        zs = {c: z(c, ch[c]) for c in W_PH}
+        if all(zs[c] is not None for c in W_PH):
+            ph = anchor + sum(W_PH[c] * zs[c] for c in W_PH)
         r['hdERA'] = round(dh, 2) if dh is not None else None
         r['hpERA'] = round(ph, 2) if ph is not None else None
         r['hdERAPlus'] = (round(200.0 - 100.0 * dh / anchor)
@@ -261,6 +306,9 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
                      for c in PH_CHANNELS},
             'lgXw': round(_channels.lg_xw, 5),
             'lgK': round(_channels.lg_k, 5),
+            'lgIzwh': round(_channels.lg_izwh, 5),
+            'lgGb': round(_channels.lg_gb, 5),
+            'lgXrv': round(_channels.lg_xrv, 5),
             'locScaleK': LOC_SCALE_K}
 
 
@@ -305,15 +353,27 @@ def score_scratch_row(row, pitches, g, gs, team, const):
     lk = const.get('locScaleK') or 10
     zs['loc'] = ((100.0 - lp) / lk) if lp is not None else None
     iz = row.get('izWhiffPct')
-    zs['izwh'] = z('izwh', -iz) if iz is not None else None
+    if iz is not None and const.get('lgIzwh') is not None:
+        _niz = (row.get('count') or 0) * IZSW_PER_PITCH
+        zs['izwh'] = z('izwh', -((iz * _niz + N0_IZWH * const['lgIzwh'])
+                                 / (_niz + N0_IZWH)))
+    else:
+        zs['izwh'] = None
     gbp = row.get('gbPct')
-    zs['gb'] = z('gb', -gbp) if gbp is not None else None
-    if pitches:
+    if gbp is not None and const.get('lgGb') is not None:
+        _nbip = row.get('nBip') or 0
+        zs['gb'] = z('gb', -((gbp * _nbip + N0_GB * const['lgGb'])
+                             / (_nbip + N0_GB)))
+    else:
+        zs['gb'] = None
+    if pitches and const.get('lgXrv') is not None:
         from pipeline_sdplus import make_rv_xrv
         rv_fn = make_rv_xrv(XRV_LG, XRV_SCALE)
         vals = [v for v in (rv_fn(p) for p in pitches) if v is not None]
-        if len(vals) >= 50:
-            zs['xrv'] = z('xrv', 100.0 * sum(vals) / len(vals))
+        if vals:
+            _xv = 100.0 * sum(vals) / len(vals)
+            zs['xrv'] = z('xrv', (_xv * len(vals) + N0_XRV * const['lgXrv'])
+                          / (len(vals) + N0_XRV))
         else:
             zs['xrv'] = None
     else:
@@ -327,7 +387,7 @@ def score_scratch_row(row, pitches, g, gs, team, const):
     zs['park'] = z('park', park.get(team, 100.0) / 100.0)
 
     ph = None
-    if pa >= 100 and all(zs.get(c) is not None for c in W_PH):
+    if all(zs.get(c) is not None for c in W_PH):
         ph = anchor + sum(W_PH[c] * zs[c] for c in W_PH)
     return (round(dh, 2) if dh is not None else None,
             round(ph, 2) if ph is not None else None)
