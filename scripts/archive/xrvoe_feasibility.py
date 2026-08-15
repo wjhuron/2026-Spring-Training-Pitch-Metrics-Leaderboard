@@ -56,7 +56,7 @@ df['stuff_pred'] = pred          # model predicts target_xrv directly (hitter-pe
 print("stuff preds done", flush=True)
 
 # ── Loc per-pitch ExpRV ──
-import pipeline_locplus as L
+import pipeline.locplus as L
 md = json.load(open(os.path.join(ROOT, 'data', 'metadata_rs.json')))
 guts = md.get('gutsConstants') or {}
 baseline = [p for p in mlb if L.is_eligible_baseline(p)]

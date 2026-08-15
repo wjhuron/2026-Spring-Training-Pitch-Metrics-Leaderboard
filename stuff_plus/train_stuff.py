@@ -51,7 +51,7 @@ def _load_live_guts():
 LG_WOBA, WOBA_SCALE = _load_live_guts()
 sys.path.insert(0, ROOT)
 try:
-    from pipeline_utils import AAA_TEAMS
+    from pipeline.utils import AAA_TEAMS
 except Exception:
     AAA_TEAMS = {'ROC'}
 
@@ -71,7 +71,7 @@ PRIOR_PKL = os.path.join(DATA, '_pitches2025_training.pkl')
 PRIOR_LG_WOBA, PRIOR_WOBA_SCALE = 0.3131, 1.2317
 
 # 2021-24 volume prior (2026-07-13): public-Statcast reconstructions
-# (scripts/build_historical_training_set.py — public tags are fine, the
+# (scripts/builders/build_historical_training_set.py — public tags are fine, the
 # model is pitch-type agnostic so labels only feed the fastball anchor,
 # computed within-season). Adopted after scripts/multi_season_retrain.py
 # showed FULL_21_25 beats the 2025-only prior on all three objectives
@@ -155,8 +155,8 @@ def _harmonize_tags(prior, current):
 # when dropped) despite a small SHAP share.
 # ── v12 config (ADOPTED 2026-08-09, per Wally) ──
 # Three changes vs v11, each validated on the full-config paired 2026 harness
-# (scripts/stuff_feature_battery_2026_08.py + stuff_combo_battery.py) and the
-# LOSO 2021-2025 replicate gate (scripts/stuff_features_loso.py):
+# (scripts/research/stuff/stuff_feature_battery_2026_08.py + stuff_combo_battery.py) and the
+# LOSO 2021-2025 replicate gate (scripts/research/stuff/stuff_features_loso.py):
 #   1. cross/cross_abs replace axis_dev/axis_dev_abs — the same SSW quantity
 #      restated in release-axis-frame INCHES (linear in movement, stable for
 #      gyro sliders where circular degrees have sd ~40).
@@ -178,7 +178,7 @@ BASE_FEATS = ['velocity', 'ivb', 'hb', 'velo_diff', 'ivb_diff', 'hb_diff',
 
 # v13 (2026-08-14, per Wally): kin_eff__ff = measured active-spin fraction
 # (KinEff), TYPE-GATED to four-seamers — real on FF, NaN elsewhere. The
-# per-type atlas (scripts/stuff_pertype_atlas.py) showed kin_eff carries
+# per-type atlas (scripts/research/stuff/stuff_pertype_atlas.py) showed kin_eff carries
 # reliance for every type but is only IRREPLACEABLE on FF (ride quality
 # beyond what ivb/spin/axis imply); gated adds on CU/SI/FC and the global
 # add all failed the LOSO gate, FF-gated passed (fut 4/5, mean +0.0042;
@@ -206,7 +206,7 @@ NVAA_SLOPES = {
 }
 # velo_diff is masked (None) on these types — see adoption note 2 above.
 #
-# WHAT THE PROBE RETURNED (scripts/stuff_velodiff_probe.py, re-run 2026-08-12).
+# WHAT THE PROBE RETURNED (scripts/research/stuff/stuff_velodiff_probe.py, re-run 2026-08-12).
 # The question was Wally's: "a curveball should not be dinged for being thrown
 # hard; separation logic belongs to changeups/splitters that mimic fastballs."
 #
@@ -492,7 +492,7 @@ def build_df(pitches, prefer_true_fastball=True, arm_fallback=None):
         # degrees blow up on gyro sliders), ax_sin/ax_cos = the axis
         # direction itself, hand-mirrored. Axis from SpinAxis degrees
         # (priors) or the sheets' RTilt clock (2026). Convention matches
-        # scripts/xmove_activespin_gain.py: th=0 is pure backspin.
+        # scripts/research/xmove/xmove_activespin_gain.py: th=0 is pure backspin.
         _sa = sf(p.get('SpinAxis'))
         if _sa is None:
             _rtm = _tilt_min(p.get('RTilt'))
@@ -594,7 +594,7 @@ KIN_SIDECAR = os.path.join(DATA, 'kinematics_2026_sidecar.pkl')
 
 def apply_kin_sidecar(pitches, path=KIN_SIDECAR):
     """Fill KinEff/KinDev/KinCd on pitch dicts from the PitchID-keyed 2026
-    sidecar (built by scripts/build_kinematics_2026.py, refreshed in CI).
+    sidecar (built by scripts/ci/build_kinematics_2026.py, refreshed in CI).
     Prior-season pickles carry kinematics natively; this is for 2026 pitches,
     whose sheet-built cache has no kinematics columns. Returns the number of
     pitches filled, or -1 if the sidecar file is absent (callers decide how
@@ -724,7 +724,7 @@ def main():
     ap.add_argument('--dump-pitch-grades', default=None, metavar='PATH',
                     help='write per-pitch Stuff+ grades keyed by sheet position '
                          '("tab\trow" -> grade) for the Sheets write-back '
-                         '(scripts/sheets_write_grades.py). Unregressed scale-(i) '
+                         '(scripts/ci/sheets_write_grades.py). Unregressed scale-(i) '
                          'values: 100 + 10*(raw - mu_type)/sd_type, clip 40-180.')
     ap.add_argument('--score-only', action='store_true',
                     help='score with the cached fold models from the saved bundle '
@@ -759,7 +759,7 @@ def main():
         else:
             sys.exit('ABORT: kinematics sidecar absent '
                      f'({KIN_SIDECAR}) — retrain would train kin_eff__ff on '
-                     'imputed 2026 rows. Run scripts/build_kinematics_2026.py '
+                     'imputed 2026 rows. Run scripts/ci/build_kinematics_2026.py '
                      '(or download the release asset) first.')
     else:
         print(f'  kinematics sidecar: {_n_kin} 2026 pitches filled')
@@ -798,7 +798,7 @@ def main():
     # process_data, via the shared pipeline_utils implementation. Mutating in
     # place is safe: `pitches` (MLB) is disjoint, and no other trainer
     # consumer reads ROC RunExp before this point.
-    from pipeline_utils import compute_runexp_scale, runexp_factor
+    from pipeline.utils import compute_runexp_scale, runexp_factor
     _re_scale = compute_runexp_scale(D)
     if _re_scale:
         _n_fx = 0
@@ -824,7 +824,7 @@ def main():
     # ── SEASON-BLOCKED prior-season training data (2026-07-03) ──
     # data/_pitches2025_training.pkl: Wally's retagged 2025 season, joined to
     # public Statcast (VAA/xwOBA/RunExp recovered, density-adjusted movement;
-    # built by scripts/build_2025_training_set.py; tags harmonized to 2026
+    # built by scripts/builders/build_2025_training_set.py; tags harmonized to 2026
     # labels via the cross-year centroid audit in the same script family).
     # It joins EVERY fold's training set below, while 2026 pitches are still
     # scored strictly out-of-fold by pitcher — so the model learns stable
@@ -1396,7 +1396,7 @@ def _pctl(sc, pool):
 # 0.20·z(Loc+), re-standardized so between-pitcher SD = 10 (the components
 # are near-orthogonal, r=+0.04, so the raw blend has SD ~7.6).
 #
-# 0.70 -> 0.80 (2026-07-25, scripts/pitchingplus_loso_full.py). The old 0.70
+# 0.70 -> 0.80 (2026-07-25, scripts/research/stuff/pitchingplus_loso_full.py). The old 0.70
 # came from a bootstrap median on a single season (95% CI [0.51, 0.91], flat
 # plateau 0.60-0.80). Re-derived leave-one-season-out across 2021-2025 — each
 # season scored by a model fit on the other four, so no season sees itself —
@@ -1424,7 +1424,7 @@ def _pctl(sc, pool):
 # DEFINED IN pipeline_utils (single source of truth — process_data, Cards and
 # sheets_write_grades all read the same constant without importing xgboost).
 # The derivation above is why it is 0.80; that note stays here.
-from pipeline_utils import PITCHING_W_STUFF  # noqa: E402
+from pipeline.utils import PITCHING_W_STUFF  # noqa: E402
 
 def _blend(stuff, loc):
     return (PITCHING_W_STUFF * (stuff - 100.0) / 10.0
@@ -1533,7 +1533,7 @@ def compute_xrvoe(df, pitches, roc_df=None, roc_pitches=None):
     (target_xrv on non-BIP, rv_raw everywhere) and ROC's RunExp was 0%
     populated; the minor-league Statcast backfill filled it.
     """
-    import pipeline_locplus as LOC
+    import pipeline.locplus as LOC
     baseline = [p for p in pitches if LOC.is_eligible_baseline(p)]
     S = LOC.build_surfaces(baseline, LG_WOBA, WOBA_SCALE)
     exprv = {}
@@ -1806,7 +1806,7 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None,
                                     if v is not None and pools_o[f] else None)
     # ── Pitcher+ (must run LAST: it consumes the fresh stuffScore/locPlus
     # written above, plus the rate stats process_data already set) ──
-    from pipeline_pitcherplus import apply_pitcher_plus, serialize_baseline
+    from pipeline.pitcherplus import apply_pitcher_plus, serialize_baseline
     # current season = calendar year (the prior asset must be year-1); an
     # offseason run can emit a harmless staleness warning.
     from datetime import datetime as _dt
@@ -1818,7 +1818,7 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None,
     # ── hdERA / hpERA (after Pitcher+: hpERA consumes the fresh
     # stuffScore + locPlusRaw + rate stats). Also sets the default
     # leaderboard row order (hpERA good -> bad).
-    from pipeline_eraplus import apply_era_plus, sort_rows_default
+    from pipeline.eraplus import apply_era_plus, sort_rows_default
     if mlb_pitches is not None:
         _era_const = apply_era_plus(pp, mlb_pitches)
     else:

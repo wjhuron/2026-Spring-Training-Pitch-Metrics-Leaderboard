@@ -42,9 +42,9 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
 import numpy as np
-import train_stuff as T
-from process_data import compute_runexp_scale, runexp_factor
-from pipeline_utils import safe_float
+import stuff_plus.train_stuff as T
+from pipeline.process_data import compute_runexp_scale, runexp_factor
+from pipeline.utils import safe_float
 
 PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 MIN_RELIAB = 100      # pitches per half for the ROC reliability estimate

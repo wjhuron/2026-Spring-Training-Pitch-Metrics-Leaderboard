@@ -7,7 +7,7 @@ Bayesian regression constant (true-score model: rel(n)=n/(n+k); r=.5 -> k=n).
 """
 import pickle, math, collections, os, sys, random
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pipeline_sdplus import classify_zone
+from pipeline.sdplus import classify_zone
 random.seed(17)
 
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

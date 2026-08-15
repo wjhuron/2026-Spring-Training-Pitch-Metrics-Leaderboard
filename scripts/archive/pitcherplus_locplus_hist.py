@@ -31,7 +31,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import leaderboard_metric_battery as bat  # noqa: E402
-from pipeline_locplus import (build_surfaces, score_pitch,  # noqa: E402
+from pipeline.locplus import (build_surfaces, score_pitch,  # noqa: E402
                               _is_scorable)
 
 OUT_CSV = os.path.join(ROOT, 'data', '_pplus_locplus_hist.csv')

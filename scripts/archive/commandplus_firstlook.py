@@ -20,7 +20,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 
 import numpy as np
-import pipeline_locplus as lp
+import pipeline.locplus as lp
 from commandplus_v1 import score_pitches, aggregate, eligible
 
 PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')

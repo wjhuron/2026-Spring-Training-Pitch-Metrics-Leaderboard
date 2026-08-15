@@ -25,7 +25,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 
-import pipeline_commandplus as port
+import pipeline.commandplus as port
 from locplus_constants_multiseason import adapt
 
 CACHE = {2021: 'data/_statcast2021_cache.pkl', 2022: 'data/_statcast2022_cache.pkl',

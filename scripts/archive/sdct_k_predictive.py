@@ -15,8 +15,8 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.dirname(HERE))
 
 import statcast_hitter_adapter as A
-import pipeline_sdplus as sd
-import pipeline_contact as ct
+import pipeline.sdplus as sd
+import pipeline.contact as ct
 from handsplit_sdct_test import load_season, guts, pearson, sd_score_baseline, ct_score
 from sdct_constant_sweeps import KS
 

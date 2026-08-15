@@ -25,7 +25,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 
-import pipeline_commandplus as port
+import pipeline.commandplus as port
 from commandplus_v1 import score_pitches_multi, aggregate
 
 PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')

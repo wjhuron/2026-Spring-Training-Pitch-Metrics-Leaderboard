@@ -24,7 +24,7 @@ import argparse
 import sys
 
 sys.path.insert(0, '/Users/wallyhuron/Huronalytics')
-import sheets_append as sa
+import scrapers.sheets_append as sa
 
 DELETE_COLS = ['EffectiveVelo', 'PlateTime', 'wOBAval', 'wOBAdom',
                'Int_X', 'Int_Y', 'Barrel']

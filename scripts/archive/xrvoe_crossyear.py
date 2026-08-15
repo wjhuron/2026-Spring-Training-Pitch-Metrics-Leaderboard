@@ -38,7 +38,7 @@ sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 
 import build_2025_training_set as B25
 import build_historical_training_set as H
-import pipeline_locplus as L
+import pipeline.locplus as L
 
 GUTS = dict(H.GUTS)
 GUTS[2025] = (0.3131, 1.2317)

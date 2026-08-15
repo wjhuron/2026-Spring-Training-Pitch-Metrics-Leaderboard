@@ -15,8 +15,8 @@ from decimal import Decimal
 import gspread
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import supabase_append as sa
-from sheets_append import SHEETS_NL, SHEETS_AL, NL_TEAMS, AL_TEAMS, ROC_AAA_TEAMS
+import scrapers.supabase_append as sa
+from scrapers.sheets_append import SHEETS_NL, SHEETS_AL, NL_TEAMS, AL_TEAMS, ROC_AAA_TEAMS
 from backfill_sheets_to_supabase import tab_to_df, read_sheet_with_retry
 
 

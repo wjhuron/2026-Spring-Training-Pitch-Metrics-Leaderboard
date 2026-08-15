@@ -19,7 +19,7 @@ import gspread
 # Run from anywhere: put the repo root (parent of scripts/) on the path.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sheets_append import (
+from scrapers.sheets_append import (
     SHEETS_AL, SHEETS_NL,
     AL_TEAMS, NL_TEAMS, ROC_AAA_TEAMS,
     WORKBOOKS, TEAM_DIVISION,
@@ -119,7 +119,7 @@ def main():
                 # cells render as 46227 / 0.045138. append_rows applies no
                 # formatting of its own, so mirror what sheets_append does.
                 try:
-                    from sheets_append import apply_block_format
+                    from scrapers.sheets_append import apply_block_format
                     rng = resp['updates']['updatedRange'].split('!')[1]
                     start = int(''.join(c for c in rng.split(':')[0] if c.isdigit()))
                     apply_block_format(cws, cws.row_values(1),
@@ -127,7 +127,7 @@ def main():
                 except Exception as e:
                     print(f"      WARNING: could not format synced rows "
                           f"({type(e).__name__}: {e}); run "
-                          f"scripts/fix_unformatted_blocks.py --apply")
+                          f"scripts/ops/fix_unformatted_blocks.py --apply")
         time.sleep(0.4)  # be gentle on the read quota
 
     print("-" * 50)

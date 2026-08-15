@@ -33,10 +33,10 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
-import train_stuff as T
+import stuff_plus.train_stuff as T
 from locplus_constants_multiseason import adapt
-from pipeline_sdplus import make_rv_xrv
-import pipeline_locplus as lp
+from pipeline.sdplus import make_rv_xrv
+import pipeline.locplus as lp
 
 LG, SCALE = 0.3169, 1.2393
 MIN_PITCH, MIN_ACTUAL = 200, 200

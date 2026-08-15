@@ -15,8 +15,8 @@ Guarded + dry-run-first. Only the listed 10 PAs are touched.
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import gspread
-import backfill_supplement as B
-from Pitcher2026 import BaseballSavantFocusedDownloader
+import scrapers.backfill_supplement as B
+from scrapers.Pitcher2026 import BaseballSavantFocusedDownloader
 
 APPLY = '--apply' in sys.argv
 CASES = [('824448', 43), ('824527', 53), ('824525', 45), ('824280', 51), ('824600', 48),

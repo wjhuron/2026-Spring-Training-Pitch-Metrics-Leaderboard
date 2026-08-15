@@ -33,7 +33,7 @@ PKL26 = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 PKL25 = os.path.join(ROOT, 'data', '_pitches2025_training.pkl')
 LG25, SCALE25 = 0.3125, 1.242   # 2025 FG Guts (fallback if live fetch fails)
 try:
-    from pipeline_fetch import fetch_guts_constants
+    from pipeline.fetch import fetch_guts_constants
     _w, _f, extra = fetch_guts_constants(2025)
     LG25, SCALE25 = extra['lgWOBA'], extra['wOBAScale']
     print(f'2025 Guts: lgWOBA={LG25}, scale={SCALE25}')

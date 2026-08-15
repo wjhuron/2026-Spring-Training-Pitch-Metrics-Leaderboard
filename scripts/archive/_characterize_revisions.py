@@ -7,7 +7,7 @@ from collections import defaultdict
 warnings.filterwarnings('ignore')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT)
 import requests, gspread
-import backfill_supplement as B
+import scrapers.backfill_supplement as B
 
 FEED = "https://statsapi.mlb.com/api/v1.1/game/{}/feed/live"
 COORD_CACHE = os.path.join(ROOT, 'scripts', '_feed_platexz_cache.pkl')

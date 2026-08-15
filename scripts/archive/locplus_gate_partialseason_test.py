@@ -27,7 +27,7 @@ pitchers who live there (shared error INFLATES reliability, deflating k),
 while error interacting with within-pitcher location spread adds unshared
 variance (inflating k). Hence measurement, not argument.
 
-Same design as scripts/locplus_stabilize_celllevel.py: cells per pitch type,
+Same design as scripts/research/locplus/locplus_stabilize_celllevel.py: cells per pitch type,
 surfaces built once per slice, random within-cell splits, 10 seeds.
 
 Usage: python3 scripts/locplus_gate_partialseason_test.py
@@ -39,7 +39,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 
-import pipeline_locplus as lp
+import pipeline.locplus as lp
 from locplus_constants_multiseason import adapt
 
 LG, SCALE = 0.3169, 1.2393

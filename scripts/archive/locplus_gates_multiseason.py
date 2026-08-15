@@ -9,7 +9,7 @@ total season length than a bandwidth optimum is. But mid-season surfaces are
 noisier, that noise lands in every pitcher's score, and it inflates k. Worth
 measuring rather than assuming.
 
-Same design as scripts/locplus_stabilize_celllevel.py, applied per season:
+Same design as scripts/research/locplus/locplus_stabilize_celllevel.py, applied per season:
 cells are per PITCH TYPE (the rendered unit), surfaces built ONCE on that
 season, random within-cell splits, 10 seeds, k = median of n(1-rho)/rho across
 the n-grid. Seasons are never pooled.
@@ -27,7 +27,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 
-import pipeline_locplus as lp
+import pipeline.locplus as lp
 from locplus_constants_multiseason import adapt
 
 LG, SCALE = 0.3169, 1.2393

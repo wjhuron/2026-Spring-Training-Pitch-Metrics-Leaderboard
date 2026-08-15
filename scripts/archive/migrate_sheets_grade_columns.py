@@ -21,7 +21,7 @@ import sys
 import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-from pipeline_fetch import _gspread_client, DIVISION_WORKBOOK_IDS
+from pipeline.fetch import _gspread_client, DIVISION_WORKBOOK_IDS
 
 # Pre-migration schema — Pitcher2026 final_columns as of commit 60f125d.
 OLD_HEADER = [

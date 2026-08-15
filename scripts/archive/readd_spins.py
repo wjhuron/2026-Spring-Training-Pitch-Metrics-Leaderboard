@@ -12,7 +12,7 @@ that already holds a value is left alone and reported.
 import os, sys, json, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import gspread
-import backfill_supplement as B
+import scrapers.backfill_supplement as B
 
 APPLY = '--apply' in sys.argv
 MAP_PATH = ('/private/tmp/claude-501/-Users-wallyhuron-Huronalytics/'

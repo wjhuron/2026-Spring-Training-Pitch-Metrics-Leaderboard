@@ -23,7 +23,7 @@ from collections import defaultdict
 warnings.filterwarnings('ignore')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT)
 import requests, gspread
-import backfill_supplement as B
+import scrapers.backfill_supplement as B
 
 APPLY = '--apply' in sys.argv
 BAND = 500          # feed must be within this of the pitcher's pitch-type median

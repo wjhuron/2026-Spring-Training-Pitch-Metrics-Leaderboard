@@ -16,7 +16,7 @@ from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from pipeline_utils import break_tilt_to_minutes
+from pipeline.utils import break_tilt_to_minutes
 
 src = open(os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')).read()
 T = {'__name__': '_stuff_mod',
@@ -41,7 +41,7 @@ for k, m in enumerate(B['fold_models']):
         pred[msk] = m.predict(X[msk])
 d['stuff_hit'] = pred
 
-import pipeline_locplus as L
+import pipeline.locplus as L
 g26 = json.load(open(os.path.join(ROOT, 'data', 'metadata_rs.json')))['gutsConstants']
 baseline = [p for p in mlb if L.is_eligible_baseline(p)]
 S = L.build_surfaces(baseline, g26['lgWOBA'], g26['wOBAScale'])

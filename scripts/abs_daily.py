@@ -50,7 +50,7 @@ def main():
     print(f"=== abs_daily {datetime.now().isoformat(timespec='seconds')} ===")
     for name, cmd in steps:
         t0 = time.time()
-        r = subprocess.run([sys.executable, "scripts/" + cmd[0]] + cmd[1:])
+        r = subprocess.run([sys.executable, "scripts/abs/" + cmd[0]] + cmd[1:])
         dt = time.time() - t0
         if r.returncode != 0:
             print(f"FAILED at {name} ({dt:.0f}s), stopping")

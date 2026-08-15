@@ -13,7 +13,7 @@ a cell is only blanked if it currently holds a value. Dry-run first.
 import os, sys, time, pickle
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import gspread
-import backfill_supplement as B
+import scrapers.backfill_supplement as B
 
 APPLY = '--apply' in sys.argv
 CLEAR = ['RunExp', 'BatSpeed', 'SwingLength', 'AttackAngle', 'AttackDirection',

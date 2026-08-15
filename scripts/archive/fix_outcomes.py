@@ -12,7 +12,7 @@ that need manual review) and printed for follow-up.
 import os, sys, csv, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import gspread
-import backfill_supplement as B
+import scrapers.backfill_supplement as B
 
 APPLY = '--apply' in sys.argv
 CSV = os.path.expanduser('~/Downloads/count_review_2026.csv')

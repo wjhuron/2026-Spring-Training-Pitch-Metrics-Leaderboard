@@ -18,8 +18,8 @@ import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.colors import LinearSegmentedColormap
-import HitterCards as HC
-from HitterCards import (load_pitch_data, load_metadata, build_sacq_lookup,
+import cards.hitter as HC
+from cards.hitter import (load_pitch_data, load_metadata, build_sacq_lookup,
                          spray_angle, LA_BINS, sf, BG, GRID_COLOR, TEXT_PRIMARY,
                          TEXT_SECONDARY, TEXT_MUTED, TEXT_FAINT)
 

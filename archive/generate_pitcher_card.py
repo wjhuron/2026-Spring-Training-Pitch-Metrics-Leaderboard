@@ -22,7 +22,7 @@ import numpy as np
 from collections import defaultdict
 from math import atan2, sin, cos
 import gspread
-from sheets_append import _workbook_id_for_team
+from scrapers.sheets_append import _workbook_id_for_team
 
 # ═══════════════════════════════════════════════════════════════
 # CONFIGURATION — change these for different pitchers/games

@@ -11,6 +11,6 @@ keeps them greppable.
 - `generate_pitcher_card.py` — v30 single-card generator (Jul 1), output
   path hardcoded to one March game; superseded by Cards.py.
 - `test_pipeline.py` — pre-embed-split smoke test; replaced by
-  `scripts/validate_output.py` (which CI now runs).
+  `scripts/ci/validate_output.py` (which CI now runs).
 - `stuff_plus_v10/` — Stuff+ v10 trainer + artifacts; superseded by
   `stuff_plus_v11/` (the only version CI runs).

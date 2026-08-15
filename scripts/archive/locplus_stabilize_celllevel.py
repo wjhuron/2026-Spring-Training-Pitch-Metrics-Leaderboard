@@ -37,7 +37,7 @@ The resulting k IS the coloring gate: gating at n = k means rho = 0.5, i.e.
 half the variance in a colored cell is signal. See js/aggregator.js
 QUAL.MIN_PITCH_LOCPLUS and pipeline_locplus.STABILIZE_N_PT (keep in sync).
 
-Usage: python3 scripts/locplus_stabilize_celllevel.py
+Usage: python3 scripts/research/locplus/locplus_stabilize_celllevel.py
 """
 import os, sys, math, pickle, statistics, random
 from collections import defaultdict
@@ -45,7 +45,7 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-import pipeline_locplus as lp
+import pipeline.locplus as lp
 
 PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 LG, SCALE = 0.3169, 1.2393

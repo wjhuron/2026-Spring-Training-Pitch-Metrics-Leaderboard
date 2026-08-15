@@ -19,8 +19,8 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-import pipeline_locplus as lp
-from pipeline_sdplus import make_rv_xrv
+import pipeline.locplus as lp
+from pipeline.sdplus import make_rv_xrv
 
 PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 LG, SCALE = 0.3169, 1.2393

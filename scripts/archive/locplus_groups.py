@@ -11,7 +11,7 @@ swK=20, V3 decomposition, true count level. n_prior=107 (measured).
 """
 import pickle, math, collections, os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pipeline_sdplus import classify_zone
+from pipeline.sdplus import classify_zone
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PKL=os.path.join(ROOT,'data','all_pitches_rs_cache.pkl')
 LG,SCALE=0.3169,1.2393

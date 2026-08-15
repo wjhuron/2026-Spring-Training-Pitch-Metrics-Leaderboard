@@ -17,7 +17,7 @@ from collections import defaultdict
 warnings.filterwarnings('ignore')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT)
 import gspread, backfill_supplement as B
-import Pitcher2026 as P
+import scrapers.Pitcher2026 as P
 
 APPLY = '--apply' in sys.argv
 SIDECAR = os.path.join(ROOT, 'data', 'game_weather_rs.json')

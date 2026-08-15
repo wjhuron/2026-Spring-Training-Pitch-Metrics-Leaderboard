@@ -24,7 +24,7 @@ from collections import defaultdict
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 
-from pipeline_utils import (
+from pipeline.utils import (
     safe_float, SWING_DESCRIPTIONS, BB_EVENTS, BUNT_BB_TYPES,
     MLB_TEAMS, AAA_TEAMS, ZONE_HALF_WIDTH,
 )
@@ -38,7 +38,7 @@ _GUTS = None
 def _get_guts():
     global _GUTS
     if _GUTS is None:
-        from pipeline_fetch import fetch_guts_constants
+        from pipeline.fetch import fetch_guts_constants
         _, _, extras = fetch_guts_constants()
         _GUTS = extras
     return _GUTS

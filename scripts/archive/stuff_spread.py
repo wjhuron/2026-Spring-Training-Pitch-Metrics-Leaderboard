@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
-from train_stuff import build_df, design, BASE_FEATS  # noqa
+from stuff_plus.train_stuff import build_df, design, BASE_FEATS  # noqa
 
 D = pickle.load(open(os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl'), 'rb'))
 pitches = [p for p in D if p.get('_source') == 'MLB']

@@ -23,9 +23,9 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-import pipeline_sdplus as sd
-import pipeline_contact as ct
-from pipeline_utils import safe_float, BUNT_BB_TYPES, spray_angle, spray_direction
+import pipeline.sdplus as sd
+import pipeline.contact as ct
+from pipeline.utils import safe_float, BUNT_BB_TYPES, spray_angle, spray_direction
 
 PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 LG_WOBA, WOBA_SCALE = 0.3169, 1.2393

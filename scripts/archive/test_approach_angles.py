@@ -158,7 +158,7 @@ def build_pitcher_level_df():
 
 def fetch_pitches_from_sheets():
     sys.path.insert(0, str(ROOT))
-    from pipeline_fetch import read_all_pitches_from_sheets
+    from pipeline.fetch import read_all_pitches_from_sheets
 
     print("  reading the six division workbooks (huronalytics)...")
     pitches = read_all_pitches_from_sheets()

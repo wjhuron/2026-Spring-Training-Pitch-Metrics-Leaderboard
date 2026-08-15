@@ -41,8 +41,8 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
-import pipeline_locplus as lp
-from pipeline_sdplus import make_rv_xrv
+import pipeline.locplus as lp
+from pipeline.sdplus import make_rv_xrv
 from locplus_constants_multiseason import adapt
 
 LG, SCALE = 0.3169, 1.2393
@@ -74,7 +74,7 @@ def stuff_by_pitcher(train_path, bundle, cutoff):
     """Mean predicted xRV per pitcher over pitches BEFORE cutoff (hitter
     perspective, so it is negated later to make higher = better)."""
     import pandas as pd
-    from train_stuff import build_df
+    from stuff_plus.train_stuff import build_df
     pitches = pickle.load(open(train_path, 'rb'))
     early = [p for p in pitches if str(p.get('Game Date', ''))[:10] < cutoff]
     del pitches

@@ -26,7 +26,7 @@ from PIL import Image
 from io import BytesIO
 import numpy as np
 import gspread
-from sheets_append import _workbook_id_for_team
+from scrapers.sheets_append import _workbook_id_for_team
 
 # ═══════════════════════════════════════════════════════════════
 # CONSTANTS

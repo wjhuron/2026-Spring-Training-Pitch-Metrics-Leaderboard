@@ -39,11 +39,11 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
-import pipeline_locplus as lp
-from pipeline_sdplus import make_rv_xrv
+import pipeline.locplus as lp
+from pipeline.sdplus import make_rv_xrv
 from locplus_constants_multiseason import adapt
 
-import train_stuff as T
+import stuff_plus.train_stuff as T
 
 LG, SCALE = 0.3169, 1.2393
 MIN_PITCH, MIN_ACTUAL = 200, 200
@@ -156,7 +156,7 @@ def main():
         # silently skipped filtering entirely, so Stuff+ was computed from the
         # WHOLE season including the second half that is the prediction target
         # — target leakage into the predictor, biasing w upward. Superseded by
-        # scripts/pitchingplus_loso_full.py, which also fixes the scales.
+        # scripts/research/stuff/pitchingplus_loso_full.py, which also fixes the scales.
         te = te[te['date'].astype(str) < mids[y]].reset_index(drop=True)
         Xte = T.design(te).reindex(columns=model.get_booster().feature_names,
                                    fill_value=0)

@@ -26,7 +26,7 @@ All raw scores are HITTER perspective (lower = better for the pitcher).
 import pickle, math, collections, sys, os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pipeline_sdplus import classify_zone, get_count as sd_get_count  # faithful V0 baseline
+from pipeline.sdplus import classify_zone, get_count as sd_get_count  # faithful V0 baseline
 
 PKL = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                    'data', 'all_pitches_rs_cache.pkl')

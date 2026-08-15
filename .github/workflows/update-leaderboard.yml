@@ -42,7 +42,7 @@ jobs:
           # FanGraphs blocks the runner, instead of ending up with no cache
           # at all. Without this the fallback dies on a missing key.
           STUFF_DATA_KEY: ${{ secrets.STUFF_DATA_KEY }}
-        run: python3 process_data.py
+        run: python3 -m pipeline.process_data
 
       # Stuff+ is an offline-trained model (needs xgboost), so it runs here
       # rather than inside process_data.py. It trains on the fresh pickle that
@@ -52,7 +52,7 @@ jobs:
       - name: Fetch prior-season training data (encrypted release asset)
         # The 2025 retagged training set travels as AES-256 ciphertext on the
         # public release; only CI (STUFF_DATA_KEY secret) and Wally's .env can
-        # decrypt. See scripts/build_2025_training_set.py for provenance.
+        # decrypt. See scripts/builders/build_2025_training_set.py for provenance.
         # Retrain runs only — score-only runs need no training data at all.
         if: ${{ inputs.retrain }}
         env:
@@ -123,7 +123,7 @@ jobs:
             https://github.com/wjhuron/Huronalytics/releases/download/latest-data/kinematics_2026_sidecar.pkl.gz \
             && gunzip -c /tmp/kin_side.gz > data/kinematics_2026_sidecar.pkl \
             || echo "sidecar asset unavailable"
-          python3 scripts/build_kinematics_2026.py \
+          python3 scripts/ci/build_kinematics_2026.py \
             || echo "kinematics refresh failed — using downloaded sidecar as-is"
 
       - name: Compute Stuff+ (retrain or cached-model scoring, inject into leaderboards)
@@ -150,10 +150,10 @@ jobs:
       # Stuff+ dump — rebuild it now that this run's dump exists, so filtered
       # site views (grade atoms) never lag the sheets/cards by a cycle.
       - name: Refresh micro-data grade atoms
-        run: python3 scripts/refresh_micro_grades.py
+        run: python3 scripts/ci/refresh_micro_grades.py
 
       - name: Rebuild embedded payload with injected Stuff+
-        run: python3 scripts/rebuild_embed.py
+        run: python3 scripts/ci/rebuild_embed.py
 
       # Per-pitch Stuff+/Loc+/Pitching+ -> the Sheets grade columns (cols
       # 24-26 after HAA). Full-column overwrite each run (retags / late arm angles /
@@ -163,13 +163,13 @@ jobs:
         continue-on-error: true
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-        run: python3 scripts/sheets_write_grades.py
+        run: python3 scripts/ci/sheets_write_grades.py
 
       # Gate the publish on real output integrity — same script Wally can
       # run locally after a pipeline run (checks leaderboard JSONs and both
       # embed chunks of the 2026-07-29 core/heavy split).
       - name: Validate output integrity
-        run: python3 scripts/validate_output.py
+        run: python3 scripts/ci/validate_output.py
 
       - name: Commit and push if changed
         run: |

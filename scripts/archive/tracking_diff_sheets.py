@@ -16,7 +16,7 @@ socket.setdefaulttimeout(90)
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import gspread
-import backfill_supplement as B
+import scrapers.backfill_supplement as B
 from pybaseball import statcast
 from collections import defaultdict
 

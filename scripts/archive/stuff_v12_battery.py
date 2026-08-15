@@ -38,7 +38,7 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 import build_2025_training_set as B25
 import build_historical_training_set as H
-from pipeline_utils import break_tilt_to_minutes
+from pipeline.utils import break_tilt_to_minutes
 
 # ── stuff module (exec, pre-main) with pid passthrough already in prod ──
 src = open(os.path.join(ROOT, 'stuff_plus', 'train_stuff.py')).read()

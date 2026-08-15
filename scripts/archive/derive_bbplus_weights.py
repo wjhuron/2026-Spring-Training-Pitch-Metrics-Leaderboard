@@ -23,7 +23,7 @@ from collections import defaultdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-from pipeline_utils import safe_float, BUNT_BB_TYPES, spray_angle, spray_direction
+from pipeline.utils import safe_float, BUNT_BB_TYPES, spray_angle, spray_direction
 
 PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 LA_BINS = [(-999, -10), (-10, 0), (0, 5), (5, 10), (10, 15), (15, 20),

@@ -17,7 +17,7 @@ fill-if-empty backfills are correct again.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import backfill_supplement as B
+import scrapers.backfill_supplement as B
 
 # Reconcile every supplement field to current Savant. Event excluded: it is only
 # meaningful on the terminal pitch and OVERWRITE_ONLY already handles scoring flips.

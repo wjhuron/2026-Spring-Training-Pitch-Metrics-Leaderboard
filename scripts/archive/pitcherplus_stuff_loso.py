@@ -35,7 +35,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'stuff_plus'))
 
 import leaderboard_metric_battery as bat        # noqa: E402
-import train_stuff as tv                    # noqa: E402
+import stuff_plus.train_stuff as tv                    # noqa: E402
 
 OUT_CSV = os.path.join(ROOT, 'data', '_pplus_stuff_loso.csv')
 SEASONS = [2021, 2022, 2023, 2024, 2025]

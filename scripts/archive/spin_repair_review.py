@@ -15,8 +15,8 @@ from collections import defaultdict
 warnings.filterwarnings('ignore')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT)
 import requests, gspread
-import backfill_supplement as B
-import Pitcher2026
+import scrapers.backfill_supplement as B
+import scrapers.Pitcher2026 as Pitcher2026
 
 MIN_N = 8; MIN_DELTA = 25; REF_MIN = 700
 FEED = "https://statsapi.mlb.com/api/v1.1/game/{}/feed/live"

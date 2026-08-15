@@ -37,8 +37,8 @@ sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 
 import numpy as np
-import pipeline_locplus as lp
-from pipeline_sdplus import make_rv_xrv
+import pipeline.locplus as lp
+from pipeline.sdplus import make_rv_xrv
 from locplus_constants_multiseason import adapt
 from commandplus_v1 import score_pitches_multi, aggregate
 

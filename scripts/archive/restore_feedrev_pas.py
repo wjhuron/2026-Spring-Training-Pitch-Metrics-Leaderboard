@@ -16,9 +16,9 @@ supplement fields by physics match), with two fixes learned since:
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import gspread
-import backfill_supplement as B
-import sheets_append as SA
-from Pitcher2026 import BaseballSavantFocusedDownloader
+import scrapers.backfill_supplement as B
+import scrapers.sheets_append as SA
+from scrapers.Pitcher2026 import BaseballSavantFocusedDownloader
 
 APPLY = '--apply' in sys.argv
 CASES = [('824295', 80), ('824295', 81), ('824290', 78), ('824290', 79),

@@ -11,7 +11,7 @@ true count level, no demean. Only grid + physical bandwidth vary here.
 """
 import pickle, math, collections, os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from pipeline_sdplus import classify_zone
+from pipeline.sdplus import classify_zone
 
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PKL=os.path.join(ROOT,'data','all_pitches_rs_cache.pkl')

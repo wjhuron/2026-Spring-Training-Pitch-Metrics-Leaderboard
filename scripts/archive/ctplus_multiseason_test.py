@@ -14,9 +14,9 @@ Usage: python3 scripts/ctplus_multiseason_test.py
 import os, sys, math, pickle, collections
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-import pipeline_contact as CT
-import pipeline_sdplus as SD
-from pipeline_utils import safe_float as sf
+import pipeline.contact as CT
+import pipeline.sdplus as SD
+from pipeline.utils import safe_float as sf
 
 LG, SCALE = 0.3172, 1.2343
 PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')

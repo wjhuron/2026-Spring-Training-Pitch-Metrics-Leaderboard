@@ -14,7 +14,7 @@ cell that still holds the exact wrong value from the audit.
 import os, sys, csv, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import gspread
-import backfill_supplement as B
+import scrapers.backfill_supplement as B
 
 APPLY = '--apply' in sys.argv
 CSVPATH = os.path.expanduser('~/Downloads/attribution_mismatches_2026.csv')

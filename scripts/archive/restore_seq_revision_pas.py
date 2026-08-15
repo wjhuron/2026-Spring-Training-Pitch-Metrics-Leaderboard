@@ -19,9 +19,9 @@ Rows written the sheets_append way (USER_ENTERED + text-force + number formats).
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import gspread
-import backfill_supplement as B
-import sheets_append as SA
-from Pitcher2026 import BaseballSavantFocusedDownloader
+import scrapers.backfill_supplement as B
+import scrapers.sheets_append as SA
+from scrapers.Pitcher2026 import BaseballSavantFocusedDownloader
 
 APPLY = '--apply' in sys.argv
 CASES = [('822739', 12), ('823138', 8), ('824214', 9), ('824215', 83), ('824458', 56)]

@@ -13,7 +13,7 @@ Usage: python3 scripts/xwobasp_multiseason_test.py
 import os, sys, math, pickle, collections
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from pipeline_utils import spray_angle, spray_direction, safe_float as sf
+from pipeline.utils import spray_angle, spray_direction, safe_float as sf
 
 PKL = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 LA_BINS = [(-999, -10), (-10, 0), (0, 5), (5, 10), (10, 15), (15, 20),

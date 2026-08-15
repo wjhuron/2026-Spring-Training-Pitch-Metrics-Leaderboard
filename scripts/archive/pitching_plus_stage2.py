@@ -39,7 +39,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 import stuff_plus.train_stuff as T
-import pipeline_locplus as L
+import pipeline.locplus as L
 
 PKL26 = os.path.join(ROOT, 'data', 'all_pitches_rs_cache.pkl')
 PKL25 = os.path.join(ROOT, 'data', '_pitches2025_training.pkl')

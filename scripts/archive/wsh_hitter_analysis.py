@@ -14,16 +14,16 @@ import sys, json, pickle, gzip
 from collections import defaultdict, OrderedDict
 sys.path.insert(0, '/Users/wallyhuron/Huronalytics')
 
-from pipeline_utils import (
+from pipeline.utils import (
     safe_float, spray_angle, spray_direction, BUNT_BB_TYPES,
     K_EVENTS, BB_EVENTS, HBP_EVENTS, SF_EVENTS, SH_EVENTS, CI_EVENTS, NON_PA_EVENTS,
 )
-from pipeline_compute import compute_hitter_stats, compute_expected_stats
-from pipeline_sdplus import (
+from pipeline.compute import compute_hitter_stats, compute_expected_stats
+from pipeline.sdplus import (
     is_eligible, make_rv_xrv, build_weight_table, zone_level_means, shrink_table,
     compute_dv, compute_hitter_sd, MIN_HITTER_DECISIONS, HITTER_PRIOR_N as SD_PRIOR,
 )
-from pipeline_contact import (
+from pipeline.contact import (
     is_ct_eligible, build_contact_cell_weights, zone_level_contact_means,
     shrink_contact_cells, compute_ct_swing, compute_hitter_ct,
     MIN_HITTER_SWINGS, HITTER_PRIOR_N as CT_PRIOR,

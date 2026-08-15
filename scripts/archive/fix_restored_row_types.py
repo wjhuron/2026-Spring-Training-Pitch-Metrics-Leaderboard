@@ -18,8 +18,8 @@ cells. This rewrites each affected row the way sheets_append does:
 import os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import gspread
-import backfill_supplement as B
-import sheets_append as SA
+import scrapers.backfill_supplement as B
+import scrapers.sheets_append as SA
 
 APPLY = '--apply' in sys.argv
 CASES = [('824448', 43), ('824527', 53), ('824525', 45), ('824280', 51), ('824600', 48),

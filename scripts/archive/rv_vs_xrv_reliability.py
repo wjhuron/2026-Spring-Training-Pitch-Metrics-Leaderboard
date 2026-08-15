@@ -17,7 +17,7 @@ Run at both the pitcher level and the pitch-type level (the table's unit).
 import sys, os, pickle, random
 from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from Cards import GUTS_LG_WOBA, GUTS_WOBA_SCALE, sf, MILB_TEAMS
+from cards.pitcher import GUTS_LG_WOBA, GUTS_WOBA_SCALE, sf, MILB_TEAMS
 
 random.seed(17)
 PICKLE = '/Users/wallyhuron/Huronalytics/data/all_pitches_rs_cache.pkl'

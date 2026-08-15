@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 import gspread
-from pipeline_fetch import DIVISION_WORKBOOK_IDS
+from pipeline.fetch import DIVISION_WORKBOOK_IDS
 
 COL_AC_INDEX = 28  # zero-indexed; AC is the 29th column
 

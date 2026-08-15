@@ -35,7 +35,7 @@ p26 = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(p26)
 
 sys.path.insert(0, REPO)
-import sheets_append as sa  # SHEETS_AL, SHEETS_NL, _get_client
+import scrapers.sheets_append as sa  # SHEETS_AL, SHEETS_NL, _get_client
 
 # Las Vegas Ballpark ground elevation (USGS EPQS at the venue coordinates).
 LV_ELEVATION_FT = 3010.0

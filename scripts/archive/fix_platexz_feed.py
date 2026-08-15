@@ -22,7 +22,7 @@ from collections import defaultdict
 warnings.filterwarnings('ignore')
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT)
 import requests, gspread
-import backfill_supplement as B
+import scrapers.backfill_supplement as B
 
 APPLY = '--apply' in sys.argv
 MATCH_TOL = 0.03   # stored coords "match" a sibling's feed coords within this
