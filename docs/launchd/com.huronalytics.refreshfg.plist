@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.huronalytics.refreshfg</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Library/Frameworks/Python.framework/Versions/3.13/bin/python3</string>
+        <string>-m</string>
+        <string>pipeline.fg_overrides</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/wallyhuron/Huronalytics</string>
+
+    <!-- Run daily at 9:00am (system local time = Eastern). FanGraphs has
+         finished its overnight stat refresh well before this. STUFF_DATA_KEY
+         comes from the repo .env for the release-asset fallback. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>9</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/wallyhuron/Library/Logs/huronalytics-refreshfg.out</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/wallyhuron/Library/Logs/huronalytics-refreshfg.err</string>
+</dict>
+</plist>

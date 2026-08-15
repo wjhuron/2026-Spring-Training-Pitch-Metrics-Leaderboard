@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.huronalytics.refreshpickle</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Library/Frameworks/Python.framework/Versions/3.13/bin/python3</string>
+        <string>-m</string>
+        <string>pipeline.refresh_pickle</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/wallyhuron/Huronalytics</string>
+
+    <!-- NOTE: the old plist exported GOOGLE_SERVICE_ACCOUNT_JSON pointing at
+         the repo's service_account.json (leaderboard-reader@st-leaderboard).
+         That credential 403s on at least one division workbook, and the env
+         var used to crash the client outright (path passed where JSON content
+         was expected — fixed 2026-08-15). The default gspread credential in
+         ~/.config/gspread/service_account.json is the one that works, so no
+         EnvironmentVariables block here. -->
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>7</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/wallyhuron/Library/Logs/huronalytics-refreshpickle.out</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/wallyhuron/Library/Logs/huronalytics-refreshpickle.err</string>
+</dict>
+</plist>
