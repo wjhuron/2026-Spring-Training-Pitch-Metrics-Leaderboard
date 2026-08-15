@@ -10,6 +10,14 @@ relevant team/date ranges from Baseball Savant and fills in the empty cells.
 Configuration: edit the variables below before running.
 """
 
+# Runnable as a file from any directory (IDE run buttons included):
+# put the repo root on sys.path before the intra-repo package imports.
+import os as _os, sys as _sys
+_ROOT = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+if _ROOT not in _sys.path:
+    _sys.path.insert(0, _ROOT)
+
+
 import argparse
 import gspread
 import requests
