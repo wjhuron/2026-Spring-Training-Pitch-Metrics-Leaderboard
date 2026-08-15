@@ -400,6 +400,12 @@ def _gspread_client():
     if sa_json:
         from google.oauth2.service_account import Credentials
         scopes = ['https://www.googleapis.com/auth/spreadsheets']
+        # CI passes the secret's JSON content; the launchd plists pass a
+        # path to service_account.json. Accept both — path-blindness here
+        # crashed the 7am refreshpickle job on every run.
+        if os.path.isfile(sa_json):
+            with open(sa_json) as f:
+                sa_json = f.read()
         creds = Credentials.from_service_account_info(json.loads(sa_json), scopes=scopes)
         return gspread.authorize(creds)
     return gspread.service_account()
