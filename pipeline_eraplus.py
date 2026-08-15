@@ -68,9 +68,12 @@ IZSW_PER_PITCH = 0.33  # league iz-swings per pitch (.32-.34, 2021-2026);
 
 DH_B = 0.917                # LOSO slope, 30+ IP display population
 
-# hpERA fold-mean OLS weights (rest-of-season fit, gate 60), ERA direction
-W_PH = {'stuff': 0.293, 'loc': 0.135, 'k': 0.101, 'izwh': 0.132,
-        'xrv': 0.177, 'gb': 0.186, 'gs': 0.264, 'park': 0.169}
+# hpERA fold-mean OLS weights (rest-of-season fit, gate 60), ERA direction.
+# REFIT 2026-08-15 on the production-consistent shrinkage (izwh n0=130,
+# gb 55, xrv 800): fitting on differently-shrunk inputs cost ~.02 held-out
+# r; refit restores ROS .482 / NEXT .512.
+W_PH = {'stuff': 0.297, 'loc': 0.136, 'k': 0.088, 'izwh': 0.117,
+        'xrv': 0.139, 'gb': 0.162, 'gs': 0.277, 'park': 0.168}
 
 # frozen run-environment constants for make_rv_xrv (the values the weight
 # fit used; z-scoring absorbs any drift in the true environment)

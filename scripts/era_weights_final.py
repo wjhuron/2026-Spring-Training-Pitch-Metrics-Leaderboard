@@ -46,7 +46,10 @@ XRV = json.load(open(os.path.join(ROOT, 'data', '_era_xrv100.json')))
 AGES = json.load(open(os.path.join(ROOT, 'data', '_era_ages.json')))
 
 N0 = {'xw': 250.0, 'k': 90.0, 'bb': 180.0, 'xwc': 700.0,
-      'stuff': 15.0, 'pplus': 20.0, 'loc': 170.0}
+      'stuff': 15.0, 'pplus': 20.0, 'loc': 170.0,
+      # production hpERA constants (2026-08-15 full-coverage sweep)
+      'izwh': 130.0, 'gb': 55.0, 'xrv': 800.0}
+IZSW_PER_PITCH = 0.33
 POOL_OUTS = {'full': 90, 'h1': 45}
 
 
@@ -84,6 +87,7 @@ def raw_features(season, scope):
             r['xwc_den'] = m['bip']
         if m.get('gb_pct') is not None:
             r['gb_pct'] = m['gb_pct']
+            r['bip_n'] = m['bip']
         if m.get('zcon_pct') is not None:
             r['izwhiff'] = 1.0 - m['zcon_pct']
         r['pitches'] = m['pitches']
@@ -136,6 +140,11 @@ def shrunk_features(season, scope):
     lg_st = lg_mean('stuff', 'stuff_n')
     lg_lo = lg_mean('loc', 'loc_n')
     lg_xrv = lg_mean('xrv100', 'xrv_n')
+    lg_gb_t = lg_mean('gb_pct', 'bip_n')
+    _izw = [(r['izwhiff'], r.get('pitches') or 0) for r in pool.values()
+            if 'izwhiff' in r]
+    lg_iz_t = (sum(v * w for v, w in _izw) / sum(w for _, w in _izw)
+               if _izw else 0.19)
 
     feats = {}
     for pid, r in pool.items():
@@ -157,12 +166,16 @@ def shrunk_features(season, scope):
                 (r['loc_n'] + N0['loc'])
         if 'xrv100' in r:
             f['xrv'] = (r['xrv100'] * r['xrv_n']
-                        + N0['pplus'] * lg_xrv) / \
-                (r['xrv_n'] + N0['pplus'])
+                        + N0['xrv'] * lg_xrv) / \
+                (r['xrv_n'] + N0['xrv'])
         if 'gb_pct' in r:
-            f['gb'] = -r['gb_pct']
+            _nb = r.get('bip_n') or 0
+            f['gb'] = -((r['gb_pct'] * _nb + N0['gb'] * lg_gb_t)
+                        / (_nb + N0['gb']))
         if 'izwhiff' in r:
-            f['izwh'] = -r['izwhiff']
+            _niz = (r.get('pitches') or 0) * IZSW_PER_PITCH
+            f['izwh'] = -((r['izwhiff'] * _niz + N0['izwh'] * lg_iz_t)
+                          / (_niz + N0['izwh']))
         if r['age'] is not None:
             f['age'] = r['age']
         f['gs_share'] = r['gs_share']
