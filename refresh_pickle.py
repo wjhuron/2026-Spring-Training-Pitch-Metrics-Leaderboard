@@ -88,9 +88,16 @@ def _apply_pre_pickle_cleanup(all_pitches):
             p['_roc_pitcher_pitch'] = True
             roc_p_count += 1
         elif src == 'AAA':
+            # e00bf72 data model (mirrors process_data): the batter is a
+            # tracked Rochester hitter ONLY when BTeam == 'ROC'; every other
+            # batter is opponent byproduct and is excluded from hitter stats
+            # too. The old `BTeam 'AAA' -> 'ROC'` rewrite here silently
+            # REVERTED sheet-side departure retags (released hitters moved
+            # ROC -> AAA) in the local pickle, so cards and local analyses
+            # kept showing departed players as ROC. Never rewrite BTeam.
             p['_roc_hitter_pitch'] = True
-            if p.get('BTeam') == 'AAA':
-                p['BTeam'] = 'ROC'
+            if p.get('BTeam') != 'ROC':
+                p['_roc_pitcher_pitch'] = True
             roc_h_count += 1
     if roc_p_count or roc_h_count:
         print(f"  Tagged {roc_p_count} ROC pitcher pitches, "
