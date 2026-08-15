@@ -3761,7 +3761,7 @@ def main():
     team            = "NEW"
     start_date      = None    # Set to None for full season
     end_date        = None             # Set to a date for date range, or None for single day
-    filter_pitchers = "Martinez, Seth"                 # Semicolon-separated "Last, First" names, or "" for all
+    filter_pitchers = "Estrada, Lazaro"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     output_dir      = OUTPUT_DIR
@@ -3919,6 +3919,7 @@ def main():
     # re-typing the number so the two cannot drift apart.
     from pipeline_fetch import FIP_CONSTANT_FALLBACK
     fip_constant = FIP_CONSTANT_FALLBACK
+    era_plus_constants = None
     if os.path.exists(METADATA_PATH):
         with open(METADATA_PATH) as f:
             meta = json.load(f)
@@ -3926,6 +3927,9 @@ def main():
         overall_avgs = meta.get('pitcherLeagueAverages', {})
         siera_constant = meta.get('sieraConstant', 5.77)
         fip_constant = meta.get('fipConstant', FIP_CONSTANT_FALLBACK)
+        # own name: `meta` is shadowed by fetch_player_metadata() inside the
+        # per-pitcher loop, so the scratch hdERA/hpERA block must not read it
+        era_plus_constants = meta.get('eraPlusConstants')
 
     # Pitcher leaderboard — source of the season percentile ranks (_pctl) that
     # feed the bubble panel. Indexed by mlbId (primary) and (pitcher, team).
@@ -4254,6 +4258,19 @@ def main():
                 _compute_scratch_pitcher_context(pitcher_name, scratch_ctx)
             print(f"  Window context: Stuff+ {pctl_row.get('stuffScore')} | "
                   f"Loc+ {pctl_row.get('locPlus')}")
+            # hdERA/hpERA for scratch season cards: scored from the window
+            # row + published pool constants, the same pattern Pitcher+
+            # uses just above (metadata pitcherPlusBaseline).
+            _epc = era_plus_constants
+            if _epc and pctl_row is not None:
+                from pipeline_eraplus import score_scratch_row
+                _dh, _ph = score_scratch_row(
+                    pctl_row,
+                    scratch_ctx['norm_by_pitcher'].get(pitcher_name) or [],
+                    box.get('g'), box.get('gs'), eff_team, _epc)
+                pctl_row['hdERA'] = _dh
+                pctl_row['hpERA'] = _ph
+                print(f"  Window context: hdERA {_dh} | hpERA {_ph}")
         elif is_multi_game:
             # (name, eff_team) wins over mlbId: a traded/called-up arm shares one
             # mlbId across team rows, so the by-name key targets the right row

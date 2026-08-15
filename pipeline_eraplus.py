@@ -251,8 +251,86 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
     n_ph = sum(1 for r in rows if r.get('hpERA') is not None)
     print(f'  eraplus: anchor {anchor:.2f} (pool {len(pool_rows)}), '
           f'hdERA {n_dh} rows, hpERA {n_ph} rows')
+    from pipeline_locplus import LOC_SCALE_K
     return {'anchor': round(anchor, 3), 'dhB': DH_B, 'weights': W_PH,
-            'n0': {'xw': N0_XW, 'k': N0_K}, 'poolMinOuts': POOL_MIN_OUTS}
+            'n0': {'xw': N0_XW, 'k': N0_K}, 'poolMinOuts': POOL_MIN_OUTS,
+            # published so window/scratch contexts (NEW-tab cards) can score
+            # hdERA/hpERA the way they already score Pitcher+ from its
+            # baseline: z-pool stats per channel + shrink targets.
+            'muSd': {c: (list(mu_sd[c]) if mu_sd.get(c) else None)
+                     for c in PH_CHANNELS},
+            'lgXw': round(_channels.lg_xw, 5),
+            'lgK': round(_channels.lg_k, 5),
+            'locScaleK': LOC_SCALE_K}
+
+
+def score_scratch_row(row, pitches, g, gs, team, const):
+    """Best-effort (hdERA, hpERA) for a WINDOW/SCRATCH pitcher (NEW-tab
+    season cards): the same channels, z-scored against the PUBLISHED pool
+    stats from `const` (metadata eraPlusConstants). Two documented
+    approximations, matching the window-context convention: the loc
+    channel arrives as site-scale locPlus and is inverted through
+    LOC_SCALE_K (raw_loc_adj is not computed in window context), and
+    NEW-tab pitch mixes can include MiLB lines. Returns (None, None)
+    where channels are missing; hpERA additionally requires 30+ IP
+    (g*outs unknown here, so the caller's box IP gates via `pitches`
+    volume: 90+ PA-ending events approximates the domain floor poorly,
+    so we gate on the row's pa >= 100 as the closest available proxy)."""
+    mu_sd = const.get('muSd') or {}
+    anchor = const.get('anchor')
+    if anchor is None:
+        return None, None
+
+    def z(c, val):
+        ms = mu_sd.get(c)
+        if val is None or not ms:
+            return None
+        m, sd = ms
+        return (val - m) / sd if sd else None
+
+    pa = row.get('pa') or 0
+    zxw = None
+    if pa > 0 and row.get('xwOBA') is not None and const.get('lgXw'):
+        xw_sh = (row['xwOBA'] * pa + N0_XW * const['lgXw']) / (pa + N0_XW)
+        zxw = z('xw', xw_sh)
+    dh = (anchor + const.get('dhB', DH_B) * zxw) if zxw is not None else None
+
+    zs = {}
+    if pa > 0 and row.get('kPct') is not None and const.get('lgK'):
+        k_sh = -((row['kPct'] * pa + N0_K * const['lgK']) / (pa + N0_K))
+        zs['k'] = z('k', k_sh)
+    st = row.get('stuffScore')
+    zs['stuff'] = z('stuff', -st) if st is not None else None
+    lp = row.get('locPlus')
+    lk = const.get('locScaleK') or 10
+    zs['loc'] = ((100.0 - lp) / lk) if lp is not None else None
+    iz = row.get('izWhiffPct')
+    zs['izwh'] = z('izwh', -iz) if iz is not None else None
+    gbp = row.get('gbPct')
+    zs['gb'] = z('gb', -gbp) if gbp is not None else None
+    if pitches:
+        from pipeline_sdplus import make_rv_xrv
+        rv_fn = make_rv_xrv(XRV_LG, XRV_SCALE)
+        vals = [v for v in (rv_fn(p) for p in pitches) if v is not None]
+        if len(vals) >= 50:
+            zs['xrv'] = z('xrv', 100.0 * sum(vals) / len(vals))
+        else:
+            zs['xrv'] = None
+    else:
+        zs['xrv'] = None
+    zs['gs'] = z('gs', (gs or 0) / g) if g else None
+    try:
+        with open(PARK_PATH) as f:
+            park = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        park = {}
+    zs['park'] = z('park', park.get(team, 100.0) / 100.0)
+
+    ph = None
+    if pa >= 100 and all(zs.get(c) is not None for c in W_PH):
+        ph = anchor + sum(W_PH[c] * zs[c] for c in W_PH)
+    return (round(dh, 2) if dh is not None else None,
+            round(ph, 2) if ph is not None else None)
 
 
 def sort_rows_default(rows):
