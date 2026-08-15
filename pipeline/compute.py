@@ -241,7 +241,7 @@ def compute_stats(pitches):
                       if p.get('Description') in ('Called Strike', 'Swinging Strike', 'Foul', 'In Play'))
     fps_pct = fps_strikes / len(first_pitches) if first_pitches else None
 
-    two_strike_pitches = [p for p in pitches if '-' in p.get('Count', '') and p['Count'].split('-')[1] == '2']
+    two_strike_pitches = [p for p in pitches if '-' in (p.get('Count') or '') and p['Count'].split('-')[1] == '2']
     # Exclude bunt-contact swings from the 2-strike whiff denominator to match
     # the regular whiff% / contact% convention.
     two_strike_swings = sum(1 for p in two_strike_pitches
@@ -534,7 +534,7 @@ def compute_hitter_stats(pitches):
                   and p.get('BBType') == 'fly_ball')
     hr_fb_pct = round(n_hr_fb / fb, 4) if fb > 0 else None
 
-    two_strike_pitches = [p for p in pitches if '-' in p.get('Count', '') and p['Count'].split('-')[1] == '2']
+    two_strike_pitches = [p for p in pitches if '-' in (p.get('Count') or '') and p['Count'].split('-')[1] == '2']
     # Exclude bunt-contact swings from the 2-strike whiff denominator to match
     # the regular whiff% / contact% convention.
     two_strike_swings = sum(1 for p in two_strike_pitches

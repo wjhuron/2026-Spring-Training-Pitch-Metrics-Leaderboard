@@ -27,7 +27,7 @@ The expected value is a DECOMPOSITION over smooth league surfaces:
   - Contact (xwOBAcon) surface is heavily shrunk toward the group mean because
     location-driven contact suppression is mostly luck (THT command study).
 
-Design choices were validated empirically (see scripts/locplus_*.py):
+Design choices were validated empirically (see scripts/research/locplus/ and scripts/archive/):
 reliability (split-half), stuff-independence (low corr with whiff%/velo), and
 predictive validity (first-half score vs second-half xRV allowed). This model
 roughly doubles the run-prevention signal of the old 5-zone metric while
@@ -52,7 +52,7 @@ from pipeline.utils import safe_float, AAA_TEAMS
 from pipeline.sdplus import classify_zone, ZONES, build_bip_count_offsets
 
 # ── Model options (each A/B-validated on the 3-objective harness:
-#    scripts/phase2_locplus_eval.py — reliability / stuff-independence /
+#    scripts/archive/phase2_locplus_eval.py — reliability / stuff-independence /
 #    predictive validity). Validated 2026-07-02: ──
 PCS_BY_HAND = True             # called-strike surface per batter hand (the
                                # LHH called zone sits ~2" farther outside;
@@ -69,7 +69,7 @@ BIP_COUNT_ANCHOR = False       # add offset(c) to the BIP value branch
                                # SD+/CT+, which score hitter decisions against
                                # the count state.)
                                # RE-TESTED 2026-07-25 under CS_COUNT_TRANSFORM
-                               # (scripts/locplus_phase3_eval.py) — still loses:
+                               # (scripts/archive/locplus_phase3_eval.py) — still loses:
                                # rel 0.600->0.586, whiff leak 0.056->0.089,
                                # velo 0.305->0.382, pred 0.075->-0.025.
                                # CORRECTION to the original reasoning: count
@@ -101,8 +101,8 @@ CS_COUNT_TRANSFORM = True      # count-transform on the called-strike surface:
                                # (hand,count) logit intercept calibrated so the
                                # predicted called-strike count matches observed
                                # among that count's takes (BP framing-model
-                               # style). WON (scripts/locplus_cs_transform_test
-                               # .py): rel 0.591->0.602, stuff-leak flat, pred
+                               # style). WON (scripts/archive/
+                               # locplus_cs_transform_test.py): rel 0.591->0.602, stuff-leak flat, pred
                                # -0.007 (noise); learned shifts monotonic and
                                # match umpire behavior (3-0 +0.32, 0-2 -0.67).
 
@@ -185,7 +185,7 @@ XW_CLEVEL_FALLBACK = {
 
 # Per-pitcher regression + normalization. n_prior values are the measured
 # split-half r=0.5 crossings (regression constant). Re-measured 2026-07-13
-# on the full season, 10 shuffle seeds (scripts/locplus_nprior_multiseed.py):
+# on the full season, 10 shuffle seeds (scripts/archive/locplus_nprior_multiseed.py):
 # overall mean 135 (median 134, seed range 118-155) — the early-season 117
 # under-regressed. Per-group is now measurable (was "breakers unmeasurable"
 # in the April measurement); values are the 10-seed medians. FF/SL stabilize
@@ -210,8 +210,8 @@ N_PRIOR_PT_DEFAULT = 0
 # 25/(25+71) = 0.26 reliable, which is why pitch-type Loc+ cannot ride the flat
 # 25-pitch outcome gate the other per-pitch metrics use (2026-07-25 audit: 771
 # rows, 30% of all colored pitch-type Loc+ cells, sat below r=0.5).
-# MIRRORED in js/aggregator.js (QUAL.MIN_PITCH_LOCPLUS) and process_data.py
-# (LOCPLUS_MIN_PITCH) — keep all three in sync.
+# MIRRORED in js/aggregator.js (QUAL.MIN_PITCH_LOCPLUS) — keep the two in
+# sync. (process_data imports stabilize_n from here, so Python is single-homed.)
 # Re-measured 2026-07-25 (scripts/research/locplus/locplus_stabilize_celllevel.py, 10 seeds) at
 # the unit the leaderboard actually renders: cells are per PITCH TYPE, surfaces
 # are built once on the full season (surface estimation noise is common to all
