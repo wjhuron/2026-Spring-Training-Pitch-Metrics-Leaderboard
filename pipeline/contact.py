@@ -182,29 +182,45 @@ def shrink_contact_cells(raw, zone_means, k=CELL_SHRINK_K):
     All 180 (zone, count, cat) cells populated; missing levels fall back
     to the next level up, then to a neutral default."""
     DEFAULT = {'p_whiff': 0.25, 'rv_contact': 0.0, 'rv_whiff': -0.05,
-               'n_swings': 0}
+               'n_swings': 0, 'n_whiff': 0}
     zc_means, z_means = zone_means
     QS = ('p_whiff', 'rv_contact', 'rv_whiff')
+
+    # Evidence count per quantity: p_whiff is a mean over ALL swings, but
+    # rv_whiff averages only the whiffs and rv_contact only the contacts.
+    # Shrinking all three with n_swings over-weighted the sparse rv_whiff
+    # means (e.g. a 445-whiff mean carried 5,040 swings of weight in
+    # heart/3-2/FB), biasing two-strike leverage by up to ~2.6x in thin
+    # cells. Fixed 2026-08-15.
+    def _n_for(c, q):
+        if q == 'rv_whiff':
+            return c.get('n_whiff', 0)
+        if q == 'rv_contact':
+            return c.get('n_swings', 0) - c.get('n_whiff', 0)
+        return c.get('n_swings', 0)
+
     smoothed = {}
     for zone in ZONES:
         zprior = z_means.get(zone, DEFAULT)
         for cat in CATS:
             zcst = zc_means.get((zone, cat), zprior)
-            n_zc = zcst.get('n_swings', 0)
-            zc_shrunk = {q: ((n_zc * zcst[q] + k * zprior[q]) / (n_zc + k)
-                             if (n_zc + k) else zprior[q]) for q in QS}
+            zc_shrunk = {q: ((_n_for(zcst, q) * zcst[q] + k * zprior[q])
+                             / (_n_for(zcst, q) + k)
+                             if (_n_for(zcst, q) + k) else zprior[q])
+                         for q in QS}
             for count in COUNTS:
                 key = (zone, count, cat)
                 cell = raw.get(key) or {
                     'n_swings': 0, 'n_whiff': 0, 'p_whiff': 0.0,
                     'rv_contact': 0.0, 'rv_whiff': 0.0,
                 }
-                n = cell['n_swings']
                 smoothed[key] = {
-                    'n_swings': n,
+                    'n_swings': cell['n_swings'],
                     'n_whiff':  cell['n_whiff'],
-                    **{q: ((n * cell[q] + k * zc_shrunk[q]) / (n + k)
-                           if (n + k) else zc_shrunk[q]) for q in QS},
+                    **{q: ((_n_for(cell, q) * cell[q] + k * zc_shrunk[q])
+                           / (_n_for(cell, q) + k)
+                           if (_n_for(cell, q) + k) else zc_shrunk[q])
+                       for q in QS},
                 }
     return smoothed
 
