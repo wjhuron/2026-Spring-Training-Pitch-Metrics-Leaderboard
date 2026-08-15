@@ -3896,17 +3896,19 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             continue
         _compute_hitter_lg_avg(stat)
 
-    # ── Hitter+ → wRC+ scale match (2026-07-13) ──
-    # The composite's SD over the qualified pool is a free display parameter
-    # (the exact-SD rescale in the Hitter+ block above targets 40). Re-scale
-    # it here — after the FG override has populated wRC+ — to the SAME
-    # pool's measured wRC+ SD, so Hitter+ and wRC+ speak one currency and a
-    # gap between them reads directly as "process ahead of/behind results".
-    # Dynamic rather than hard-coded because wRC+'s spread shrinks as PAs
-    # accumulate (~23 mid-season, ~20 full-season); a fixed target drifts.
-    # Linear around 100: ranks, percentiles, and coloring are unchanged, and
-    # the PA-weighted mean stays pinned at 100 by the reanchor. If wRC+
-    # didn't populate (FG override failure), the SD-40 scale stands.
+    # ── Hitter+ → run-truth scale (2026-08-15, supersedes the plain wRC+
+    # match of 2026-07-13) ──
+    # Measured (scripts/hitter_spread_atlas.py, 2021-2026 replicates):
+    # Hitter+ agrees with same-season wRC+ at r = .815 (range .77-.84), so
+    # one SD of Hitter+ carries 0.82 SD of wRC+ — displaying it at the FULL
+    # wRC+ spread overstated the implied production by 1/r. Target spread is
+    # therefore HITTER_RUN_TRUTH x the pool's live wRC+ SD: points stay
+    # honest wRC+ points, and the anchor stays live (wRC+'s spread deflates
+    # ~23 mid-season -> ~20 full-season; the FACTOR is the season-invariant
+    # measured quantity, the SD it multiplies is intentionally current, so
+    # the "gap vs wRC+ = process vs results" reading holds all season).
+    # Linear around 100: ranks, percentiles, and coloring are unchanged.
+    # If wRC+ didn't populate (FG override failure), the SD-40 scale stands.
     _pool_hp, _pool_wrc = [], []
     for _row in hitter_leaderboard:
         if _row.get('_isROC') or _row.get('_isCombined'):
@@ -3924,9 +3926,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         def _psd(vals):
             m = sum(vals) / len(vals)
             return math.sqrt(sum((x - m) ** 2 for x in vals) / len(vals))
+        HITTER_RUN_TRUTH = 0.82   # measured r(Hitter+, wRC+), 6-season mean
         _sd_hp, _sd_wrc = _psd(_pool_hp), _psd(_pool_wrc)
         if _sd_hp > 1e-9 and _sd_wrc > 1e-9:
-            _f = _sd_wrc / _sd_hp
+            _f = (HITTER_RUN_TRUTH * _sd_wrc) / _sd_hp
             for _row in hitter_leaderboard:
                 if _row.get('hitterPlus') is not None:
                     _row['hitterPlus'] = round(100.0 + (_row['hitterPlus'] - 100.0) * _f, 1)
@@ -3938,22 +3941,24 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     else:
         print("  Hitter+ wRC+ scale match skipped (wRC+ pool too small) — SD-40 scale stands.")
 
-    # ── BB+/SD+/CT+ rescaled to the wRC+ spread ──────────────────────
-    # The same treatment Hitter+ gets above, extended to the three components
-    # it is built from. Each is a ratio-to-league index whose spread (pool SDs
-    # ~15.6 / 7.1 / 12.8 against wRC+'s ~20.9) is an accident of its own league
-    # mean rather than a measured fact, so a reader porting wRC+ intuition
-    # misreads all three — worst on CT+, where 110 is the 89th percentile but
-    # reads as "barely above average". Matching each pool SD to wRC+'s puts
-    # them on the scale readers already know, and makes the Hitter+
-    # decomposition legible: equal spreads on the components, with the value
-    # differences between them carried explicitly by the Hitter+ weights.
-    #
-    # Measured live rather than frozen, because the two sides of the ratio move
-    # independently: over 2026-07-14..08-12 wRC+'s pool SD fell 13.7% while the
-    # components moved under 1.5% (they are Bayesian-shrunk, so they lack the
-    # small-sample inflation wRC+ carries early). No constant holds parity.
-    # Evidence: scripts/plus_scale_ratio_check.py.
+    # ── BB+/SD+/CT+ display scales (2026-08-15, supersedes uniform wRC+
+    # matching) ──
+    # Measured run slopes (scripts/hitter_spread_atlas.py, 2021-2026
+    # replicates, wRC+ points per 1 SD of metric):
+    #   BB+  15.9 desc / 10.7 pred  (r ~ .66 -> a production sub-estimate:
+    #        keep the wRC+ currency, at its measured 0.66x share)
+    #   SD+   5.8 desc /  6.1 pred  (real, stable skill; tiny run payoff)
+    #   CT+  ~0 both horizons       (quantity trades against quality)
+    # Printing SD+/CT+ at wRC+ width overstated their run meaning 4x-to-
+    # infinite, and printing them at run-truth width would produce dead
+    # columns — so they move to the explicit skill z-ruler the pitcher side
+    # already uses (Command+/Pitcher+ convention): pool SD pinned at 10,
+    # "+10 = 1 SD better at the skill", no run claim in the scale at all.
+    # BB+ keeps the live wRC+ anchor (factor x current pool SD) for the same
+    # reason Hitter+ does: the factor is the measured season-invariant
+    # quantity, wRC+'s deflating spread is intentionally current.
+    # The value differences between components are carried explicitly by
+    # the Hitter+ weights, as before.
     #
     # Ordering matters and is load-bearing:
     #   - AFTER Hitter+ is built from these three, so Hitter+ is invariant by
@@ -3983,12 +3988,16 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             m = sum(vals) / len(vals)
             return math.sqrt(sum((x - m) ** 2 for x in vals) / len(vals))
 
+        BB_RUN_TRUTH = 0.66      # measured r(BB+, wRC+), 6-season mean
+        SKILL_RULER_SD = 10.0    # SD+/CT+: Command+-style z-ruler
         _sd_wrc_c = _cpsd([r['wRCplus'] for r in _comp_pool])
         for _stat in ('bbPlus', 'sdPlus', 'ctPlus'):
             _sd_c = _cpsd([r[_stat] for r in _comp_pool])
             if _sd_wrc_c <= 1e-9 or _sd_c <= 1e-9:
                 continue
-            _f = _sd_wrc_c / _sd_c
+            _target = (BB_RUN_TRUTH * _sd_wrc_c if _stat == 'bbPlus'
+                       else SKILL_RULER_SD)
+            _f = _target / _sd_c
             # Rescale around 100 first, unrounded. ROC rows are rescaled with
             # the MLB factor but excluded from the mean, same convention as the
             # multiplicative re-anchor and the percentile pool.
@@ -4014,10 +4023,45 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             plus_wrc_scale[_stat] = {'factor': round(_f, 6), 'shift': round(_shift, 4)}
         plus_wrc_scale['poolWrcSd'] = round(_sd_wrc_c, 3)
         plus_wrc_scale['n'] = len(_comp_pool)
-        print(f"  BB+/SD+/CT+ rescaled to the wRC+ spread (pool wRC+ SD "
+        print(f"  BB+/SD+/CT+ rescaled (pool wRC+ SD "
               f"{_sd_wrc_c:.1f}, n={len(_comp_pool)}): " + ", ".join(
                   f"{_s} x{plus_wrc_scale[_s]['factor']:.3f}"
                   for _s in ('bbPlus', 'sdPlus', 'ctPlus') if _s in plus_wrc_scale))
+
+        # ── xwRC+ run-truth cap (2026-08-15) ──
+        # An estimate must not print wider than the thing it estimates:
+        # xwRC+'s spread ran ~1.09x wRC+'s (the excess is xwOBA input
+        # sampling noise), while its measured slope on same-season wRC+ is
+        # 0.85 (atlas, 2021-2026 replicates). Same live-anchored treatment
+        # as Hitter+/BB+. Re-anchors to its own PRIOR PA-weighted mean, not
+        # to 100: the league-level xwRC+ vs wRC+ gap (contact quality vs
+        # results league-wide) is information the cap must not erase.
+        XWRC_RUN_TRUTH = 0.85
+        _pool_x = [_row['xWRCplus'] for _row in _comp_pool
+                   if _row.get('xWRCplus') is not None]
+        if len(_pool_x) >= 10:
+            _sd_x = _cpsd(_pool_x)
+            if _sd_x > 1e-9 and _sd_wrc_c > 1e-9:
+                _fx = (XWRC_RUN_TRUTH * _sd_wrc_c) / _sd_x
+                _xrows = [(_r, _r['xWRCplus']) for _r in hitter_leaderboard
+                          if _r.get('xWRCplus') is not None]
+                _nb = _db = _na = _da = 0.0
+                for _r, _v in _xrows:
+                    if _r.get('_isROC') or _r.get('_isCombined'):
+                        continue
+                    _w = _r.get('pa') or 0
+                    if _w > 0:
+                        _nb += _v * _w
+                        _db += _w
+                        _na += (100.0 + (_v - 100.0) * _fx) * _w
+                        _da += _w
+                _shift = ((_nb / _db) - (_na / _da)) if _db > 0 else 0.0
+                for _r, _v in _xrows:
+                    _r['xWRCplus'] = round(100.0 + (_v - 100.0) * _fx + _shift)
+                plus_wrc_scale['xWRCplus'] = {'factor': round(_fx, 6),
+                                              'shift': round(_shift, 4)}
+                print(f"  xwRC+ capped at run-truth spread "
+                      f"(factor {_fx:.3f}, shift {_shift:+.2f}).")
     else:
         print("  BB+/SD+/CT+ wRC+ scale match skipped (pool too small) — "
               "ratio-to-league scale stands.")

@@ -196,14 +196,14 @@ HITTER_STAT_LINE_COLOR = {
     # in case a theme wrapper or alternative layout references them.
     'BB%':     ('bbPct',      'pct', True),
     'K%':      ('kPct',       'pct', False),
-    # All four now carry the wRC+ spread (pool SD matched in process_data.py),
-    # so they take wRC+'s ±intensity rather than the old half-width. Hitter+
-    # had already been wRC+-matched in the pipeline while still colouring at 10,
-    # which saturated it at half the intended deviation.
-    'SD+':     ('sdPlus',     'raw', True,  20),
-    'CT+':     ('ctPlus',     'raw', True,  20),
-    'BB+':     ('bbPlus',     'raw', True,  20),
-    'Hitter+': ('hitterPlus', 'raw', True,  20),
+    # Tint distances track each metric's SHIPPED spread (run-truth rescale,
+    # 2026-08-15): SD+/CT+ are pinned at pool SD 10 (skill z-ruler), BB+ at
+    # 0.66 x wRC+'s SD (~14), Hitter+ at 0.82 x (~17) — full colour lands at
+    # ~2 SD for each, matching the wRC+ cell's visual intensity per SD.
+    'SD+':     ('sdPlus',     'raw', True,  10),
+    'CT+':     ('ctPlus',     'raw', True,  10),
+    'BB+':     ('bbPlus',     'raw', True,  14),
+    'Hitter+': ('hitterPlus', 'raw', True,  17),
 }
 
 # Headline stat order — MLB default. ROC overrides this since the + family
