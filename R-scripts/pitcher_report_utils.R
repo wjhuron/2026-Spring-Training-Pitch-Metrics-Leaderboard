@@ -183,20 +183,30 @@ load_pitch_data <- function(input) {
 # ---- Shared Helper Functions ----
 
 # Compute InZone from PlateX/PlateZ/SzTop/SzBot with ball-radius adjustment
-# Matches the formula in process_data.py:
-#   BALL_RADIUS_FT = 1.45 / 12  (~0.121 ft)
-#   ZONE_HALF_WIDTH = 0.83  (half plate 8.5" + ball radius 1.45" in feet)
-#   InZone = "Yes" if abs(PlateX) <= 0.83 AND (SzBot - radius) <= PlateZ <= (SzTop + radius)
+# Matches pipeline/utils.py compute_in_zone (ball-radius rounded-rect,
+# validated 0 mismatches vs Statcast zone):
+#   dx = max(0, abs(PlateX) - 8.5/12)   distance outside the plate width
+#   dz = max(0, SzBot - PlateZ, PlateZ - SzTop)   distance outside the height
+#   InZone = "Yes" iff sqrt(dx^2 + dz^2) <= 1.45/12 (one ball radius)
 compute_in_zone <- function(plate_x, plate_z, sz_top, sz_bot) {
   ball_radius <- 1.45 / 12  # ~0.121 ft
-  zone_half_width <- 0.83
+  half_plate <- 8.5 / 12    # half plate width in feet
+  dx <- pmax(0, abs(plate_x) - half_plate)
+  dz <- pmax(0, sz_bot - plate_z, plate_z - sz_top)
   case_when(
     is.na(plate_x) | is.na(plate_z) | is.na(sz_top) | is.na(sz_bot) ~ NA_character_,
-    abs(plate_x) <= zone_half_width &
-      plate_z >= (sz_bot - ball_radius) &
-      plate_z <= (sz_top + ball_radius) ~ "Yes",
+    sqrt(dx^2 + dz^2) <= ball_radius ~ "Yes",
     TRUE ~ "No"
   )
+}
+
+# Helper: sprintf a summary (mean by default) of a numeric vector, or "" when
+# it has no non-NA values — an all-NA metric group would otherwise render
+# "NaN rpm" / "-Inf mph" / literal NA in the stat tables.
+fmt_or_blank <- function(x, fmt, f = mean) {
+  x <- x[!is.na(x)]
+  if (length(x) == 0) return("")
+  sprintf(fmt, f(x))
 }
 
 # Helper: average clock-format tilt strings (e.g., "1:54", "12:30")
@@ -342,19 +352,19 @@ summarize_pitch_type_stats <- function(data, pitcher_name, has_arm_angle = FALSE
     summarize(
       num_thrown = sprintf("%.0f", n()),
       percent_thrown = sprintf("%.1f%%", n() / total_pitches * 100),
-      avg_velo = sprintf("%.1f mph", mean(Velocity, na.rm = TRUE)),
-      max_velo = sprintf("%.1f mph", max(Velocity, na.rm = TRUE)),
-      avg_spin = sprintf("%.0f rpm", round(mean(`Spin Rate`, na.rm = TRUE))),
-      avg_rtilt = avg_tilt_clock(RTilt),
-      avg_tilt = avg_tilt_clock(OTilt),
-      avg_ivb = sprintf("%.1f\"", mean(xIndVrtBrk, na.rm = TRUE)),
-      avg_hb = sprintf("%.1f\"", mean(xHorzBrk, na.rm = TRUE)),
-      avg_height = sprintf("%.2f'", mean(RelPosZ, na.rm = TRUE)),
-      avg_side = sprintf("%.2f'", mean(RelPosX, na.rm = TRUE)),
-      avg_extension = sprintf("%.2f'", mean(Extension, na.rm = TRUE)),
-      avg_arm_angle = if (has_arm_angle) sprintf("%.1f°", mean(ArmAngle, na.rm = TRUE)) else NA_character_,
-      avg_vaa = sprintf("%.2f°", mean(VAA, na.rm = TRUE)),
-      avg_haa = sprintf("%.2f°", mean(HAA, na.rm = TRUE)),
+      avg_velo = fmt_or_blank(Velocity, "%.1f mph"),
+      max_velo = fmt_or_blank(Velocity, "%.1f mph", max),
+      avg_spin = fmt_or_blank(`Spin Rate`, "%.0f rpm", function(x) round(mean(x))),
+      avg_rtilt = coalesce(avg_tilt_clock(RTilt), ""),
+      avg_tilt = coalesce(avg_tilt_clock(OTilt), ""),
+      avg_ivb = fmt_or_blank(xIndVrtBrk, "%.1f\""),
+      avg_hb = fmt_or_blank(xHorzBrk, "%.1f\""),
+      avg_height = fmt_or_blank(RelPosZ, "%.2f'"),
+      avg_side = fmt_or_blank(RelPosX, "%.2f'"),
+      avg_extension = fmt_or_blank(Extension, "%.2f'"),
+      avg_arm_angle = if (has_arm_angle) fmt_or_blank(ArmAngle, "%.1f°") else NA_character_,
+      avg_vaa = fmt_or_blank(VAA, "%.2f°"),
+      avg_haa = fmt_or_blank(HAA, "%.2f°"),
       # Outcome metrics
       iz_percent = sprintf("%.1f%%", sum(InZone == "Yes", na.rm = TRUE) / n() * 100),
       swing_percent = sprintf("%.1f%%", sum(Description %in% swing_events, na.rm = TRUE) / n() * 100),
@@ -554,7 +564,9 @@ create_pitch_plot_shared <- function(pitch_data_filtered, pitcher_name,
   # Create arm angle line data
   arm_angle_segments <- data.frame()
 
-  if (arm_angle_lines) {
+  # Skip the rays entirely when the CSV has no ArmAngle column at all
+  # (group_by + mean(ArmAngle) would error, not just produce NAs)
+  if (arm_angle_lines && "ArmAngle" %in% names(pitch_data_filtered)) {
     # Calculate average arm angle for each pitch type for arm angle lines
     arm_angle_data <- pitch_data_filtered %>%
       group_by(`Pitch Type`) %>%

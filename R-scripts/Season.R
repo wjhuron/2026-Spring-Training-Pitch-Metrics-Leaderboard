@@ -83,8 +83,8 @@ calculate_platoon_stats <- function(data, pitcher_name) {
       percent_thrown = sprintf("%.1f%%", (num_thrown / total_pitches) * 100),
       iz_percent = sprintf("%.1f%%", (iz_count / num_thrown) * 100),
       csw_percent = sprintf("%.1f%%", (csw_count / num_thrown) * 100),
-      swstr_percent = sprintf("%.1f%%", ifelse(swing_count > 0, (swstr_count / swing_count) * 100, 0)),
-      chase_percent = sprintf("%.1f%%", ifelse(ooz_count > 0, (chase_count / ooz_count) * 100, 0)),
+      swstr_percent = ifelse(swing_count > 0, sprintf("%.1f%%", (swstr_count / swing_count) * 100), "---"),
+      chase_percent = ifelse(ooz_count > 0, sprintf("%.1f%%", (chase_count / ooz_count) * 100), "---"),
       gb_percent = sprintf("%.1f%%", ifelse(balls_in_play > 0, (ground_balls / balls_in_play) * 100, 0))
     ) %>%
     select(`Pitch Type`, Bats, num_thrown_fmt, percent_thrown, iz_percent,
@@ -106,11 +106,11 @@ calculate_platoon_stats <- function(data, pitcher_name) {
     full_join(lhh_stats, by = "Pitch Type") %>%
     replace_na(list(
       num_thrown_fmt_rhh = "0", percent_thrown_rhh = "0.0%", iz_percent_rhh = "0.0%",
-      csw_percent_rhh = "0.0%", swstr_percent_rhh = "0.0%",
-      chase_percent_rhh = "0.0%", gb_percent_rhh = "0.0%",
+      csw_percent_rhh = "0.0%", swstr_percent_rhh = "---",
+      chase_percent_rhh = "---", gb_percent_rhh = "0.0%",
       num_thrown_fmt_lhh = "0", percent_thrown_lhh = "0.0%", iz_percent_lhh = "0.0%",
-      csw_percent_lhh = "0.0%", swstr_percent_lhh = "0.0%",
-      chase_percent_lhh = "0.0%", gb_percent_lhh = "0.0%"
+      csw_percent_lhh = "0.0%", swstr_percent_lhh = "---",
+      chase_percent_lhh = "---", gb_percent_lhh = "0.0%"
     ))
 
   return(combined_platoon)

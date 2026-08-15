@@ -223,7 +223,12 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
                              !grepl("^bunt", BBType),
                            na.rm = TRUE)
           if (total_bip > 0) {
-            n_gb <- sum(BBType == "ground_ball", na.rm = TRUE)
+            # Gate on the in-play description too, matching the total_bip
+            # denominator (see summarize_pitch_type_stats in
+            # pitcher_report_utils.R) — otherwise a ground_ball tagged on a
+            # non "In Play" row inflates GB% and can exceed 100%.
+            n_gb <- sum(Description %in% in_play_events &
+                          BBType == "ground_ball", na.rm = TRUE)
             sprintf("%.1f%%", n_gb / total_bip * 100)
           } else {
             "---"
@@ -294,7 +299,11 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
                      total_bip_all > 0)
       sprintf(
         "%.1f%%",
-        sum(pitcher_data$BBType == "ground_ball", na.rm = TRUE) / total_bip_all * 100
+        sum(
+          pitcher_data$Description %in% in_play_events &
+            pitcher_data$BBType == "ground_ball",
+          na.rm = TRUE
+        ) / total_bip_all * 100
       )
     else
       "---"
@@ -473,14 +482,6 @@ fetch_pitcher_statline <- function(game_date, team_code, pitcher_name) {
     if (is.null(games) || nrow(games) == 0)
       return(NULL)
 
-    game_pk <- games$gamePk[1]
-
-    # Get boxscore
-    box_url <- paste0("https://statsapi.mlb.com/api/v1/game/",
-                      game_pk,
-                      "/boxscore")
-    boxscore <- fromJSON(box_url)
-
     # Convert "Last, First" to "First Last" for matching
     name_parts <- str_match(pitcher_name, "^(.+),\\s*(.+)$")
     if (!is.na(name_parts[1, 1])) {
@@ -489,59 +490,81 @@ fetch_pitcher_statline <- function(game_date, team_code, pitcher_name) {
       search_name <- tolower(pitcher_name)
     }
 
-    # Search both sides for the pitcher
-    for (side in c("away", "home")) {
-      players <- boxscore$teams[[side]]$players
-      if (is.null(players))
-        next
+    # Search one game's boxscore for the pitcher; NULL when he isn't found
+    # with a non-empty pitching block.
+    search_game <- function(game_pk) {
+      # Get boxscore
+      box_url <- paste0("https://statsapi.mlb.com/api/v1/game/",
+                        game_pk,
+                        "/boxscore")
+      boxscore <- fromJSON(box_url)
 
-      for (pkey in names(players)) {
-        p <- players[[pkey]]
-        full_name <- p$person$fullName
-        if (is.null(full_name))
+      # Search both sides for the pitcher
+      for (side in c("away", "home")) {
+        players <- boxscore$teams[[side]]$players
+        if (is.null(players))
           next
 
-        if (tolower(full_name) == search_name) {
-          ps <- p$stats$pitching
-          if (is.null(ps) || length(ps) == 0)
-            return(NULL)
+        for (pkey in names(players)) {
+          p <- players[[pkey]]
+          full_name <- p$person$fullName
+          if (is.null(full_name))
+            next
 
-          return(
-            list(
-              ip = if (!is.null(ps$inningsPitched))
-                ps$inningsPitched
-              else
-                "---",
-              h  = if (!is.null(ps$hits))
-                as.character(ps$hits)
-              else
-                "---",
-              r  = if (!is.null(ps$runs))
-                as.character(ps$runs)
-              else
-                "---",
-              er = if (!is.null(ps$earnedRuns))
-                as.character(ps$earnedRuns)
-              else
-                "---",
-              so = if (!is.null(ps$strikeOuts))
-                as.character(ps$strikeOuts)
-              else
-                "---",
-              bb = if (!is.null(ps$baseOnBalls))
-                as.character(ps$baseOnBalls)
-              else
-                "---"
+          if (tolower(full_name) == search_name) {
+            ps <- p$stats$pitching
+            # Empty pitching block: rostered but didn't throw in THIS game
+            # (e.g. the other half of a doubleheader) — keep scanning
+            if (is.null(ps) || length(ps) == 0)
+              next
+
+            return(
+              list(
+                ip = if (!is.null(ps$inningsPitched))
+                  ps$inningsPitched
+                else
+                  "---",
+                h  = if (!is.null(ps$hits))
+                  as.character(ps$hits)
+                else
+                  "---",
+                r  = if (!is.null(ps$runs))
+                  as.character(ps$runs)
+                else
+                  "---",
+                er = if (!is.null(ps$earnedRuns))
+                  as.character(ps$earnedRuns)
+                else
+                  "---",
+                so = if (!is.null(ps$strikeOuts))
+                  as.character(ps$strikeOuts)
+                else
+                  "---",
+                bb = if (!is.null(ps$baseOnBalls))
+                  as.character(ps$baseOnBalls)
+                else
+                  "---"
+              )
             )
-          )
+          }
         }
       }
+      NULL
+    }
+
+    # Scan ALL games for this team/date (doubleheaders have two gamePks, and a
+    # pitcher can appear with an empty pitching block in the game he didn't
+    # throw in); return the first non-empty statline.
+    for (game_pk in games$gamePk) {
+      statline <- search_game(game_pk)
+      if (!is.null(statline))
+        return(statline)
     }
 
     message("Pitcher '",
             pitcher_name,
-            "' not found in boxscore for game ",
-            game_pk)
+            "' not found with a pitching statline in any boxscore on ",
+            game_date)
     return(NULL)
   }, error = function(e) {
     message("MLB API error: ", e$message)
