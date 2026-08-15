@@ -65,9 +65,9 @@ MLB_TEAMS = {
     'PHI', 'PIT', 'SDP', 'SEA', 'SFG', 'STL', 'TBR', 'TEX', 'TOR', 'WSH',
     'WBC',
 }
-# 'AAA' included defensively: the dormant Supabase reader can tag rows
-# PTeam='AAA', which would otherwise slip past `team not in AAA_TEAMS`
-# checks and leak into MLB normalization pools if that path is ever revived.
+# 'AAA' included defensively: AAA-source rows (the NLE2026 AAA tab) carry
+# team 'AAA', which would otherwise slip past `team not in AAA_TEAMS`
+# checks and leak into MLB normalization pools.
 AAA_TEAMS = {'ROC', 'AAA'}
 ALL_TEAMS = MLB_TEAMS | AAA_TEAMS
 
@@ -165,14 +165,16 @@ def get_count(p):
 
 
 def _pctl(v, pool):
-    """Percentile rank of v within pool (ties averaged), 0-100.
+    """Percentile rank of v within pool (ties averaged), 0-100, INTEGER.
 
-    Single home for the percentile convention shared by ERA+ and Pitcher+."""
+    Single home for the percentile convention shared by ERA+ and Pitcher+.
+    Integer to match every other leaderboard percentile (the 1-decimal form
+    made hdERA/hpERA tooltips read "68.4th" while everything else is "68th")."""
     if v is None or not pool:
         return None
     below = sum(1 for x in pool if x < v)
     ties = sum(1 for x in pool if x == v)
-    return round(100.0 * (below + 0.5 * ties) / len(pool), 1)
+    return round(100.0 * (below + 0.5 * ties) / len(pool))
 
 
 def safe_float(val):

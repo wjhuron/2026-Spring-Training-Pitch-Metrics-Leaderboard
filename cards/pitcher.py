@@ -199,7 +199,11 @@ PLOT_PANEL     = '#e8dfcb'  # light panel for movement / location plots
 GRID_COLOR     = '#c5b89f'  # subtle grid on cream
 PHOTO_BORDER   = '#6a5f55'  # photo edge
 
-MLB_ID_CACHE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'mlb_id_cache.json')
+# Unified with the pipeline's cache 2026-08-15 (was a separate root-level
+# mlb_id_cache.json with the same "Last, First|TEAM" -> id schema; the data/
+# copy is CI-updated and carries a merge=theirs driver, so local writes
+# never conflict on pull).
+MLB_ID_CACHE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'mlb_id_cache.json')
 OUTPUT_DIR = os.path.join(os.path.expanduser('~'), 'Downloads', '')
 METADATA_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'metadata_rs.json')
 

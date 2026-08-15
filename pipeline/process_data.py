@@ -226,7 +226,9 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
         if in_zone:
             c[1] += 1  # iz
         desc = p.get('Description', '')
-        if desc in SWING_DESCRIPTIONS:
+        # Bunts are not swings (matches the hitter micro counters and the
+        # season aggregates in pipeline.compute; changed together 2026-08-15)
+        if desc in SWING_DESCRIPTIONS and p.get('BBType') not in BUNT_BB_TYPES:
             c[2] += 1  # sw
             if in_zone:
                 c[18] += 1  # izSw
@@ -359,7 +361,8 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
         if in_zone:
             c[1] += 1
         desc = p.get('Description', '')
-        if desc in SWING_DESCRIPTIONS:
+        # Bunts are not swings (same gate as the main pitcher micro counter)
+        if desc in SWING_DESCRIPTIONS and p.get('BBType') not in BUNT_BB_TYPES:
             c[2] += 1
             if in_zone:
                 c[18] += 1  # izSw

@@ -200,15 +200,22 @@ def compute_stats(pitches):
         return empty
 
     iz = sum(1 for p in pitches if p.get('InZone') == 'Yes')
-    swings = sum(1 for p in pitches if p['Description'] in SWING_DESCRIPTIONS)
+    # Bunts are not swings (house convention; the hitter side and the
+    # two-strike whiff below already excluded them — pitcher Whiff%/IZ-Whiff%/
+    # Chase% joined 2026-08-15). BBType is only set on In Play rows, so the
+    # guard is inert for Swinging Strike / Foul.
+    swings = sum(1 for p in pitches if p['Description'] in SWING_DESCRIPTIONS
+                 and p.get('BBType') not in BUNT_BB_TYPES)
     whiffs = sum(1 for p in pitches if p['Description'] == 'Swinging Strike')
     csw = sum(1 for p in pitches if p['Description'] in ('Called Strike', 'Swinging Strike'))
 
     iz_pitches = [p for p in pitches if p.get('InZone') == 'Yes']
-    iz_swings = sum(1 for p in iz_pitches if p['Description'] in SWING_DESCRIPTIONS)
+    iz_swings = sum(1 for p in iz_pitches if p['Description'] in SWING_DESCRIPTIONS
+                    and p.get('BBType') not in BUNT_BB_TYPES)
     iz_whiffs = sum(1 for p in iz_pitches if p['Description'] == 'Swinging Strike')
     ooz = [p for p in pitches if p.get('InZone') == 'No']
-    ooz_swung = sum(1 for p in ooz if p['Description'] in ('Swinging Strike', 'In Play', 'Foul'))
+    ooz_swung = sum(1 for p in ooz if p['Description'] in ('Swinging Strike', 'In Play', 'Foul')
+                    and p.get('BBType') not in BUNT_BB_TYPES)
 
     bip = [p for p in pitches if p.get('BBType') is not None and p.get('BBType') not in BUNT_BB_TYPES]
     gb = sum(1 for p in bip if p.get('BBType') == 'ground_ball')

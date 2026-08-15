@@ -300,7 +300,12 @@ def scrape_milb_transactions(start_date, end_date):
             }
 
         # Pattern 1: "Team released/signed POSITION Player ."
-        pattern1 = rf'(released|signed)\s+{POS}\s+([^.]+?)\s*\.'
+        # The name is captured token-by-token (word chars, accents, periods,
+        # apostrophes, hyphens) rather than as [^.]+ — the old class stopped
+        # at the first period, so "P.J. Labriola" came out as "P".
+        NAME = (r'([\wÀ-ſ][\wÀ-ſ.\'\-]*'
+                r'(?:\s+[\wÀ-ſ][\wÀ-ſ.\'\-]+)*)')
+        pattern1 = rf'(released|signed)\s+{POS}\s+{NAME}\s*\.'
         match = re.search(pattern1, transaction_text, re.IGNORECASE)
         if match:
             return {
