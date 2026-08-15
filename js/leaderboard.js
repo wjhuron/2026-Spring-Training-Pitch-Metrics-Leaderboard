@@ -532,13 +532,19 @@ const Leaderboard = {
     avg.pitcherPlusProj = 100;
     avg.hdERAPlus = 100;
     avg.hpERAPlus = 100;
-    // hdERA/hpERA anchor at the 30+ IP pool mean ERA by construction;
-    // the pipeline publishes it in pitcherLeagueAverages.
-    try {
-      var _pla = (DataStore.active().metadata || {}).pitcherLeagueAverages || {};
-      if (_pla.hdera != null) avg.hdERA = _pla.hdera;
-      if (_pla.hpera != null) avg.hpERA = _pla.hpera;
-    } catch (e) { /* metadata not loaded yet: leave blank */ }
+    // hdERA/hpERA league-avg = plain mean over the rows in view (they are
+    // pool-z metrics, unweighted by construction — the published anchor is
+    // the ALL-30+-IP pool mean, which under a Qualified view reads as a
+    // suspicious constant instead of describing the table on screen).
+    for (var _ek = 0; _ek < 2; _ek++) {
+      var _key = _ek === 0 ? 'hdERA' : 'hpERA';
+      var _s = 0, _n = 0;
+      for (var _ri = 0; _ri < data.length; _ri++) {
+        var _v = data[_ri][_key];
+        if (_v != null) { _s += _v; _n++; }
+      }
+      if (_n >= 5) avg[_key] = Math.round(100 * _s / _n) / 100;
+    }
     return avg;
   },
 

@@ -93,23 +93,40 @@ def main(core_gz=CORE_GZ, heavy_gz=HEAVY_GZ, tables_gz=TABLES_GZ):
     # refresh_micro_grades.py writes micro_data_rs.json with CURRENT grade
     # atoms; without this swap the heavy chunk ships the micro data built
     # mid-process_data with the previous run's Stuff+ dump.
+    #
+    # STALENESS GUARD (2026-08-15): a LOCAL run can have a weeks-old
+    # micro_data_rs.json lying around (it is not git-tracked). Swapping it
+    # in silently replaces the CI-fresh micro in data_heavy with old rows
+    # and old-scale grade atoms — every FILTERED site view then shows a
+    # previous model's Stuff+ and long-departed team labels (shipped live
+    # 2026-08-15 for ~2h that way: Ribalta 98 vs 107, released ROC players
+    # resurrected). Swap ONLY when the micro refresh is newer than the
+    # injected leaderboard it must match.
     micro_path = os.path.join(DATA, 'micro_data_rs.json')
-    if os.path.exists(micro_path):
-        heavy = _read_gz(heavy_gz)
+    lb_path = os.path.join(DATA, 'pitcher_leaderboard_rs.json')
+    micro_fresh = (os.path.exists(micro_path)
+                   and os.path.getmtime(micro_path)
+                   >= os.path.getmtime(lb_path) - 6 * 3600)
+    heavy = _read_gz(heavy_gz)
+    if micro_fresh:
         heavy['microData'] = json.load(open(micro_path))
         _write_gz(heavy_gz, heavy)
         print(f"Rebuilt {os.path.basename(heavy_gz)}: "
               f"{len(heavy['microData'].get('pitchMicro', []))} pitch micro rows, "
               f"{os.path.getsize(heavy_gz)/1e6:.1f} MB")
-        # Keep the qualification denominator in step with the microData that
-        # just replaced the one process_data measured.
-        obj.setdefault('metadata', {})['teamGames'] = _team_games_played(heavy['microData'])
-        _write_gz(core_gz, obj)
-        print(f"  teamGames refreshed from swapped microData: "
-              f"{len(obj['metadata']['teamGames'])} teams")
+    elif os.path.exists(micro_path):
+        print(f"{os.path.basename(heavy_gz)} untouched: {os.path.basename(micro_path)} "
+              f"is STALE (older than the injected leaderboard) — keeping the "
+              f"embedded micro. Run scripts/refresh_micro_grades.py to refresh.")
     else:
         print(f"{os.path.basename(heavy_gz)} untouched (no {os.path.basename(micro_path)} "
               f"refresh found — run scripts/refresh_micro_grades.py first)")
+    # Qualification denominators always follow the micro that actually
+    # ships in data_heavy (swapped or kept), never a skipped candidate.
+    obj.setdefault('metadata', {})['teamGames'] = _team_games_played(heavy['microData'])
+    _write_gz(core_gz, obj)
+    print(f"  teamGames synced to shipping microData: "
+          f"{len(obj['metadata']['teamGames'])} teams")
 
 
 if __name__ == '__main__':
