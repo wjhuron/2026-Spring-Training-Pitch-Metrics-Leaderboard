@@ -174,19 +174,7 @@ def classify_decision(p):
     return None
 
 
-def get_count(p):
-    """Parse 'Count' column (e.g., '2-2') into (balls, strikes). None if invalid."""
-    c = p.get('Count')
-    if not isinstance(c, str) or '-' not in c:
-        return None
-    try:
-        b_str, s_str = c.split('-', 1)
-        b, s = int(b_str), int(s_str)
-    except (TypeError, ValueError):
-        return None
-    if not (0 <= b <= 3 and 0 <= s <= 2):
-        return None
-    return (b, s)
+from pipeline.utils import get_count  # single-homed count parser
 
 
 def is_eligible(p):

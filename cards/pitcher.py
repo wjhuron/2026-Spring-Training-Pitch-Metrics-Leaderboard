@@ -50,8 +50,8 @@ from scrapers.sheets_append import _workbook_id_for_team
 # ═══════════════════════════════════════════════════════════════
 # Sheet routing comes from sheets_append._workbook_id_for_team (per team).
 
-AL_TEAMS = {'ATH','BAL','BOS','CLE','CWS','DET','HOU','KCR','LAA','MIN','NYY','SEA','TBR','TEX','TOR'}
-NL_TEAMS = {'ARI','ATL','CHC','CIN','COL','LAD','MIA','MIL','NYM','PHI','PIT','SDP','SFG','STL','WSH'}
+# League splits single-homed in scrapers.sheets_append (already imported above).
+from scrapers.sheets_append import AL_TEAMS, NL_TEAMS  # noqa: E402
 
 # MiLB teams — data lives as extra tabs in the NL spreadsheet
 MILB_TEAMS = {
@@ -70,7 +70,10 @@ TEAM_ABBREV_TO_ID = {
     'COL':115,'DET':116,'HOU':117,'KCR':118,'LAA':108,'LAD':119,'MIA':146,'MIL':158,
     'MIN':142,'NYM':121,'NYY':147,'ATH':133,'PHI':143,'PIT':134,'SDP':135,'SFG':137,
     'SEA':136,'STL':138,'TBR':139,'TEX':140,'TOR':141,'WSH':120,
-    'ROC':120,  # Rochester Red Wings — parent org is WSH
+    'ROC':120,  # Rochester Red Wings — parent org id (WSH), used for the
+                # parentOrgId match in the player search. pipeline.utils maps
+                # ROC to the CLUB id 534 instead; the two are intentionally
+                # different, do not unify.
 }
 
 TEAM_NAME_TO_ABBREV = {
@@ -668,16 +671,9 @@ def _rgba(hexc, a):
     """#rrggbb -> (r,g,b,a) float tuple for independent fill/edge alphas."""
     return (int(hexc[1:3],16)/255.0, int(hexc[3:5],16)/255.0, int(hexc[5:7],16)/255.0, a)
 
-def is_barrel(ev, la):
-    """Statcast barrel definition from baseballr code_barrel (EV >= 98 per MLB glossary)."""
-    if ev is None or la is None:
-        return False
-    return (la >= 8 and la <= 50 and ev >= 98 and
-            ev * 1.5 - la >= 117 and
-            ev + la >= 124)
-
-def outs_to_ip_str(outs):
-    return f"{outs//3}.{outs%3}"
+# Barrel + IP formatting come from the pipeline's single home so the
+# definitions can never drift between cards and leaderboard.
+from pipeline.utils import is_barrel, outs_to_ip_str  # noqa: E402
 
 def compute_siera(so, bb, tbf, gb_count, fb_count, gs, g, siera_constant):
     """Compute SIERA for a single pitcher. Returns rounded value or None."""
@@ -3048,8 +3044,10 @@ _SCRATCH_POOL_STATS = ['xRunValue', 'xRv100', 'xwOBA', 'kPct', 'bbPct', 'kbbPct'
 
 
 def _pitching_blend(stuff, loc):
-    """Stuff+/Loc+ blend in z units — the trainer's _blend (single source of
-    truth for the 70/30 weight; falls back to 0.70 if the import fails)."""
+    """Stuff+/Loc+ blend in z units — the trainer's _blend. The weight's
+    single source of truth is pipeline.utils.PITCHING_W_STUFF (0.80); the
+    fallback reads it from there rather than hardcoding, so a weight change
+    can never silently fork the card blend again."""
     _sv_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root, for stuff_plus package
     if _sv_dir not in sys.path:
         sys.path.insert(0, _sv_dir)
@@ -3057,7 +3055,9 @@ def _pitching_blend(stuff, loc):
         from stuff_plus.train_stuff import _blend
         return _blend(stuff, loc)
     except Exception:
-        return 0.80 * (stuff - 100.0) / 10.0 + 0.20 * (loc - 100.0) / 10.0
+        from pipeline.utils import PITCHING_W_STUFF
+        w = PITCHING_W_STUFF
+        return w * (stuff - 100.0) / 10.0 + (1.0 - w) * (loc - 100.0) / 10.0
 
 
 def _pitching_scale(rows, min_pitches=25):

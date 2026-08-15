@@ -46,7 +46,7 @@ and calibration are MLB).
 import json
 import os
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+from pipeline.utils import DATA_DIR
 PARK_PATH = os.path.join(DATA_DIR, 'era_park_factors.json')
 
 POOL_MIN_OUTS = 90          # 30 IP: z-pool and anchor population
@@ -97,12 +97,7 @@ def _ip_outs(ip_str):
         return 0
 
 
-def _pctl(v, pool):
-    if v is None or not pool:
-        return None
-    below = sum(1 for x in pool if x < v)
-    ties = sum(1 for x in pool if x == v)
-    return round(100.0 * (below + 0.5 * ties) / len(pool), 1)
+from pipeline.utils import _pctl  # single-homed percentile convention
 
 
 def compute_xrv_map(pitches, aaa_teams):

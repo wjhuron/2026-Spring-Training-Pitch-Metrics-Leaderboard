@@ -272,16 +272,7 @@ BUNT_BB = {'bunt', 'bunt_grounder', 'bunt_popup', 'bunt_line_drive'}
 # ═════════════════════════════════════════════════════════════════════════
 #  HELPERS
 # ═════════════════════════════════════════════════════════════════════════
-def get_count(p):
-    c = p.get('Count')
-    if not isinstance(c, str) or '-' not in c:
-        return None
-    try:
-        b, s = c.split('-', 1)
-        b, s = int(b), int(s)
-    except (TypeError, ValueError):
-        return None
-    return (b, s) if (0 <= b <= 3 and 0 <= s <= 2) else None
+from pipeline.utils import get_count  # single-homed count parser
 
 def _znorm(p):
     pz = safe_float(p.get('PlateZ'))

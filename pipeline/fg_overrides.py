@@ -46,7 +46,7 @@ import json
 import os
 import urllib.request
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data')
+from pipeline.utils import DATA_DIR
 CACHE_PATH = os.path.join(DATA_DIR, 'fg_overrides.json')
 
 FG_API = 'https://www.fangraphs.com/api/leaders/major-league/data'

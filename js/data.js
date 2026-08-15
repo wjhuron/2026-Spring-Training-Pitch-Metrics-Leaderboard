@@ -24,9 +24,11 @@ const DataStore = {
    *
    * The data used to be a ~100 MB `window.RS_DATA = {...}` inline script
    * (over GitHub's 100 MB file wall, slow to download). It now ships as
-   * data/data_embedded.json.gz (~13-16 MB) and is inflated here via the
-   * native DecompressionStream. Returns a Promise — app.js already
-   * chains .then()/.catch() on this, so the async path needs no caller
+   * staged gzip chunks (data_core / data_tables / data_heavy .json.gz,
+   * 2026-08-03 split; the old combined data_embedded.json.gz is gone) and
+   * is inflated here via the native DecompressionStream. Returns a
+   * Promise — app.js already chains .then()/.catch() on this, so the
+   * async path needs no caller
    * changes; a fetch/inflate failure routes to app.js's existing
    * "Error loading data. Please refresh." handler.
    */

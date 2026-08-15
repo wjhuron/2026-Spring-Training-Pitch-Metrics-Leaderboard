@@ -151,7 +151,7 @@ const Aggregator = {
     }
     const self = this;
     // data/micro_data_rs.json is untracked (local pipeline artifact only) —
-    // in production microData always arrives via data_embedded.json.gz, so
+    // in production microData always arrives via data_heavy.json.gz, so
     // this fetch 404s on Pages and lands in the graceful catch below.
     return fetch('data/micro_data_rs.json')
       .then(function (r) { return r.json(); })

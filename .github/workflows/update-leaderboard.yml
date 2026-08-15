@@ -178,7 +178,10 @@ jobs:
           # cache-file merge driver (see .gitattributes): auto-resolve
           # generated caches during the rebase-retry loop below
           git config merge.theirs.driver "cp -f %B %A"
-          git add data/ index.html css/ js/
+          # trade.html + catch.html carry ?v= stamps from bump_asset_version
+          # too — without them here the stamps regenerate every run but
+          # never publish, leaving those pages on stale cache keys.
+          git add data/ index.html trade.html catch.html css/ js/
           if git diff --cached --quiet; then
             echo "No changes to deploy."
           else

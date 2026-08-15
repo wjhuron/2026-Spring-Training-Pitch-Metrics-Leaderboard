@@ -86,7 +86,8 @@ resolve_team_path <- function(input, base_dir = path.expand("~/Downloads/")) {
 # by round-tripping the query result through a temp CSV, so readr infers the
 # exact same column types it always did.
 
-# Canonical 47 columns, in Sheet order (must match supabase_append.COLUMNS).
+# Canonical 47 columns, in Sheet order (must match COLUMNS in
+# scrapers/supabase_append.py, the dormant Supabase mirror).
 SUPABASE_COLUMNS <- c(
   "Game Date", "PTeam", "Pitcher", "Throws", "Pitch Type", "Velocity",
   "Spin Rate", "RTilt", "OTilt", "IndVertBrk", "HorzBrk", "xIndVrtBrk",
@@ -140,7 +141,8 @@ supabase_connect <- function() {
 read_team_from_supabase <- function(team) {
   con <- supabase_connect()
   on.exit(DBI::dbDisconnect(con), add = TRUE)
-  # Each team is its own table (matches supabase_append.table_for_team()).
+  # Each team is its own table (matches table_for_team() in
+  # scrapers/supabase_append.py).
   tbl <- gsub("[^A-Z0-9_]", "_", toupper(trimws(team)))
   collist <- paste(sprintf('"%s"', SUPABASE_COLUMNS), collapse = ", ")
   q <- sprintf('SELECT %s FROM "%s" ORDER BY "PitchID"', collist, tbl)

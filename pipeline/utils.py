@@ -146,6 +146,35 @@ TEAM_ABBREV_TO_ID = {
 
 # ── Pure utility functions ───────────────────────────────────────────────
 
+def get_count(p):
+    """Parse 'Count' column (e.g., '2-2') into (balls, strikes). None if invalid.
+
+    Single home — SD+/Loc+/xwOBA3D/compute all consume this one parser so a
+    count-format quirk can never be handled differently across models."""
+    c = p.get('Count')
+    if not isinstance(c, str) or '-' not in c:
+        return None
+    try:
+        b_str, s_str = c.split('-', 1)
+        b, s = int(b_str), int(s_str)
+    except (TypeError, ValueError):
+        return None
+    if not (0 <= b <= 3 and 0 <= s <= 2):
+        return None
+    return (b, s)
+
+
+def _pctl(v, pool):
+    """Percentile rank of v within pool (ties averaged), 0-100.
+
+    Single home for the percentile convention shared by ERA+ and Pitcher+."""
+    if v is None or not pool:
+        return None
+    below = sum(1 for x in pool if x < v)
+    ties = sum(1 for x in pool if x == v)
+    return round(100.0 * (below + 0.5 * ties) / len(pool), 1)
+
+
 def safe_float(val):
     """Convert a value to float, returning None if not possible."""
     if val is None or val == '':

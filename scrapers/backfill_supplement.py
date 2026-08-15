@@ -44,17 +44,10 @@ resync_platez_days = 200
 backfill_milb = "yes"
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Six 2026 per-division workbooks (huronalytics account), replacing the two old
-# AL/NL books. main() opens each book and walks its team tabs, so pointing at the
-# six is all the routing this script needs; NLE2026 also carries ROC/AAA/FCL.
-SPREADSHEET_IDS = {
-    'ALE2026': '1YbgAliQzXePiFan-ruwJ50G80l4AjeyTGN8cO3KJ1XI',
-    'ALC2026': '14gglESfgJoT90crQb5hHoEZNUFDZ5chPLbUIV9mlm4E',
-    'ALW2026': '1eSFfKRo5kSImjP0SZ1SMssGrOhrKSZM9GOHiwntIlhs',
-    'NLE2026': '1BypxxlWgQAltETOLqccOYigeo8nXX-FIuVv6rhT4anA',
-    'NLC2026': '1-I8BVEw9bR9rzGVYJao_Ar0bjYZF54pi5pm3YEluB9w',
-    'NLW2026': '1vm257A676FORcSRzXcNj6txgehGhYI7k5mnmsgQCYH0',
-}
+# Six 2026 per-division workbooks — single-homed in pipeline.fetch so the
+# audit layer and the pipeline can never point at different books. main()
+# opens each book and walks its team tabs; NLE2026 also carries ROC/AAA/FCL.
+from pipeline.fetch import DIVISION_WORKBOOK_IDS as SPREADSHEET_IDS
 
 # Spreadsheet column name -> Statcast CSV column name
 SUPPLEMENT_MAP = {

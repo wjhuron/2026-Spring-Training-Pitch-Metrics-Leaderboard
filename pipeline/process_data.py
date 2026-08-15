@@ -4810,7 +4810,7 @@ def write_embedded_js(rs_result):
 
 
 def bump_asset_version(index_path=None):
-    """Rewrite every `?v=...` query in index.html + trade.html to the current
+    """Rewrite every `?v=...` query in index.html + trade.html + catch.html to the current
     build timestamp (YYYYMMDDHHMMSS). Forces browsers to bypass cached
     CSS/JS/data whenever the pipeline regenerates output. Second-resolution so
     two runs that land in the same minute still produce distinct ?v= tags —
@@ -4819,7 +4819,10 @@ def bump_asset_version(index_path=None):
     would serve stale data for up to a year."""
     repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     paths = ([index_path] if index_path is not None else
-             [os.path.join(repo, 'index.html'), os.path.join(repo, 'trade.html')])
+             [os.path.join(repo, 'index.html'), os.path.join(repo, 'trade.html'),
+              # catch.html was missed until 2026-08-15 and sat 16 days behind
+              # on a stale styles.css cache key
+              os.path.join(repo, 'catch.html')])
     build_tag = datetime.now().strftime('%Y%m%d%H%M%S')
     for path in paths:
         name = os.path.basename(path)

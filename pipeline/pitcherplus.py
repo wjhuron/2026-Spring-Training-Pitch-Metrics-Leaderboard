@@ -268,13 +268,7 @@ def load_prior(data_dir, current_season=None):
     return values, season
 
 
-def _pctl(v, pool):
-    """Percentile rank of v within pool (ties averaged), 0-100."""
-    if v is None or not pool:
-        return None
-    below = sum(1 for x in pool if x < v)
-    equal = sum(1 for x in pool if x == v)
-    return round(100.0 * (below + 0.5 * equal) / len(pool), 1)
+from pipeline.utils import _pctl  # single-homed percentile convention
 
 
 def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None,
