@@ -60,7 +60,7 @@ def _write_gz(path, obj):
 def main(core_gz=CORE_GZ, heavy_gz=HEAVY_GZ, tables_gz=TABLES_GZ):
     obj = _read_gz(core_gz)
     obj['pitcherData'] = json.load(open(os.path.join(DATA, 'pitcher_leaderboard_rs.json')))
-    # The inject step also updates metadata (Pitcher+ baseline, dhERA/phERA
+    # The inject step also updates metadata (Pitcher+ baseline, hdERA/hpERA
     # anchors + constants). Merge the inject-owned keys so the embedded
     # metadata never ships a cycle stale.
     try:
@@ -72,7 +72,7 @@ def main(core_gz=CORE_GZ, heavy_gz=HEAVY_GZ, tables_gz=TABLES_GZ):
         _pla = _md.get('pitcherLeagueAverages') or {}
         if _pla:
             _core_pla = _core_md.setdefault('pitcherLeagueAverages', {})
-            for _k in ('dhera', 'phera'):
+            for _k in ('hdera', 'hpera'):
                 if _k in _pla:
                     _core_pla[_k] = _pla[_k]
     except (OSError, json.JSONDecodeError):

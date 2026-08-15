@@ -1,21 +1,21 @@
-"""pipeline_eraplus.py — dhERA and phERA (+ their 100-scale twins).
+"""pipeline_eraplus.py — hdERA and hpERA (+ their 100-scale twins).
 
-dhERA (deserved ERA, descriptive): what the pitcher's season deserves on
+hdERA (deserved ERA, descriptive): what the pitcher's season deserves on
 the ERA scale, luck stripped. Single channel by measurement — every
 second channel was swept and rejected (FIP's gain is 95% its HR term,
 HR/FB self-r 0.12; freed K/BB/xwOBAcon weights LOSE to packaged xwOBA in
 every replicate season).
 
-    dhERA = poolERA + DH_B * z(xwOBA against, shrunk at N0_XW PA)
+    hdERA = poolERA + DH_B * z(xwOBA against, shrunk at N0_XW PA)
 
-phERA (projected ERA, going forward): the Pitcher+ component set plus
+hpERA (projected ERA, going forward): the Pitcher+ component set plus
 role and park, calibrated to future ERA. Weights are the fold-mean OLS
 fit on rest-of-season replicates 2021-2026 (one weight set serves both
 horizons: next-season transfer cost 0.001). Held-out r: 0.51 next
 season, 0.48 rest-of-season at the 60 IP gate — beats SIERA in all 11
 replicates.
 
-    phERA = poolERA + sum_c W_PH[c] * z(channel_c)
+    hpERA = poolERA + sum_c W_PH[c] * z(channel_c)
 
 Channels (ERA direction, i.e. higher value = more expected runs):
     xw     shrunk xwOBA against          stuff  -stuffScore (as published;
@@ -29,8 +29,8 @@ Channels (ERA direction, i.e. higher value = more expected runs):
                                             park  home park factor
 
 The 100-scale twins mirror wRC+/ERA- construction (a labeled convention,
-not a fit): dhERA+ = 200 - 100 * dhERA / poolERA, higher = better,
-average 100; likewise phERA+. Their spread is genuine run-prevention
+not a fit): hdERA+ = 200 - 100 * hdERA / poolERA, higher = better,
+average 100; likewise hpERA+. Their spread is genuine run-prevention
 information (SD ~23 and ~19), landing naturally in wRC+ territory.
 
 Shrinkage constants were measured by scripts/era_shrinkage_sweep.py
@@ -58,7 +58,7 @@ N0_K = 90.0
 
 DH_B = 0.917                # LOSO slope, 30+ IP display population
 
-# phERA fold-mean OLS weights (rest-of-season fit, gate 60), ERA direction
+# hpERA fold-mean OLS weights (rest-of-season fit, gate 60), ERA direction
 W_PH = {'stuff': 0.293, 'loc': 0.135, 'k': 0.101, 'izwh': 0.132,
         'xrv': 0.177, 'gb': 0.186, 'gs': 0.264, 'park': 0.169}
 
@@ -68,7 +68,7 @@ XRV_LG, XRV_SCALE = 0.3169, 1.2393
 
 PH_CHANNELS = ('xw', 'stuff', 'loc', 'k', 'izwh', 'gb', 'xrv', 'gs',
                'park')
-# NOTE: xw itself is not a phERA channel (W_PH has no 'xw'): the K/contact
+# NOTE: xw itself is not a hpERA channel (W_PH has no 'xw'): the K/contact
 # information arrives through k/izwh/xrv/gb. It is listed here only so the
 # z-pool statistics cover every channel one pass computes.
 
@@ -152,7 +152,7 @@ def _channels(row, xrv_map, park, is_combined):
 
 def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
                    is_combined_fn=None):
-    """Set dhERA / phERA / dhERAPlus / phERAPlus (+ _pctl each) in place.
+    """Set hdERA / hpERA / hdERAPlus / hpERAPlus (+ _pctl each) in place.
     Returns the constants bundle for metadata, or None if the pool is too
     thin. `pitches` = the MLB+MiLB pitch dicts (sheet schema) for the
     xRV/100 channel; `is_combined_fn` identifies 2TM/3TM rows."""
@@ -176,7 +176,7 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
                  and r.get('era') is not None]
     if len(pool_rows) < 50:
         for r in rows:
-            for k in ('dhERA', 'phERA', 'dhERAPlus', 'phERAPlus'):
+            for k in ('hdERA', 'hpERA', 'hdERAPlus', 'hpERAPlus'):
                 r[k] = None
                 r[k + '_pctl'] = None
         return None
@@ -211,32 +211,32 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
 
     for r in rows:
         if r.get('team') in aaa:
-            for k in ('dhERA', 'phERA', 'dhERAPlus', 'phERAPlus'):
+            for k in ('hdERA', 'hpERA', 'hdERAPlus', 'hpERAPlus'):
                 r[k] = None
             continue
         ch = raw[id(r)]
         zxw = z('xw', ch['xw'])
         dh = (anchor + DH_B * zxw) if zxw is not None else None
-        # phERA only inside its calibrated domain (30+ IP): its pitch-level
+        # hpERA only inside its calibrated domain (30+ IP): its pitch-level
         # channels (izWhiff/GB/xRV) are unshrunk, so tiny samples would
-        # extrapolate garbage. dhERA's single channel is fully shrunk and
+        # extrapolate garbage. hdERA's single channel is fully shrunk and
         # safe at any n.
         ph = None
         if _ip_outs(r.get('ip')) >= POOL_MIN_OUTS:
             zs = {c: z(c, ch[c]) for c in W_PH}
             if all(zs[c] is not None for c in W_PH):
                 ph = anchor + sum(W_PH[c] * zs[c] for c in W_PH)
-        r['dhERA'] = round(dh, 2) if dh is not None else None
-        r['phERA'] = round(ph, 2) if ph is not None else None
-        r['dhERAPlus'] = (round(200.0 - 100.0 * dh / anchor)
+        r['hdERA'] = round(dh, 2) if dh is not None else None
+        r['hpERA'] = round(ph, 2) if ph is not None else None
+        r['hdERAPlus'] = (round(200.0 - 100.0 * dh / anchor)
                           if dh is not None else None)
-        r['phERAPlus'] = (round(200.0 - 100.0 * ph / anchor)
+        r['hpERAPlus'] = (round(200.0 - 100.0 * ph / anchor)
                           if ph is not None else None)
 
     # percentiles: qualified MLB non-combined pool, every row ranked
-    # (site convention). dhERA/phERA are lower-is-better -> invert.
-    for key, invert in (('dhERA', True), ('phERA', True),
-                        ('dhERAPlus', False), ('phERAPlus', False)):
+    # (site convention). hdERA/hpERA are lower-is-better -> invert.
+    for key, invert in (('hdERA', True), ('hpERA', True),
+                        ('hdERAPlus', False), ('hpERAPlus', False)):
         pool = [r[key] for r in mlb
                 if r.get(key) is not None
                 and not is_combined_fn(r.get('team'))
@@ -247,18 +247,18 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
                 p = round(100.0 - p, 1)
             r[key + '_pctl'] = p
 
-    n_dh = sum(1 for r in rows if r.get('dhERA') is not None)
-    n_ph = sum(1 for r in rows if r.get('phERA') is not None)
+    n_dh = sum(1 for r in rows if r.get('hdERA') is not None)
+    n_ph = sum(1 for r in rows if r.get('hpERA') is not None)
     print(f'  eraplus: anchor {anchor:.2f} (pool {len(pool_rows)}), '
-          f'dhERA {n_dh} rows, phERA {n_ph} rows')
+          f'hdERA {n_dh} rows, hpERA {n_ph} rows')
     return {'anchor': round(anchor, 3), 'dhB': DH_B, 'weights': W_PH,
             'n0': {'xw': N0_XW, 'k': N0_K}, 'poolMinOuts': POOL_MIN_OUTS}
 
 
 def sort_rows_default(rows):
-    """Default leaderboard order: phERA good -> bad, valueless rows last
+    """Default leaderboard order: hpERA good -> bad, valueless rows last
     (the client renders JSON order until a header is clicked)."""
-    rows.sort(key=lambda r: (r.get('phERA') is None,
-                             r.get('phERA') if r.get('phERA') is not None
+    rows.sort(key=lambda r: (r.get('hpERA') is None,
+                             r.get('hpERA') if r.get('hpERA') is not None
                              else 0.0))
     return rows

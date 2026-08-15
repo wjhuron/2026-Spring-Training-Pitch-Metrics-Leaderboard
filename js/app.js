@@ -48,7 +48,7 @@
 
   // Per-tab default sort. Falls back to alphabetical by player name.
   const TAB_DEFAULT_SORT = {
-    pitcherStats:          { key: 'phERA',      dir: 'asc' },
+    pitcherStats:          { key: 'hpERA',      dir: 'asc' },
     pitchMetrics:          { key: 'xRv100',     dir: 'desc' },
     pitcherSwingDecisions: { key: 'swStrPct',   dir: 'desc' },
     pitcherBattedBall:     { key: 'xwOBAcon',   dir: 'asc'  },

@@ -365,11 +365,11 @@ STAT_LINE_COLOR = {
     'ERA':    ('era',      'raw', False, 1.5),
     'FIP':    ('fip',      'raw', False, 1.5),
     'SIERA':  ('siera',    'raw', False, 1.5),
-    # dhERA/phERA tint scales match ERA's visual intensity per SD: their
+    # hdERA/hpERA tint scales match ERA's visual intensity per SD: their
     # spreads are compressed (SD ~0.95 and ~0.75 runs vs ERA ~1.4), so the
     # full-color distance shrinks proportionally. Convention, not a fit.
-    'dhERA':  ('dhera',    'raw', False, 1.0),
-    'phERA':  ('phera',    'raw', False, 0.8),
+    'hdERA':  ('hdera',    'raw', False, 1.0),
+    'hpERA':  ('hpera',    'raw', False, 0.8),
     'K%':     ('kPct',     'pct', True),
     'BB%':    ('bbPct',    'pct', False),
     'Zone%':  ('izPct',    'pct', True),
@@ -1720,7 +1720,7 @@ def render_card(config, pitches, output_file):
     # column beneath it. Single-game cards have no bubble column, so they use
     # a much tighter column so the (now 8-cell) strip doesn't run too wide.
     is_season_strip = bool(config.get('mvn_models'))
-    # 5-cell strips (dhERA/phERA season layout) widen to 1.33 so the strip
+    # 5-cell strips (hdERA/hpERA season layout) widen to 1.33 so the strip
     # still spans the bubble column; 6-cell (range cards: ERA/FIP/SIERA)
     # keep 1.25 for the same total width.
     col_w = ((1.33 if len(config['stat_headers']) == 5 else 1.25)
@@ -4261,17 +4261,17 @@ def main():
             pctl_row = pctl_by_name.get((pitcher_name, eff_team)) \
                        or (pctl_by_id.get(str(int(mlb_id))) if mlb_id is not None else None)
 
-        # Season cards: the headline strip shows dhERA/phERA off the
+        # Season cards: the headline strip shows hdERA/hpERA off the
         # leaderboard row (they are season-scope metrics: shrunk inputs,
         # 30+ IP z-pools — not reconstructable from a pitch window).
         # Explicit date-range cards keep the box-derived ERA/FIP/SIERA
         # trio, which honours the range.
         if (start_date is None and end_date is None
                 and pctl_row is not None and is_multi_game):
-            _dh = pctl_row.get('dhERA')
-            _ph = pctl_row.get('phERA')
+            _dh = pctl_row.get('hdERA')
+            _ph = pctl_row.get('hpERA')
             if _dh is not None or _ph is not None:
-                stat_headers = ['G', 'GS', 'IP', 'dhERA', 'phERA']
+                stat_headers = ['G', 'GS', 'IP', 'hdERA', 'hpERA']
                 stat_values = [
                     str(box.get('g', len(game_dates_seen))),
                     str(box.get('gs', 0)),

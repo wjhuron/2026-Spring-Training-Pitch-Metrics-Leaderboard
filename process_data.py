@@ -58,9 +58,9 @@ XRVOE_KEYS = ('xrvoe100', 'rvoe100', 'rvoe', 'xrvoe',
               # '_pctl' itself — listing the rank key here would look for
               # 'pitcherPlus_pctl_pctl'.
               'pitcherPlus', 'pitcherRuns100', 'pitcherPlusProj',
-              # dhERA/phERA are inject-step metrics too (phERA consumes the
+              # hdERA/hpERA are inject-step metrics too (hpERA consumes the
               # fresh stuffScore); same carry-over contract.
-              'dhERA', 'phERA', 'dhERAPlus', 'phERAPlus')
+              'hdERA', 'hpERA', 'hdERAPlus', 'hpERAPlus')
 
 # ── Runtime state (set in main) ──────────────────────────────────────────
 WOBA_WEIGHTS = None
@@ -4182,7 +4182,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         total_ip = total_outs / 3.0
         metadata['pitcherLeagueAverages']['era'] = round(total_er * 9 / total_ip, 2)
 
-    # dhERA/phERA anchor = unweighted mean ERA of the 30+ IP MLB pool (the
+    # hdERA/hpERA anchor = unweighted mean ERA of the 30+ IP MLB pool (the
     # metrics' z-pool population, see pipeline_eraplus). Published here so
     # card tinting works even on a process-only run; the inject step
     # overwrites with its own identical computation.
@@ -4193,8 +4193,8 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                     and ip_str_to_float(r['ip']) >= 30.0]
     if len(_anchor_pool) >= 50:
         _anchor = round(sum(_anchor_pool) / len(_anchor_pool), 3)
-        metadata['pitcherLeagueAverages']['dhera'] = _anchor
-        metadata['pitcherLeagueAverages']['phera'] = _anchor
+        metadata['pitcherLeagueAverages']['hdera'] = _anchor
+        metadata['pitcherLeagueAverages']['hpera'] = _anchor
 
     # HR/9 league average — weighted by IP (MLB only, exclude combined rows)
     hr9_pairs = [(r['hr9'], ip_str_to_float(r.get('ip'))) for r in pitcher_leaderboard
@@ -4554,7 +4554,7 @@ def write_json_outputs(result, suffix):
                                 row[f + '_pctl'] = stuff_map[key].get(f + '_pctl')
                         n_merged += 1
                 print(f"  Preserved overall Stuff+ scores: {n_merged}/{len(stuff_map)} rows merged")
-                # default leaderboard order rides on the carried phERA
+                # default leaderboard order rides on the carried hpERA
                 # (fresh values re-sort in the inject step)
                 from pipeline_eraplus import sort_rows_default
                 sort_rows_default(result['pitcher_leaderboard'])
