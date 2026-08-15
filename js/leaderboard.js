@@ -285,7 +285,7 @@ const Leaderboard = {
 
   _TAB_HIDDEN_DEFAULTS: {
     pitchMetrics:          ['maxVelo', 'vaa', 'haa', 'cswPct', 'barrelPctAgainst', 'xwOBA', 'xBA', 'xSLG', 'rv100', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100', 'xrvoe100'],
-    pitcherStats:          ['w', 'l', 'sv', 'hld', 'tbf', 'era', 'siera', 'fip', 'xFIP', 'pitchingScore', 'hdERAPlus', 'hpERAPlus', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100'],
+    pitcherStats:          ['w', 'l', 'sv', 'hld', 'tbf', 'siera', 'fip', 'xFIP', 'pitchingScore', 'hdERAPlus', 'hpERAPlus', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100'],
     pitcherSwingDecisions: ['twoStrikeWhiffPct', 'fpsPct', 'oneOneWinPct', 'earlyActionPct'],
     pitcherBattedBall:     ['hrFbPct', 'xwOBAsp', 'xBA', 'xSLG', 'maxEVAgainst'],
     hitterStats:           ['g', 'ab', 'ops', 'iso', 'babip', 'bbToK', 'xwOBAcon', 'xBA', 'xSLG', 'doubles', 'triples', 'cs', 'sbPct'],

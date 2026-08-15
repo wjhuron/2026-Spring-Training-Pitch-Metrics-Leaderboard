@@ -3805,7 +3805,7 @@ def main():
 
     if args.team is not None: team = args.team
     if args.start is not None: start_date = None if args.start.lower() == 'none' else args.start
-    if args.end is not None: end_date = args.end
+    if args.end is not None: end_date = None if args.end.lower() == 'none' else args.end
     if args.pitchers is not None: filter_pitchers = args.pitchers
     if args.game_pk is not None: game_pk = args.game_pk
     if args.display_team is not None: display_team = args.display_team
@@ -4288,11 +4288,12 @@ def main():
             _dh = pctl_row.get('hdERA')
             _ph = pctl_row.get('hpERA')
             if _dh is not None or _ph is not None:
-                stat_headers = ['G', 'GS', 'IP', 'hdERA', 'hpERA']
+                stat_headers = ['G', 'GS', 'IP', 'ERA', 'hdERA', 'hpERA']
                 stat_values = [
                     str(box.get('g', len(game_dates_seen))),
                     str(box.get('gs', 0)),
                     ip_str,
+                    f"{era_val:.2f}" if era_val is not None else '—',
                     f"{_dh:.2f}" if _dh is not None else '—',
                     f"{_ph:.2f}" if _ph is not None else '—',
                 ]
