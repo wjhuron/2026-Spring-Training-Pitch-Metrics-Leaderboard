@@ -454,7 +454,7 @@ const Leaderboard = {
     // median over an arbitrary filtered slice has no canonical reference.
     // Accepted small visual jump when toggling a filter on/off.
     var DYNAMIC_STATS = { runValue:1, rv100:1, xRunValue:1, xRv100:1, xBA:1, xSLG:1, wOBA:1, xwOBA:1, xwOBAcon:1, xwOBAsp:1, bbPlus:1,
-                          era:1, fip:1, xFIP:1, siera:1,
+                          era:1, fip:1, xFIP:1, siera:1, hdERA:1, hpERA:1,
                           avg:1, obp:1, slg:1, ops:1, iso:1 };
 
     // Keys where average should use absolute values (RHP/LHP have opposite signs)
@@ -475,7 +475,7 @@ const Leaderboard = {
     var _parseIP = Utils.parseIP;
 
     // Weight mapping — matches process_data.py precomputed average methodology
-    var IP_WEIGHTED = { era:1, fip:1, xFIP:1, siera:1 };
+    var IP_WEIGHTED = { era:1, fip:1, xFIP:1, siera:1, hdERA:1, hpERA:1 };
     var BIP_WEIGHTED = { avgEVAgainst:1, maxEVAgainst:1, hardHitPct:1, barrelPctAgainst:1,
                           gbPct:1, ldPct:1, fbPct:1, hrFbPct:1, xwOBAsp:1, bbPlus:1,
                           avgEV:1, avgEVAll:1, ev50:1, maxEV:1, barrelPct:1, pullPct:1, airPullPct:1 };
@@ -532,19 +532,10 @@ const Leaderboard = {
     avg.pitcherPlusProj = 100;
     avg.hdERAPlus = 100;
     avg.hpERAPlus = 100;
-    // hdERA/hpERA league-avg = plain mean over the rows in view (they are
-    // pool-z metrics, unweighted by construction — the published anchor is
-    // the ALL-30+-IP pool mean, which under a Qualified view reads as a
-    // suspicious constant instead of describing the table on screen).
-    for (var _ek = 0; _ek < 2; _ek++) {
-      var _key = _ek === 0 ? 'hdERA' : 'hpERA';
-      var _s = 0, _n = 0;
-      for (var _ri = 0; _ri < data.length; _ri++) {
-        var _v = data[_ri][_key];
-        if (_v != null) { _s += _v; _n++; }
-      }
-      if (_n >= 5) avg[_key] = Math.round(100 * _s / _n) / 100;
-    }
+    // hdERA/hpERA league averages ride the same IP-weighted DYNAMIC_STATS
+    // path as ERA/FIP/xFIP/SIERA — one weighting convention across the
+    // whole ERA-scale family, so cross-column reads (deserved vs allowed)
+    // compare like with like.
     return avg;
   },
 
