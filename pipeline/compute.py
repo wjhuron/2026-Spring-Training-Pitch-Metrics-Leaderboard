@@ -109,8 +109,13 @@ def compute_expected_stats(pitches, woba_weights=None):
         if event == 'Intent Walk':
             continue
 
-        # xwOBA denominator is AB+BB+HBP+SF (standard); exclude SH (sac bunt) and CI.
-        if event not in SH_EVENTS and event not in CI_EVENTS:
+        # Savant drops bunt ABs from expected stats entirely; xBA/xSLG/
+        # xwOBAcon below already follow that — xwOBA joined 2026-08-15.
+        _is_bunt = p.get('BBType') in BUNT_BB_TYPES
+
+        # xwOBA denominator is AB+BB+HBP+SF (standard); exclude SH (sac bunt),
+        # CI, and bunt ABs.
+        if event not in SH_EVENTS and event not in CI_EVENTS and not _is_bunt:
             xwoba_val = safe_float(p.get('xwOBA'))
             if xwoba_val is not None:
                 xwoba_sum += xwoba_val
@@ -134,8 +139,8 @@ def compute_expected_stats(pitches, woba_weights=None):
 
         ab += 1
         # Savant excludes bunts from expected stats entirely, so bunt at-bats are
-        # dropped from BOTH the xBA/xSLG numerators AND the denominator (nonbunt_ab).
-        _is_bunt = p.get('BBType') in BUNT_BB_TYPES
+        # dropped from BOTH the xBA/xSLG numerators AND the denominator
+        # (nonbunt_ab). _is_bunt computed above the xwOBA block.
         if not _is_bunt:
             nonbunt_ab += 1
         if event == 'Single':
@@ -709,9 +714,24 @@ def compute_percentile_ranks(rows, metric_key, min_count=0, count_key='count', q
         equal = above - below
         return max(0, min(100, round((below + 0.5 * (equal - 1)) / max(1, n - 1) * 100)))
 
+    def _pctl_interp(val):
+        # Rows OUTSIDE the pool rank against it without self-exclusion —
+        # mirrors js/aggregator.js, which routes non-qualified rows through
+        # (below + 0.5*equal)/n. The self-excluding pool formula assumes
+        # membership and was off by ~0.17 pctl points for these rows.
+        val = _v(val)
+        below = bisect.bisect_left(sorted_vals, val)
+        equal = bisect.bisect_right(sorted_vals, val) - below
+        return max(0, min(100, round((below + 0.5 * equal) / n * 100)))
+
     for row in rows:
         val = row.get(metric_key)
-        row[pctl_key] = _pctl_from_sorted(val) if val is not None else None
+        if val is None:
+            row[pctl_key] = None
+        elif _row_in_pool(row):
+            row[pctl_key] = _pctl_from_sorted(val)
+        else:
+            row[pctl_key] = _pctl_interp(val)
 
 
 def compute_percentile_ranks_with_aaa(rows, metric_key, min_count=0, count_key='count', qualifier_fn=None, abs_val=False):

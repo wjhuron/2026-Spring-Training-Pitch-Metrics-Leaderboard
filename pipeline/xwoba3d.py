@@ -28,7 +28,7 @@ from pipeline.utils import (
 # Coarse bins for stability. With ~18k BIP early in season, these give
 # ~100 obs/cell on average across the ~288 cells.
 EV_BINS = [(0, 70), (70, 80), (80, 88), (88, 95), (95, 102), (102, 200)]
-LA_BINS = [(-90, -10), (-10, 0), (0, 10), (10, 20), (20, 30), (30, 40), (40, 90)]
+LA_BINS = [(-90, -10), (-10, 0), (0, 10), (10, 20), (20, 30), (30, 40), (40, 91)]  # 91: _bucket is half-open, so LA=90.0 exactly must not fall out the top
 SPRAY_DIRS = ['pull', 'pull_side', 'center_pull', 'center_oppo', 'oppo_side', 'oppo']
 # Per-pitch Bats is always the side batted from ('L'/'R'; the scraper writes
 # per-PA batSide). 'S' is deliberately NOT accepted: spray_direction() would
