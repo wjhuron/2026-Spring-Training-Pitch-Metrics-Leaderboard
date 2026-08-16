@@ -101,27 +101,53 @@ def cat_of(p):
     return 'BRK'
 
 # ── Hyperparameters ─────────────────────────────────────────────────────
-CELL_SHRINK_K  = 200      # cell → zone shrinkage pseudo-obs. Raised from 50
-                          # on 2026-07-13: the k-sweep (scripts/
-                          # sdct_constant_sweeps.py + sdct_k_predictive.py,
-                          # 2021-2026) showed split-half reliability rising
-                          # monotonically with k (SD+ .655→.682 at 200) while
-                          # next-season prediction stayed dead flat — the
-                          # count-level cell detail beyond k=200 was noise
-                          # hitters were being scored against.
-HITTER_PRIOR_N = 180      # hitter → league regression pseudo-obs. Set to
+CELL_SHRINK_K  = 50       # cell → zone shrinkage pseudo-obs.
+                          # 2026-08-16, scripts/research/hitter/
+                          # cellk_fine_sweep.py: out-of-sample MSE of the
+                          # cell run-value model, train on one FULL season /
+                          # score another, 30 ordered pairs 2021-2026.
+                          #
+                          # HONEST LABEL — flat region, NO measurable
+                          # optimum. k=0..100 spans 5 ppm of MSE (0.025%)
+                          # and 14 of 30 pairs prefer k=0 outright. 50 is
+                          # NOT an argmin and is not better in any way a
+                          # reader would notice.
+                          #
+                          # What IS unambiguous is the direction: k=50 fits
+                          # better than the old 200 in 29/30 pairs, k=100 in
+                          # 30/30 (sign test p~1e-9). 200 is the one value
+                          # shown to sit outside the flat region, and it was
+                          # set by a split-half RELIABILITY sweep — a metric
+                          # this constant games, since smoothing the table
+                          # removes denominator noise and lifts reliability
+                          # while the model gets no better. Its own prior
+                          # note recorded reliability "rising monotonically
+                          # with k while next-season prediction stayed dead
+                          # flat": monotone to the grid edge on a gameable
+                          # objective is not a measurement.
+                          #
+                          # Cost of the move: shipped sdPlus shifted a median
+                          # 0.29 (max 1.38) after the plusReanchor/
+                          # plusWrcScale rescale — ~3% of the metric's SD.
+HITTER_PRIOR_N = 190      # hitter → league regression pseudo-obs. Set to
                           # the measured stabilization constant n0, i.e. the
                           # MMSE-optimal pseudo-count K=n0, matching CT+'s
-                          # convention. Re-measured 2026-08-15 for the final
-                          # definition (un-anchored, category-collapsed;
-                          # scripts/research/hitter/n0_remeasure_sd_revert.py, 2024-2026:
-                          # implied 170-186 across N, consensus 179). The
-                          # anchored cat3 form measured 198/200; un-anchored
-                          # cat3 measured 166.
-MIN_HITTER_DECISIONS = 180  # floor = split-half r=.50 point (signal=
+                          # convention.
+                          # RE-MEASURED 2026-08-16 under CELL_SHRINK_K=50
+                          # (scripts/research/hitter/n0_remeasure_2026_08.py,
+                          # 2024-2026, 3 seeds: implied 185-203 across N,
+                          # consensus 190). Was 180 under the k=200 tables.
+                          # n0 rising as k falls is the expected direction —
+                          # a less-smoothed cell table leaves a noisier
+                          # per-decision expectation, so the hitter estimate
+                          # stabilizes more slowly. Re-run this whenever
+                          # CELL_SHRINK_K moves; the two are coupled.
+MIN_HITTER_DECISIONS = 190  # floor = split-half r=.50 point (signal=
                             # noise), = n0 by construction; moves with the
-                            # re-measure above. Leaderboard qualification
-                            # (3.1 × TGP) is a separate stricter gate.
+                            # re-measure above (r = .503 at N=190). Costs
+                            # ~5 hitters their SD+ display until they clear
+                            # it. Leaderboard qualification (3.1 × TGP) is a
+                            # separate stricter gate.
 
 # MLB standard qualification: PA ≥ 3.1 × team games played.
 PA_PER_TEAM_GAME = 3.1
