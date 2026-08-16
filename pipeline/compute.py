@@ -476,7 +476,6 @@ def compute_hitter_stats(pitches):
     iz_swing_pct = iz_swings / len(iz_pitches) if iz_pitches else None
     chase_pct = ooz_swings / len(ooz_pitches) if ooz_pitches else None
 
-    swings_non_bunt = n_swings
     contact_non_bunt = sum(1 for p in pitches
                            if p['Description'] in ('Foul', 'In Play')
                            and p.get('BBType') not in BUNT_BB_TYPES)
@@ -648,8 +647,8 @@ def compute_hitter_stats(pitches):
         # are indistinguishable from regular whiffs in the data (no BBType on
         # any swinging strike), so they remain counted in the numerator —
         # negligible effect since they're rare.
-        'whiffPct': whiffs / swings_non_bunt if swings_non_bunt > 0 else None,
-        'izWhiffPct': iz_whiffs / iz_swings_non_bunt if iz_swings_non_bunt > 0 else None,
+        'whiffPct': whiffs / n_swings if n_swings > 0 else None,
+        'izWhiffPct': iz_whiffs / iz_swings if iz_swings > 0 else None,
         'runValue': (lambda vals: -sum(vals) if vals else None)([v for v in (safe_float(p.get('RunExp')) for p in pitches) if v is not None]),
         'batSpeed': round(sum(bs_vals) / len(bs_vals), 1) if bs_vals else None,
         'swingLength': round(sum(sl_vals) / len(sl_vals), 1) if sl_vals else None,
