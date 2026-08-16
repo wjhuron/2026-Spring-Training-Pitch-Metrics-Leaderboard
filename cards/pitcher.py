@@ -112,10 +112,25 @@ PITCH_NAMES = {
     'EP':'Eephus'
 }
 PITCH_ORDER = ['FF','SI','FC','SL','ST','CU','SV','CH','FS','KN']
-# Bunts are not swings (matches pipeline_utils.SWING_DESCRIPTIONS) so card
+# Bunts are not swings (matches pipeline.utils.SWING_DESCRIPTIONS) so card
 # Whiff%/Chase%/Swing% use the same swing set as the leaderboard they're colored
 # against. STRIKE_DESC still counts Foul Bunt — a foul bunt is a strike.
 SWING_DESC = ['Swinging Strike','Foul','In Play']
+
+
+def is_swing(p):
+    """Swing test for every card rate denominator.
+
+    'Foul Bunt' / 'Missed Bunt' are excluded by Description, but a bunt put
+    IN PLAY reads Description='In Play' with a bunt BBType — so the
+    Description test alone is not enough. pipeline.compute applies exactly
+    this BBType guard (2026-08-15); without it here, 426 of 548 qualified
+    pitchers showed a card Whiff% up to 1.03 points off the leaderboard the
+    card is colored against.
+    """
+    from pipeline.utils import BUNT_BB_TYPES
+    return (p.get('Description') in SWING_DESC
+            and p.get('BBType') not in BUNT_BB_TYPES)
 
 def _opponent_label(pitches):
     """Opposing team for a single-game card, off the pitches themselves.
@@ -2289,7 +2304,7 @@ def render_card(config, pitches, output_file):
         relxs=[v for v in (sf(p.get('RelPosX')) for p in pp) if v is not None]
         exts=[v for v in (sf(p.get('Extension')) for p in pp) if v is not None]
         armangles=[v for v in (sf(p.get('ArmAngle')) for p in pp) if v is not None]
-        swings=[p for p in pp if p.get('Description') in SWING_DESC]
+        swings=[p for p in pp if is_swing(p)]
         whiffs=[p for p in pp if p.get('Description')=='Swinging Strike']
         iz_n=0
         for p in pp:
@@ -2334,7 +2349,7 @@ def render_card(config, pitches, output_file):
                   'xRVOE/100': ((round(xrvoe100_by_pt[pt], 1) + 0.0)
                                 if xrvoe100_by_pt.get(pt) is not None else None)}
         # Chase% — swings on out-of-zone pitches over OoZ pitches.
-        oop_swings_n = sum(1 for p in pp if p.get('Description') in SWING_DESC and compute_iz(p) == False)
+        oop_swings_n = sum(1 for p in pp if is_swing(p) and compute_iz(p) == False)
         oop_pitches_n = sum(1 for p in pp if compute_iz(p) == False)
         chase_pct = oop_swings_n / oop_pitches_n if oop_pitches_n else None
         # xwOBAcon — average xwOBA on BIPs only. ROC sheet pitches carry no
@@ -2498,7 +2513,7 @@ def render_card(config, pitches, output_file):
             row.append(str(_v) if _v is not None else '—')
         pitch_stats.append((pt, row))
 
-    t_sw=[p for p in pitches if p.get('Description') in SWING_DESC]
+    t_sw=[p for p in pitches if is_swing(p)]
     t_wh=[p for p in pitches if p.get('Description')=='Swinging Strike']
     t_iz=sum(1 for p in pitches if compute_iz(p)==True)
     t_called=sum(1 for p in pitches if p.get('Description')=='Called Strike')
@@ -2510,7 +2525,7 @@ def render_card(config, pitches, output_file):
     t_exts=[v for v in (sf(p.get('Extension')) for p in pitches) if v is not None]
     t_armangles=[v for v in (sf(p.get('ArmAngle')) for p in pitches) if v is not None]
     # Chase% total
-    t_oop_sw = sum(1 for p in pitches if p.get('Description') in SWING_DESC and compute_iz(p) == False)
+    t_oop_sw = sum(1 for p in pitches if is_swing(p) and compute_iz(p) == False)
     t_oop_n = sum(1 for p in pitches if compute_iz(p) == False)
     t_chase = t_oop_sw / t_oop_n if t_oop_n else None
     # xwOBAcon total — average xwOBA on BIPs.
@@ -4206,7 +4221,7 @@ def main():
             iz_results = [compute_iz(p) for p in pp]
             iz_count = sum(1 for r in iz_results if r is True)
             total_p = sum(1 for r in iz_results if r is not None)
-            swings = [p for p in pp if p.get('Description') in SWING_DESC]
+            swings = [p for p in pp if is_swing(p)]
             whiffs = [p for p in pp if p.get('Description') == 'Swinging Strike']
             bip_all = [p for p in pp if p.get('BBType') and not str(p.get('BBType', '')).startswith('bunt')]
             gb_count = sum(1 for p in bip_all if p.get('BBType') == 'ground_ball')
