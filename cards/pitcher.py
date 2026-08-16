@@ -1872,6 +1872,10 @@ def render_card(config, pitches, output_file):
     ax_plot.axhline(y=0, color=GRID_COLOR, linestyle='--', linewidth=0.6)
     ax_plot.axvline(x=0, color=GRID_COLOR, linestyle='--', linewidth=0.6)
     _mv_big = bool(config.get('mvn_models'))
+    # Ellipse minimum, movement scatter and zone plots alike: 4 pitches
+    # (2026-08-15, per Wally — season cards included). A 4-pitch type is
+    # worth an ellipse; below that the covariance fit has nothing to say.
+    mv_ellipse_min = 4
     ax_plot.set_xlabel('Horizontal Break (in)', fontsize=12 if _mv_big else 10, color=TEXT_MUTED, fontweight='bold', fontfamily='IBM Plex Sans')
     ax_plot.set_ylabel('Induced Vertical Break (in)', fontsize=12 if _mv_big else 10, color=TEXT_MUTED, fontweight='bold', fontfamily='IBM Plex Sans')
     ax_plot.tick_params(labelsize=9.5 if _mv_big else 8, colors=TEXT_MUTED)
@@ -1903,11 +1907,11 @@ def render_card(config, pitches, output_file):
     # Drop the shaded expected-movement ellipses + caption on all cards.
     exp_movement = {}
 
-    # Draw expected movement ellipses first (behind scatter points, min 6 pitches)
+    # Draw expected movement ellipses first (behind scatter points, mv_ellipse_min)
     for pt in PITCH_ORDER:
         if pt not in exp_movement or pt not in groups:
             continue
-        if len(groups[pt]) < 6:
+        if len(groups[pt]) < mv_ellipse_min:
             continue
         em = exp_movement[pt]
         cx = em['sum_hb'] / em['n']
@@ -1922,7 +1926,7 @@ def render_card(config, pitches, output_file):
         if pt not in groups: continue
         xs, ys = zip(*groups[pt]); color = PITCH_COLORS[pt]
         ax_plot.scatter(xs, ys, c=color, s=65, alpha=1.0, edgecolors=PLOT_PANEL, linewidths=0.5, zorder=3)
-        if len(groups[pt]) >= 6:
+        if len(groups[pt]) >= mv_ellipse_min:
             cov = np.cov(xs, ys); vals, vecs = np.linalg.eigh(cov)
             if vals[0] <= 0 or vals[1] <= 0:
                 continue
@@ -1966,7 +1970,7 @@ def render_card(config, pitches, output_file):
                      fontsize=7, color='#000000', fontfamily='IBM Plex Sans', va='bottom')
     # Notes render BLACK on every layout (2026-08-13, per Wally — the muted
     # gray read too faint at card scale).
-    ax_plot.text(0.02, 0.005, 'Min. 6 pitches for ellipse', transform=ax_plot.transAxes,
+    ax_plot.text(0.02, 0.005, f'Min. {mv_ellipse_min} pitches for ellipse', transform=ax_plot.transAxes,
                  fontsize=6.5, color='#000000',
                  fontfamily='IBM Plex Sans', va='bottom', fontstyle='italic')
     if _ghosted:
@@ -1999,14 +2003,12 @@ def render_card(config, pitches, output_file):
         bh = p.get('Bats', ''); pt = p.get('Pitch Type', '')
         if bh in ('L', 'R') and pt:
             hand_usage[bh][pt] += 1; hand_tot[bh] += 1
-    # Single-game zone plots use a lower 6-pitch ellipse minimum (matches the
-    # movement scatter rule). Season cards keep 10 to suppress ellipse noise
-    # when many pitch types are crammed into the same plot.
+    # Zone-plot ellipse minimum — same 4 as the movement scatter
+    # (2026-08-15, per Wally; was 6, and 10 on season cards before that).
     # Season: the >=10%-usage gate (below) decides WHICH pitches get
     # ellipses; the count floor is only the covariance-fit minimum, so a
-    # >=10% pitch in a thin platoon split still draws (was 10, which
-    # silently hid qualifying pitches vs the rarer hand).
-    zone_ellipse_min = 6
+    # >=10% pitch in a thin platoon split still draws.
+    zone_ellipse_min = 4
 
     # Fixed zone bounds — same size for every pitcher, every card.
     # Season cards TRANSLATE the window so the plate/zone sits middle-right
