@@ -3175,12 +3175,18 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
     ROC path in train_stuff.main(). k_shrink overrides the season K_SHRINK
     (used lightly for daily cards)."""
     import pickle as _pickle
-    _sv_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root, for stuff_plus package
-    if _sv_dir not in sys.path:
-        sys.path.insert(0, _sv_dir)
+    _repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _repo_root not in sys.path:
+        sys.path.insert(0, _repo_root)
     import stuff_plus.train_stuff as _sv
 
-    with open(os.path.join(_sv_dir, 'stuff_models.pkl'), 'rb') as f:
+    # The bundle lives INSIDE stuff_plus/, not at the repo root — two
+    # different directories, and conflating them is what silently dropped
+    # the Stuff+ column from every card on 2026-08-15 (the FileNotFoundError
+    # is swallowed by the caller's except, so the card just renders without
+    # the column). Keep these two paths visibly distinct.
+    _bundle_path = os.path.join(_repo_root, 'stuff_plus', 'stuff_models.pkl')
+    with open(_bundle_path, 'rb') as f:
         bundle = _pickle.load(f)
     if 'kin_eff__ff' not in bundle.get('features', []) \
             or 'cross' not in bundle.get('features', []):
@@ -3474,6 +3480,12 @@ def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
     try:
         (ctx['stuff_overall'], ctx['stuff_pt'],
          ctx['stuff_atoms_by_pid']) = _scratch_stuff_scores(norm_by_pitcher, stuff_k_shrink)
+    except (FileNotFoundError, RuntimeError):
+        # A missing or version-stale bundle is an operator problem with a
+        # known fix, not a data condition — raise it instead of rendering a
+        # card that is silently missing its Stuff+ column. (2026-08-15: a
+        # wrong bundle path hid behind the old blanket warning for a day.)
+        raise
     except Exception as _e:
         print(f"  WARNING: Stuff+ scoring failed for scratch pitches: {_e}")
         ctx['stuff_overall'], ctx['stuff_pt'], ctx['stuff_atoms_by_pid'] = {}, {}, {}
