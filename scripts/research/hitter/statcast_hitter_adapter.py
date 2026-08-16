@@ -113,6 +113,10 @@ def season_dicts(year):
             'xwOBA': sf(r.estimated_woba_using_speedangle),
             'HC_X': sf(r.hc_x), 'HC_Y': sf(r.hc_y),
             'LaunchAngle': sf(r.launch_angle),
+            # ExitVelo was missing until 2026-08-16 while LaunchAngle was
+            # mapped, so anything in this harness keyed on EV (xwOBA3D cells,
+            # hard-hit / barrel rates) silently saw None on every batted ball.
+            'ExitVelo': sf(r.launch_speed),
         }
         p['InZone'] = compute_in_zone(p)
         out.append(p)

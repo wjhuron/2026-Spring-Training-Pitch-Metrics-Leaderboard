@@ -35,7 +35,8 @@ anchor 2026-08-15; CT+ keeps it — the toggle was flat on reliability and
 slightly negative on prediction in the multi-season battery.)
 
 Cells are (zone × count × FB/BRK/OFF) since 2026-08-15, with the same
-cascade shrinkage as SD+: cell → (zone × cat) → zone, k=200 per level.
+cascade shrinkage as SD+: cell → (zone × cat) → zone, k=CELL_SHRINK_K
+per level.
 The old "pitch-type expansion added <1% residual variance" claim did not
 survive replicate testing — cat3 won split-half reliability 6/6 seasons
 2021-2026 and next-season prediction 4/4 pairs (+0.005/+0.004), and wins
@@ -52,22 +53,36 @@ from pipeline.sdplus import (
 )
 
 # ── Hyperparameters ─────────────────────────────────────────────────────
-CELL_SHRINK_K  = 200      # cell → zone shrinkage pseudo-swings. Raised from
-                          #   50 on 2026-07-13 alongside SD+ (see
-                          #   pipeline_sdplus.CELL_SHRINK_K): the 2021-2026
-                          #   k-sweep showed reliability up (+.007 for CT+)
-                          #   with prediction flat.
-HITTER_PRIOR_N = 61       # hitter → league regression pseudo-swings.
-                          #   Re-measured 2026-08-15 AFTER the per-quantity
-                          #   shrinkage-weight fix
+CELL_SHRINK_K  = 50       # cell → zone shrinkage pseudo-swings.
+                          #   RE-MEASURED 2026-08-16 (scripts/research/
+                          #   hitter/cellk_fine_sweep.py): train the table on
+                          #   one FULL season, score out-of-sample log loss of
+                          #   p_whiff on another; 30 ordered pairs 2021-2026.
+                          #   k=50 beats the old 200 in 30/30 pairs.
+                          #   HONEST LABEL: not "the optimum". The mean-score
+                          #   minimum is k=32, but the per-pair argmin is
+                          #   scattered over the whole grid (5 to 100), so the
+                          #   basin ~16-64 is FLAT (spread 7e-6 log loss).
+                          #   50 is chosen inside that flat basin for maximum
+                          #   robustness (30/30, vs 21/30 at k=5) — a
+                          #   convention, and the value CT+ held before the
+                          #   2026-07-13 raise.
+                          #   The 200 came from a split-half RELIABILITY
+                          #   sweep, which this constant games: smoothing the
+                          #   table removes denominator noise and lifts
+                          #   reliability while CT+ converges on raw contact%
+                          #   (corr .902 -> .948 across k). Reliability is a
+                          #   diagnostic here, never the objective.
+HITTER_PRIOR_N = 66       # hitter → league regression pseudo-swings.
+                          #   RE-MEASURED 2026-08-16 under CELL_SHRINK_K=50
                           #   (scripts/research/hitter/n0_remeasure_2026_08.py:
-                          #   consensus 61, implied 55-63 across N/half
-                          #   40-180, seasons 2024-2026, 3 seeds). The prior
-                          #   65 was measured under the mis-weighted table.
-                          #   NOTE: CELL_SHRINK_K=200 was not re-swept after
-                          #   the weight fix (n0 barely moving suggests the
-                          #   table-noise structure is unchanged); fold a k
-                          #   re-sweep into the next constants battery.
+                          #   consensus 66, implied 62-70 across N/half
+                          #   40-180, seasons 2024-2026, 3 seeds). Was 61
+                          #   under the k=200 tables; n0 RISING as k falls is
+                          #   the expected direction — less cell smoothing
+                          #   leaves a noisier per-swing expectation, so the
+                          #   hitter estimate stabilizes more slowly. Any
+                          #   future change to CELL_SHRINK_K must re-run this.
                           #   Set to the metric's stabilization constant n0.
                           #   For a shrinkage estimator adj=(n·obs+K·lg)/(n+K),
                           #   the MMSE-optimal pseudo-count is exactly K=n0.

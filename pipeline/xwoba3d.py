@@ -36,7 +36,18 @@ SPRAY_DIRS = ['pull', 'pull_side', 'center_pull', 'center_oppo', 'oppo_side', 'o
 HANDS = ['R', 'L']
 
 # Hierarchical shrinkage pseudo-count toward 2D marginals.
-CELL_SHRINK_K = 20
+CELL_SHRINK_K = 3
+# RE-MEASURED 2026-08-16 (scripts/research/hitter/cellk_fine_sweep.py):
+# out-of-sample MSE of the cell xwOBA model, 30 ordered full-season pairs
+# 2021-2026. Unlike SD+/CT+ this curve has real curvature — the minimum
+# region is {2,3}, the old k=20 is 0.4% worse, and marginals-only (k->inf)
+# is 76% worse, so the 3D cell detail is doing genuine work. 3 is the
+# interior point of the measured minimum, and the slightly more shrunk of
+# the two, which is the safer side for the sparse ROC/AAA cells this table
+# exists to fill.
+# NOTE: measured on MLB cells (~240 BIP/cell). The ROC application is
+# sparser; k=3 shrinks less, so thin ROC cells lean harder on their own
+# evidence. Re-check if ROC xwOBA fill ever looks noisy.
 
 
 # ── Classification ──────────────────────────────────────────────────────
