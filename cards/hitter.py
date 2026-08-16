@@ -1951,7 +1951,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 
         right = _place_text(annot_x, l1_y, 'xwOBAsp: ', 18, TEXT_MUTED, '600')
         # Value uses percentile-derived color (matches hitter page)
-        right = _place_text(right, l1_y, fmt_3dec(xwobasp_display), 18, pctl_color, '800')
+        right = _place_text(right, l1_y, fmt_3dec(xwobasp_display), 18, pctl_color, '700')
         right += 0.005  # tiny gap before bipnote
         _place_text(right, l1_y, bipnote, 11, TEXT_FAINT, '600')
 
@@ -1974,12 +1974,12 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         # Both spray-direction value and LA value share xwOBAsp percentile color
         # (matches hitter page — links Avg Placement visually to xwOBAsp)
         right = _place_text2(right, l2_y, f"{abs(med_spray):.1f}° {sd}",
-                              14, pctl_color, '800')
+                              14, pctl_color, '700')
         right += 0.006
         right = _place_text2(right, l2_y, '|', 13, TEXT_FAINT, '600')
         right += 0.006
         _place_text2(right, l2_y, f"{med_la_real:.1f}° LA",
-                       14, pctl_color, '800')
+                       14, pctl_color, '700')
 
     # Section title (centered ABOVE the annotation block, matches hitter page)
     # Editorial-style title: letterspaced uppercase, off-white, with thin
@@ -2338,6 +2338,12 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         t.remove()
         return w
 
+    # NOTE: 700 is the ceiling for IBM Plex Sans / Plex Sans Condensed —
+    # the family ships no 800 face (assets/fonts/ has 400-700). Asking for
+    # 800 made matplotlib fall back to 700 anyway and print a findfont
+    # warning per call; the weights below are the heaviest available, so
+    # this is the same rendering without the noise. Bitter is the only
+    # bundled family with a heavier face (900) if a card ever needs one.
     def _hm_text(x, y, txt, color, fontsize=HM_FONT, fontweight='600'):
         t = fig.text(x, y, txt, color=color, fontsize=fontsize,
                       fontweight=fontweight, fontfamily='IBM Plex Sans',
@@ -2350,7 +2356,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         mlb_pos: optional [0, 1] position on the bar to draw a white tick +
         small 'MLB' label, anchoring the absolute scale."""
         x = x_left
-        x = _hm_text(x, y_center, label, TEXT_MUTED, fontweight='800')
+        x = _hm_text(x, y_center, label, TEXT_MUTED, fontweight='700')
         x += 0.005
         x = _hm_text(x, y_center, low_str, TEXT_SECONDARY)
         x += 0.003
@@ -2584,13 +2590,13 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         if rr == 0:
             # Header row: off-white, heavy weight, slightly bigger
             cell.set_facecolor(DARKER)
-            cell.set_text_props(color=TEXT_PRIMARY, fontweight='800', fontsize=13, fontfamily='IBM Plex Sans Condensed')
+            cell.set_text_props(color=TEXT_PRIMARY, fontweight='700', fontsize=13, fontfamily='IBM Plex Sans Condensed')
         elif rr == len(rows):
             # Total row: heavier weight + brighter, edge thickened all-around
             # to read as a distinct summary band
             cell.set_facecolor(DARKER)
             cell.set_edgecolor(TOTAL_BORDER); cell.set_linewidth(1.4)
-            cell.set_text_props(fontweight='800', color=TEXT_PRIMARY, fontsize=13, fontfamily='IBM Plex Sans')
+            cell.set_text_props(fontweight='700', color=TEXT_PRIMARY, fontsize=13, fontfamily='IBM Plex Sans')
         else:
             # Body rows: lighter weight to differentiate from header/total
             cell.set_facecolor(DARK_CELL if rr % 2 == 1 else ALT_ROW_BG)
@@ -2613,7 +2619,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 blended = f'#{blend_r:02x}{blend_g:02x}{blend_b:02x}'
                 cell.set_facecolor(blended)
                 cell.set_text_props(color=badge_text_color(blended),
-                                    fontweight='800', fontsize=13, fontfamily='IBM Plex Sans')
+                                    fontweight='700', fontsize=13, fontfamily='IBM Plex Sans')
 
     # Color rate-stat cells based on hitter direction
     hl_a = metadata.get('hitterLeagueAverages', {})

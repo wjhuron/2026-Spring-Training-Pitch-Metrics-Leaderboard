@@ -39,8 +39,20 @@ from matplotlib.patches import Ellipse, FancyBboxPatch, Rectangle
 # this module, so it inherits the registration too.
 import os as _os
 import matplotlib.font_manager as _fm
-_FONT_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'assets', 'fonts')
-if _os.path.isdir(_FONT_DIR):
+# assets/ lives at the REPO ROOT, one level above cards/ — this join lost a
+# level in the 2026-08 reorg and pointed at cards/assets/fonts, which does
+# not exist. The isdir() guard then skipped registration silently, so the
+# bundle was never loaded; it only looked fine on machines that happen to
+# have Bitter/IBM Plex installed system-wide, which is the exact situation
+# this block exists to not depend on.
+_FONT_DIR = _os.path.join(
+    _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))),
+    'assets', 'fonts')
+if not _os.path.isdir(_FONT_DIR):
+    print(f"  WARNING: bundled font dir missing ({_FONT_DIR}) — cards will "
+          f"render in whatever fonts the system provides, not the print "
+          f"identity.")
+else:
     for _fn in sorted(_os.listdir(_FONT_DIR)):
         if _fn.lower().endswith(('.ttf', '.otf')):
             try:
