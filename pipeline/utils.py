@@ -146,6 +146,20 @@ TEAM_ABBREV_TO_ID = {
 
 # ── Pure utility functions ───────────────────────────────────────────────
 
+def is_swing(p):
+    """The swing test for every rate denominator, everywhere.
+
+    Bunts are not swings and not chases (Wally, 2026-08-15). 'Foul Bunt'
+    and 'Missed Bunt' already sit outside SWING_DESCRIPTIONS, but a bunt
+    put IN PLAY reads Description='In Play' with a bunt BBType, so the
+    Description test alone lets it through. Single-homed because this
+    predicate has to hold identically across the leaderboard, the micro
+    counters the site sums for filtered views, and the cards.
+    """
+    return (p.get('Description') in SWING_DESCRIPTIONS
+            and p.get('BBType') not in BUNT_BB_TYPES)
+
+
 def get_count(p):
     """Parse 'Count' column (e.g., '2-2') into (balls, strikes). None if invalid.
 

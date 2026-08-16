@@ -119,7 +119,7 @@ SWING_DESC = ['Swinging Strike','Foul','In Play']
 
 
 def is_swing(p):
-    """Swing test for every card rate denominator.
+    """Swing test for every card rate denominator — the pipeline's own.
 
     'Foul Bunt' / 'Missed Bunt' are excluded by Description, but a bunt put
     IN PLAY reads Description='In Play' with a bunt BBType — so the
@@ -128,9 +128,8 @@ def is_swing(p):
     pitchers showed a card Whiff% up to 1.03 points off the leaderboard the
     card is colored against.
     """
-    from pipeline.utils import BUNT_BB_TYPES
-    return (p.get('Description') in SWING_DESC
-            and p.get('BBType') not in BUNT_BB_TYPES)
+    from pipeline.utils import is_swing as _is_swing
+    return _is_swing(p)
 
 def _opponent_label(pitches):
     """Opposing team for a single-game card, off the pitches themselves.

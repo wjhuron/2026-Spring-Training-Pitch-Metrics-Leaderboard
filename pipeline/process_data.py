@@ -564,7 +564,11 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
                 c[49] += 1  # buntAB
 
         # Swing counts
-        if desc in SWING_DESCRIPTIONS:
+        # Bunts are not swings and not chases (2026-08-15) — same guard
+        # as pipeline.compute.is_swing, so filtered site views (which sum
+        # these counters) match the season aggregates exactly.
+        _swing = desc in SWING_DESCRIPTIONS and bb_type not in BUNT_BB_TYPES
+        if _swing:
             c[12] += 1  # swings
         if desc == 'Swinging Strike':
             c[13] += 1  # whiffs
@@ -572,17 +576,15 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
         # Zone-based counts
         if in_zone == 'Yes':
             c[14] += 1  # izPitches
-            if desc in SWING_DESCRIPTIONS:
+            if _swing:
                 c[16] += 1  # izSwings
-                # izSwNonBunt: exclude bunt BIPs from IZ swing count
-                if bb_type not in BUNT_BB_TYPES:  # None not in set → True
-                    c[19] += 1
+                c[19] += 1  # izSwNonBunt (identical set now)
             if desc in ('Foul', 'In Play'):
                 if bb_type not in BUNT_BB_TYPES:
                     c[20] += 1  # izContact
         elif in_zone == 'No':
             c[15] += 1  # oozPitches
-            if desc in SWING_DESCRIPTIONS:
+            if _swing:
                 c[17] += 1  # oozSwings
 
         # Contact (overall)
@@ -590,8 +592,8 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
             c[18] += 1
 
         # Contact excluding bunts (for contactPct)
-        if desc in SWING_DESCRIPTIONS and bb_type not in BUNT_BB_TYPES:
-            c[47] += 1  # swingsNonBunt
+        if _swing:
+            c[47] += 1  # swingsNonBunt (identical set now)
         if desc in ('Foul', 'In Play') and bb_type not in BUNT_BB_TYPES:
             c[48] += 1  # contactNonBunt
 
@@ -784,31 +786,34 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
             if event in CI_EVENTS:       c[10] += 1
             if event in K_EVENTS:        c[11] += 1
 
-        if desc in SWING_DESCRIPTIONS:
+        # Bunts are not swings and not chases (2026-08-15) — same guard
+        # as pipeline.compute.is_swing, so filtered site views (which sum
+        # these counters) match the season aggregates exactly.
+        _swing = desc in SWING_DESCRIPTIONS and bb_type not in BUNT_BB_TYPES
+        if _swing:
             c[12] += 1  # swings
         if desc == 'Swinging Strike':
             c[13] += 1  # whiffs
 
         if in_zone == 'Yes':
             c[14] += 1  # izPitches
-            if desc in SWING_DESCRIPTIONS:
+            if _swing:
                 c[16] += 1  # izSwings
-                if bb_type not in BUNT_BB_TYPES:
-                    c[19] += 1  # izSwNonBunt
+                c[19] += 1  # izSwNonBunt (identical set now)
             if desc in ('Foul', 'In Play'):
                 if bb_type not in BUNT_BB_TYPES:
                     c[20] += 1  # izContact
         elif in_zone == 'No':
             c[15] += 1  # oozPitches
-            if desc in SWING_DESCRIPTIONS:
+            if _swing:
                 c[17] += 1  # oozSwings
 
         if desc in ('Foul', 'In Play'):
             c[18] += 1  # contact
 
         # Contact excluding bunts (for contactPct)
-        if desc in SWING_DESCRIPTIONS and bb_type not in BUNT_BB_TYPES:
-            c[47] += 1  # swingsNonBunt
+        if _swing:
+            c[47] += 1  # swingsNonBunt (identical set now)
         if desc in ('Foul', 'In Play') and bb_type not in BUNT_BB_TYPES:
             c[48] += 1  # contactNonBunt
 

@@ -584,14 +584,15 @@ def compute_group_stats(group_pitches, sacq_lookups, bats):
         pb = p.get('Bats') or bats
         return pb, (sacq_lookups.get(pb) or sacq_lookups.get(bats)
                     or next(iter(sacq_lookups.values())))
-    swings = [p for p in group_pitches if p.get('Description') in SWING_DESC]
+    # Bunts are not swings and not chases (2026-08-15) — one predicate,
+    # shared with the leaderboard (pipeline.utils.is_swing), so Swing%,
+    # Chase% and Whiff% here cannot drift from the columns they mirror.
+    # Bunt-attempt whiffs are indistinguishable from regular whiffs (no
+    # BBType on any swinging strike), so they stay in the numerator.
+    from pipeline.utils import is_swing as _is_swing
+    swings = [p for p in group_pitches if _is_swing(p)]
     whiffs = [p for p in group_pitches if p.get('Description') == 'Swinging Strike']
-    # Bunt-excluded swing count — matches the canonical leaderboard whiffPct
-    # denominator (pipeline_compute.py L400-402, L566). Bunt-attempt whiffs
-    # themselves are indistinguishable from regular whiffs (no BBType on any
-    # swinging strike), so they stay in the numerator — negligible.
-    swings_non_bunt = [p for p in swings
-                       if not str(p.get('BBType', '')).startswith('bunt')]
+    swings_non_bunt = swings
     iz = [p for p in group_pitches if compute_iz(p) is True]
     ooz_swings = [p for p in swings if compute_iz(p) is False]
     ooz_total = sum(1 for p in group_pitches if compute_iz(p) is False)

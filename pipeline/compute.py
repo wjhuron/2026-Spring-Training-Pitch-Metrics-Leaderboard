@@ -5,7 +5,7 @@ import math
 from collections import defaultdict
 
 from pipeline.utils import (
-    safe_float, median, is_barrel,
+    safe_float, median, is_barrel, is_swing,
     spray_angle, spray_direction,
     SWING_DESCRIPTIONS, HIT_EVENTS, K_EVENTS, BB_EVENTS, HBP_EVENTS,
     SF_EVENTS, SH_EVENTS, CI_EVENTS, NON_PA_EVENTS, BUNT_BB_TYPES,
@@ -204,18 +204,15 @@ def compute_stats(pitches):
     # two-strike whiff below already excluded them — pitcher Whiff%/IZ-Whiff%/
     # Chase% joined 2026-08-15). BBType is only set on In Play rows, so the
     # guard is inert for Swinging Strike / Foul.
-    swings = sum(1 for p in pitches if p['Description'] in SWING_DESCRIPTIONS
-                 and p.get('BBType') not in BUNT_BB_TYPES)
+    swings = sum(1 for p in pitches if is_swing(p))
     whiffs = sum(1 for p in pitches if p['Description'] == 'Swinging Strike')
     csw = sum(1 for p in pitches if p['Description'] in ('Called Strike', 'Swinging Strike'))
 
     iz_pitches = [p for p in pitches if p.get('InZone') == 'Yes']
-    iz_swings = sum(1 for p in iz_pitches if p['Description'] in SWING_DESCRIPTIONS
-                    and p.get('BBType') not in BUNT_BB_TYPES)
+    iz_swings = sum(1 for p in iz_pitches if is_swing(p))
     iz_whiffs = sum(1 for p in iz_pitches if p['Description'] == 'Swinging Strike')
     ooz = [p for p in pitches if p.get('InZone') == 'No']
-    ooz_swung = sum(1 for p in ooz if p['Description'] in ('Swinging Strike', 'In Play', 'Foul')
-                    and p.get('BBType') not in BUNT_BB_TYPES)
+    ooz_swung = sum(1 for p in ooz if is_swing(p))
 
     bip = [p for p in pitches if p.get('BBType') is not None and p.get('BBType') not in BUNT_BB_TYPES]
     gb = sum(1 for p in bip if p.get('BBType') == 'ground_ball')
@@ -462,33 +459,33 @@ def compute_hitter_stats(pitches):
     babip_denom = n_ab - n_k - n_hr + n_sf
     babip = round((n_h - n_hr) / babip_denom, 3) if babip_denom > 0 else None
 
-    n_swings = sum(1 for p in pitches if p['Description'] in SWING_DESCRIPTIONS)
+    # Bunts are not swings and not chases (2026-08-15): every swing
+    # denominator below goes through is_swing, which adds the bunt-BBType
+    # guard that Description alone misses on a bunt put in play. This also
+    # collapsed the old parallel swings_non_bunt / iz_swings_non_bunt
+    # counters — with bunts out of the base counts they were duplicates.
+    n_swings = sum(1 for p in pitches if is_swing(p))
     whiffs = sum(1 for p in pitches if p['Description'] == 'Swinging Strike')
 
     iz_pitches = [p for p in pitches if p.get('InZone') == 'Yes']
     ooz_pitches = [p for p in pitches if p.get('InZone') == 'No']
-    iz_swings = sum(1 for p in iz_pitches if p['Description'] in SWING_DESCRIPTIONS)
+    iz_swings = sum(1 for p in iz_pitches if is_swing(p))
     iz_whiffs = sum(1 for p in iz_pitches if p['Description'] == 'Swinging Strike')
-    ooz_swings = sum(1 for p in ooz_pitches if p['Description'] in SWING_DESCRIPTIONS)
+    ooz_swings = sum(1 for p in ooz_pitches if is_swing(p))
 
     iz_swing_pct = iz_swings / len(iz_pitches) if iz_pitches else None
     chase_pct = ooz_swings / len(ooz_pitches) if ooz_pitches else None
 
-    swings_non_bunt = sum(1 for p in pitches
-                          if p['Description'] in SWING_DESCRIPTIONS
-                          and p.get('BBType') not in BUNT_BB_TYPES)
+    swings_non_bunt = n_swings
     contact_non_bunt = sum(1 for p in pitches
                            if p['Description'] in ('Foul', 'In Play')
                            and p.get('BBType') not in BUNT_BB_TYPES)
-    contact_pct = contact_non_bunt / swings_non_bunt if swings_non_bunt > 0 else None
+    contact_pct = contact_non_bunt / n_swings if n_swings > 0 else None
 
-    iz_swings_non_bunt = sum(1 for p in iz_pitches
-                             if p['Description'] in SWING_DESCRIPTIONS
-                             and p.get('BBType') not in BUNT_BB_TYPES)
     iz_contact = sum(1 for p in iz_pitches
                      if p['Description'] in ('Foul', 'In Play')
                      and p.get('BBType') not in BUNT_BB_TYPES)
-    iz_contact_pct = iz_contact / iz_swings_non_bunt if iz_swings_non_bunt > 0 else None
+    iz_contact_pct = iz_contact / iz_swings if iz_swings > 0 else None
 
     bip = [p for p in pitches if p.get('BBType') is not None and p.get('BBType') not in BUNT_BB_TYPES]
     n_bip = len(bip)
