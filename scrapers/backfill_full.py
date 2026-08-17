@@ -67,7 +67,7 @@ from scrapers.backfill_supplement import (
 from scrapers.sheet_precision import (
     PRECISION, NUMBER_FORMATS, STRING_COLS, TIME_COLS, TILT_MINUTES,
     UNFORMATTED_COLS, fmt, as_float, stored_decimals, tilt_minutes, tilt_gap,
-    merge_rendered,
+    merge_rendered, domain_problem,
 )
 
 DATA = os.path.join(_ROOT, 'data')
@@ -938,6 +938,22 @@ def recommend(kind, col, old, new, units, pitcher, pitch_type, game_pk,
     """Return (verdict, one-line reason)."""
     if (game_pk, col) in KNOWN_BAD_SOURCE:
         return REJECT, 'source is wrong for this whole game'
+
+    # Domain check, before anything else. The per-event columns have no player
+    # median to be judged against, and until Wally asked for a real test that meant
+    # they were adopted with NOTHING checking them: 1,293 rows in the season set,
+    # covering the expected stats, the batted-ball block, the bat-tracking block and
+    # every string column. "The pitcher's median is the wrong yardstick" was true
+    # and became "no yardstick", which was never the intent.
+    #
+    # What they do have is a domain. Codes, angles and rate scales are fixed by
+    # arithmetic; Count, Runners and BBType are closed sets. See
+    # sheet_precision.HARD_DOMAIN, SOFT_DOMAIN and VOCABULARY. Applied to every
+    # column, not just the per-event ones, since a Velocity outside its envelope is
+    # no more welcome than a Barrel of 7.
+    bad = domain_problem(col, new)
+    if bad:
+        return REJECT, bad
 
     if kind in ('zone_fix', 'zone_fix_nodonor'):
         return ADOPT, 'zone belongs to another hitter'

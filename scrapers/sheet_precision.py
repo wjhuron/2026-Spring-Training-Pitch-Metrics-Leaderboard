@@ -251,3 +251,71 @@ def stored_decimals(text):
     except ValueError:
         return None
     return len(s.split('.')[1]) if '.' in s else 0
+
+
+# ── Domain validation for the per-event columns ──────────────────────────────
+# These columns describe a single event, so no player median is a yardstick for
+# them, and until 2026-08-17 that meant they were adopted with NOTHING checking
+# them: 1,293 rows across the season set. Wally asked for a real test.
+#
+# What they DO have is a domain. Some are mathematically fixed — a code, an angle,
+# a probability-like quantity — and those are asserted without inventing anything.
+# The closed vocabularies are read off 583,619 real rows, and every one of them is
+# a small enumerated set that a feed cannot legitimately extend mid-season.
+#
+# The soft-bounded quantities (ExitVelo, Distance, HC_X, HC_Y, BatSpeed,
+# SwingLength, RunExp) have no fixed limit, so their envelopes are a CONVENTION:
+# the observed range across the season widened by roughly a third, chosen only to
+# catch a garbage value while never rejecting a real extreme. Observed ranges at
+# the time of writing, for reference when one of these ever trips:
+#   ExitVelo 4.0..119.0   Distance 0..474   HC_X 1.0..254.8   HC_Y 6.9..254.0
+#   BatSpeed 50.0..88.0   SwingLength 3.7..15.7   RunExp -2.702..0.637
+HARD_DOMAIN = {
+    # code sets and counts — exact, not conventional
+    'Barrel': (1, 6), 'Outs': (0, 2),
+    # angles in degrees — geometry fixes these
+    'LaunchAngle': (-90, 90), 'AttackAngle': (-90, 90),
+    'AttackDirection': (-180, 180), 'SwingPathTilt': (0, 90),
+    # expected-stat scales — a rate cannot leave its own scale
+    'xBA': (0, 1), 'xSLG': (0, 4), 'xwOBA': (0, 2.1),
+}
+SOFT_DOMAIN = {
+    'ExitVelo': (0, 130), 'Distance': (0, 600),
+    'HC_X': (0, 300), 'HC_Y': (0, 300),
+    'BatSpeed': (40, 110), 'SwingLength': (2, 20),
+    'RunExp': (-3.5, 1.5),
+}
+VOCABULARY = {
+    'BBType': {'bunt', 'fly_ball', 'ground_ball', 'line_drive', 'popup'},
+    'Count': {f'{b}-{s}' for b in range(4) for s in range(3)},
+    'Runners': {'0', '1', '2', '3', '1+2', '1+3', '2+3', '1+2+3'},
+}
+
+
+def domain_problem(col, value):
+    """Why `value` cannot be right for `col`, or None if it is admissible.
+
+    Only knows about the per-event columns. Returns None for anything it has no
+    opinion on, so a column absent from these tables is unaffected.
+    """
+    if value in (None, ''):
+        return None
+    if col in VOCABULARY:
+        if str(value).strip() not in VOCABULARY[col]:
+            return (f'{value!r} is not one of the {len(VOCABULARY[col])} values '
+                    f'{col} can take')
+        return None
+    lo_hi = HARD_DOMAIN.get(col)
+    hard = lo_hi is not None
+    if lo_hi is None:
+        lo_hi = SOFT_DOMAIN.get(col)
+    if lo_hi is None:
+        return None
+    v = as_float(value)
+    if v is None:
+        return f'{value!r} is not a number'
+    lo, hi = lo_hi
+    if not (lo <= v <= hi):
+        return (f'{v} is outside the {"fixed" if hard else "plausible"} range '
+                f'{lo} to {hi} for {col}')
+    return None
