@@ -11,6 +11,7 @@ import urllib.parse
 from datetime import timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from scrapers.sheet_precision import merge_rendered
 from pipeline.guts import scrape_guts
 from pipeline.utils import (
     DATA_DIR, MLB_TEAMS, ALL_TEAMS, TEAM_ABBREV_TO_ID,
@@ -228,8 +229,26 @@ def sheets_call_with_retry(fn, max_retries=5):
 
 
 def read_sheet_with_retry(ws, max_retries=5):
-    """Read a worksheet's values through the transient-error retry wrapper."""
-    return sheets_call_with_retry(ws.get_all_values, max_retries)
+    """Read a worksheet's values through the transient-error retry wrapper.
+
+    Two reads, merged per column. `get_all_values` returns the DISPLAYED string,
+    and eight columns are displayed at fewer decimals than they store: Extension
+    holds 6.6053 and shows 6.61. Google will not let this account change the
+    number format on them — see scrapers/sheet_precision.py:UNFORMATTED_COLS for
+    the four API paths that were tried and accepted without effect — so the site
+    was getting two decimals where the sheet had four.
+
+    Only the columns in UNFORMATTED_COLS come from the unformatted read. It cannot
+    be a blanket switch: read unformatted, Game Date comes back as the serial
+    46241 and RTilt 1:03 comes back as 0.04375.
+    """
+    formatted = sheets_call_with_retry(ws.get_all_values, max_retries)
+    if not formatted:
+        return formatted
+    unformatted = sheets_call_with_retry(
+        lambda: ws.get_all_values(value_render_option='UNFORMATTED_VALUE'),
+        max_retries)
+    return merge_rendered(formatted[0], formatted, unformatted)
 
 
 def read_pitches_from_sheet(gc, sheet_id, extra_tabs=None, only_tabs=None):

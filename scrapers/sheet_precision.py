@@ -117,6 +117,55 @@ def fmt(col, value):
         return ''
 
 
+# Columns read as UNFORMATTED values rather than as the displayed string.
+#
+# Google will not let this account change the number format on eight of these
+# columns. Verified 2026-08-17 on the HOU tab: repeatCell over the whole column,
+# repeatCell with an explicit endRowIndex, gspread's ws.format() on three cells,
+# and a deliberately different pattern were all accepted with HTTP 200 and empty
+# replies, and none of them changed anything. There are no protected ranges, no
+# banded ranges and no conditional formats on the tab, and a value write to the
+# same cell lands fine.
+#
+# The values in the sheet ARE correct. Extension stores 6.6053 and displays 6.61.
+# So the fix is to stop reading the display: get_all_values() returns the
+# formatted string, and UNFORMATTED_VALUE returns the stored number.
+#
+# It has to be per column, not a blanket switch. Read unformatted, Game Date comes
+# back as 46241 and the tilts come back as a fraction of a day — 1:03 becomes
+# 0.04375. So the set is every column with a declared decimal depth, MINUS the
+# tilts, which leaves dates, times and strings on the formatted read where they
+# belong.
+UNFORMATTED_COLS = set(PRECISION) - TIME_COLS
+
+
+def merge_rendered(header, formatted_rows, unformatted_rows):
+    """Merge a formatted and an unformatted read into one grid of strings.
+
+    UNFORMATTED_COLS take their value from the unformatted read and are then put
+    back through fmt(), so both sides of any later comparison are rendered by the
+    same function and a display format cannot make a matching value look changed.
+    Every other column keeps the formatted string.
+
+    Row 0 is the header and is passed through untouched. It must be: running the
+    header through fmt() turns every substituted column name into '', because
+    float('Extension') raises, and the caller then cannot find its own columns.
+    """
+    idx = [(j, name) for j, name in enumerate(header)
+           if name in UNFORMATTED_COLS]
+    out = [list(formatted_rows[0])]
+    for r in range(1, len(formatted_rows)):
+        row = list(formatted_rows[r])
+        urow = unformatted_rows[r] if r < len(unformatted_rows) else []
+        for j, name in idx:
+            if j >= len(row):
+                continue
+            raw = urow[j] if j < len(urow) else ''
+            row[j] = '' if raw == '' or raw is None else fmt(name, raw)
+        out.append(row)
+    return out
+
+
 def as_float(text):
     """Parse a sheet string to float, or None. Blank and junk both give None."""
     if text is None:

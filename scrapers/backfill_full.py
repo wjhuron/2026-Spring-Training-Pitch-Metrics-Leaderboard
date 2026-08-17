@@ -66,7 +66,8 @@ from scrapers.backfill_supplement import (
 )
 from scrapers.sheet_precision import (
     PRECISION, NUMBER_FORMATS, STRING_COLS, TIME_COLS, TILT_MINUTES,
-    fmt, as_float, stored_decimals, tilt_minutes, tilt_gap,
+    UNFORMATTED_COLS, fmt, as_float, stored_decimals, tilt_minutes, tilt_gap,
+    merge_rendered,
 )
 
 DATA = os.path.join(_ROOT, 'data')
@@ -1797,7 +1798,18 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
             if i > 0:
                 time.sleep(1.5)
 
+            # Two reads, merged per column. The displayed string truncates
+            # eight columns — Extension stores 6.6053 and shows 6.61 — and Google
+            # will not let this account repin those formats. Comparing against the
+            # display made the sweep propose the same cells forever: on HOU, run 2
+            # re-proposed 162,179 cells that run 1 had already written correctly.
             rows = read_sheet_with_retry(ws)
+            if rows:
+                unformatted = _retry_sheets_call(
+                    lambda: ws.get_all_values(
+                        value_render_option='UNFORMATTED_VALUE'),
+                    'unformatted sheet read')
+                rows = merge_rendered(rows[0], rows, unformatted)
             if not rows or len(rows) < 2:
                 print("  empty tab")
                 continue
