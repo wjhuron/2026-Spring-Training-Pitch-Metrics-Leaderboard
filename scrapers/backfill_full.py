@@ -736,6 +736,41 @@ def _wanted(ch, decisions, kinds):
 
 # ── Reading a reviewed workbook back in ──────────────────────────────────────
 def read_decisions(path):
+    """Read one reviewed workbook, or a whole folder of them.
+
+    A season sweep hands back 31 workbooks, so pointing --decisions-from at the
+    folder reads them all and merges the result. Conflicts are caught across files
+    as well as within one: the same cell answered two ways in two different
+    workbooks has no right reading, and taking whichever file sorted last would
+    hide the disagreement.
+    """
+    if os.path.isdir(path):
+        books = sorted(f for f in os.listdir(path) if f.lower().endswith('.xlsx')
+                       and not f.startswith('~$'))
+        if not books:
+            raise SystemExit(f"No .xlsx files in {path}")
+        print(f"  reading {len(books)} workbooks from {os.path.basename(path)}/")
+        merged, origin, clashes = {}, {}, []
+        for b in books:
+            one = _read_one_workbook(os.path.join(path, b))
+            for k, v in one.items():
+                if k in merged and merged[k] != v:
+                    clashes.append((k, origin[k], b))
+                merged[k] = v
+                origin[k] = b
+        if clashes:
+            raise SystemExit(
+                f"REFUSING: {len(clashes)} cells are answered two different ways "
+                f"in two different workbooks, e.g. {clashes[0][0]} in "
+                f"{clashes[0][1]} and {clashes[0][2]}. Make them agree and re-run.")
+        print(f"  {len(merged)} decisions across {len(books)} workbooks; "
+              f"{sum(merged.values())} cells to write, "
+              f"{len(merged) - sum(merged.values())} to leave alone")
+        return merged
+    return _read_one_workbook(path)
+
+
+def _read_one_workbook(path):
     """Turn a reviewed dry-run workbook into a decision map.
 
     Returns {(PitchID, column): True to write, False to leave alone}.
@@ -2046,10 +2081,11 @@ if __name__ == '__main__':
                     default=('new,drift,drift_sub,drift_small,precision,'
                              'zone_fix,zone_fix_nodonor'),
                     help='which change classes --apply writes')
-    ap.add_argument('--decisions-from', default=None, metavar='XLSX',
-                    help='a reviewed dry-run workbook. Each row follows its '
-                         'Recommend column, inverted where the Reject box is '
-                         'ticked. Without this, every recommendation stands.')
+    ap.add_argument('--decisions-from', default=None, metavar='XLSX_OR_DIR',
+                    help='a reviewed dry-run workbook, or a FOLDER of them. Each '
+                         'row follows its Recommend column, inverted where the '
+                         'override box was changed. Without this, every '
+                         'recommendation stands.')
     ap.add_argument('--no-record', action='store_true',
                     help='do not write what this sweep surfaced into '
                          'data/backfill_decisions.json. Use for an exploratory '
