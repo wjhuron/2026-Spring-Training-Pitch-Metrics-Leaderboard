@@ -748,6 +748,7 @@ def read_decisions(path):
     wb = load_workbook(path, read_only=True, data_only=True)
     out, flipped, seen = {}, 0, 0
     boxes_seen = boxes_intact = 0
+    conflicts = []
     for name in wb.sheetnames:
         ws = wb[name]
         header = None
@@ -772,8 +773,20 @@ def read_decisions(path):
                 flipped += 1
             else:
                 boxes_intact += 1
-            out[(str(pid), str(col))] = write
+            key = (str(pid), str(col))
+            if key in out and out[key] != write:
+                conflicts.append((key, name))
+            out[key] = write
             seen += 1
+    # A cell listed on two tabs with two different answers has no right reading,
+    # and silently taking the last one would hide the disagreement.
+    if conflicts:
+        raise SystemExit(
+            f"REFUSING to read {os.path.basename(path)}: "
+            f"{len(conflicts)} cells are answered two different ways on two "
+            f"different tabs, e.g. {conflicts[0][0]} on {conflicts[0][1]}. "
+            f"Make them agree and run this again.")
+
     # A workbook with no boxes left ANYWHERE is a format conversion dropping the
     # glyph, not a decision to overturn every recommendation. Refuse rather than
     # invert a few hundred rows on a guess.
@@ -1469,7 +1482,11 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     # value by as much as the sheet was already displaying.
     # Already-seen rows are left OFF the tabs entirely. Wally's rule: a value a
     # sweep has raised once does not come back. They stay in the SUMMARY counts.
-    HIDDEN = SUMMARY_ONLY_KINDS | {'suppressed'}
+    # Zone repairs get their own tabs, so keeping them on the SzTop and SzBot
+    # tabs too listed 29 HOU cells twice. Harmless while both copies agreed, but a
+    # decision made in one place and not the other would have been resolved by
+    # whichever tab happened to be read last.
+    HIDDEN = SUMMARY_ONLY_KINDS | {'suppressed', 'zone_fix', 'zone_fix_nodonor'}
     for c in order:
         rows_ = [r for r in by_col[c] if r.kind not in HIDDEN]
         if not rows_:
@@ -1863,11 +1880,20 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
               f"hitter in their game and are reported instead")
         all_changes.extend(zc)
         if apply and zc:
-            zc = [c for c in zc if _wanted(c, decisions, kinds)]
-            for tab, group in collections.groupby(
-                    sorted(zc, key=lambda c: c.tab), key=lambda c: c.tab):
+            accepted = [c for c in zc if _wanted(c, decisions, kinds)]
+            per_tab = collections.defaultdict(list)
+            for c in accepted:
+                per_tab[c.tab].append(c)
+            for tab, group in sorted(per_tab.items()):
+                if tab not in tab_handles:
+                    # Cannot happen on a normal run: a zone change is only built
+                    # from a row this run read. Guard anyway rather than crash
+                    # after the main write has already landed.
+                    print(f"  WARNING: {len(group)} zone cells for {tab}, which "
+                          f"this run never opened. Skipped; re-run that tab.")
+                    continue
                 ws, header = tab_handles[tab]
-                n = apply_changes(ws, header, list(group))
+                n = apply_changes(ws, header, group)
                 print(f"  {tab}: wrote {n} zone cells")
 
     # ---- summary ----
@@ -1898,26 +1924,42 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
             print(f"  {tab} {gpk}: {err}")
 
     if report:
+        # ONE WORKBOOK PER TEAM, with the team code in the filename. Wally's ask
+        # 2026-08-17: a season sweep touches 31 tabs, and a single workbook of
+        # everything is neither reviewable nor tellable apart in Downloads.
+        # Grouped by the tab the row lives in, so a zone repair lands in the
+        # workbook of the team whose sheet holds that row.
         os.makedirs(REPORT_DIR, exist_ok=True)
         stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        # The team code goes in the filename. Wally's ask 2026-08-17: with one
-        # workbook per tab in flight at a time, a bare timestamp gives no way to
-        # tell which is which in Downloads. Uses the tabs actually walked rather
-        # than the --teams argument, so a whole-season run says ALL and a run
-        # whose tabs were filtered names them.
-        walked = sorted({c.tab for c in all_changes} | {m[1].get('_PTeam', '')
-                                                        for m in all_missing})
-        walked = [t for t in walked if t]
-        if not walked:
-            label = 'none'
-        elif len(walked) > 6:
-            label = f'ALL{len(walked)}'
+        out_dir = os.path.join(REPORT_DIR, f'backfill_{stamp}')
+        by_tab = collections.defaultdict(list)
+        for c in all_changes:
+            by_tab[c.tab].append(c)
+        miss_by_tab = collections.defaultdict(list)
+        for m in all_missing:
+            miss_by_tab[m[1].get('_PTeam', '') or '?'].append(m)
+        zone_by_tab = collections.defaultdict(list)
+        for u in unexplained_zones:
+            zone_by_tab[u['tab']].append(u)
+
+        tabs = sorted(set(by_tab) | set(miss_by_tab) | set(zone_by_tab))
+        if len(tabs) > 1:
+            os.makedirs(out_dir, exist_ok=True)
+        written = []
+        for tab in tabs:
+            base = os.path.join(out_dir if len(tabs) > 1 else REPORT_DIR,
+                                f'backfill_{tab}_{stamp}.xlsx')
+            write_report(by_tab.get(tab, []), miss_by_tab.get(tab, []), ledger,
+                         base, unexplained_zones=zone_by_tab.get(tab, []))
+            written.append(base)
+        if len(written) == 1:
+            print(f"\nReport: {written[0]}")
+        elif written:
+            print(f"\n{len(written)} reports in {out_dir}:")
+            for w in written:
+                print(f"  {os.path.basename(w)}")
         else:
-            label = '-'.join(walked)
-        path = os.path.join(REPORT_DIR, f'backfill_{label}_{stamp}.xlsx')
-        write_report(all_changes, all_missing, ledger, path,
-                     unexplained_zones=unexplained_zones)
-        print(f"\nReport: {path}")
+            print("\nNo changes anywhere, so no report was written.")
 
     if record:
         n_new = record_sweep(all_changes, ledger)
