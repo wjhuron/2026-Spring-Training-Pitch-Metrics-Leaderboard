@@ -67,7 +67,7 @@ from scrapers.backfill_supplement import (
 from scrapers.sheet_precision import (
     PRECISION, NUMBER_FORMATS, STRING_COLS, TIME_COLS, TILT_MINUTES,
     UNFORMATTED_COLS, fmt, as_float, stored_decimals, tilt_minutes, tilt_gap,
-    merge_rendered, domain_problem,
+    merge_rendered, domain_problem, HARD_DOMAIN, SOFT_DOMAIN, VOCABULARY,
 )
 
 DATA = os.path.join(_ROOT, 'data')
@@ -764,6 +764,16 @@ def logic_fingerprint():
         'badsrc=' + ','.join(sorted(f'{g}:{c}' for g, c in KNOWN_BAD_SOURCE)),
         'prec=' + ','.join(f'{k}:{v}' for k, v in sorted(PRECISION.items())),
         'subnoise=adopt',
+        # The domain tables decide a recommendation too, so they belong here. They
+        # were missed on the first pass: adding the whole per-event domain check
+        # left the fingerprint at 7f9ac767c081, so a workbook from before it and one
+        # from after would have compared equal and the guard would have waved a
+        # stale file straight through. A fingerprint that does not move when the
+        # logic moves is worse than none, because it looks like a safeguard.
+        'hard=' + ','.join(f'{k}:{v}' for k, v in sorted(HARD_DOMAIN.items())),
+        'soft=' + ','.join(f'{k}:{v}' for k, v in sorted(SOFT_DOMAIN.items())),
+        'vocab=' + ','.join(f'{k}:{len(v)}:{sorted(v)[0]}'
+                            for k, v in sorted(VOCABULARY.items())),
     ]
     return hashlib.sha256('|'.join(parts).encode()).hexdigest()[:12]
 
