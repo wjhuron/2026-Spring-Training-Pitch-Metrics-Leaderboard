@@ -882,7 +882,7 @@ PLAIN_KIND = {
 
 
 def recommend(kind, col, old, new, units, pitcher, pitch_type, game_pk,
-              batter=None, bteam=None):
+              batter=None, bteam=None, zone_pair=None):
     """Return (verdict, one-line reason)."""
     if (game_pk, col) in KNOWN_BAD_SOURCE:
         return REJECT, 'source is wrong for this whole game'
@@ -902,18 +902,38 @@ def recommend(kind, col, old, new, units, pitcher, pitch_type, game_pk,
     # have reverted the repair. Left alone that is a permanent oscillation:
     # repair, revert, repair, revert, one round trip per sweep.
     if col in ZONE_COLS:
+        # The strike zone is a PAIR, and it has to be judged as one. Judging the
+        # two columns independently is what put the drift path and the zone-repair
+        # path into permanent disagreement.
+        #
+        # Found 2026-08-17 on three HOU cells that flipped every sweep. Jose
+        # Fermin's at-bat 824205_067 carries a feed zone of 3.113/1.571 against his
+        # own 3.140/1.580. SzTop is 0.32 inches off, so the whole reading belongs to
+        # someone else, but SzBot on its own is only 0.11 inches off. The drift path
+        # looked at SzBot alone, called it close enough, and wrote 1.571.
+        # zone_outlier_changes() then looked at the pair, saw the 0.32 on SzTop, and
+        # wanted the hitter's 1.580 back. One flip per sweep, forever.
+        #
+        # So the test here is now exactly the test in zone_outlier_changes(): if
+        # EITHER coordinate is more than ZONE_OUTLIER_FT off the hitter's own zone,
+        # the reading is foreign and neither column may be taken from it. Same
+        # question, same inputs, so the two paths cannot disagree by construction.
         modal = hitter_modal_zone(batter, bteam)
         if modal is None:
             return ADOPT, 'no modal zone on file for this hitter'
-        want = modal[0] if col == 'SzTop' else modal[1]
-        v = as_float(new)
-        if v is None:
-            return ADOPT, 'not a number'
-        off = abs(v - want)
-        if off > ZONE_OUTLIER_FT:
-            return REJECT, (f'{off * 12:.2f} in from his own zone of {want:.3f}, '
-                            f'so this is another hitter\'s zone')
-        return ADOPT, f'{off * 12:.2f} in from his own zone of {want:.3f}'
+        if not zone_pair or any(as_float(v) is None for v in zone_pair):
+            return ADOPT, 'incomplete zone reading, nothing to compare'
+        off_top = abs(as_float(zone_pair[0]) - modal[0])
+        off_bot = abs(as_float(zone_pair[1]) - modal[1])
+        worst = max(off_top, off_bot)
+        mine = modal[0] if col == 'SzTop' else modal[1]
+        if worst > ZONE_OUTLIER_FT:
+            which = 'SzTop' if off_top >= off_bot else 'SzBot'
+            return REJECT, (f'this at-bat\'s zone reading is {worst * 12:.2f} in off '
+                            f'his own {modal[0]:.3f}/{modal[1]:.3f} on {which}, so '
+                            f'the whole reading is another hitter\'s')
+        return ADOPT, (f'zone reading is within {worst * 12:.2f} in of his own '
+                       f'{modal[0]:.3f}/{modal[1]:.3f}')
 
     if col not in PITCH_METRIC_COLS:
         if col in STRING_COLS:
@@ -1320,7 +1340,9 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
                          fill_units(col, pitcher, pitch_type, new))
                 rec, rec_why = recommend(kind, col, old, new, probe,
                                          pitcher, pitch_type, pid.split('_')[0],
-                                         batter=batter, bteam=cell('BTeam'))
+                                         batter=batter, bteam=cell('BTeam'),
+                                         zone_pair=(expected.get('SzTop'),
+                                                    expected.get('SzBot')))
                 if (pid.split('_')[0], col) in KNOWN_BAD_SOURCE:
                     kind = 'blocked_source'
 
