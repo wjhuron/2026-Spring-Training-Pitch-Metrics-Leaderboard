@@ -51,6 +51,7 @@ import math
 import os
 import time
 from datetime import datetime
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 import gspread
 import pandas as pd
@@ -63,8 +64,8 @@ from scrapers.backfill_supplement import (
     download_statcast,
 )
 from scrapers.sheet_precision import (
-    PRECISION, NUMBER_FORMATS, STRING_COLS, TIME_COLS,
-    fmt, as_float, stored_decimals,
+    PRECISION, NUMBER_FORMATS, STRING_COLS, TIME_COLS, TILT_MINUTES,
+    fmt, as_float, stored_decimals, tilt_minutes, tilt_gap,
 )
 
 DATA = os.path.join(_ROOT, 'data')
@@ -203,6 +204,158 @@ def feed_rows(game_pk, session, refresh=False):
             out[pid]['_PTeam'] = str(rec.get('PTeam') or '')
     _FEED_ROWS_CACHE[game_pk] = out
     return out
+
+
+# ── Noise scale, for deciding what needs a human ─────────────────────────────
+# Wally's rule (2026-08-17): drift that is only drift gets force-overwritten;
+# changes big enough to be a real correction are the ones he decides on. That
+# needs a per-column yardstick, and the natural one is the column's own spread
+# within a (pitcher, pitch type) group. A 10 rpm move is 0.11 of that spread; a
+# 760 rpm move is 8.5 of it. Absolute thresholds cannot do that job, because
+# 10 rpm and 10 mph are not remotely the same size of claim.
+#
+# Robust scale (MAD x 1.4826) so the misreads we are hunting do not inflate the
+# yardstick that is meant to catch them. Measured over the current sheet, at the
+# sample size production runs at, using groups of 30 pitches or more.
+SCALE_MIN_N = 30
+BASELINE_MIN_N = 10
+
+# Drift beyond this many scale units goes to review; below it, it is written
+# without asking. CONVENTION, not a measured optimum — no objective trades review
+# effort against missed corrections, so none exists to bracket. What the data
+# does say is that the choice barely matters: of ARI's 17,762 scaled drift cells,
+# 99.85% sit below 1.0 and the sweep gives 91 review rows at 0.5, 26 at 1.0, 10
+# at 2.0 and 7 at 3.0. Every point in that range leaves a list short enough to
+# actually read, so 1.0 is picked for being the round number in the flat part.
+DRIFT_REVIEW_SD = 1.0
+
+# A blank cell whose candidate value sits further than this from the pitcher's
+# own median for that pitch type is not offered as a fill. Also a CONVENTION.
+# Wally deleted values like a 55.9 mph fastball against a 95 mph median, which is
+# 33 scale units out; the gate exists so that class never comes back. Candidates
+# beyond it are NOT written and NOT silently dropped — they land in the
+# _IMPLAUSIBLE FILLS tab, rolled up by game, because on ARI the tail turned out
+# to be a systematic per-game defect rather than 140 unrelated cells.
+FILL_REVIEW_SD = 4.0
+
+_BASELINES = None
+
+
+def baselines():
+    """(scale, median) per column, from the current sheet cache.
+
+    scale[col]              -> robust SD within a (pitcher, pitch type) group
+    median[col][(p, ptype)] -> that group's median, the plausibility baseline
+    """
+    global _BASELINES
+    if _BASELINES is not None:
+        return _BASELINES
+    import pickle
+    import statistics
+    path = os.path.join(DATA, 'all_pitches_rs_cache.pkl')
+    if not os.path.exists(path):
+        print(f"  WARNING: {os.path.relpath(path, _ROOT)} is missing, so no "
+              f"noise scale can be measured. EVERY drift and every blank fill "
+              f"will be sent to review rather than written silently. Run "
+              f"python3 -m pipeline.process_data to rebuild it.")
+        _BASELINES = ({}, {})
+        return _BASELINES
+
+    print("  measuring the per-column noise scale from the sheet cache...")
+    rows = pickle.load(open(path, 'rb'))
+    cols = [c for c in IN_SCOPE if c in PRECISION]
+    grp = collections.defaultdict(lambda: collections.defaultdict(list))
+    for x in rows:
+        key = (x.get('Pitcher'), x.get('Pitch Type'))
+        for c in cols:
+            v = as_float(x.get(c))
+            if v is not None:
+                grp[c][key].append(v)
+
+    scale, median = {}, {}
+
+    # RTilt and OTilt need their own pass. They are clock readings, so their
+    # spread has to be measured circularly around the group's modal reading, or
+    # every group straddling noon reports a spread of about six hours. Without a
+    # scale here, every tilt change lands in review however small it is, and on
+    # ARI that meant 39 rows of which most were a one or two minute wobble.
+    for c in TIME_COLS:
+        if c not in IN_SCOPE:
+            continue
+        tg = collections.defaultdict(list)
+        for x in rows:
+            m = tilt_minutes(x.get(c))
+            if m is not None:
+                tg[(x.get('Pitcher'), x.get('Pitch Type'))].append(m)
+        sds, med = [], {}
+        for key, vals in tg.items():
+            mode = collections.Counter(vals).most_common(1)[0][0]
+            if len(vals) >= BASELINE_MIN_N:
+                med[key] = mode
+            if len(vals) >= SCALE_MIN_N:
+                devs = []
+                for v in vals:
+                    d = abs(v - mode) % TILT_MINUTES
+                    devs.append(min(d, TILT_MINUTES - d))
+                sd = 1.4826 * statistics.median(devs)
+                if sd > 0:
+                    sds.append(sd)
+        median[c] = med
+        if sds:
+            scale[c] = statistics.median(sds)
+
+    for c in cols:
+        sds, med = [], {}
+        for key, vals in grp[c].items():
+            m = statistics.median(vals)
+            if len(vals) >= BASELINE_MIN_N:
+                med[key] = m
+            if len(vals) >= SCALE_MIN_N:
+                s = 1.4826 * statistics.median([abs(v - m) for v in vals])
+                if s > 0:
+                    sds.append(s)
+        median[c] = med
+        if sds:
+            scale[c] = statistics.median(sds)
+    print(f"    scale measured for {len(scale)} columns "
+          f"({len(cols)} numeric + {len(TIME_COLS & set(IN_SCOPE))} tilt)")
+    _BASELINES = (scale, median)
+    return _BASELINES
+
+
+def scale_units(col, delta, old=None, new=None):
+    """|delta| in the column's own noise units, or None when it has no scale.
+
+    For RTilt and OTilt the delta has to come from tilt_gap rather than a
+    subtraction, because the clock wraps at noon.
+    """
+    scale, _ = baselines()
+    s = scale.get(col)
+    if s is None:
+        return None
+    if col in TIME_COLS:
+        g = tilt_gap(old, new)
+        return None if g is None else g / s
+    if delta is None:
+        return None
+    return abs(delta) / s
+
+
+def fill_units(col, pitcher, pitch_type, value):
+    """How far a candidate fill sits from that pitcher's own median, in units."""
+    scale, median = baselines()
+    s = scale.get(col)
+    m = (median.get(col) or {}).get((pitcher, pitch_type))
+    if s is None or m is None:
+        return None
+    if col in TIME_COLS:
+        mv = tilt_minutes(value)
+        if mv is None:
+            return None
+        d = abs(mv - m) % TILT_MINUTES
+        return min(d, TILT_MINUTES - d) / s
+    v = as_float(value)
+    return None if v is None else abs(v - m) / s
 
 
 # ── Prior-decision ledger ────────────────────────────────────────────────────
@@ -372,7 +525,14 @@ class DecisionLedger:
 # One row per proposed cell change.
 Change = collections.namedtuple(
     'Change', 'tab row col pitcher batter game_date pitch_id '
-              'old new kind delta source')
+              'old new kind delta source units')
+# `units` is |delta| expressed in the column's own noise scale, or None for a
+# string, a time value, or a column with no measurable spread.
+
+# Written without asking. Everything else needs Wally to look at it.
+AUTO_KINDS = {'precision', 'drift_sub', 'drift_small', 'zone_fix'}
+# Counted on SUMMARY only; never listed row by row.
+SUMMARY_ONLY_KINDS = {'precision', 'drift_sub', 'drift_small'}
 
 # kind:
 #   new         sheet cell is blank, the source has a value
@@ -415,63 +575,184 @@ def classify(col, old, new):
     d = stored_decimals(old)
     if d is None:
         return 'drift'
-    if round(n, d) == round(o, d):
+
+    # Both comparisons run in the DECIMAL domain, not the float domain. Done in
+    # floats, HAA 1.90 -> 1.905 computes |n-o| as 0.0050000000000001155 and
+    # tests false against half a unit of 10^-2, so the code contradicted its own
+    # rule and filed the cell as drift. That single artifact produced 2,418 of
+    # ARI's 20,224 drift rows: HAA 662, PlateZ 654, VAA 328, RelPosX 87,
+    # RelPosZ 25, SzTop 24, Extension 22, all sitting exactly on the boundary.
+    # Decimal(old) is exact because `old` is the sheet's own string, and
+    # Decimal(new) is exact because `new` came out of fmt() at a fixed depth.
+    # There is no epsilon and no tolerance to tune.
+    try:
+        do, dn = Decimal(old), Decimal(new)
+    except InvalidOperation:
+        return 'drift'
+    if do.quantize(Decimal(1).scaleb(-d), rounding=ROUND_HALF_UP) == \
+       dn.quantize(Decimal(1).scaleb(-d), rounding=ROUND_HALF_UP):
         return 'precision'
-    # The epsilon is not a tuning knob, it is a float-comparison guard. Without
-    # it, HAA 1.90 -> 1.905 computes a delta of 0.0050000000000001 and lands in
-    # `drift` instead of `drift_sub`. That one artifact accounted for 1,826 of
-    # ARI's 20,224 drift rows: HAA 662, PlateZ 654, VAA 328, RelPosX 87, RelPosZ
-    # 25, SzTop 24, Extension 22, every one of them at exactly the boundary.
-    if abs(n - o) <= 0.5 * (10 ** -d) + 1e-9:
+    if abs(dn - do) <= Decimal(1).scaleb(-d) / 2:
         return 'drift_sub'
     return 'drift'
 
 
-def modal_zone_changes(zone_obs):
-    """Optional: force one SzTop/SzBot per hitter, using the modal feed value.
+# Deviation from a hitter's own modal strike zone, beyond which the cell is not
+# a rounding artifact. MEASURED, not chosen: across all 583,619 zone cells the
+# distribution is sharply bimodal in inches — 573,333 within 0.06, then 3,784 to
+# 0.12, then 6,411 to 0.25, then it collapses to 46 in the 0.25 to 0.5 band and
+# 45 beyond. That 140x drop between the 0.12-0.25 band and the 0.25-0.5 band is
+# the break, and it leaves 91 cells in the whole season above it.
+ZONE_OUTLIER_FT = 0.25 / 12
 
-    OFF by default, and it should stay off unless Wally decides otherwise.
-    Measured 2026-08-17 on 33 cells across 6 flagged at-bats: the sheet already
-    matches the feed on 25 of them. The odd values are in MLB's own data, and
-    MLB really does re-measure a stance mid-plate-appearance — Altuve's at-bat
-    824170_065 reads 3.161/1.595 for pitches 1 to 3 and 2.926/1.477 for pitches
-    4 to 6. Normalising those would replace faithful source data with a number
-    MLB never reported for that pitch.
+_ZONE_INDEX = None
 
-    Keyed on (Batter, BTeam) rather than Batter alone, because two players share
-    a name: Max Muncy reads 3.128/1.579 for LAD and 3.228/1.629 for ATH, and
-    both are correct. A name-only key would corrupt one of them.
+
+def _sheet_zone_index():
+    """Season-wide zone observations, from the sheet cache.
+
+    Returns (counts, game_hitters):
+      counts[(batter, bteam)][(sztop2, szbot2)] -> how many pitches
+      game_hitters[game_pk]                     -> set of (batter, bteam)
+
+    Fresh copies each call, so the caller can fold this run's own observations in
+    without polluting the cached index.
     """
-    by_hitter = collections.defaultdict(lambda: collections.defaultdict(int))
+    global _ZONE_INDEX
+    if _ZONE_INDEX is None:
+        import pickle
+        path = os.path.join(DATA, 'all_pitches_rs_cache.pkl')
+        counts = collections.defaultdict(collections.Counter)
+        rosters = collections.defaultdict(set)
+        if not os.path.exists(path):
+            print(f"    WARNING: {os.path.relpath(path, _ROOT)} is missing, so "
+                  f"the modal strike zone can only be built from the tabs in "
+                  f"this run. Run every tab together, or no zone will be "
+                  f"repaired.")
+        else:
+            for x in pickle.load(open(path, 'rb')):
+                b, pid = x.get('Batter'), x.get('PitchID')
+                t, bo = as_float(x.get('SzTop')), as_float(x.get('SzBot'))
+                if not b or not pid or t is None or bo is None:
+                    continue
+                key = (b, x.get('BTeam'))
+                counts[key][(round(t, 2), round(bo, 2))] += 1
+                rosters[pid.split('_')[0]].add(key)
+        _ZONE_INDEX = (counts, rosters)
+    c, r = _ZONE_INDEX
+    out_c = collections.defaultdict(collections.Counter)
+    for k, v in c.items():
+        out_c[k] = v.copy()
+    out_r = collections.defaultdict(set)
+    for k, v in r.items():
+        out_r[k] = set(v)
+    return out_c, out_r
+
+
+def zone_outlier_changes(zone_obs):
+    """Repair strike-zone cells that carry a DIFFERENT hitter's zone.
+
+    Wally's read (2026-08-17): the operator failed to change who was batting.
+    Tested directly against all 91 season cells beyond ZONE_OUTLIER_FT, and it
+    holds for 40 of the 51 at-bats: the odd zone equals the modal zone of
+    another hitter who batted in that same game. Rocchio's at-bat 824408_027
+    carries Trevor Larnach's zone, Ward's and Beavers' in 824168 carry Colton
+    Cowser's, and Altuve's 824170_065 carries Isaac Paredes'.
+
+    A cell is only rewritten when that match exists. The other 11 at-bats have a
+    different signature and are reported instead of repaired: SzTop matches the
+    hitter's own modal value EXACTLY and only SzBot moves, by roughly 0.4 inch.
+    A mis-attributed batter would move both together, so these are something
+    else — most likely a genuine re-measurement of the bottom of the zone, which
+    a change in crouch would produce without moving shoulder height.
+
+    Keyed on (Batter, BTeam), never on Batter alone, because two players share a
+    name: Max Muncy reads 3.128/1.579 for LAD and 3.228/1.629 for ATH, and both
+    are correct.
+
+    Returns (changes, unexplained).
+    """
+    # The modal zone and the game rosters come from the WHOLE sheet, not from
+    # this run's tabs. A hitter appears in the tab of every team that pitched to
+    # him, so a --teams run sees a slice of him. Deriving the mode from that
+    # slice produces false matches: on a HOU-only run Brent Rooker's HOU-slice
+    # mode came out as 3.290/1.688 and "explained" Zack Gelof's outlier, which
+    # the full-season data says is unexplained. The cache is today's sheet, which
+    # is the right basis for "what is this hitter's usual zone", and it agrees
+    # with the feed everywhere except on the outliers being hunted.
+    counts, game_hitters = _sheet_zone_index()
+    for o in zone_obs:
+        t, b = as_float(o['sztop']), as_float(o['szbot'])
+        if t is None or b is None:
+            continue
+        key = (o['batter'], o['bteam'])
+        counts[key][(round(t, 2), round(b, 2))] += 1
+        game_hitters[o['pid'].split('_')[0]].add(key)
+
+    # Ties broken by count then by value, so a re-run cannot flip the answer.
+    modal = {k: max(sorted(c), key=lambda v: c[v]) for k, c in counts.items()}
+
+    # A modal zone is only trustworthy when it rests on enough observations and
+    # is a clear plurality. This is a fail-closed guard for PARTIAL runs, not a
+    # tuned threshold: a hitter appears in the tab of every team that pitched to
+    # him, so `--teams HOU` might see only two of his rows, and if both carry the
+    # bad zone the mode IS the bad zone. In a full-season run the affected
+    # hitters carry 979 to 2,220 rows with the mode at over 99%, so this drops
+    # nothing real. It only stops a narrow run from writing a wrong repair.
+    ZONE_MIN_OBS, ZONE_MIN_SHARE = 20, 0.80
+    weak = set()
+    for k, c in counts.items():
+        n = sum(c.values())
+        if n < ZONE_MIN_OBS or c[modal[k]] / n < ZONE_MIN_SHARE:
+            weak.add(k)
+    if weak:
+        print(f"    zone repair: {len(weak)} of {len(modal)} hitters have too "
+              f"few or too mixed observations for a trustworthy modal zone and "
+              f"are skipped. Run every tab together to clear this.")
+
+    out, unexplained = [], []
     for o in zone_obs:
         key = (o['batter'], o['bteam'])
-        by_hitter[key][(o['sztop'], o['szbot'])] += 1
+        if key not in modal or key in weak:
+            continue
+        mt, mb = modal[key]
+        t, b = as_float(o['sztop']), as_float(o['szbot'])
+        if t is None or b is None:
+            continue
+        if max(abs(t - mt), abs(b - mb)) <= ZONE_OUTLIER_FT:
+            continue
 
-    modal = {}
-    for key, counts in by_hitter.items():
-        # Ties broken by the higher count then the value, so the result does not
-        # depend on dict order and a re-run cannot flip.
-        modal[key] = max(sorted(counts), key=lambda v: counts[v])
+        gpk = o['pid'].split('_')[0]
+        match = [hk for hk in game_hitters[gpk]
+                 if hk != key
+                 and abs(modal[hk][0] - round(t, 2)) <= ZONE_OUTLIER_FT
+                 and abs(modal[hk][1] - round(b, 2)) <= ZONE_OUTLIER_FT]
+        if not match:
+            unexplained.append({
+                'game_date': o['game_date'], 'game_pk': gpk, 'pid': o['pid'],
+                'at_bat': o['pid'].split('_')[1], 'tab': o['tab'],
+                'batter': o['batter'], 'bteam': o['bteam'],
+                'has': f'{t:.3f}/{b:.3f}', 'modal': f'{mt:.3f}/{mb:.3f}',
+                'sztop_matches': abs(t - mt) <= ZONE_OUTLIER_FT,
+            })
+            continue
 
-    out = []
-    for o in zone_obs:
-        key = (o['batter'], o['bteam'])
-        want_top, want_bot = modal[key]
-        for col, have, want in (('SzTop', o['sztop'], want_top),
-                                ('SzBot', o['szbot'], want_bot)):
-            if not want or have == want:
-                continue
+        for col, want in (('SzTop', mt), ('SzBot', mb)):
             sheet_val = o['sheet_' + col]
-            if classify(col, sheet_val, want) is None:
+            new = fmt(col, want)
+            # Only a real move counts as a repair. When one of the pair already
+            # matches (Gelof's SzTop was right and only SzBot was wrong) the
+            # difference is precision, and the ordinary precision pass owns it.
+            if classify(col, sheet_val, new) in (None, 'precision'):
                 continue
-            o_f, n_f = as_float(sheet_val), as_float(want)
+            o_f = as_float(sheet_val)
             out.append(Change(
                 tab=o['tab'], row=o['row'], col=col, pitcher=o['pitcher'],
                 batter=o['batter'], game_date=o['game_date'],
-                pitch_id=o['pid'], old=sheet_val, new=want, kind='zone_modal',
-                delta=(n_f - o_f) if (o_f is not None and n_f is not None) else None,
-                source='modal'))
-    return out
+                pitch_id=o['pid'], old=sheet_val, new=new, kind='zone_fix',
+                delta=(want - o_f) if o_f is not None else None,
+                units=None, source=f'zone of {match[0][0]}'))
+    return out, unexplained
 
 
 def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
@@ -522,6 +803,7 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
                     else '')
 
         pitcher, batter, gdate = cell('Pitcher'), cell('Batter'), cell('Game Date')
+        pitch_type = cell('Pitch Type')   # read-only here; never written
 
         # Feed truth for the zone, recorded whether or not it differs, because
         # the modal pass needs every observation to find the mode.
@@ -544,14 +826,33 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
             kind = classify(col, old, new)
             if kind is None:
                 continue
-            if kind == 'new' and col in LEDGER_COLS and ledger.suppresses(pid, col, new):
-                kind = 'suppressed'
             o, n = as_float(old), as_float(new)
             delta = (n - o) if (o is not None and n is not None) else None
+            units = None
+
+            if kind == 'new':
+                # Gate 1: a value already rejected for this exact cell.
+                if col in LEDGER_COLS and ledger.suppresses(pid, col, new):
+                    kind = 'suppressed'
+                else:
+                    # Gate 2: is the candidate even plausible for this pitcher?
+                    units = fill_units(col, pitcher, pitch_type, new)
+                    if units is not None and units > FILL_REVIEW_SD:
+                        kind = 'fill_implausible'
+            elif kind == 'drift':
+                # Wally's rule: only drift large enough to be a real correction
+                # gets a human. A column with no measurable scale (every string
+                # and time column) has units None and always goes to review,
+                # which is right — those are the re-tags he asked for, and there
+                # are only a handful per tab.
+                units = scale_units(col, delta, old=old, new=new)
+                if units is not None and units <= DRIFT_REVIEW_SD:
+                    kind = 'drift_small'
+
             changes.append(Change(
                 tab=tab, row=r_idx, col=col, pitcher=pitcher, batter=batter,
                 game_date=gdate, pitch_id=pid, old=old, new=new, kind=kind,
-                delta=delta,
+                delta=delta, units=units,
                 source='feed' if col in FEED_COLS else 'savant'))
 
     missing = []
@@ -570,11 +871,13 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
 BATTER_SIDE = {'SzTop', 'SzBot', 'Batter', 'Bats'}
 
 
-def write_report(changes, missing, ledger, path):
+def write_report(changes, missing, ledger, path, unexplained_zones=None):
     """One workbook. A summary tab, then one tab per column, then extras."""
     from openpyxl import Workbook
     from openpyxl.styles import Font
     from openpyxl.utils import get_column_letter
+
+    SCALES, _ = baselines()
 
     wb = Workbook()
     wb.remove(wb.active)
@@ -596,10 +899,12 @@ def write_report(changes, missing, ledger, path):
         by_col[ch.col].append(ch)
 
     # ---- Summary -----------------------------------------------------------
-    ws = sheet('SUMMARY', ['Column', 'Source', 'Decimals', 'New fills',
-                           'Drift (reviewed)', 'Drift below precision',
-                           'Precision rewrites', 'Suppressed',
-                           'Median |drift|', 'Max |drift|', 'Reviewable tab?'])
+    ws = sheet('SUMMARY', ['Column', 'Source', 'Decimals',
+                           'Fills to review', 'Fills implausible',
+                           'Drift to review', 'Drift auto-written',
+                           'Precision rewrites', 'Zone fixes', 'Suppressed',
+                           'Median |drift| reviewed', 'Max |drift| reviewed',
+                           'Noise scale (1 unit)', 'Rows to read'])
     order = sorted(by_col, key=lambda c: (c not in FEED_COLS, c))
     for c in order:
         rows_ = by_col[c]
@@ -610,46 +915,59 @@ def write_report(changes, missing, ledger, path):
         deltas = sorted(abs(r.delta) for r in rows_
                         if r.delta is not None and r.kind == 'drift')
         med = deltas[len(deltas) // 2] if deltas else None
-        reviewable = kinds['new'] + kinds['drift'] + kinds['suppressed']
+        auto = kinds['drift_sub'] + kinds['drift_small']
+        to_read = kinds['new'] + kinds['drift']
+        sc = SCALES.get(c)
         ws.append([c, 'feed' if c in FEED_COLS else 'savant',
                    PRECISION.get(c, 'string/time'),
-                   kinds['new'], kinds['drift'], kinds['drift_sub'],
-                   kinds['precision'], kinds['suppressed'],
+                   kinds['new'], kinds['fill_implausible'],
+                   kinds['drift'], auto,
+                   kinds['precision'], kinds['zone_fix'], kinds['suppressed'],
                    round(med, 6) if med is not None else '',
                    round(deltas[-1], 6) if deltas else '',
-                   'yes' if reviewable else 'summary only'])
+                   round(sc, 4) if sc else '',
+                   to_read])
     total = collections.Counter(r.kind for r in changes)
     ws.append([])
-    ws.append(['TOTAL', '', '', total['new'], total['drift'],
-               total['drift_sub'], total['precision'], total['suppressed'],
-               '', '', ''])
+    ws.append([])
+    ws.append(['TOTAL', '', '', total['new'], total['fill_implausible'],
+               total['drift'], total['drift_sub'] + total['drift_small'],
+               total['precision'], total['zone_fix'], total['suppressed'],
+               '', '', '',
+               total['new'] + total['drift']])
     ws.append(['Missing pitches', '', '', len(missing)])
-    autosize(ws, [18, 8, 10, 11, 17, 21, 19, 11, 15, 13, 16])
+    ws.append(['Zone at-bats unexplained', '', '', len(unexplained_zones or [])])
+    ws.append([])
+    ws.append(['Drift is sent to review above %s noise units; blank fills are '
+               'offered below %s. See DRIFT_REVIEW_SD / FILL_REVIEW_SD.'
+               % (DRIFT_REVIEW_SD, FILL_REVIEW_SD)])
+    autosize(ws, [18, 8, 9, 14, 16, 15, 18, 18, 11, 11, 22, 21, 19, 12])
 
     # ---- One tab per column ------------------------------------------------
     # `precision` and `drift_sub` are counted on SUMMARY and deliberately NOT
     # listed: Wally's call 2026-08-17, summary only. Together they run to
     # millions of rows and carry no judgement, because neither one moves the
     # value by as much as the sheet was already displaying.
-    SUMMARY_ONLY = {'precision', 'drift_sub'}
     for c in order:
-        rows_ = [r for r in by_col[c] if r.kind not in SUMMARY_ONLY]
+        rows_ = [r for r in by_col[c] if r.kind not in SUMMARY_ONLY_KINDS]
         if not rows_:
             continue
         keyer = ((lambda r: (r.tab, r.batter, r.game_date, r.pitch_id))
                  if c in BATTER_SIDE else
                  (lambda r: (r.tab, r.pitcher, r.game_date, r.pitch_id)))
         rows_.sort(key=keyer)
-        ws = sheet(c, ['Team', 'Pitcher', 'Batter', 'Game Date', 'PitchID',
-                       'Sheet row', 'Change', 'Current', 'Proposed', 'Delta',
-                       'Previously rejected'])
+        ws = sheet(c, ['Team', 'Pitcher', 'Batter', 'Game Date', 'GameID',
+                       'PitchID', 'Sheet row', 'Change', 'Current', 'Proposed',
+                       'Delta', 'Noise units', 'Previously rejected'])
         for r in rows_:
             prior = ledger.entries.get((r.pitch_id, r.col))
-            ws.append([r.tab, r.pitcher, r.batter, r.game_date, r.pitch_id,
+            ws.append([r.tab, r.pitcher, r.batter, r.game_date,
+                       r.pitch_id.split('_')[0], r.pitch_id,
                        r.row, r.kind, r.old, r.new,
                        round(r.delta, 6) if r.delta is not None else '',
+                       round(r.units, 2) if r.units is not None else '',
                        ', '.join(prior['rejected']) if prior else ''])
-        autosize(ws, [7, 24, 24, 12, 18, 10, 11, 12, 12, 11, 22])
+        autosize(ws, [7, 24, 24, 12, 10, 18, 10, 17, 12, 12, 11, 12, 22])
 
     # ---- Missing pitches ---------------------------------------------------
     if missing:
@@ -665,18 +983,95 @@ def write_report(changes, missing, ledger, path):
                        exp.get('Description', '')])
         autosize(ws, [7, 18, 12, 24, 24, 11, 8, 22])
 
-    # ---- Modal-zone forcing, when it was requested -------------------------
-    zc = [r for r in changes if r.kind == 'zone_modal']
+    # ---- Blank fills, one row per PITCH -------------------------------------
+    # The per-column tabs are the authority, but they over-count the decision:
+    # on ARI 1,310 fills were really 290 pitches, and 113 of those were a single
+    # pitch that had no tracking at all and now has all ten columns. Approving
+    # that is one judgement, not ten.
+    fills = [r for r in changes if r.kind == 'new']
+    if fills:
+        ws = sheet('_FILLS BY PITCH',
+                   ['Team', 'Pitcher', 'Game Date', 'GameID', 'PitchID',
+                    'Sheet row', 'Columns gained', 'Max noise units', 'Values'])
+        byp = collections.defaultdict(list)
+        for r in fills:
+            byp[(r.tab, r.pitcher, str(r.game_date), r.pitch_id, r.row)].append(r)
+        for (tab, pit, gd, pid, row), rs in sorted(byp.items()):
+            us = [r.units for r in rs if r.units is not None]
+            ws.append([tab, pit, gd, pid.split('_')[0], pid, row, len(rs),
+                       round(max(us), 2) if us else '',
+                       ', '.join(f'{r.col}={r.new}' for r in sorted(
+                           rs, key=lambda r: r.col))])
+        autosize(ws, [7, 24, 12, 10, 18, 10, 15, 16, 70])
+
+    # ---- Drift auto-written, rolled up by column and month ------------------
+    # Wally's call 2026-08-17: summarise these rather than list them. PlateX
+    # alone runs to about 80,000 cells season-wide and its whole story is the
+    # month it lands in, not the individual rows.
+    auto = [r for r in changes if r.kind in ('drift_small', 'drift_sub')]
+    if auto:
+        ws = sheet('_AUTO-WRITTEN BY MONTH',
+                   ['Column', 'Month', 'Cells', 'Median |delta|', 'Max |delta|',
+                    'Max noise units'])
+        buck = collections.defaultdict(list)
+        for r in auto:
+            buck[(r.col, str(r.game_date)[:7])].append(r)
+        for (c, m), rs in sorted(buck.items()):
+            ds = sorted(abs(r.delta) for r in rs if r.delta is not None)
+            us = [r.units for r in rs if r.units is not None]
+            ws.append([c, m, len(rs),
+                       round(ds[len(ds) // 2], 6) if ds else '',
+                       round(ds[-1], 6) if ds else '',
+                       round(max(us), 3) if us else ''])
+        autosize(ws, [18, 9, 9, 15, 13, 16])
+
+    # ---- Zone repairs ------------------------------------------------------
+    zc = [r for r in changes if r.kind == 'zone_fix']
     if zc:
-        ws = sheet('_ZONE NORMALIZE', ['Team', 'Column', 'Batter', 'Game Date',
-                                       'PitchID', 'Sheet row', 'Current',
-                                       'Modal', 'Delta'])
-        zc.sort(key=lambda r: (r.batter, r.col, r.tab, r.pitch_id))
+        ws = sheet('_ZONE FIXED', ['Game Date', 'GameID', 'At-bat', 'Team',
+                                   'Column', 'Batter', 'PitchID', 'Sheet row',
+                                   'Current', 'Corrected', 'Delta',
+                                   'Whose zone it was'])
+        zc.sort(key=lambda r: (str(r.game_date), r.pitch_id, r.col))
         for r in zc:
-            ws.append([r.tab, r.col, r.batter, r.game_date, r.pitch_id, r.row,
-                       r.old, r.new,
-                       round(r.delta, 6) if r.delta is not None else ''])
-        autosize(ws, [7, 9, 24, 12, 18, 10, 12, 12, 11])
+            parts = r.pitch_id.split('_')
+            ws.append([r.game_date, parts[0], parts[1], r.tab, r.col, r.batter,
+                       r.pitch_id, r.row, r.old, r.new,
+                       round(r.delta, 6) if r.delta is not None else '',
+                       r.source])
+        autosize(ws, [12, 10, 8, 7, 9, 24, 18, 10, 12, 12, 11, 30])
+
+    # ---- Zone outliers that do NOT look like a batter mix-up ---------------
+    if unexplained_zones:
+        ws = sheet('_ZONE UNEXPLAINED',
+                   ['Game Date', 'GameID', 'At-bat', 'Team', 'Batter',
+                    'Has (top/bot)', 'Hitter usual', 'PitchID',
+                    'SzTop already correct?'])
+        for u in sorted(unexplained_zones, key=lambda u: (str(u['game_date']),
+                                                          u['game_pk'])):
+            ws.append([u['game_date'], u['game_pk'], u['at_bat'], u['tab'],
+                       u['batter'], u['has'], u['modal'], u['pid'],
+                       'yes' if u['sztop_matches'] else 'no'])
+        autosize(ws, [12, 10, 8, 7, 24, 15, 15, 18, 21])
+
+    # ---- Blank fills rejected as implausible, rolled up by game -----------
+    imp = [r for r in changes if r.kind == 'fill_implausible']
+    if imp:
+        ws = sheet('_IMPLAUSIBLE FILLS',
+                   ['Column', 'Game Date', 'GameID', 'Team', 'Cells',
+                    'Median noise units', 'Max noise units', 'Example'])
+        buck = collections.defaultdict(list)
+        for r in imp:
+            buck[(r.col, str(r.game_date), r.pitch_id.split('_')[0], r.tab)].append(r)
+        for (c, gd, gpk, tab), rs in sorted(buck.items(),
+                                            key=lambda kv: -len(kv[1])):
+            us = sorted(r.units for r in rs if r.units is not None)
+            worst = max(rs, key=lambda r: r.units or 0)
+            ws.append([c, gd, gpk, tab, len(rs),
+                       round(us[len(us) // 2], 2) if us else '',
+                       round(us[-1], 2) if us else '',
+                       f'{worst.pitcher}: blank -> {worst.new}'])
+        autosize(ws, [18, 12, 10, 7, 8, 19, 17, 40])
 
     # ---- Suppressed, gathered in one place ---------------------------------
     supp = [r for r in changes if r.kind == 'suppressed']
@@ -731,16 +1126,13 @@ def apply_changes(ws, header, changes, chunk=40000):
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
-         report=True, force_modal_zone=False):
-    kinds = kinds or {'new', 'drift', 'drift_sub', 'precision'}
+         report=True):
+    kinds = kinds or {'new', 'drift', 'drift_sub', 'drift_small',
+                  'precision', 'zone_fix'}
     print(f"Mode: {'APPLY' if apply else 'DRY RUN (nothing is written)'}")
     print(f"Change classes in scope: {', '.join(sorted(kinds))}")
     print(f"Columns: {len(IN_SCOPE)} ({len(FEED_COLS)} feed, "
           f"{len(SAVANT_COLS)} savant)")
-    if force_modal_zone:
-        print("SzTop/SzBot will be forced to each hitter's modal feed value. "
-              "This overwrites values the feed still reports — see "
-              "modal_zone_changes().")
 
     ledger = DecisionLedger.load()
     gc = gspread.service_account()
@@ -825,9 +1217,11 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
                       f"missing-pitch list for this tab")
 
             k = collections.Counter(c.kind for c in changes)
-            print(f"  new {k['new']} | drift {k['drift']} | "
-                  f"sub-precision {k['drift_sub']} | precision {k['precision']} "
-                  f"| suppressed {k['suppressed']} | missing {len(missing)}")
+            print(f"  to read: {k['new']} fills + {k['drift']} drift | "
+                  f"auto: {k['drift_small'] + k['drift_sub']} small + "
+                  f"{k['precision']} precision | held: {k['suppressed']} "
+                  f"suppressed + {k['fill_implausible']} implausible | "
+                  f"missing {len(missing)}")
 
             all_changes.extend(changes)
             all_missing.extend(missing)
@@ -840,13 +1234,17 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
                 else:
                     print("  nothing to write")
 
-    # ---- optional modal-zone pass, after every tab is in ----
-    if force_modal_zone and zone_obs:
-        zc = modal_zone_changes(zone_obs)
-        print(f"\nmodal-zone pass: {len(zc)} SzTop/SzBot cells would be forced "
-              f"to the hitter's modal value")
+    # ---- strike-zone repair, after every tab is in ----
+    # Must run across all tabs at once: a hitter appears in the tab of every team
+    # that pitched to him, and the modal zone needs all of those observations.
+    unexplained_zones = []
+    if zone_obs:
+        zc, unexplained_zones = zone_outlier_changes(zone_obs)
+        print(f"\nzone repair: {len(zc)} cells carry another hitter's zone and "
+              f"are repaired; {len(unexplained_zones)} at-bats do not match any "
+              f"hitter in their game and are reported instead")
         all_changes.extend(zc)
-        if apply and 'zone_modal' in kinds:
+        if apply and 'zone_fix' in kinds and zc:
             for tab, group in collections.groupby(
                     sorted(zc, key=lambda c: c.tab), key=lambda c: c.tab):
                 ws, header = tab_handles[tab]
@@ -856,14 +1254,21 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
     # ---- summary ----
     k = collections.Counter(c.kind for c in all_changes)
     print(f"\n{'=' * 62}")
-    print(f"new fills             {k['new']}")
-    print(f"drift (reviewed)      {k['drift']}")
-    print(f"drift below precision {k['drift_sub']}   (summary only)")
-    print(f"precision rewrites    {k['precision']}   (summary only)")
-    print(f"suppressed            {k['suppressed']}")
-    print(f"missing pitches       {len(all_missing)}")
-    print(f"cells to write        "
-          f"{k['new'] + k['drift'] + k['drift_sub'] + k['precision']}")
+    print(f"TO READ")
+    print(f"  blank fills to approve   {k['new']}")
+    print(f"  drift to approve         {k['drift']}")
+    print(f"  zone at-bats unexplained {len(unexplained_zones)}")
+    print(f"WRITTEN WITHOUT ASKING")
+    print(f"  precision rewrites       {k['precision']}")
+    print(f"  drift below precision    {k['drift_sub']}")
+    print(f"  drift below 1 noise unit {k['drift_small']}")
+    print(f"  strike-zone repairs      {k['zone_fix']}")
+    print(f"NOT WRITTEN")
+    print(f"  suppressed by the ledger {k['suppressed']}")
+    print(f"  fills judged implausible {k['fill_implausible']}")
+    print(f"  missing pitches found    {len(all_missing)}")
+    print(f"cells this run would write "
+          f"{sum(k[x] for x in AUTO_KINDS) + k['new'] + k['drift']}")
     if feed_failures:
         print(f"\nWARNING: {len(feed_failures)} games could not be read. Their "
               f"pitches were left out of the missing-pitch list rather than "
@@ -875,7 +1280,8 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
         os.makedirs(REPORT_DIR, exist_ok=True)
         stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         path = os.path.join(REPORT_DIR, f'backfill_full_{stamp}.xlsx')
-        write_report(all_changes, all_missing, ledger, path)
+        write_report(all_changes, all_missing, ledger, path,
+                     unexplained_zones=unexplained_zones)
         print(f"\nReport: {path}")
 
     ledger.save()
@@ -893,17 +1299,13 @@ if __name__ == '__main__':
                     help='write to the sheets. Omit for a dry run.')
     ap.add_argument('--refresh-feed', action='store_true',
                     help='re-pull every game instead of using data/_feed_cache')
-    ap.add_argument('--kinds', default='new,drift,drift_sub,precision',
+    ap.add_argument('--kinds',
+                    default='new,drift,drift_sub,drift_small,precision,zone_fix',
                     help='which change classes --apply writes')
-    ap.add_argument('--force-modal-zone', action='store_true',
-                    help='force one SzTop/SzBot per hitter. Off by default: the '
-                         'sheet already matches the feed on most flagged cells, '
-                         'and MLB does re-measure a stance mid-plate-appearance.')
     ap.add_argument('--no-report', action='store_true')
     a = ap.parse_args()
     main(filter_teams=[t.strip().upper() for t in a.teams.split(',')] if a.teams else None,
          apply=a.apply,
          refresh_feed=a.refresh_feed,
          kinds={k.strip() for k in a.kinds.split(',') if k.strip()},
-         report=not a.no_report,
-         force_modal_zone=a.force_modal_zone)
+         report=not a.no_report)

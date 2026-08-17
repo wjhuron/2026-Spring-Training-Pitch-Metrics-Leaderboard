@@ -121,6 +121,44 @@ def as_float(text):
         return None
 
 
+TILT_MINUTES = 720          # a tilt clock is 12 hours, and it wraps
+
+
+def tilt_minutes(text):
+    """Parse an h:mm tilt to minutes past 12:00, or None.
+
+    RTilt and OTilt are stored as clock readings, so they need a numeric view
+    before any size-of-change question can be asked about them. 12:00 is 0 and
+    the reading advances clockwise, so 1:19 is 79 and 11:37 is 697.
+    """
+    if text is None:
+        return None
+    s = str(text).strip()
+    if ':' not in s:
+        return None
+    h, _, m = s.partition(':')
+    try:
+        hh, mm = int(h), int(m)
+    except ValueError:
+        return None
+    if not (0 <= mm < 60) or not (1 <= hh <= 12):
+        return None
+    return ((hh % 12) * 60 + mm) % TILT_MINUTES
+
+
+def tilt_gap(a, b):
+    """Shortest distance between two tilt readings, in minutes.
+
+    Must be circular. 11:59 and 12:01 are two minutes apart, not 718, and a
+    linear subtraction would report every wrap across 12:00 as a huge change.
+    """
+    ma, mb = tilt_minutes(a), tilt_minutes(b)
+    if ma is None or mb is None:
+        return None
+    d = abs(ma - mb) % TILT_MINUTES
+    return min(d, TILT_MINUTES - d)
+
+
 def stored_decimals(text):
     """Decimal places in a stored sheet string. None when it is not a number."""
     if text is None:
