@@ -323,6 +323,28 @@ def baselines():
     return _BASELINES
 
 
+_GROUP_N = None
+
+
+def group_sizes():
+    """(pitcher, pitch type) -> how many pitches the sheet has for that pair.
+
+    Shown beside every average in the review so a 4-pitch baseline is never
+    mistaken for a 400-pitch one.
+    """
+    global _GROUP_N
+    if _GROUP_N is not None:
+        return _GROUP_N
+    import pickle
+    path = os.path.join(DATA, 'all_pitches_rs_cache.pkl')
+    out = collections.Counter()
+    if os.path.exists(path):
+        for x in pickle.load(open(path, 'rb')):
+            out[(x.get('Pitcher'), x.get('Pitch Type'))] += 1
+    _GROUP_N = out
+    return out
+
+
 def scale_units(col, delta, old=None, new=None):
     """|delta| in the column's own noise units, or None when it has no scale.
 
@@ -524,13 +546,13 @@ class DecisionLedger:
 # ── Diff ─────────────────────────────────────────────────────────────────────
 # One row per proposed cell change.
 Change = collections.namedtuple(
-    'Change', 'tab row col pitcher batter game_date pitch_id '
+    'Change', 'tab row col pitcher batter game_date pitch_id pitch_type '
               'old new kind delta source units')
 # `units` is |delta| expressed in the column's own noise scale, or None for a
 # string, a time value, or a column with no measurable spread.
 
 # Written without asking. Everything else needs Wally to look at it.
-AUTO_KINDS = {'precision', 'drift_sub', 'drift_small', 'zone_fix'}
+AUTO_KINDS = {'precision', 'drift_sub', 'drift_small', 'zone_fix', 'zone_fix_nodonor'}
 # Counted on SUMMARY only; never listed row by row.
 SUMMARY_ONLY_KINDS = {'precision', 'drift_sub', 'drift_small'}
 
@@ -649,7 +671,7 @@ def _sheet_zone_index():
     return out_c, out_r
 
 
-def zone_outlier_changes(zone_obs):
+def zone_outlier_changes(zone_obs, fix_nodonor=True):
     """Repair strike-zone cells that carry a DIFFERENT hitter's zone.
 
     Wally's read (2026-08-17): the operator failed to change who was batting.
@@ -669,6 +691,15 @@ def zone_outlier_changes(zone_obs):
     Keyed on (Batter, BTeam), never on Batter alone, because two players share a
     name: Max Muncy reads 3.128/1.579 for LAD and 3.228/1.629 for ATH, and both
     are correct.
+
+    The 9 unmatched at-bats are repaired as well, tagged `zone_fix_nodonor` and
+    listed in their own tab. Wally's call 2026-08-17. Measured signature: SzTop
+    is off by 0.00 inch in every one of the 9, and only SzBot moves, by 0.28 to
+    0.47 inch. A mis-attributed batter moves both together, so the mechanism is
+    different — but the alternate SzBot holds steady for the whole at-bat, which
+    reads as an artifact rather than a genuine re-read of the knee. It is 17
+    cells in 583,619, all under half an inch. Pass fix_nodonor=False to leave
+    them alone.
 
     Returns (changes, unexplained).
     """
@@ -733,10 +764,13 @@ def zone_outlier_changes(zone_obs):
                 'at_bat': o['pid'].split('_')[1], 'tab': o['tab'],
                 'batter': o['batter'], 'bteam': o['bteam'],
                 'has': f'{t:.3f}/{b:.3f}', 'modal': f'{mt:.3f}/{mb:.3f}',
-                'sztop_matches': abs(t - mt) <= ZONE_OUTLIER_FT,
+                'sztop_off_in': round((t - mt) * 12, 2),
+                'szbot_off_in': round((b - mb) * 12, 2),
             })
-            continue
+            if not fix_nodonor:
+                continue
 
+        kind = 'zone_fix' if match else 'zone_fix_nodonor'
         for col, want in (('SzTop', mt), ('SzBot', mb)):
             sheet_val = o['sheet_' + col]
             new = fmt(col, want)
@@ -749,9 +783,11 @@ def zone_outlier_changes(zone_obs):
             out.append(Change(
                 tab=o['tab'], row=o['row'], col=col, pitcher=o['pitcher'],
                 batter=o['batter'], game_date=o['game_date'],
-                pitch_id=o['pid'], old=sheet_val, new=new, kind='zone_fix',
-                delta=(want - o_f) if o_f is not None else None,
-                units=None, source=f'zone of {match[0][0]}'))
+                pitch_id=o['pid'], pitch_type=o.get('pitch_type', ''),
+                old=sheet_val, new=new, kind=kind,
+                delta=(want - o_f) if o_f is not None else None, units=None,
+                source=(f'zone of {match[0][0]}' if match
+                        else 'no donor in this game')))
     return out, unexplained
 
 
@@ -811,6 +847,7 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
             zone_obs.append({
                 'tab': tab, 'row': r_idx, 'pid': pid, 'pitcher': pitcher,
                 'batter': batter, 'bteam': cell('BTeam'), 'game_date': gdate,
+                'pitch_type': pitch_type,
                 'sztop': expected.get('SzTop', ''),
                 'szbot': expected.get('SzBot', ''),
                 'sheet_SzTop': cell('SzTop'), 'sheet_SzBot': cell('SzBot'),
@@ -851,7 +888,8 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
 
             changes.append(Change(
                 tab=tab, row=r_idx, col=col, pitcher=pitcher, batter=batter,
-                game_date=gdate, pitch_id=pid, old=old, new=new, kind=kind,
+                game_date=gdate, pitch_id=pid, pitch_type=pitch_type,
+                old=old, new=new, kind=kind,
                 delta=delta, units=units,
                 source='feed' if col in FEED_COLS else 'savant'))
 
@@ -877,7 +915,8 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     from openpyxl.styles import Font
     from openpyxl.utils import get_column_letter
 
-    SCALES, _ = baselines()
+    SCALES, MEDIANS = baselines()
+    GROUP_N = group_sizes()
 
     wb = Workbook()
     wb.remove(wb.active)
@@ -922,7 +961,9 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                    PRECISION.get(c, 'string/time'),
                    kinds['new'], kinds['fill_implausible'],
                    kinds['drift'], auto,
-                   kinds['precision'], kinds['zone_fix'], kinds['suppressed'],
+                   kinds['precision'],
+                   kinds['zone_fix'] + kinds['zone_fix_nodonor'],
+                   kinds['suppressed'],
                    round(med, 6) if med is not None else '',
                    round(deltas[-1], 6) if deltas else '',
                    round(sc, 4) if sc else '',
@@ -932,7 +973,8 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     ws.append([])
     ws.append(['TOTAL', '', '', total['new'], total['fill_implausible'],
                total['drift'], total['drift_sub'] + total['drift_small'],
-               total['precision'], total['zone_fix'], total['suppressed'],
+               total['precision'],
+               total['zone_fix'] + total['zone_fix_nodonor'], total['suppressed'],
                '', '', '',
                total['new'] + total['drift']])
     ws.append(['Missing pitches', '', '', len(missing)])
@@ -956,18 +998,38 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                  if c in BATTER_SIDE else
                  (lambda r: (r.tab, r.pitcher, r.game_date, r.pitch_id)))
         rows_.sort(key=keyer)
-        ws = sheet(c, ['Team', 'Pitcher', 'Batter', 'Game Date', 'GameID',
-                       'PitchID', 'Sheet row', 'Change', 'Current', 'Proposed',
+        # Pitch Type and the pitcher's own average for that pitch type sit next
+        # to the proposed value. Wally's ask 2026-08-17: HorzBrk 11.2 means
+        # nothing until you know it is a slider and that his sliders average
+        # 10.8. `Off usual` is the proposed value minus that average, which is
+        # the number that actually decides whether a change is believable.
+        ws = sheet(c, ['Team', 'Pitcher', 'Pitch Type', 'Batter', 'Game Date',
+                       'GameID', 'PitchID', 'Sheet row', 'Change',
+                       'Current', 'Proposed',
+                       'Pitcher avg on this type', 'Off usual', 'n for avg',
                        'Delta', 'Noise units', 'Previously rejected'])
+        colmed = MEDIANS.get(c) or {}
         for r in rows_:
             prior = ledger.entries.get((r.pitch_id, r.col))
-            ws.append([r.tab, r.pitcher, r.batter, r.game_date,
+            avg = colmed.get((r.pitcher, r.pitch_type))
+            n_for_avg = GROUP_N.get((r.pitcher, r.pitch_type), '')
+            if c in TIME_COLS and avg is not None:
+                avg_disp = f'{(int(avg) // 60) or 12}:{int(avg) % 60:02d}'
+                off = tilt_gap(r.new, avg_disp)
+            else:
+                avg_disp = round(avg, PRECISION.get(c, 3)) if avg is not None else ''
+                nv = as_float(r.new)
+                off = (round(nv - avg, PRECISION.get(c, 3))
+                       if (avg is not None and nv is not None) else '')
+            ws.append([r.tab, r.pitcher, r.pitch_type, r.batter, r.game_date,
                        r.pitch_id.split('_')[0], r.pitch_id,
                        r.row, r.kind, r.old, r.new,
+                       avg_disp, off if off is not None else '', n_for_avg,
                        round(r.delta, 6) if r.delta is not None else '',
                        round(r.units, 2) if r.units is not None else '',
                        ', '.join(prior['rejected']) if prior else ''])
-        autosize(ws, [7, 24, 24, 12, 10, 18, 10, 17, 12, 12, 11, 12, 22])
+        autosize(ws, [7, 24, 11, 24, 12, 10, 18, 10, 17, 12, 12,
+                      24, 11, 10, 11, 12, 22])
 
     # ---- Missing pitches ---------------------------------------------------
     if missing:
@@ -991,18 +1053,29 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     fills = [r for r in changes if r.kind == 'new']
     if fills:
         ws = sheet('_FILLS BY PITCH',
-                   ['Team', 'Pitcher', 'Game Date', 'GameID', 'PitchID',
-                    'Sheet row', 'Columns gained', 'Max noise units', 'Values'])
+                   ['Team', 'Pitcher', 'Pitch Type', 'Game Date', 'GameID',
+                    'PitchID', 'Sheet row', 'Columns gained',
+                    'Max noise units', 'Proposed values (pitcher avg)'])
         byp = collections.defaultdict(list)
         for r in fills:
-            byp[(r.tab, r.pitcher, str(r.game_date), r.pitch_id, r.row)].append(r)
-        for (tab, pit, gd, pid, row), rs in sorted(byp.items()):
+            byp[(r.tab, r.pitcher, r.pitch_type, str(r.game_date),
+                 r.pitch_id, r.row)].append(r)
+        for (tab, pit, pt, gd, pid, row), rs in sorted(byp.items()):
             us = [r.units for r in rs if r.units is not None]
-            ws.append([tab, pit, gd, pid.split('_')[0], pid, row, len(rs),
-                       round(max(us), 2) if us else '',
-                       ', '.join(f'{r.col}={r.new}' for r in sorted(
-                           rs, key=lambda r: r.col))])
-        autosize(ws, [7, 24, 12, 10, 18, 10, 15, 16, 70])
+            bits = []
+            for r in sorted(rs, key=lambda r: r.col):
+                avg = (MEDIANS.get(r.col) or {}).get((pit, pt))
+                if avg is None:
+                    bits.append(f'{r.col}={r.new}')
+                elif r.col in TIME_COLS:
+                    bits.append(f'{r.col}={r.new} '
+                                f'(avg {(int(avg) // 60) or 12}:{int(avg) % 60:02d})')
+                else:
+                    bits.append(f'{r.col}={r.new} '
+                                f'(avg {avg:.{PRECISION.get(r.col, 3)}f})')
+            ws.append([tab, pit, pt, gd, pid.split('_')[0], pid, row, len(rs),
+                       round(max(us), 2) if us else '', ', '.join(bits)])
+        autosize(ws, [7, 24, 11, 12, 10, 18, 10, 15, 16, 110])
 
     # ---- Drift auto-written, rolled up by column and month ------------------
     # Wally's call 2026-08-17: summarise these rather than list them. PlateX
@@ -1041,18 +1114,36 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                        r.source])
         autosize(ws, [12, 10, 8, 7, 9, 24, 18, 10, 12, 12, 11, 30])
 
-    # ---- Zone outliers that do NOT look like a batter mix-up ---------------
+    # ---- Zone outliers with no donor in their game -------------------------
+    # Repaired too (Wally, 2026-08-17), but kept separate: the mechanism is not a
+    # mis-attributed batter, so if one of these later proves to be a real
+    # measurement the list of what was changed is right here.
+    zn = [r for r in changes if r.kind == 'zone_fix_nodonor']
+    if zn:
+        ws = sheet('_ZONE FIXED (NO DONOR)',
+                   ['Game Date', 'GameID', 'At-bat', 'Team', 'Column', 'Batter',
+                    'PitchID', 'Sheet row', 'Current', 'Corrected',
+                    'Delta (in)'])
+        zn.sort(key=lambda r: (str(r.game_date), r.pitch_id, r.col))
+        for r in zn:
+            parts = r.pitch_id.split('_')
+            ws.append([r.game_date, parts[0], parts[1], r.tab, r.col, r.batter,
+                       r.pitch_id, r.row, r.old, r.new,
+                       round(r.delta * 12, 2) if r.delta is not None else ''])
+        autosize(ws, [12, 10, 8, 7, 9, 24, 18, 10, 12, 12, 11])
+
     if unexplained_zones:
         ws = sheet('_ZONE UNEXPLAINED',
                    ['Game Date', 'GameID', 'At-bat', 'Team', 'Batter',
                     'Has (top/bot)', 'Hitter usual', 'PitchID',
-                    'SzTop already correct?'])
+                    'SzTop off (in)', 'SzBot off (in)', 'Repaired?'])
         for u in sorted(unexplained_zones, key=lambda u: (str(u['game_date']),
                                                           u['game_pk'])):
             ws.append([u['game_date'], u['game_pk'], u['at_bat'], u['tab'],
                        u['batter'], u['has'], u['modal'], u['pid'],
-                       'yes' if u['sztop_matches'] else 'no'])
-        autosize(ws, [12, 10, 8, 7, 24, 15, 15, 18, 21])
+                       u['sztop_off_in'], u['szbot_off_in'],
+                       'yes, see _ZONE FIXED (NO DONOR)' if zn else 'no'])
+        autosize(ws, [12, 10, 8, 7, 24, 15, 15, 18, 15, 15, 30])
 
     # ---- Blank fills rejected as implausible, rolled up by game -----------
     imp = [r for r in changes if r.kind == 'fill_implausible']
@@ -1128,7 +1219,7 @@ def apply_changes(ws, header, changes, chunk=40000):
 def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
          report=True):
     kinds = kinds or {'new', 'drift', 'drift_sub', 'drift_small',
-                  'precision', 'zone_fix'}
+                  'precision', 'zone_fix', 'zone_fix_nodonor'}
     print(f"Mode: {'APPLY' if apply else 'DRY RUN (nothing is written)'}")
     print(f"Change classes in scope: {', '.join(sorted(kinds))}")
     print(f"Columns: {len(IN_SCOPE)} ({len(FEED_COLS)} feed, "
@@ -1244,7 +1335,8 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
               f"are repaired; {len(unexplained_zones)} at-bats do not match any "
               f"hitter in their game and are reported instead")
         all_changes.extend(zc)
-        if apply and 'zone_fix' in kinds and zc:
+        if apply and zc and ({'zone_fix', 'zone_fix_nodonor'} & kinds):
+            zc = [c for c in zc if c.kind in kinds]
             for tab, group in collections.groupby(
                     sorted(zc, key=lambda c: c.tab), key=lambda c: c.tab):
                 ws, header = tab_handles[tab]
@@ -1262,7 +1354,8 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
     print(f"  precision rewrites       {k['precision']}")
     print(f"  drift below precision    {k['drift_sub']}")
     print(f"  drift below 1 noise unit {k['drift_small']}")
-    print(f"  strike-zone repairs      {k['zone_fix']}")
+    print(f"  strike-zone repairs      {k['zone_fix']} matched to a donor, "
+          f"{k['zone_fix_nodonor']} without one")
     print(f"NOT WRITTEN")
     print(f"  suppressed by the ledger {k['suppressed']}")
     print(f"  fills judged implausible {k['fill_implausible']}")
@@ -1300,7 +1393,8 @@ if __name__ == '__main__':
     ap.add_argument('--refresh-feed', action='store_true',
                     help='re-pull every game instead of using data/_feed_cache')
     ap.add_argument('--kinds',
-                    default='new,drift,drift_sub,drift_small,precision,zone_fix',
+                    default=('new,drift,drift_sub,drift_small,precision,'
+                             'zone_fix,zone_fix_nodonor'),
                     help='which change classes --apply writes')
     ap.add_argument('--no-report', action='store_true')
     a = ap.parse_args()

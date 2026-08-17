@@ -55,10 +55,19 @@ PRECISION = {
     # source-quantized — measured
     'Velocity': 1, 'IndVertBrk': 1, 'HorzBrk': 1,
     'xIndVrtBrk': 1, 'xHorzBrk': 1,
-    'ExitVelo': 1, 'LaunchAngle': 1, 'Distance': 1,
+    'ExitVelo': 1,
     'ArmAngle': 1, 'BatSpeed': 1, 'SwingLength': 1,
     'HC_X': 2, 'HC_Y': 2,
     'xBA': 3, 'xSLG': 3, 'xwOBA': 3, 'RunExp': 3,
+    # LaunchAngle and Distance are INTEGERS, and stay integers. An earlier pass
+    # here read them as carrying one decimal and gave them a 0.0 pattern. That
+    # measurement was wrong: it counted the decimal places in repr(13.0), which
+    # is 1, rather than asking whether the fraction is ever non-zero. Re-checked
+    # 2026-08-17 over 6,183 batted balls in 120 cached games — the fractional
+    # part is .0 on 100% of both fields, so a decimal adds a digit that carries
+    # no information. ExitVelo is the genuine contrast and keeps its decimal:
+    # only 9.8% of its values are integral and the other nine digits all appear.
+    'LaunchAngle': 0, 'Distance': 0,
     'Spin Rate': 0, 'Outs': 0, 'Barrel': 0,
 }
 
