@@ -739,6 +739,38 @@ def _wanted(ch, decisions, kinds):
 
 
 # ── Reading a reviewed workbook back in ──────────────────────────────────────
+def logic_fingerprint():
+    """A short hash of everything that decides a recommendation.
+
+    Stamped into every workbook and checked when one comes back. An override file is
+    only meaningful against the workbook that produced it: it records "do the
+    OPPOSITE of what you recommended", so if the recommendation logic changes under
+    it, replaying it inverts silently.
+
+    That is not hypothetical. On 2026-08-17 Wally overrode 550 ROC rows to force
+    adoption of sub-noise changes, the logic was then fixed to adopt them by default,
+    and replaying his file would have flipped all 550 to reject — the exact opposite
+    of what he asked for. Caught only because the fix and the file arrived in the same
+    conversation.
+    """
+    import hashlib
+    parts = [
+        f'v2',
+        f'drift={DRIFT_REVIEW_SD}', f'fill={FILL_REVIEW_SD}',
+        f'zone={ZONE_OUTLIER_FT:.6f}', f'band={BAND_QUANTILE}/{BAND_MIN_N}',
+        f'scale={SCALE_MIN_N}/{BASELINE_MIN_N}',
+        'metric=' + ','.join(sorted(PITCH_METRIC_COLS)),
+        'zonecols=' + ','.join(sorted(ZONE_COLS)),
+        'badsrc=' + ','.join(sorted(f'{g}:{c}' for g, c in KNOWN_BAD_SOURCE)),
+        'prec=' + ','.join(f'{k}:{v}' for k, v in sorted(PRECISION.items())),
+        'subnoise=adopt',
+    ]
+    return hashlib.sha256('|'.join(parts).encode()).hexdigest()[:12]
+
+
+FINGERPRINT_LABEL = 'Recommendation logic'
+
+
 def read_decisions(path):
     """Read one reviewed workbook, or a whole folder of them.
 
@@ -786,6 +818,22 @@ def _read_one_workbook(path):
     """
     from openpyxl import load_workbook
     wb = load_workbook(path, read_only=True, data_only=True)
+
+    stamp = None
+    if 'HOW TO READ' in wb.sheetnames:
+        for row in wb['HOW TO READ'].iter_rows(values_only=True):
+            if row and str(row[0]).strip() == FINGERPRINT_LABEL:
+                stamp = str(row[1]).strip()
+                break
+    mine = logic_fingerprint()
+    if stamp != mine:
+        raise SystemExit(
+            f"REFUSING to read {os.path.basename(path)}: it was produced by "
+            f"recommendation logic {stamp or '(unstamped)'} and this code is {mine}. "
+            f"The Reject box means 'do the opposite of my recommendation', so "
+            f"replaying it against changed logic would invert your answers instead of "
+            f"honouring them. Re-run the sweep to get a fresh workbook.")
+
     out, flipped, seen = {}, 0, 0
     boxes_seen = boxes_intact = 0
     conflicts = []
@@ -1564,6 +1612,11 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     for k, v in [
         ('What this file is',
          'A dry run. Nothing has been written to any sheet.'),
+        (FINGERPRINT_LABEL, logic_fingerprint()),
+        ('Why that matters',
+         'The Reject box means "do the opposite of my recommendation", so this file '
+         'is only valid against the logic that produced it. If the logic changes, '
+         '--decisions-from refuses the file rather than inverting your answers.'),
         ('Each value appears once',
          'Every value in this file has been recorded in '
          'data/backfill_decisions.json. A later sweep will NOT raise it again '
