@@ -1338,7 +1338,23 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
                 # which is right — those are the re-tags he asked for, and there
                 # are only a handful per tab.
                 units = scale_units(col, delta, old=old, new=new)
-                if units is not None and units <= DRIFT_REVIEW_SD:
+                # SzTop and SzBot are NEVER auto-written. Their pooled noise scale
+                # is 0.1038 ft, which is 1.25 inches, because it measures the
+                # spread across the many hitters a pitcher faces rather than
+                # within one hitter. So "below one noise unit" waved through any
+                # zone change under 1.25 inches, while ZONE_OUTLIER_FT says a
+                # value 0.25 inches off a hitter's own zone already belongs to
+                # somebody else. That left a full inch of band where another
+                # hitter's zone was written silently, with no review and without
+                # the hitter test in recommend() ever running.
+                #
+                # Found 2026-08-17 when Wally asked what HOU's 47 auto-written
+                # cells were: 26 of them were zone changes of 0.3 to 1.2 inches.
+                # The pooled scale is simply the wrong yardstick for a column that
+                # belongs to the batter, so these always go to review and their
+                # recommendation is decided against the hitter's own zone.
+                if (units is not None and units <= DRIFT_REVIEW_SD
+                        and col not in ZONE_COLS):
                     kind = 'drift_small'
 
             changes.append(Change(
