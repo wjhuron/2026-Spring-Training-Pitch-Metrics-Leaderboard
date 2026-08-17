@@ -48,7 +48,13 @@ import pandas as pd
 PRECISION = {
     # feet — convention, 4
     'PlateZ': 4, 'PlateX': 4, 'RelPosZ': 4, 'RelPosX': 4, 'Extension': 4,
-    'SzTop': 4, 'SzBot': 4,
+    # SzTop and SzBot are 3, not 4. Measured 2026-08-17 over 57,371 feed values:
+    # the 4th decimal is zero on 100.000% of them, while every other place on
+    # every other column runs about 10% zeros, which is what a digit carrying
+    # information looks like. The feed simply never resolves the strike zone finer
+    # than a thousandth of a foot, so a 4th digit is decoration. Same rule that
+    # sent LaunchAngle and Distance back to integers.
+    'SzTop': 3, 'SzBot': 3,
     # degrees — convention, 3
     'VAA': 3, 'HAA': 3,
     'AttackAngle': 3, 'AttackDirection': 3, 'SwingPathTilt': 3,
