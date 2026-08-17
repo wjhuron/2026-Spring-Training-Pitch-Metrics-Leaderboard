@@ -605,8 +605,29 @@ class DecisionLedger:
 #
 # --no-record turns the write-back off, for an exploratory run that should not
 # silence anything.
-RECORDED_KINDS = {'new', 'drift', 'suppressed', 'fill_implausible',
-                  'blocked_source'}
+RECORDED_KINDS = {'new', 'drift', 'suppressed', 'blocked_source'}
+
+# The override column. A validated character rather than a form control, so it
+# survives a round trip through Excel, Sheets or Numbers.
+BOX_EMPTY = '\u2610'      # ballot box
+BOX_TICKED = '\u2611'     # ballot box with check
+TICK_MARKS = {BOX_TICKED, '\u2612', 'x', 'X', 'y', 'yes', 'true', '1', '\u2713',
+              '\u2714', 'reject', 'flip', 'override'}
+
+
+def is_ticked(value):
+    """Was the override box marked? Forgiving on purpose.
+
+    Anything that is not empty and not an untouched box counts as ticked, so a
+    typed x, a tick character or the dropdown all work, and a round trip that
+    silently rewrites the glyph cannot lose a decision.
+    """
+    if value is None:
+        return False
+    v = str(value).strip()
+    if not v or v == BOX_EMPTY:
+        return False
+    return v in TICK_MARKS or v.lower() in TICK_MARKS
 
 
 def record_sweep(changes, ledger):
@@ -622,11 +643,177 @@ def record_sweep(changes, ledger):
     return after - before
 
 
+def _accepted(ch, decisions):
+    """Should this change be written?
+
+    A change with no recommendation is one of the automatic classes (extra
+    decimals, sub-precision drift), and those are written regardless — they are
+    never listed for review, so there is nothing to decide.
+    """
+    if not ch.rec:
+        return True
+    if decisions is not None and (ch.pitch_id, ch.col) in decisions:
+        return decisions[(ch.pitch_id, ch.col)]
+    return ch.rec == ADOPT
+
+
+# ── Reading a reviewed workbook back in ──────────────────────────────────────
+def read_decisions(path):
+    """Turn a reviewed dry-run workbook into a decision map.
+
+    Returns {(PitchID, column): True to write, False to leave alone}.
+
+    The recommendation column carries the verdict; the Reject box inverts it.
+    An untouched workbook therefore means "do exactly what was recommended",
+    which is the safe reading — a file that never got opened cannot silently
+    flip anything.
+    """
+    from openpyxl import load_workbook
+    wb = load_workbook(path, read_only=True, data_only=True)
+    out, flipped, seen = {}, 0, 0
+    for name in wb.sheetnames:
+        ws = wb[name]
+        header = None
+        for row in ws.iter_rows(values_only=True):
+            if header is None:
+                header = list(row)
+                if not {'PitchID', 'Recommend', 'Reject'} <= set(header):
+                    break            # SUMMARY, HOW TO READ, or a rollup tab
+                continue
+            rec_row = dict(zip(header, row))
+            pid = rec_row.get('PitchID')
+            if not pid:
+                continue
+            # On a per-column tab the column IS the tab name. On the zone tabs it
+            # is in a Column cell, because those carry SzTop and SzBot together.
+            col = rec_row.get('Column') or name
+            verdict = str(rec_row.get('Recommend') or '').strip().lower()
+            write = verdict == ADOPT
+            if is_ticked(rec_row.get('Reject')):
+                write = not write
+                flipped += 1
+            out[(str(pid), str(col))] = write
+            seen += 1
+    print(f"  read {seen} decisions from {os.path.basename(path)}; "
+          f"{flipped} boxes ticked, so {sum(out.values())} cells will be "
+          f"written and {seen - sum(out.values())} left alone")
+    return out
+
+
+# ── Recommendation ───────────────────────────────────────────────────────────
+# One verdict per reviewable row: adopt the new value, or leave the cell alone.
+# Deliberately blind to the ledger — Wally's instruction 2026-08-17 is that the
+# recommendation must stand on the data in front of it, not on whether a value
+# has been seen before.
+#
+# The whole judgement rests on one comparison: where does the proposed value sit
+# relative to THIS pitcher's own median for THIS pitch type. That is what makes
+# Kai-Wei Teng's sweeper reading IVB 18.6 against his own 1.0 obviously wrong,
+# and Bryan King's fastball moving 2223 -> 2126 against his own 2106 obviously
+# right, even though the second is the larger raw change.
+ADOPT, REJECT = 'adopt', 'do not adopt'
+
+# Only these columns describe the PITCHER, so only these can be judged against
+# his own median for a pitch type. A slider that reads IVB 18.6 when his sliders
+# average 1.0 is wrong, and the median is what proves it.
+#
+# Every other column is event-level or belongs to the batter, and the pitcher's
+# median says nothing about it. Caught 2026-08-17 on the first run that showed
+# recommendations: xSLG 3.403 -> 4.000 was being rejected as 3.8 units from Mike
+# Burrows' median, when 4.000 IS the xSLG of a home run and his median across all
+# batted balls is about 0.24. The same error hit xBA, xwOBA, RunExp and the whole
+# bat-tracking block, where SwingLength belongs to the hitter's swing and has
+# nothing to do with who threw the pitch.
+#
+# For those columns the source is authoritative for the single event and the
+# recommendation is to adopt. A per-hitter baseline WOULD be meaningful for bat
+# tracking, and that is a worthwhile refinement, but a wrong baseline is worse
+# than none so it is not guessed at here.
+PITCHER_SHAPE_COLS = {
+    'Velocity', 'Spin Rate', 'RTilt', 'OTilt',
+    'IndVertBrk', 'HorzBrk', 'xIndVrtBrk', 'xHorzBrk',
+    'RelPosZ', 'RelPosX', 'Extension', 'ArmAngle',
+    'VAA', 'HAA',
+}
+
+# Plain words for the report. `suppressed` in particular read like a verdict when
+# it only ever meant "this value was raised by an earlier sweep".
+PLAIN_KIND = {
+    'new': 'cell is blank',
+    'drift': 'value changed at source',
+    'blocked_source': 'whole game bad at source',
+    'zone_fix': 'wrong hitter\'s zone',
+    'zone_fix_nodonor': 'zone outlier, no donor',
+    'suppressed': 'already raised by an earlier sweep',
+    'precision': 'extra decimals only',
+    'drift_sub': 'change below stored precision',
+    'drift_small': 'change below one noise unit',
+}
+
+
+def recommend(kind, col, old, new, units, pitcher, pitch_type, game_pk):
+    """Return (verdict, one-line reason)."""
+    if (game_pk, col) in KNOWN_BAD_SOURCE:
+        return REJECT, 'source is wrong for this whole game'
+
+    if kind in ('zone_fix', 'zone_fix_nodonor'):
+        return ADOPT, 'zone belongs to another hitter'
+
+    if col not in PITCHER_SHAPE_COLS:
+        if col in STRING_COLS:
+            return ADOPT, 'feed is authoritative for this column'
+        return ADOPT, ('per-event value, so the pitcher\'s own average is not a '
+                       'yardstick for it')
+
+    avg_units_new = fill_units(col, pitcher, pitch_type, new)
+
+    # No numeric baseline: every string and time column, and any pitcher/type
+    # pair too thin to have a median. Description, BBType, Count and Event land
+    # here, and the feed is the authority on all four — those are the scoring and
+    # tagging corrections that motivated the whole exercise.
+    if avg_units_new is None:
+        if col in STRING_COLS:
+            return ADOPT, 'feed is authoritative for this column'
+        return ADOPT, 'no baseline for this pitcher and pitch type'
+
+    if kind == 'new':
+        if avg_units_new > FILL_REVIEW_SD:
+            return REJECT, (f'{avg_units_new:.1f} units from his own average '
+                            f'for this pitch type')
+        return ADOPT, f'{avg_units_new:.1f} units from his own average'
+
+    # Drift. The size of the move is not the question; the direction is. A change
+    # that lands closer to the pitcher's own centre is an improvement whatever
+    # its size. A change that lands further out, past the gate, makes the sheet
+    # worse — Hunter Brown's curveball 2624 -> 1403 against a 2561 average.
+    avg_units_old = fill_units(col, pitcher, pitch_type, old)
+    if avg_units_old is None:
+        return (ADOPT if avg_units_new <= FILL_REVIEW_SD else REJECT,
+                f'{avg_units_new:.1f} units from his own average')
+    if avg_units_new <= avg_units_old:
+        return ADOPT, (f'moves toward his average '
+                       f'({avg_units_old:.1f} -> {avg_units_new:.1f} units)')
+
+    # Moving away. The absolute gate is not enough on its own: Josh Hader's
+    # slider sat at 2493 against a 2492 average and the feed proposed 2147, which
+    # is 3.9 units out and slipped under FILL_REVIEW_SD, so it was recommended
+    # for adoption. The current value being dead on his average is itself the
+    # evidence that the current value is right. So the test is how much distance
+    # the change ADDS, measured in the same noise unit the rest of the module
+    # uses for "a real change" rather than a new number invented here.
+    added = avg_units_new - avg_units_old
+    if added > DRIFT_REVIEW_SD or avg_units_new > FILL_REVIEW_SD:
+        return REJECT, (f'moves away from his average by {added:.1f} units '
+                        f'({avg_units_old:.1f} -> {avg_units_new:.1f})')
+    return ADOPT, (f'moves away by only {added:.1f} units '
+                   f'({avg_units_old:.1f} -> {avg_units_new:.1f})')
+
+
 # ── Diff ─────────────────────────────────────────────────────────────────────
 # One row per proposed cell change.
 Change = collections.namedtuple(
     'Change', 'tab row col pitcher batter game_date pitch_id pitch_type '
-              'old new kind delta source units')
+              'old new kind delta source units rec rec_why')
 # `units` is |delta| expressed in the column's own noise scale, or None for a
 # string, a time value, or a column with no measurable spread.
 
@@ -865,6 +1052,9 @@ def zone_outlier_changes(zone_obs, fix_nodonor=True):
                 pitch_id=o['pid'], pitch_type=o.get('pitch_type', ''),
                 old=sheet_val, new=new, kind=kind,
                 delta=(want - o_f) if o_f is not None else None, units=None,
+                rec=ADOPT,
+                rec_why=(f'carries {match[0][0]}\'s zone' if match
+                         else 'outlier against his own zone, no donor found'),
                 source=(f'zone of {match[0][0]}' if match
                         else 'no donor in this game')))
     return out, unexplained
@@ -950,23 +1140,25 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
             delta = (n - o) if (o is not None and n is not None) else None
             units = None
 
-            # Gate 0: a value this exact cell has already declined, whether it
-            # would arrive as a fill or as an overwrite. The bootstrap only ever
-            # covered blank fills in LEDGER_COLS, but a rejection typed into a
-            # reviewed workbook means "never write this here", and that has to
-            # hold for a drift overwrite too — otherwise every run re-proposes
-            # Hunter Brown's 1403 rpm curveball.
+            # The recommendation is computed FIRST, from the data alone, and is
+            # deliberately blind to the ledger.
+            rec = rec_why = ''
+            if kind in ('new', 'drift'):
+                probe = (scale_units(col, delta, old=old, new=new)
+                         if kind == 'drift' else
+                         fill_units(col, pitcher, pitch_type, new))
+                rec, rec_why = recommend(kind, col, old, new, probe,
+                                         pitcher, pitch_type, pid.split('_')[0])
+                if (pid.split('_')[0], col) in KNOWN_BAD_SOURCE:
+                    kind = 'blocked_source'
+
+            # Already seen with this same value, so not raised again. Wally's
+            # rule 2026-08-17. Applies to a drift overwrite as much as to a fill,
+            # or every run re-proposes Hunter Brown's 1403 rpm curveball.
             if kind in ('new', 'drift') and ledger.suppresses(pid, col, new):
                 kind = 'suppressed'
             elif kind == 'new':
-                # Gate 1: the source is wrong for this whole game and column.
-                if (pid.split('_')[0], col) in KNOWN_BAD_SOURCE:
-                    kind = 'blocked_source'
-                else:
-                    # Gate 2: is the candidate even plausible for this pitcher?
-                    units = fill_units(col, pitcher, pitch_type, new)
-                    if units is not None and units > FILL_REVIEW_SD:
-                        kind = 'fill_implausible'
+                units = fill_units(col, pitcher, pitch_type, new)
             elif kind == 'drift':
                 # Wally's rule: only drift large enough to be a real correction
                 # gets a human. A column with no measurable scale (every string
@@ -981,7 +1173,7 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
                 tab=tab, row=r_idx, col=col, pitcher=pitcher, batter=batter,
                 game_date=gdate, pitch_id=pid, pitch_type=pitch_type,
                 old=old, new=new, kind=kind,
-                delta=delta, units=units,
+                delta=delta, units=units, rec=rec, rec_why=rec_why,
                 source='feed' if col in FEED_COLS else 'savant'))
 
     missing = []
@@ -1003,8 +1195,9 @@ BATTER_SIDE = {'SzTop', 'SzBot', 'Batter', 'Bats'}
 def write_report(changes, missing, ledger, path, unexplained_zones=None):
     """One workbook. A summary tab, then one tab per column, then extras."""
     from openpyxl import Workbook
-    from openpyxl.styles import Font
+    from openpyxl.styles import Alignment, Font
     from openpyxl.utils import get_column_letter
+    from openpyxl.worksheet.datavalidation import DataValidation
 
     SCALES, MEDIANS = baselines()
     GROUP_N = group_sizes()
@@ -1020,10 +1213,59 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
         ws.freeze_panes = 'A2'
         return ws
 
+    def fit(ws, cap=90):
+        """Size every column to its own longest cell, header included.
 
-    def autosize(ws, widths):
-        for i, w in enumerate(widths, start=1):
-            ws.column_dimensions[get_column_letter(i)].width = w
+        Replaces the hand-written width lists, which were guesses and went stale
+        the moment a column moved. This reads the sheet that was actually
+        written, so a two-character Pitch Type column stays two characters wide
+        and a reason column is only as wide as its longest reason.
+
+        A column whose content runs past `cap` is capped there and wrapped, so
+        one long cell cannot push every other column off the screen.
+        """
+        for col_cells in ws.iter_cols():
+            widest = 0
+            for c in col_cells:
+                if c.value is None:
+                    continue
+                for line in str(c.value).split('\n'):
+                    widest = max(widest, len(line))
+            letter = get_column_letter(col_cells[0].column)
+            if widest > cap:
+                ws.column_dimensions[letter].width = cap
+                for c in col_cells[1:]:
+                    c.alignment = Alignment(wrap_text=True, vertical='top')
+            else:
+                # +3 covers the padding Excel adds inside a cell plus the extra
+                # width a bold header needs, so no heading is clipped.
+                ws.column_dimensions[letter].width = widest + 3
+
+    def add_checkboxes(ws, col_letter, n_rows):
+        """Put an empty ballot box in every cell of a column, with a two-item
+        dropdown so it can be ticked without typing.
+
+        openpyxl cannot create a real Excel form-control checkbox, and a real one
+        would not survive a round trip through Sheets or Numbers anyway. A
+        validated character does, and it reads back reliably. is_ticked() accepts
+        a typed x or any tick glyph as well, so a round trip that rewrites the
+        character cannot lose a decision.
+        """
+        if n_rows < 1:
+            return
+        dv = DataValidation(type='list',
+                            formula1=f'"{BOX_EMPTY},{BOX_TICKED}"',
+                            allow_blank=True, showDropDown=False)
+        dv.error = f'Choose {BOX_EMPTY} or {BOX_TICKED}'
+        dv.promptTitle = 'Override the recommendation'
+        dv.prompt = ('Tick to do the OPPOSITE of the Recommend column on this '
+                     'row. Leave it alone to accept the recommendation.')
+        ws.add_data_validation(dv)
+        dv.add(f'{col_letter}2:{col_letter}{n_rows + 1}')
+        for r in range(2, n_rows + 2):
+            c = ws[f'{col_letter}{r}']
+            c.value = BOX_EMPTY
+            c.alignment = Alignment(horizontal='center')
 
     ws = sheet('HOW TO READ', ['', ''])
     for k, v in [
@@ -1040,23 +1282,38 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
         ('To see everything again',
          'Delete data/backfill_decisions.json, or run with --no-record so a '
          'sweep does not record what it surfaced.'),
-        ('Change: new', 'The cell is blank and the source has a value.'),
-        ('Change: drift',
+        ('Recommend',
+         'My verdict on this row: "%s" or "%s". Computed from the data only — it '
+         'ignores whether an earlier sweep already raised this value.'
+         % (ADOPT, REJECT)),
+        ('Reject',
+         'Tick the box to do the OPPOSITE of Recommend. Recommended adopt plus a '
+         'tick means leave the cell alone; recommended do-not-adopt plus a tick '
+         'means write it. Leave every box alone to accept all recommendations.'),
+        ('Send it back',
+         'python3 -m scrapers.backfill_full --apply --decisions-from <this file>'),
+        ('Rows are sorted',
+         'Everything I recommend against is at the TOP of each tab, so the rows '
+         'most likely to need a tick are the first ones you see.'),
+        ('Change: cell is blank',
+         'The cell is empty and the source has a value.'),
+        ('Change: value changed at source',
          'Both have a value and they differ by more than %s of the column\'s '
          'own spread within a pitcher and pitch type.' % DRIFT_REVIEW_SD),
         ('Off usual',
          'Proposed value minus that pitcher\'s median for that pitch type. '
          'This is the number that says whether a change is believable.'),
         ('Not listed here',
-         'Precision rewrites and drift below the review threshold. They are '
-         'counted on SUMMARY and written without asking.'),
+         'Extra-decimal rewrites, drift below stored precision, drift below one '
+         'noise unit, and anything an earlier sweep already raised. Counted on '
+         'SUMMARY and written without asking.'),
         ('EP pitches',
          'Position players. Release, movement, spin and approach columns are '
          'skipped for them. Count, Description, Event and batted-ball data are '
          'kept.'),
     ]:
         ws.append([k, v])
-    autosize(ws, [26, 120])
+    fit(ws)
 
     by_col = collections.defaultdict(list)
     for ch in changes:
@@ -1108,15 +1365,18 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     ws.append(['Drift is sent to review above %s noise units; blank fills are '
                'offered below %s. See DRIFT_REVIEW_SD / FILL_REVIEW_SD.'
                % (DRIFT_REVIEW_SD, FILL_REVIEW_SD)])
-    autosize(ws, [18, 8, 9, 14, 16, 15, 18, 18, 11, 11, 22, 21, 19, 12])
+    fit(ws)
 
     # ---- One tab per column ------------------------------------------------
     # `precision` and `drift_sub` are counted on SUMMARY and deliberately NOT
     # listed: Wally's call 2026-08-17, summary only. Together they run to
     # millions of rows and carry no judgement, because neither one moves the
     # value by as much as the sheet was already displaying.
+    # Already-seen rows are left OFF the tabs entirely. Wally's rule: a value a
+    # sweep has raised once does not come back. They stay in the SUMMARY counts.
+    HIDDEN = SUMMARY_ONLY_KINDS | {'suppressed'}
     for c in order:
-        rows_ = [r for r in by_col[c] if r.kind not in SUMMARY_ONLY_KINDS]
+        rows_ = [r for r in by_col[c] if r.kind not in HIDDEN]
         if not rows_:
             continue
         keyer = ((lambda r: (r.tab, r.batter, r.game_date, r.pitch_id))
@@ -1128,15 +1388,20 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
         # nothing until you know it is a slider and that his sliders average
         # 10.8. `Off usual` is the proposed value minus that average, which is
         # the number that actually decides whether a change is believable.
+        # Recommendation and the override box sit immediately after Proposed,
+        # where the eye already is. Wally's layout, 2026-08-17.
         ws = sheet(c, ['Team', 'Pitcher', 'Pitch Type', 'Batter', 'Game Date',
                        'GameID', 'PitchID', 'Sheet row', 'Change',
                        'Current', 'Proposed',
+                       'Recommend', 'Reject', 'Why',
                        'Pitcher avg on this type', 'Off usual', 'n for avg',
-                       'Delta', 'Noise units', 'Previously rejected'])
+                       'Delta', 'Noise units'])
+        REC_LETTER, BOX_LETTER = 'L', 'M'
         colmed = MEDIANS.get(c) or {}
+        rows_.sort(key=lambda r: (r.rec != REJECT, keyer(r)))
+        show_avg = c in PITCHER_SHAPE_COLS
         for r in rows_:
-            prior = ledger.entries.get((r.pitch_id, r.col))
-            avg = colmed.get((r.pitcher, r.pitch_type))
+            avg = colmed.get((r.pitcher, r.pitch_type)) if show_avg else None
             n_for_avg = GROUP_N.get((r.pitcher, r.pitch_type), '')
             if c in TIME_COLS and avg is not None:
                 avg_disp = f'{(int(avg) // 60) or 12}:{int(avg) % 60:02d}'
@@ -1148,13 +1413,13 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                        if (avg is not None and nv is not None) else '')
             ws.append([r.tab, r.pitcher, r.pitch_type, r.batter, r.game_date,
                        r.pitch_id.split('_')[0], r.pitch_id,
-                       r.row, r.kind, r.old, r.new,
+                       r.row, PLAIN_KIND.get(r.kind, r.kind), r.old, r.new,
+                       r.rec, None, r.rec_why,
                        avg_disp, off if off is not None else '', n_for_avg,
                        round(r.delta, 6) if r.delta is not None else '',
-                       round(r.units, 2) if r.units is not None else '',
-                       ', '.join(prior['rejected']) if prior else ''])
-        autosize(ws, [7, 24, 11, 24, 12, 10, 18, 10, 17, 12, 12,
-                      24, 11, 10, 11, 12, 22])
+                       round(r.units, 2) if r.units is not None else ''])
+        add_checkboxes(ws, BOX_LETTER, len(rows_))
+        fit(ws)
 
     # ---- Missing pitches ---------------------------------------------------
     if missing:
@@ -1168,7 +1433,7 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                        exp.get('Pitcher', ''), exp.get('Batter', ''),
                        exp.get('Pitch Type', ''), exp.get('Count', ''),
                        exp.get('Description', '')])
-        autosize(ws, [7, 18, 12, 24, 24, 11, 8, 22])
+        fit(ws)
 
     # ---- Blank fills, one row per PITCH -------------------------------------
     # The per-column tabs are the authority, but they over-count the decision:
@@ -1180,7 +1445,9 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
         ws = sheet('_FILLS BY PITCH',
                    ['Team', 'Pitcher', 'Pitch Type', 'Game Date', 'GameID',
                     'PitchID', 'Sheet row', 'Columns gained',
-                    'Max noise units', 'Proposed values (pitcher avg)'])
+                    'Max noise units',
+                    'Proposed values (pitcher avg) — READ ONLY, decide on the '
+                    'per-column tabs'])
         byp = collections.defaultdict(list)
         for r in fills:
             byp[(r.tab, r.pitcher, r.pitch_type, str(r.game_date),
@@ -1201,7 +1468,7 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
             ws.append([tab, pit, pt, gd, pid.split('_')[0], pid, row,
                        len(rs), round(max(us), 2) if us else '',
                        ', '.join(bits)])
-        autosize(ws, [7, 24, 11, 12, 10, 18, 10, 15, 16, 110])
+        fit(ws)
 
     # ---- Drift auto-written, rolled up by column and month ------------------
     # Wally's call 2026-08-17: summarise these rather than list them. PlateX
@@ -1222,23 +1489,26 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                        round(ds[len(ds) // 2], 6) if ds else '',
                        round(ds[-1], 6) if ds else '',
                        round(max(us), 3) if us else ''])
-        autosize(ws, [18, 9, 9, 15, 13, 16])
+        fit(ws)
 
     # ---- Zone repairs ------------------------------------------------------
     zc = [r for r in changes if r.kind == 'zone_fix']
     if zc:
         ws = sheet('_ZONE FIXED', ['Game Date', 'GameID', 'At-bat', 'Team',
                                    'Column', 'Batter', 'PitchID', 'Sheet row',
-                                   'Current', 'Corrected', 'Delta',
-                                   'Whose zone it was'])
+                                   'Current', 'Corrected',
+                                   'Recommend', 'Reject',
+                                   'Delta', 'Whose zone it was'])
         zc.sort(key=lambda r: (str(r.game_date), r.pitch_id, r.col))
         for r in zc:
             parts = r.pitch_id.split('_')
             ws.append([r.game_date, parts[0], parts[1], r.tab, r.col, r.batter,
                        r.pitch_id, r.row, r.old, r.new,
+                       r.rec, None,
                        round(r.delta, 6) if r.delta is not None else '',
                        r.source])
-        autosize(ws, [12, 10, 8, 7, 9, 24, 18, 10, 12, 12, 11, 30])
+        add_checkboxes(ws, 'L', len(zc))
+        fit(ws)
 
     # ---- Zone outliers with no donor in their game -------------------------
     # Repaired too (Wally, 2026-08-17), but kept separate: the mechanism is not a
@@ -1249,14 +1519,15 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
         ws = sheet('_ZONE FIXED (NO DONOR)',
                    ['Game Date', 'GameID', 'At-bat', 'Team', 'Column', 'Batter',
                     'PitchID', 'Sheet row', 'Current', 'Corrected',
-                    'Delta (in)'])
+                    'Recommend', 'Reject', 'Delta (in)'])
         zn.sort(key=lambda r: (str(r.game_date), r.pitch_id, r.col))
         for r in zn:
             parts = r.pitch_id.split('_')
             ws.append([r.game_date, parts[0], parts[1], r.tab, r.col, r.batter,
-                       r.pitch_id, r.row, r.old, r.new,
+                       r.pitch_id, r.row, r.old, r.new, r.rec, None,
                        round(r.delta * 12, 2) if r.delta is not None else ''])
-        autosize(ws, [12, 10, 8, 7, 9, 24, 18, 10, 12, 12, 11])
+        add_checkboxes(ws, 'L', len(zn))
+        fit(ws)
 
     if unexplained_zones:
         ws = sheet('_ZONE UNEXPLAINED',
@@ -1269,7 +1540,7 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                        u['batter'], u['has'], u['modal'], u['pid'],
                        u['sztop_off_in'], u['szbot_off_in'],
                        'yes, see _ZONE FIXED (NO DONOR)' if zn else 'no'])
-        autosize(ws, [12, 10, 8, 7, 24, 15, 15, 18, 15, 15, 30])
+        fit(ws)
 
     # ---- Blank fills rejected as implausible, rolled up by game -----------
     imp = [r for r in changes if r.kind in ('fill_implausible', 'blocked_source')]
@@ -1291,7 +1562,7 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                        round(us[len(us) // 2], 2) if us else '',
                        round(us[-1], 2) if us else '',
                        f'{worst.pitcher}: blank -> {worst.new}'])
-        autosize(ws, [18, 12, 10, 7, 30, 8, 19, 17, 40])
+        fit(ws)
 
     # ---- Suppressed, gathered in one place ---------------------------------
     supp = [r for r in changes if r.kind == 'suppressed']
@@ -1304,7 +1575,7 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
             e = ledger.entries.get((r.pitch_id, r.col)) or {}
             ws.append([r.tab, r.col, r.pitcher, r.game_date, r.pitch_id, r.new,
                        ', '.join(e.get('rejected', [])), e.get('asof', '')])
-        autosize(ws, [7, 12, 24, 12, 18, 12, 22, 12])
+        fit(ws)
 
     wb.save(path)
     return path
@@ -1346,13 +1617,18 @@ def apply_changes(ws, header, changes, chunk=40000):
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
-         report=True, record=True):
+         report=True, record=True, decisions_from=None):
     kinds = kinds or {'new', 'drift', 'drift_sub', 'drift_small',
                   'precision', 'zone_fix', 'zone_fix_nodonor'}
     print(f"Mode: {'APPLY' if apply else 'DRY RUN (nothing is written)'}")
     print(f"Change classes in scope: {', '.join(sorted(kinds))}")
     print(f"Columns: {len(IN_SCOPE)} ({len(FEED_COLS)} feed, "
           f"{len(SAVANT_COLS)} savant)")
+
+    decisions = read_decisions(decisions_from) if decisions_from else None
+    if apply and decisions is None:
+        print("  NOTE: no --decisions-from workbook, so every reviewable change "
+              "follows its own recommendation with no overrides.")
 
     ledger = DecisionLedger.load()
     gc = gspread.service_account()
@@ -1448,6 +1724,7 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
 
             if apply:
                 todo = [c for c in changes if c.kind in kinds]
+                todo = [c for c in todo if _accepted(c, decisions)]
                 if todo:
                     n = apply_changes(ws, header, todo)
                     print(f"  wrote {n} cells")
@@ -1465,7 +1742,7 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
               f"hitter in their game and are reported instead")
         all_changes.extend(zc)
         if apply and zc and ({'zone_fix', 'zone_fix_nodonor'} & kinds):
-            zc = [c for c in zc if c.kind in kinds]
+            zc = [c for c in zc if c.kind in kinds and _accepted(c, decisions)]
             for tab, group in collections.groupby(
                     sorted(zc, key=lambda c: c.tab), key=lambda c: c.tab):
                 ws, header = tab_handles[tab]
@@ -1534,6 +1811,10 @@ if __name__ == '__main__':
                     default=('new,drift,drift_sub,drift_small,precision,'
                              'zone_fix,zone_fix_nodonor'),
                     help='which change classes --apply writes')
+    ap.add_argument('--decisions-from', default=None, metavar='XLSX',
+                    help='a reviewed dry-run workbook. Each row follows its '
+                         'Recommend column, inverted where the Reject box is '
+                         'ticked. Without this, every recommendation stands.')
     ap.add_argument('--no-record', action='store_true',
                     help='do not write what this sweep surfaced into '
                          'data/backfill_decisions.json. Use for an exploratory '
@@ -1546,4 +1827,5 @@ if __name__ == '__main__':
          refresh_feed=a.refresh_feed,
          kinds={k.strip() for k in a.kinds.split(',') if k.strip()},
          report=not a.no_report,
-         record=not a.no_record)
+         record=not a.no_record,
+         decisions_from=a.decisions_from)
