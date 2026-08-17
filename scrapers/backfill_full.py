@@ -1436,6 +1436,26 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
                 if (units is not None and units <= DRIFT_REVIEW_SD
                         and col not in ZONE_COLS):
                     kind = 'drift_small'
+                    # A sub-noise change is ADOPTED regardless of where the value
+                    # sits. The band test asks "did the source get this value
+                    # wrong", which is a question about the VALUE, not about the
+                    # change — and for a change this small the answer is identical
+                    # for the old value and the new one, so applying it here
+                    # rejects a precision gain on the strength of a complaint
+                    # about a number that is already in the cell.
+                    #
+                    # Wally caught it on ROC 2026-08-17 and overrode 550 rows:
+                    # Extension 5.7500 -> 5.7497 is three ten-thousandths of a
+                    # foot, RelPosX 1.7800 -> 1.7809 is nine, VAA -9.870 ->
+                    # -9.868 is two thousandths of a degree. Refusing those left
+                    # a value equally far outside the band with fewer decimals.
+                    #
+                    # Changes big enough to matter still face the band test: Josh
+                    # Hader's slider moving 345 rpm is 3.9 noise units, so it stays
+                    # classified `drift` and is still recommended against.
+                    rec, rec_why = ADOPT, (
+                        f'{units:.2f} noise units, far below the {DRIFT_REVIEW_SD} '
+                        f'that makes a change worth judging')
 
             changes.append(Change(
                 tab=tab, row=r_idx, col=col, pitcher=pitcher, batter=batter,
