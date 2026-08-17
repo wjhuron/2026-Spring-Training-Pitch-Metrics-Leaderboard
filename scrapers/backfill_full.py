@@ -129,7 +129,22 @@ assert not (set(FEED_COLS) & SAVANT_COL_SET), 'a column has two authorities'
 # hitter, not the pitcher. VAA and HAA ARE in it, because they are derived from
 # velocity and movement and inherit their meaninglessness here.
 EP_PITCH_TYPE = 'EP'
-EP_SKIP_COLS = {
+
+# THE pitch-metric block. One set, two uses, and they are the same set because
+# they are the same idea: these fourteen columns describe how the pitch was
+# thrown, and nothing else in the schema does.
+#
+#   1. They are skipped entirely on EP rows. Release, movement, spin and approach
+#      are not meaningful for a shortstop lobbing one in.
+#   2. They are the only columns a recommendation may judge against the pitcher's
+#      own median for a pitch type. Everything else is per-event or belongs to the
+#      batter, so his median says nothing about it — see recommend().
+#
+# Deliberately absent: PlateZ and PlateX, because a pitcher throws all over the
+# zone and his median location is not a yardstick for one pitch; SzTop and SzBot,
+# because the zone belongs to the hitter; and the whole batted-ball and
+# bat-tracking block, which describes what the hitter did.
+PITCH_METRIC_COLS = {
     'Velocity', 'Spin Rate', 'RTilt', 'OTilt',
     'IndVertBrk', 'HorzBrk', 'xIndVrtBrk', 'xHorzBrk',
     'RelPosZ', 'RelPosX', 'Extension', 'ArmAngle',
@@ -713,28 +728,17 @@ def read_decisions(path):
 # right, even though the second is the larger raw change.
 ADOPT, REJECT = 'adopt', 'do not adopt'
 
-# Only these columns describe the PITCHER, so only these can be judged against
-# his own median for a pitch type. A slider that reads IVB 18.6 when his sliders
-# average 1.0 is wrong, and the median is what proves it.
+# Judging a value against the pitcher's own median only makes sense for the
+# pitch-metric block, which is single-homed above as PITCH_METRIC_COLS.
 #
-# Every other column is event-level or belongs to the batter, and the pitcher's
-# median says nothing about it. Caught 2026-08-17 on the first run that showed
-# recommendations: xSLG 3.403 -> 4.000 was being rejected as 3.8 units from Mike
-# Burrows' median, when 4.000 IS the xSLG of a home run and his median across all
-# batted balls is about 0.24. The same error hit xBA, xwOBA, RunExp and the whole
-# bat-tracking block, where SwingLength belongs to the hitter's swing and has
-# nothing to do with who threw the pitch.
-#
-# For those columns the source is authoritative for the single event and the
-# recommendation is to adopt. A per-hitter baseline WOULD be meaningful for bat
-# tracking, and that is a worthwhile refinement, but a wrong baseline is worse
-# than none so it is not guessed at here.
-PITCHER_SHAPE_COLS = {
-    'Velocity', 'Spin Rate', 'RTilt', 'OTilt',
-    'IndVertBrk', 'HorzBrk', 'xIndVrtBrk', 'xHorzBrk',
-    'RelPosZ', 'RelPosX', 'Extension', 'ArmAngle',
-    'VAA', 'HAA',
-}
+# Caught 2026-08-17 on the first run that showed recommendations: xSLG
+# 3.403 -> 4.000 was rejected as 3.8 units from Mike Burrows' median, when 4.000
+# IS the xSLG of a home run and his median across all batted balls is about 0.24.
+# The same error hit xBA, xwOBA, RunExp and the whole bat-tracking block, where
+# SwingLength belongs to the hitter's swing and has nothing to do with who threw
+# the pitch. A per-hitter baseline WOULD be meaningful for bat tracking, and that
+# is a worthwhile refinement, but a wrong baseline is worse than none so it is not
+# guessed at here.
 
 # Plain words for the report. `suppressed` in particular read like a verdict when
 # it only ever meant "this value was raised by an earlier sweep".
@@ -759,7 +763,7 @@ def recommend(kind, col, old, new, units, pitcher, pitch_type, game_pk):
     if kind in ('zone_fix', 'zone_fix_nodonor'):
         return ADOPT, 'zone belongs to another hitter'
 
-    if col not in PITCHER_SHAPE_COLS:
+    if col not in PITCH_METRIC_COLS:
         if col in STRING_COLS:
             return ADOPT, 'feed is authoritative for this column'
         return ADOPT, ('per-event value, so the pitcher\'s own average is not a '
@@ -1125,7 +1129,7 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
         ep_row = pitch_type.strip().upper() == EP_PITCH_TYPE
 
         for col in live:
-            if ep_row and col in EP_SKIP_COLS:
+            if ep_row and col in PITCH_METRIC_COLS:
                 continue
             c_idx = col_idx[col]
             old = (row[c_idx] if c_idx < len(row) else '') or ''
@@ -1399,7 +1403,7 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
         REC_LETTER, BOX_LETTER = 'L', 'M'
         colmed = MEDIANS.get(c) or {}
         rows_.sort(key=lambda r: (r.rec != REJECT, keyer(r)))
-        show_avg = c in PITCHER_SHAPE_COLS
+        show_avg = c in PITCH_METRIC_COLS
         for r in rows_:
             avg = colmed.get((r.pitcher, r.pitch_type)) if show_avg else None
             n_for_avg = GROUP_N.get((r.pitcher, r.pitch_type), '')
