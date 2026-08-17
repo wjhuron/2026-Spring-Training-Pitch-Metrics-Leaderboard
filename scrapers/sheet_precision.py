@@ -112,9 +112,25 @@ def fmt(col, value):
     if d is None:
         return str(value).strip()
     try:
-        return f"{float(value):.{d}f}"
+        f = float(value)
     except (TypeError, ValueError):
         return ''
+    s = f"{f:.{d}f}"
+
+    # Negative zero. A small negative that rounds to nothing renders with a sign
+    # that means nothing: a launch angle of -0.4 at 0 decimals becomes "-0", and an
+    # HAA of -0.0004 at 3 decimals becomes "-0.000". Caught 2026-08-17 by Wally
+    # asking what HOU's 18 remaining precision rewrites were — all 18 were this.
+    #
+    # It is two faults at once. "-0" is not a number anyone wants in a cell, and
+    # Sheets stores it as 0, so the sweep read back "0", saw a difference, and
+    # would have re-proposed those cells on every future run forever.
+    #
+    # A negative zero is not a negative number, so dropping the sign does not
+    # collide with the display rule that negatives keep theirs.
+    if s.startswith('-') and float(s) == 0.0:
+        s = s[1:]
+    return s
 
 
 # Columns read as UNFORMATTED values rather than as the displayed string.

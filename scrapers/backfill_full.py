@@ -846,13 +846,39 @@ PLAIN_KIND = {
 }
 
 
-def recommend(kind, col, old, new, units, pitcher, pitch_type, game_pk):
+def recommend(kind, col, old, new, units, pitcher, pitch_type, game_pk,
+              batter=None, bteam=None):
     """Return (verdict, one-line reason)."""
     if (game_pk, col) in KNOWN_BAD_SOURCE:
         return REJECT, 'source is wrong for this whole game'
 
     if kind in ('zone_fix', 'zone_fix_nodonor'):
         return ADOPT, 'zone belongs to another hitter'
+
+    # SzTop and SzBot are judged against the HITTER's own zone, never taken from
+    # the feed on trust. The feed is precisely what carries the mis-attributed
+    # value that zone_outlier_changes() exists to repair, so treating it as
+    # authoritative here put the two paths in direct opposition.
+    #
+    # Caught 2026-08-17, and it was live. The HOU apply had already corrected
+    # Taylor Ward's at-bat 824168_002 from Colton Cowser's 3.3290/1.6800 to his
+    # own 3.1900/1.6100. The very next sweep read the feed, still found 3.3290,
+    # classified it as ordinary drift, and recommended ADOPTING it — which would
+    # have reverted the repair. Left alone that is a permanent oscillation:
+    # repair, revert, repair, revert, one round trip per sweep.
+    if col in ZONE_COLS:
+        modal = hitter_modal_zone(batter, bteam)
+        if modal is None:
+            return ADOPT, 'no modal zone on file for this hitter'
+        want = modal[0] if col == 'SzTop' else modal[1]
+        v = as_float(new)
+        if v is None:
+            return ADOPT, 'not a number'
+        off = abs(v - want)
+        if off > ZONE_OUTLIER_FT:
+            return REJECT, (f'{off * 12:.2f} in from his own zone of {want:.3f}, '
+                            f'so this is another hitter\'s zone')
+        return ADOPT, f'{off * 12:.2f} in from his own zone of {want:.3f}'
 
     if col not in PITCH_METRIC_COLS:
         if col in STRING_COLS:
@@ -983,6 +1009,25 @@ def classify(col, old, new):
 # 45 beyond. That 140x drop between the 0.12-0.25 band and the 0.25-0.5 band is
 # the break, and it leaves 91 cells in the whole season above it.
 ZONE_OUTLIER_FT = 0.25 / 12
+
+# The two columns that belong to the hitter, not to whoever threw the pitch.
+ZONE_COLS = {'SzTop', 'SzBot'}
+
+_MODAL_ZONE = None
+
+
+def hitter_modal_zone(batter, bteam):
+    """(SzTop, SzBot) this hitter almost always has, or None.
+
+    Keyed on (batter, team) because two players share a name: Max Muncy reads
+    3.128/1.579 for LAD and 3.228/1.629 for ATH and both are correct.
+    """
+    global _MODAL_ZONE
+    if _MODAL_ZONE is None:
+        counts, _ = _sheet_zone_index()
+        _MODAL_ZONE = {k: max(sorted(c), key=lambda v: c[v])
+                       for k, c in counts.items() if sum(c.values()) >= 20}
+    return _MODAL_ZONE.get((batter, bteam))
 
 _ZONE_INDEX = None
 
@@ -1239,7 +1284,8 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
                          if kind == 'drift' else
                          fill_units(col, pitcher, pitch_type, new))
                 rec, rec_why = recommend(kind, col, old, new, probe,
-                                         pitcher, pitch_type, pid.split('_')[0])
+                                         pitcher, pitch_type, pid.split('_')[0],
+                                         batter=batter, bteam=cell('BTeam'))
                 if (pid.split('_')[0], col) in KNOWN_BAD_SOURCE:
                     kind = 'blocked_source'
 
