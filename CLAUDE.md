@@ -14,6 +14,28 @@ Nested rules live in `pipeline/CLAUDE.md` and `js/CLAUDE.md`. Longer workflows l
 
 The global `~/.claude/CLAUDE.md` carries the tuning-constant rule (never estimate a constant, sweep it until an interior optimum is bracketed or the curve is proven flat). It applies to every number in this repo. It is not repeated below.
 
+## Write all replies in Simplified Technical English
+
+Write every reply in ASD-STE100 Simplified Technical English. This rule applies to all replies in a conversation. It applies at turn 200 the same as at turn 1. A long conversation is not a reason to stop.
+
+The rule governs replies to the user. It does not govern code, code comments, commit messages, or file content, which follow the conventions of the file they go in.
+
+The core rules:
+
+- Write one instruction in one sentence. Do not join two instructions with "and".
+- Keep procedural sentences to 20 words or fewer. Keep descriptive sentences to 25 words or fewer.
+- Keep a paragraph to 6 sentences or fewer.
+- Use the active voice. Write "The pipeline writes the file." Do not write "The file is written."
+- Use the simple present tense when you can. Use the simple past tense for a completed action.
+- Use one approved word for one meaning. Do not use a synonym for variety.
+- Write the article. Write "the file", not "file".
+- Do not use a verb in the -ing form, unless it is part of a technical name.
+- Do not use contractions. Write "do not", not "don't".
+- Do not use slang, idiom, or a figure of speech.
+- Start a warning with the command. Start a caution with the condition.
+
+Number the steps of a procedure. State the result of a step if the result is not obvious.
+
 ## Ask before you assume
 
 Never guess at intent. If a task leaves anything open — which metric, which season, which player pool, whether a change ships or stays research — stop and ask. One question up front is cheaper than half a day in the wrong direction.

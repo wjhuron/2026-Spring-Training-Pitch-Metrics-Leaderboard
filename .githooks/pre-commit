@@ -1,6 +1,6 @@
 #!/bin/sh
-# Auto-bump the ?v= cache-bust stamp in index.html/trade.html whenever a js/
-# or css/ file is part of the commit, so a code edit always reaches browsers
+# Auto-bump the ?v= cache-bust stamp in index.html/trade.html whenever a
+# .js or .css file is part of the commit, so a code edit always reaches browsers
 # instead of serving a stale cached file. Keeps all asset versions on one
 # shared stamp (matching the leaderboard pipeline's convention — same
 # [\w-]+ pattern bump_asset_version and js/data.js use).
@@ -8,7 +8,7 @@
 # Installed via:  git config core.hooksPath .githooks
 # Skip once with: git commit --no-verify
 
-changed=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(js|css)/')
+changed=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(js|css)/.*\.(js|css)$')
 [ -z "$changed" ] && exit 0
 
 stamp=$(date +%Y%m%d%H%M%S)
