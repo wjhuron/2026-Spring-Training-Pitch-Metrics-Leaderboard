@@ -1776,7 +1776,23 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
   # not be.
     HIDDEN = SUMMARY_ONLY_KINDS | {'suppressed', 'zone_fix', 'zone_fix_nodonor'}
 
+    # A cell may appear on exactly ONE decision surface. The zone tabs own any cell
+    # they have an opinion about, and the per-column tab must not also list it.
+    #
+    # Wally asked what _ALREADY RAISED was for and the honest answer was that it made
+    # him review things twice. Measured on his WSH workbook: 28 cells listed on two
+    # tabs, and 9 of them ANSWERED TWO DIFFERENT WAYS, because a zone cell can be a
+    # `drift` row proposing the feed's value on the SzTop tab and a `zone_fix` row
+    # proposing the hitter's own value on _ZONE FIXED. Two proposals, one cell. His
+    # file was refused by the conflict guard, which is the guard working, but the
+    # report should never have produced the conflict.
+    ZONE_OWNED = {(r.pitch_id, r.col) for r in changes
+                  if r.kind in ('zone_fix', 'zone_fix_nodonor')}
+
     def hidden(r):
+        if (r.pitch_id, r.col) in ZONE_OWNED and r.kind not in (
+                'zone_fix', 'zone_fix_nodonor'):
+            return True            # the zone tab is deciding this cell
         return r.kind in HIDDEN and r.rec != REJECT
     for c in order:
         rows_ = [r for r in by_col[c] if not hidden(r)]
@@ -1970,18 +1986,21 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
 
     # ---- Values an earlier sweep already raised -----------------------------
     # These are NOT written. They are here so the record is visible, and they
-    # carry the same Pitch Type, pitcher average and override box as the review
-    # tabs — Wally's ask 2026-08-17, because a row cannot be judged without
-    # knowing what the pitch was and what he normally does with it. Overriding
-    # one here brings it back: _wanted() lets a decision beat the kind filter.
+    # carry the Pitch Type and pitcher average context Wally asked for.
+    #
+    # REFERENCE ONLY. It has no Recommend or Reject column, deliberately. Carrying
+    # them made 22 WSH cells appear on two tabs at once with a box on each, three of
+    # them answered differently, and offered a recommendation that could never be
+    # acted on because this class is outside the write set. To recover one of these
+    # values, name the PitchID and it is done as a one-off.
     supp = [r for r in changes if r.kind == 'suppressed']
     if supp:
         ws = sheet('_ALREADY RAISED (not written)',
                    ['Team', 'Column', 'Pitcher', 'Pitch Type', 'Game Date',
-                    'GameID', 'PitchID', 'Sheet row', 'Current', 'Proposed',
-                    'Recommend', 'Reject', 'Why',
+                    'GameID', 'PitchID', 'Sheet row', 'Current',
+                    'Value you declined', 'Would be', 'Why',
                     'Pitcher avg on this type', 'Off usual', 'n for avg',
-                    'First raised', 'Values already declined'])
+                    'First raised'])
         supp.sort(key=lambda r: (r.rec != REJECT, r.col, r.tab, r.pitcher,
                                  r.pitch_id))
         for r in supp:
@@ -2000,12 +2019,10 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                 off = round(nv - avg, dp) if nv is not None else ''
             ws.append([r.tab, r.col, r.pitcher, r.pitch_type, r.game_date,
                        r.pitch_id.split('_')[0], r.pitch_id, r.row,
-                       r.old, r.new, r.rec, None, r.rec_why,
+                       r.old, ', '.join(e.get('rejected', [])), r.new, r.rec_why,
                        avg_disp, off if off is not None else '',
                        GROUP_N.get((r.pitcher, r.pitch_type), ''),
-                       e.get('asof', ''),
-                       ', '.join(e.get('rejected', []))])
-        add_checkboxes(ws, 'L', len(supp))
+                       e.get('asof', '')])
         fit(ws)
 
     wb.save(path)
