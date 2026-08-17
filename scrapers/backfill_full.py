@@ -246,6 +246,10 @@ def feed_rows(game_pk, session, refresh=False):
                 continue
             out[pid] = {c: fmt(c, rec.get(c)) for c in cols}
             out[pid]['_PTeam'] = str(rec.get('PTeam') or '')
+            # Identity columns the sweep never writes, but an APPENDED row must
+            # carry. scripts/ops/append_missing_pitches.py reads them from here.
+            out[pid]['_BTeam'] = str(rec.get('BTeam') or '')
+            out[pid]['_PitchType'] = str(rec.get('Pitch Type') or '')
     _FEED_ROWS_CACHE[game_pk] = out
     return out
 
