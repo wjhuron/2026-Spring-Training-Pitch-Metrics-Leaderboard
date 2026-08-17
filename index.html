@@ -71,8 +71,9 @@
       <button class="section-tab" data-section="hitters" role="tab" aria-selected="false">Hitters</button>
       <button class="section-tab" data-section="abs" role="tab" aria-selected="false">ABS</button>
       <!-- TradeBoard nav entry removed 2026-08-17: hidden from the site
-           entirely, including under ?roc=1. trade.html itself still builds
-           and is still reachable by direct URL. -->
+           entirely, including under ?roc=1. trade.html, js/trade.js and
+           data/tradevalue_data.json.gz are also listed in .vercelignore, so
+           the direct URL 404s on the deployed site. They still build locally. -->
       <!-- CatchProbCalc is hidden by default and revealed only under the
            ?roc=1 secret link (app.js, same flag as the ROC team filter).
            display:none is set in the markup so it never flashes before JS runs. -->

@@ -1,0 +1,11 @@
+# Files excluded from the Vercel deployment. They stay in the repo and keep
+# building locally; they are simply never uploaded to the CDN, so a request
+# for them returns Vercel's 404 rather than the page.
+#
+# TradeBoard, retired from the site 2026-08-17. The nav entry was removed in
+# a08dcfa2; these three lines close the direct-URL route as well. Delete this
+# block to put the page back — nothing else needs to change, and the
+# vercel.json headers rule for tradevalue_data.json.gz is still in place.
+trade.html
+js/trade.js
+data/tradevalue_data.json.gz
