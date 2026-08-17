@@ -401,6 +401,24 @@ def fill_units(col, pitcher, pitch_type, value):
 LEDGER_COLS = {'Velocity', 'Spin Rate', 'RTilt',
                'IndVertBrk', 'HorzBrk', 'xIndVrtBrk', 'xHorzBrk'}
 
+# (game_pk, column) pairs where the SOURCE is wrong for the whole game, so no
+# cell in it may be filled however plausible the individual value looks.
+#
+# Mexico City series, 2026-04-25 and 2026-04-26, Estadio Alfredo Harp Helu.
+# Wally blanked Extension for both games on purpose. Verified 2026-08-17: the
+# feed still serves extension about half a foot below each pitcher's own median
+# for that pitch type (median offered-minus-usual -0.490 ft in 825093 and
+# -0.543 ft in 825094, against -0.113, 0.000 and -0.017 ft in the three other
+# whole-game Extension gaps, which are ordinary tracking gaps and DO get
+# filled). The per-cell plausibility gate is not enough on its own here: the
+# median offset is 3.7 noise units, under FILL_REVIEW_SD, so roughly two thirds
+# of the 615 cells would have passed it one at a time. A defect that applies to
+# a whole game has to be blocked at the game level.
+KNOWN_BAD_SOURCE = {
+    ('825093', 'Extension'),
+    ('825094', 'Extension'),
+}
+
 _SNAPSHOT_DATE = '2026-07-06'
 
 
@@ -868,8 +886,11 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
             units = None
 
             if kind == 'new':
+                # Gate 0: the source is wrong for this whole game and column.
+                if (pid.split('_')[0], col) in KNOWN_BAD_SOURCE:
+                    kind = 'blocked_source'
                 # Gate 1: a value already rejected for this exact cell.
-                if col in LEDGER_COLS and ledger.suppresses(pid, col, new):
+                elif col in LEDGER_COLS and ledger.suppresses(pid, col, new):
                     kind = 'suppressed'
                 else:
                     # Gate 2: is the candidate even plausible for this pitcher?
@@ -1146,23 +1167,26 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
         autosize(ws, [12, 10, 8, 7, 24, 15, 15, 18, 15, 15, 30])
 
     # ---- Blank fills rejected as implausible, rolled up by game -----------
-    imp = [r for r in changes if r.kind == 'fill_implausible']
+    imp = [r for r in changes if r.kind in ('fill_implausible', 'blocked_source')]
     if imp:
         ws = sheet('_IMPLAUSIBLE FILLS',
-                   ['Column', 'Game Date', 'GameID', 'Team', 'Cells',
+                   ['Column', 'Game Date', 'GameID', 'Team', 'Why', 'Cells',
                     'Median noise units', 'Max noise units', 'Example'])
         buck = collections.defaultdict(list)
         for r in imp:
-            buck[(r.col, str(r.game_date), r.pitch_id.split('_')[0], r.tab)].append(r)
-        for (c, gd, gpk, tab), rs in sorted(buck.items(),
-                                            key=lambda kv: -len(kv[1])):
+            buck[(r.col, str(r.game_date), r.pitch_id.split('_')[0], r.tab,
+                  r.kind)].append(r)
+        for (c, gd, gpk, tab, kind), rs in sorted(buck.items(),
+                                                  key=lambda kv: -len(kv[1])):
             us = sorted(r.units for r in rs if r.units is not None)
             worst = max(rs, key=lambda r: r.units or 0)
-            ws.append([c, gd, gpk, tab, len(rs),
+            why = ('source bad for the whole game' if kind == 'blocked_source'
+                   else f'beyond {FILL_REVIEW_SD} noise units')
+            ws.append([c, gd, gpk, tab, why, len(rs),
                        round(us[len(us) // 2], 2) if us else '',
                        round(us[-1], 2) if us else '',
                        f'{worst.pitcher}: blank -> {worst.new}'])
-        autosize(ws, [18, 12, 10, 7, 8, 19, 17, 40])
+        autosize(ws, [18, 12, 10, 7, 30, 8, 19, 17, 40])
 
     # ---- Suppressed, gathered in one place ---------------------------------
     supp = [r for r in changes if r.kind == 'suppressed']
@@ -1359,6 +1383,7 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
     print(f"NOT WRITTEN")
     print(f"  suppressed by the ledger {k['suppressed']}")
     print(f"  fills judged implausible {k['fill_implausible']}")
+    print(f"  blocked, bad at source   {k['blocked_source']}")
     print(f"  missing pitches found    {len(all_missing)}")
     print(f"cells this run would write "
           f"{sum(k[x] for x in AUTO_KINDS) + k['new'] + k['drift']}")
