@@ -733,34 +733,49 @@ class BaseballSavantFocusedDownloader:
             print(f"Error getting team games: {str(e)}")
             return []
 
-    def download_game_data(self, game_pk, filter_team=None, filter_player_id=None):
+    def download_game_data(self, game_pk, filter_team=None, filter_player_id=None,
+                           game_json=None, raw_precision=False):
         """
         Download pitch-by-pitch data using the MLB Stats API
         Returns the DataFrame directly rather than saving to a file
 
         filter_player_id: optional MLB player ID — keep only plays where that
         player was the pitcher or the batter.
-        """
-        print(f"Downloading data for game {game_pk}...")
 
+        game_json: an already-fetched feed/live payload. When given, no HTTP
+        request is made and the payload is parsed as-is. This is what lets
+        scrapers/backfill_full.py replay a disk-cached season without re-pulling
+        1,987 games, while still going through this one parser rather than a
+        second copy of it.
+
+        raw_precision: skip the display-rounding pass at the end and return the
+        parsed values at full source precision. The backfill applies its own
+        per-column depth (scrapers/backfill_full.py:PRECISION), so rounding here
+        first would throw away digits it needs. Default False keeps every
+        existing caller byte-identical.
+        """
         # Using the MLB Stats API endpoint
         url = f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live"
 
         try:
-            response = self.session.get(url, timeout=60)
+            if game_json is not None:
+                data = game_json
+            else:
+                print(f"Downloading data for game {game_pk}...")
+                response = self.session.get(url, timeout=60)
 
-            if response.status_code != 200:
-                print(f"Error: Received status code {response.status_code}")
-                print(f"Response: {response.text[:500]}")
-                return None
+                if response.status_code != 200:
+                    print(f"Error: Received status code {response.status_code}")
+                    print(f"Response: {response.text[:500]}")
+                    return None
 
-            # Parse the JSON response
-            try:
-                data = response.json()
-            except json.JSONDecodeError:
-                print("Error: Failed to parse JSON response")
-                print(f"Response: {response.text[:500]}")
-                return None
+                # Parse the JSON response
+                try:
+                    data = response.json()
+                except json.JSONDecodeError:
+                    print("Error: Failed to parse JSON response")
+                    print(f"Response: {response.text[:500]}")
+                    return None
 
             # Check if we received valid data
             if not data or 'liveData' not in data or 'plays' not in data['liveData']:
@@ -1007,7 +1022,15 @@ class BaseballSavantFocusedDownloader:
 
                         # Extension from the live API (pitchData.extension)
                         extension_raw = pitch.get('pitchData', {}).get('extension')
-                        extension = round(extension_raw, 2) if extension_raw is not None else None
+                        # Rounded here rather than in the display pass below, so
+                        # raw_precision has to opt out of it too or Extension
+                        # would be the one "feet" column stuck at 2 decimals.
+                        if extension_raw is None:
+                            extension = None
+                        elif raw_precision:
+                            extension = extension_raw
+                        else:
+                            extension = round(extension_raw, 2)
 
                         # Strike zone boundaries
                         sz_top = pitch.get('pitchData', {}).get('strikeZoneTop')
@@ -1133,6 +1156,13 @@ class BaseballSavantFocusedDownloader:
                 return None
 
             df = pd.DataFrame(pitches)
+
+            if raw_precision:
+                # Full source precision, no display rounding. The caller owns the
+                # depth. Only used by scrapers/backfill_full.py.
+                print(f"Successfully processed {len(df)} pitches from game {game_pk} "
+                      f"(raw precision)")
+                return df
 
             # Format numeric columns with appropriate decimal places
             # Use pd.to_numeric to handle any non-numeric values (empty strings, etc.)

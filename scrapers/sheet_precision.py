@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+"""
+Per-column decimal depth for the Google Sheet columns, and the one formatter.
+
+Single home for the precision policy. `backfill_supplement.py` and
+`backfill_full.py` both write the same columns, so a depth that lived in two
+places would have them overwrite each other's cells on every run: one writes
+53.6, the other writes 53.600, and each sees the other's value as a change
+forever. `pipeline/utils.py:32` carries the same warning about PITCHING_W_STUFF,
+which once ran 70/30 in one file and 80/20 in another for about three weeks.
+
+Depths were measured 2026-08-17 by reading every field of 5 MLB feed games and
+one Savant day as raw text, before any float parsing. That split the columns in
+two:
+
+CLASS 1, the source is genuinely quantized. The depth here IS the source depth
+and there is nothing to decide.
+    Velocity, IndVertBrk, HorzBrk, ExitVelo, ArmAngle, BatSpeed, SwingLength  1
+    LaunchAngle, Distance                                                     1
+    HC_X, HC_Y                                                                2
+    xBA, xSLG, xwOBA, RunExp                                                  3
+    Spin Rate, Outs, Barrel                                                   0
+LaunchAngle and Distance were being cast to integers, so they gain a digit that
+the feed was always sending.
+
+CLASS 2, the source is a raw IEEE-754 double. The feed and Savant report 12 to
+20 decimals of binary expansion, which is not measurement. There is no objective
+that could pick a depth here, so these are a CONVENTION, not a measured optimum,
+and they are labelled as such per the tuning rule in ~/.claude/CLAUDE.md.
+Wally set them 2026-08-17: 4 decimals for feet, 3 for degrees. Reasoning on
+record: 0.0001 ft is 0.0012 inch and Hawkeye resolves to roughly 0.1 inch, so 4
+decimals keeps every real digit with about 100x margin, and digit 5 onward is
+noise.
+    PlateZ, PlateX, RelPosZ, RelPosX, Extension, SzTop, SzBot                 4
+    VAA, HAA, AttackAngle, AttackDirection, SwingPathTilt                     3
+
+xIndVrtBrk and xHorzBrk stay at 1 decimal by instruction. They are IndVertBrk
+times a weather factor, and IndVertBrk itself carries only 1 decimal.
+
+RTilt and OTilt are Sheets time values rendered h:mm and are deliberately absent
+from PRECISION. Wally's call 2026-08-17: leave the representation alone.
+"""
+
+import math
+
+import pandas as pd
+
+PRECISION = {
+    # feet — convention, 4
+    'PlateZ': 4, 'PlateX': 4, 'RelPosZ': 4, 'RelPosX': 4, 'Extension': 4,
+    'SzTop': 4, 'SzBot': 4,
+    # degrees — convention, 3
+    'VAA': 3, 'HAA': 3,
+    'AttackAngle': 3, 'AttackDirection': 3, 'SwingPathTilt': 3,
+    # source-quantized — measured
+    'Velocity': 1, 'IndVertBrk': 1, 'HorzBrk': 1,
+    'xIndVrtBrk': 1, 'xHorzBrk': 1,
+    'ExitVelo': 1, 'LaunchAngle': 1, 'Distance': 1,
+    'ArmAngle': 1, 'BatSpeed': 1, 'SwingLength': 1,
+    'HC_X': 2, 'HC_Y': 2,
+    'xBA': 3, 'xSLG': 3, 'xwOBA': 3, 'RunExp': 3,
+    'Spin Rate': 0, 'Outs': 0, 'Barrel': 0,
+}
+
+# Free-form strings. Compared verbatim, never coerced to a number.
+STRING_COLS = {'Pitcher', 'Throws', 'Batter', 'Bats', 'Count', 'Description',
+               'Event', 'BBType', 'Runners'}
+
+# Sheets time values, rendered h:mm.
+TIME_COLS = {'RTilt', 'OTilt'}
+
+# The number format pinned on each column so the stored number and the rendered
+# string agree. This is load-bearing, not cosmetic: both backfills decide
+# "already correct" by comparing against get_all_values(), which returns the
+# FORMATTED string. Under Sheets' Automatic format trailing zeros are stripped,
+# so 94.0 reads back as "94" and every later run sees a mismatch and rewrites
+# the cell forever.
+NUMBER_FORMATS = {c: {'type': 'NUMBER', 'pattern': ('0.' + '0' * d) if d else '0'}
+                  for c, d in PRECISION.items()}
+
+
+def fmt(col, value):
+    """Render a source value as the exact string that belongs in the sheet.
+
+    Returns '' for a missing value. Never returns '0' for a NaN: a blank arm
+    angle, a zero arm angle and a missing pitch type are three different
+    failures, and none of them is 0.
+    """
+    if value is None or value is pd.NA:
+        return ''
+    if isinstance(value, float) and math.isnan(value):
+        return ''
+    try:
+        if pd.isna(value):
+            return ''
+    except (TypeError, ValueError):
+        pass
+
+    if col in STRING_COLS or col in TIME_COLS:
+        return str(value).strip()
+
+    d = PRECISION.get(col)
+    if d is None:
+        return str(value).strip()
+    try:
+        return f"{float(value):.{d}f}"
+    except (TypeError, ValueError):
+        return ''
+
+
+def as_float(text):
+    """Parse a sheet string to float, or None. Blank and junk both give None."""
+    if text is None:
+        return None
+    s = str(text).strip()
+    if not s:
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def stored_decimals(text):
+    """Decimal places in a stored sheet string. None when it is not a number."""
+    if text is None:
+        return None
+    s = str(text).strip()
+    if not s or ':' in s:
+        return None
+    try:
+        float(s)
+    except ValueError:
+        return None
+    return len(s.split('.')[1]) if '.' in s else 0

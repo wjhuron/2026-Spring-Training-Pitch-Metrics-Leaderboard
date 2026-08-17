@@ -143,21 +143,14 @@ STATCAST_TO_MLB_EVENT = {
 # back as "0.000" — exactly the strings RAW stored. Without the pin, Automatic
 # format would render those as "41" and "0" and every later run would see a
 # mismatch and phantom-overwrite the cell.
-SUPPLEMENT_NUMBER_FORMATS = {
-    'ArmAngle':        {'type': 'NUMBER', 'pattern': '0.0'},
-    'BatSpeed':        {'type': 'NUMBER', 'pattern': '0.0'},
-    'SwingLength':     {'type': 'NUMBER', 'pattern': '0.0'},
-    'AttackAngle':     {'type': 'NUMBER', 'pattern': '0.0'},
-    'AttackDirection': {'type': 'NUMBER', 'pattern': '0.0'},
-    'SwingPathTilt':   {'type': 'NUMBER', 'pattern': '0.0'},
-    'RunExp':          {'type': 'NUMBER', 'pattern': '0.000'},
-    'xBA':             {'type': 'NUMBER', 'pattern': '0.000'},
-    'xSLG':            {'type': 'NUMBER', 'pattern': '0.000'},
-    'xwOBA':           {'type': 'NUMBER', 'pattern': '0.000'},
-    'Outs':            {'type': 'NUMBER', 'pattern': '0'},
-    'Barrel':          {'type': 'NUMBER', 'pattern': '0'},
-    # Event is a free-form string (STRING_COLS) — deliberately absent.
-}
+#
+# Single-homed in scrapers/sheet_precision.py as of 2026-08-17, because
+# backfill_full.py writes the same columns. Two copies of a depth meant the two
+# scripts overwrote each other's cells on every run: one wrote 53.6, the other
+# 53.600, and each read the other's value as a change forever.
+#
+# Event is a free-form string (STRING_COLS), so it has no format entry.
+from scrapers.sheet_precision import NUMBER_FORMATS as SUPPLEMENT_NUMBER_FORMATS
 
 
 def pin_supplement_formats(ws, header, cols):
@@ -184,19 +177,15 @@ def pin_supplement_formats(ws, header, cols):
                        'number-format pin')
 
 
-# Per-column rounding (default is 1 decimal for anything not listed)
-ROUND_DECIMALS = {
-    'ArmAngle': 1,
-    'BatSpeed': 1,
-    'SwingLength': 1,
-    'AttackAngle': 1,
-    'AttackDirection': 1,
-    'SwingPathTilt': 1,
-    'RunExp': 3,
-    'xBA': 3,
-    'xSLG': 3,
-    'xwOBA': 3,
-}
+# Per-column rounding, single-homed in scrapers/sheet_precision.py alongside the
+# number formats. Default is 1 decimal for anything not listed.
+#
+# AttackAngle, AttackDirection and SwingPathTilt moved from 1 decimal to 3 on
+# 2026-08-17. Savant serves those three as raw doubles (13 to 17 decimals) while
+# bat_speed and swing_length come back at a clean 1, so rounding all five alike
+# was throwing away real digits on three of them. See sheet_precision.py for the
+# measurement and for why 3 is a convention rather than a measured optimum.
+from scrapers.sheet_precision import PRECISION as ROUND_DECIMALS
 
 # Team abbreviation mapping: spreadsheet tab name -> Statcast Search abbreviation
 STATCAST_TEAM_MAP = {
