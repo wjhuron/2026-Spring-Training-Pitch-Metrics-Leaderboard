@@ -1251,33 +1251,58 @@ def zone_outlier_changes(zone_obs, fix_nodonor=True):
     return out, unexplained
 
 
-_SIBLING_PIDS = {}
+_PIDS_ELSEWHERE = None
 
 
-def _pitchids_in_sibling_tabs(tab):
-    """PitchIDs held by the OTHER tabs that share this tab's games.
+def _pitchids_elsewhere(tab, gc=None):
+    """Every PitchID held by any tab OTHER than this one, across all six books.
 
-    Only ROC and AAA share games. They are two views of the same Rochester
-    fixtures, so a pitch absent from one is not missing if the other has it. Read
-    from the sheet cache, so it is season-complete regardless of which tabs this
-    run walks.
+    The missing-pitch list is the only output that leads to ADDING a row, so it has
+    to ask "does any tab hold this" and not "does this tab hold it".
+
+    A same-tab test made ROC claim 3,423 missing pitches on 2026-08-17 of which
+    3,329 were in the AAA tab, because normalize_aaa_labels rewrites every pitcher
+    in a Rochester game to PTeam ROC while the sheet splits them: ROC holds
+    Rochester's own pitchers and AAA holds the opposing pitchers in the same games.
+
+    Widening it to just ROC and AAA was not enough either. NEW is a live tab
+    carrying 4,895 real pitch rows, and it is deliberately outside the sweep's team
+    list, so nothing in the cache covers it. That left a pitch logged in NEW looking
+    missing. It happens not to bite today, since the tabs whose pitches could land
+    in NEW report nothing missing, but correct by luck is not correct.
+
+    So the set is the sheet cache plus a live read of every workbook tab the cache
+    does not cover. Built once per process.
     """
-    tab = tab.upper()
-    if tab not in MILB_TEAMS:
-        return frozenset()
-    if not _SIBLING_PIDS:
+    global _PIDS_ELSEWHERE
+    if _PIDS_ELSEWHERE is None:
         import pickle
-        path = os.path.join(DATA, 'all_pitches_rs_cache.pkl')
         by_tab = collections.defaultdict(set)
+        path = os.path.join(DATA, 'all_pitches_rs_cache.pkl')
         if os.path.exists(path):
             for x in pickle.load(open(path, 'rb')):
                 if x.get('PitchID'):
                     by_tab[x['_sheet_tab'].upper()].add(x['PitchID'])
-        for t in MILB_TEAMS:
-            _SIBLING_PIDS[t] = frozenset(
-                set().union(*(by_tab[o] for o in MILB_TEAMS if o != t))
-                if len(MILB_TEAMS) > 1 else set())
-    return _SIBLING_PIDS.get(tab, frozenset())
+        else:
+            print("    WARNING: no sheet cache, so the missing-pitch list cannot "
+                  "be cross-checked against other tabs. Treat it as unverified.")
+        if gc is not None:
+            for sid in SPREADSHEET_IDS.values():
+                sh = _retry_sheets_call(lambda: gc.open_by_key(sid), 'workbook open')
+                for w in _retry_sheets_call(sh.worksheets, 'tab list'):
+                    t = w.title.upper()
+                    if t in by_tab:
+                        continue          # the cache already covers it
+                    vals = read_sheet_with_retry(w)
+                    if not vals or 'PitchID' not in vals[0]:
+                        continue
+                    j = vals[0].index('PitchID')
+                    by_tab[t] = {r[j] for r in vals[1:] if j < len(r) and r[j]}
+                    print(f"    cross-checking against the untracked {t} tab "
+                          f"({len(by_tab[t])} pitches)")
+        _PIDS_ELSEWHERE = by_tab
+    return frozenset().union(*(v for k, v in _PIDS_ELSEWHERE.items()
+                               if k != tab.upper())) if _PIDS_ELSEWHERE else frozenset()
 
 
 def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
@@ -1417,16 +1442,8 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
 
     # A pitch is only missing when NO tab holds it. For MLB that is the same as
     # "not in this tab", because a pitch belongs to exactly one team's sheet. For
-    # Rochester it is not: normalize_aaa_labels rewrites every pitcher in a ROC
-    # game to PTeam ROC, while the sheet deliberately splits them — the ROC tab
-    # holds Rochester's own pitchers and the AAA tab holds the opposing pitchers in
-    # those same games.
-    #
-    # Left as a same-tab test, ROC reported 3,423 missing pitches on 2026-08-17 of
-    # which 3,329 were sitting in the AAA tab all along. Only 94 were genuinely
-    # absent. Reporting 3,329 phantom missing pitches would have invited appending
-    # 3,329 duplicate rows.
-    elsewhere = _pitchids_in_sibling_tabs(tab)
+    # Rochester it is not. See _pitchids_elsewhere.
+    elsewhere = _pitchids_elsewhere(tab)
     missing = []
     for pid, exp in feed_by_pid.items():
         if pid in present or pid in elsewhere:
@@ -1943,6 +1960,11 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
 
     ledger = DecisionLedger.load()
     gc = gspread.service_account()
+
+    # Prime the cross-tab PitchID index while a client is in hand. diff_tab needs it
+    # to answer "does any tab hold this pitch" rather than "does this tab hold it",
+    # and it has no client of its own. Built once and reused for every tab.
+    _pitchids_elsewhere('', gc)
     session = requests.Session()
     session.headers.update({
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
