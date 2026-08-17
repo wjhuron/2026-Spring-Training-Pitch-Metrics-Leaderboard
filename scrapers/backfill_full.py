@@ -1251,6 +1251,35 @@ def zone_outlier_changes(zone_obs, fix_nodonor=True):
     return out, unexplained
 
 
+_SIBLING_PIDS = {}
+
+
+def _pitchids_in_sibling_tabs(tab):
+    """PitchIDs held by the OTHER tabs that share this tab's games.
+
+    Only ROC and AAA share games. They are two views of the same Rochester
+    fixtures, so a pitch absent from one is not missing if the other has it. Read
+    from the sheet cache, so it is season-complete regardless of which tabs this
+    run walks.
+    """
+    tab = tab.upper()
+    if tab not in MILB_TEAMS:
+        return frozenset()
+    if not _SIBLING_PIDS:
+        import pickle
+        path = os.path.join(DATA, 'all_pitches_rs_cache.pkl')
+        by_tab = collections.defaultdict(set)
+        if os.path.exists(path):
+            for x in pickle.load(open(path, 'rb')):
+                if x.get('PitchID'):
+                    by_tab[x['_sheet_tab'].upper()].add(x['PitchID'])
+        for t in MILB_TEAMS:
+            _SIBLING_PIDS[t] = frozenset(
+                set().union(*(by_tab[o] for o in MILB_TEAMS if o != t))
+                if len(MILB_TEAMS) > 1 else set())
+    return _SIBLING_PIDS.get(tab, frozenset())
+
+
 def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
     """Compare one team tab against its sources. Returns (changes, missing).
 
@@ -1386,9 +1415,21 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
                 delta=delta, units=units, rec=rec, rec_why=rec_why,
                 source='feed' if col in FEED_COLS else 'savant'))
 
+    # A pitch is only missing when NO tab holds it. For MLB that is the same as
+    # "not in this tab", because a pitch belongs to exactly one team's sheet. For
+    # Rochester it is not: normalize_aaa_labels rewrites every pitcher in a ROC
+    # game to PTeam ROC, while the sheet deliberately splits them — the ROC tab
+    # holds Rochester's own pitchers and the AAA tab holds the opposing pitchers in
+    # those same games.
+    #
+    # Left as a same-tab test, ROC reported 3,423 missing pitches on 2026-08-17 of
+    # which 3,329 were sitting in the AAA tab all along. Only 94 were genuinely
+    # absent. Reporting 3,329 phantom missing pitches would have invited appending
+    # 3,329 duplicate rows.
+    elsewhere = _pitchids_in_sibling_tabs(tab)
     missing = []
     for pid, exp in feed_by_pid.items():
-        if pid in present:
+        if pid in present or pid in elsewhere:
             continue
         if exp.get('_PTeam', '').upper() != tab.upper():
             continue          # belongs to the other team's tab
