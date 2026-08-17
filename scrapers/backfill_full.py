@@ -1584,9 +1584,19 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     # tabs too listed 29 HOU cells twice. Harmless while both copies agreed, but a
     # decision made in one place and not the other would have been resolved by
     # whichever tab happened to be read last.
+    # A row recommended AGAINST is never hidden, whatever its class. A sub-noise
+  # row still carries a recommendation, because rec is computed while the row is
+  # still classified as drift and only then downgraded. Seventeen HOU cells were
+  # counted under "written without asking" and then correctly refused by _wanted
+  # for being outside the pitcher's own band, which meant they were neither
+  # written nor listed anywhere. Invisible is the one thing a withheld change must
+  # not be.
     HIDDEN = SUMMARY_ONLY_KINDS | {'suppressed', 'zone_fix', 'zone_fix_nodonor'}
+
+    def hidden(r):
+        return r.kind in HIDDEN and r.rec != REJECT
     for c in order:
-        rows_ = [r for r in by_col[c] if r.kind not in HIDDEN]
+        rows_ = [r for r in by_col[c] if not hidden(r)]
         if not rows_:
             continue
         keyer = ((lambda r: (r.tab, r.batter, r.game_date, r.pitch_id))
@@ -1684,7 +1694,8 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     # Wally's call 2026-08-17: summarise these rather than list them. PlateX
     # alone runs to about 80,000 cells season-wide and its whole story is the
     # month it lands in, not the individual rows.
-    auto = [r for r in changes if r.kind in ('drift_small', 'drift_sub')]
+    auto = [r for r in changes if r.kind in ('drift_small', 'drift_sub')
+            and r.rec != REJECT]
     if auto:
         ws = sheet('_AUTO-WRITTEN BY MONTH',
                    ['Column', 'Month', 'Cells', 'Median |delta|', 'Max |delta|',
@@ -2012,6 +2023,14 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
     print(f"  blank fills to approve   {k['new']}")
     print(f"  drift to approve         {k['drift']}")
     print(f"  zone at-bats unexplained {len(unexplained_zones)}")
+    would_write = [c for c in all_changes if _wanted(c, decisions, kinds)]
+    held_by_rec = [c for c in all_changes
+                   if c.rec == REJECT and c.kind in AUTO_KINDS]
+    print(f"WOULD BE WRITTEN BY THIS CONFIG: {len(would_write)}")
+    if held_by_rec:
+        print(f"  of the automatic classes, {len(held_by_rec)} are recommended "
+              f"AGAINST and are withheld; they are listed in the report, not "
+              f"hidden")
     print(f"WRITTEN WITHOUT ASKING")
     print(f"  precision rewrites       {k['precision']}")
     print(f"  drift below precision    {k['drift_sub']}")
