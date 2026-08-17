@@ -263,6 +263,27 @@ def feed_rows(game_pk, session, refresh=False):
 SCALE_MIN_N = 30
 BASELINE_MIN_N = 10
 
+# A pitcher's own band: the quantile of his deviations from his centre, for one
+# pitch type, that a proposed value must stay inside.
+#
+# This replaced an "added distance" test that was too aggressive and that Wally
+# caught on 2026-08-17. Bryan Abreu's fastball tilt read 12:54, the feed proposed
+# 12:42, and his average is 1:00. The old rule rejected it because the change
+# moved the value from 6 minutes off his average to 18. But 18 minutes is 9
+# degrees of spin axis and his own band is 20 minutes, so that is an entirely
+# ordinary place for one pitch to land. Distance from the average is not evidence
+# of error until it leaves the range the pitcher actually occupies, and only his
+# own observed spread can say where that is.
+#
+# 0.99 rather than the maximum is a CONVENTION, and the reasoning is that the
+# maximum is fragile: one bad value already sitting in the sheet for that pitcher
+# and pitch type inflates it and the test stops rejecting anything. Measured on
+# HOU's 105 candidate rows the two differ on 6, and in all 6 the maximum is the
+# permissive one. BAND_MIN_N of 20 is the floor for trusting a quantile at all;
+# below it the pooled-SD gate takes over.
+BAND_QUANTILE = 0.99
+BAND_MIN_N = 20
+
 # Drift beyond this many scale units goes to review; below it, it is written
 # without asking. CONVENTION, not a measured optimum — no objective trades review
 # effort against missed corrections, so none exists to bracket. What the data
@@ -301,7 +322,7 @@ def baselines():
               f"noise scale can be measured. EVERY drift and every blank fill "
               f"will be sent to review rather than written silently. Run "
               f"python3 -m pipeline.process_data to rebuild it.")
-        _BASELINES = ({}, {})
+        _BASELINES = ({}, {}, {})
         return _BASELINES
 
     print("  measuring the per-column noise scale from the sheet cache...")
@@ -315,11 +336,44 @@ def baselines():
             if v is not None:
                 grp[c][key].append(v)
 
-    scale, median = {}, {}
+    scale, median, band = {}, {}, {}
+
+    def summarise(c, groups, circular):
+        """Fill scale[c], median[c] and band[c] for one column.
+
+        band[c][(pitcher, type)] is that pitcher's OWN 99th-percentile deviation
+        from his centre for that pitch type. It is the yardstick a recommendation
+        actually needs: "is this value outside what he has been observed to throw",
+        which no single pooled SD figure can answer.
+        """
+        sds, med, bnd = [], {}, {}
+        for key, vals in groups.items():
+            if circular:
+                centre = collections.Counter(vals).most_common(1)[0][0]
+                devs = []
+                for v in vals:
+                    d = abs(v - centre) % TILT_MINUTES
+                    devs.append(min(d, TILT_MINUTES - d))
+            else:
+                centre = statistics.median(vals)
+                devs = [abs(v - centre) for v in vals]
+            if len(vals) >= BASELINE_MIN_N:
+                med[key] = centre
+            if len(vals) >= BAND_MIN_N:
+                devs.sort()
+                bnd[key] = devs[min(len(devs) - 1,
+                                    int(BAND_QUANTILE * len(devs)))]
+            if len(vals) >= SCALE_MIN_N:
+                sd = 1.4826 * statistics.median(devs)
+                if sd > 0:
+                    sds.append(sd)
+        median[c], band[c] = med, bnd
+        if sds:
+            scale[c] = statistics.median(sds)
 
     # RTilt and OTilt need their own pass. They are clock readings, so their
     # spread has to be measured circularly around the group's modal reading, or
-    # every group straddling noon reports a spread of about six hours. Without a
+    # every group straddling 12:00 reports a spread of about six hours. Without a
     # scale here, every tilt change lands in review however small it is, and on
     # ARI that meant 39 rows of which most were a one or two minute wobble.
     for c in TIME_COLS:
@@ -330,39 +384,14 @@ def baselines():
             m = tilt_minutes(x.get(c))
             if m is not None:
                 tg[(x.get('Pitcher'), x.get('Pitch Type'))].append(m)
-        sds, med = [], {}
-        for key, vals in tg.items():
-            mode = collections.Counter(vals).most_common(1)[0][0]
-            if len(vals) >= BASELINE_MIN_N:
-                med[key] = mode
-            if len(vals) >= SCALE_MIN_N:
-                devs = []
-                for v in vals:
-                    d = abs(v - mode) % TILT_MINUTES
-                    devs.append(min(d, TILT_MINUTES - d))
-                sd = 1.4826 * statistics.median(devs)
-                if sd > 0:
-                    sds.append(sd)
-        median[c] = med
-        if sds:
-            scale[c] = statistics.median(sds)
+        summarise(c, tg, circular=True)
 
     for c in cols:
-        sds, med = [], {}
-        for key, vals in grp[c].items():
-            m = statistics.median(vals)
-            if len(vals) >= BASELINE_MIN_N:
-                med[key] = m
-            if len(vals) >= SCALE_MIN_N:
-                s = 1.4826 * statistics.median([abs(v - m) for v in vals])
-                if s > 0:
-                    sds.append(s)
-        median[c] = med
-        if sds:
-            scale[c] = statistics.median(sds)
+        summarise(c, grp[c], circular=False)
+
     print(f"    scale measured for {len(scale)} columns "
           f"({len(cols)} numeric + {len(TIME_COLS & set(IN_SCOPE))} tilt)")
-    _BASELINES = (scale, median)
+    _BASELINES = (scale, median, band)
     return _BASELINES
 
 
@@ -394,7 +423,7 @@ def scale_units(col, delta, old=None, new=None):
     For RTilt and OTilt the delta has to come from tilt_gap rather than a
     subtraction, because the clock wraps at noon.
     """
-    scale, _ = baselines()
+    scale, _, _ = baselines()
     s = scale.get(col)
     if s is None:
         return None
@@ -406,9 +435,35 @@ def scale_units(col, delta, old=None, new=None):
     return abs(delta) / s
 
 
+def centre_distance(col, pitcher, pitch_type, value):
+    """How far `value` sits from that pitcher's centre for that pitch type.
+
+    In the column's own units, circular for a tilt. None when there is no centre
+    to measure against.
+    """
+    _, median, _ = baselines()
+    m = (median.get(col) or {}).get((pitcher, pitch_type))
+    if m is None:
+        return None
+    if col in TIME_COLS:
+        mv = tilt_minutes(value)
+        if mv is None:
+            return None
+        d = abs(mv - m) % TILT_MINUTES
+        return min(d, TILT_MINUTES - d)
+    v = as_float(value)
+    return None if v is None else abs(v - m)
+
+
+def own_band(col, pitcher, pitch_type):
+    """That pitcher's own 99th-percentile deviation for that pitch type."""
+    _, _, band = baselines()
+    return (band.get(col) or {}).get((pitcher, pitch_type))
+
+
 def fill_units(col, pitcher, pitch_type, value):
     """How far a candidate fill sits from that pitcher's own median, in units."""
-    scale, median = baselines()
+    scale, median, _ = baselines()
     s = scale.get(col)
     m = (median.get(col) or {}).get((pitcher, pitch_type))
     if s is None or m is None:
@@ -622,27 +677,29 @@ class DecisionLedger:
 # silence anything.
 RECORDED_KINDS = {'new', 'drift', 'suppressed', 'blocked_source'}
 
-# The override column. A validated character rather than a form control, so it
-# survives a round trip through Excel, Sheets or Numbers.
+# The override column. A pre-filled character rather than a form control:
+# openpyxl cannot write a real Excel checkbox, and Numbers discards Excel data
+# validation on import, so there was nothing to click there.
 BOX_EMPTY = '\u2610'      # ballot box
 BOX_TICKED = '\u2611'     # ballot box with check
-TICK_MARKS = {BOX_TICKED, '\u2612', 'x', 'X', 'y', 'yes', 'true', '1', '\u2713',
-              '\u2714', 'reject', 'flip', 'override'}
 
 
-def is_ticked(value):
-    """Was the override box marked? Forgiving on purpose.
+def is_override(value):
+    """Did this row get marked to do the opposite of the recommendation?
 
-    Anything that is not empty and not an untouched box counts as ticked, so a
-    typed x, a tick character or the dropdown all work, and a round trip that
-    silently rewrites the glyph cannot lose a decision.
+    The test is "the cell is no longer an untouched box", NOT "the cell contains
+    a tick". Wally reviewed the first workbook in Numbers, where the dropdown had
+    been stripped and the box could not be clicked, and his workaround was to
+    DELETE the character. So an empty cell has to count as an override, and so
+    does a tick, an x, or any other mark. One rule, same behaviour in Excel,
+    Sheets and Numbers, and it matches what he already did.
+
+    read_decisions() guards the failure mode this creates: a workbook that comes
+    back with no boxes left ANYWHERE is a format conversion dropping the glyph,
+    not a decision to overturn every recommendation, and it refuses rather than
+    inverting a few hundred rows.
     """
-    if value is None:
-        return False
-    v = str(value).strip()
-    if not v or v == BOX_EMPTY:
-        return False
-    return v in TICK_MARKS or v.lower() in TICK_MARKS
+    return str(value or '').strip() != BOX_EMPTY
 
 
 def record_sweep(changes, ledger):
@@ -658,18 +715,22 @@ def record_sweep(changes, ledger):
     return after - before
 
 
-def _accepted(ch, decisions):
+def _wanted(ch, decisions, kinds):
     """Should this change be written?
 
-    A change with no recommendation is one of the automatic classes (extra
-    decimals, sub-precision drift), and those are written regardless — they are
-    never listed for review, so there is nothing to decide.
+    A decision read out of a reviewed workbook wins outright, including over the
+    kind filter. That is what lets an override on the already-raised tab recover
+    a previously declined value: those rows are not in `kinds`, so without this
+    they could never come back however the box was marked.
+
+    With no decision on file, an automatic class (extra decimals, sub-precision
+    drift) is written and everything else follows its own recommendation.
     """
-    if not ch.rec:
-        return True
     if decisions is not None and (ch.pitch_id, ch.col) in decisions:
         return decisions[(ch.pitch_id, ch.col)]
-    return ch.rec == ADOPT
+    if ch.kind not in kinds:
+        return False
+    return not ch.rec or ch.rec == ADOPT
 
 
 # ── Reading a reviewed workbook back in ──────────────────────────────────────
@@ -686,6 +747,7 @@ def read_decisions(path):
     from openpyxl import load_workbook
     wb = load_workbook(path, read_only=True, data_only=True)
     out, flipped, seen = {}, 0, 0
+    boxes_seen = boxes_intact = 0
     for name in wb.sheetnames:
         ws = wb[name]
         header = None
@@ -704,14 +766,29 @@ def read_decisions(path):
             col = rec_row.get('Column') or name
             verdict = str(rec_row.get('Recommend') or '').strip().lower()
             write = verdict == ADOPT
-            if is_ticked(rec_row.get('Reject')):
+            boxes_seen += 1
+            if is_override(rec_row.get('Reject')):
                 write = not write
                 flipped += 1
+            else:
+                boxes_intact += 1
             out[(str(pid), str(col))] = write
             seen += 1
-    print(f"  read {seen} decisions from {os.path.basename(path)}; "
-          f"{flipped} boxes ticked, so {sum(out.values())} cells will be "
-          f"written and {seen - sum(out.values())} left alone")
+    # A workbook with no boxes left ANYWHERE is a format conversion dropping the
+    # glyph, not a decision to overturn every recommendation. Refuse rather than
+    # invert a few hundred rows on a guess.
+    if boxes_seen and boxes_intact == 0:
+        raise SystemExit(
+            f"REFUSING to read {os.path.basename(path)}: not one of its "
+            f"{boxes_seen} override cells still holds '{BOX_EMPTY}'. That looks "
+            f"like the character not surviving a format conversion rather than a "
+            f"decision to overturn every recommendation. Re-export as .xlsx from "
+            f"the app you reviewed it in, check the Reject column still shows "
+            f"'{BOX_EMPTY}' on the rows you left alone, and run this again.")
+    print(f"  read {seen} decisions from {os.path.basename(path)}: "
+          f"{boxes_intact} left alone, {flipped} overridden. "
+          f"{sum(out.values())} cells to write, {seen - sum(out.values())} to "
+          f"leave alone.")
     return out
 
 
@@ -769,48 +846,44 @@ def recommend(kind, col, old, new, units, pitcher, pitch_type, game_pk):
         return ADOPT, ('per-event value, so the pitcher\'s own average is not a '
                        'yardstick for it')
 
-    avg_units_new = fill_units(col, pitcher, pitch_type, new)
+    # ONE test for fills and for drift alike: does the proposed value stay inside
+    # the range this pitcher actually occupies for this pitch type?
+    #
+    # The direction of a change is NOT evidence. A value moving from very typical
+    # to merely typical is not a defect, and treating it as one is what rejected
+    # Bryan Abreu's fastball tilt 12:54 -> 12:42 when his own band is 20 minutes
+    # wide. What matters is only whether the value leaves the range.
+    dist = centre_distance(col, pitcher, pitch_type, new)
 
-    # No numeric baseline: every string and time column, and any pitcher/type
-    # pair too thin to have a median. Description, BBType, Count and Event land
-    # here, and the feed is the authority on all four — those are the scoring and
-    # tagging corrections that motivated the whole exercise.
-    if avg_units_new is None:
+    # No centre to measure against: a string column, or a pitcher and pitch type
+    # pair too thin for a median. Description, BBType, Count and Event land here,
+    # and the feed is the authority on all four — they are the scoring and tagging
+    # corrections that motivated the whole exercise.
+    if dist is None:
         if col in STRING_COLS:
             return ADOPT, 'feed is authoritative for this column'
         return ADOPT, 'no baseline for this pitcher and pitch type'
 
-    if kind == 'new':
-        if avg_units_new > FILL_REVIEW_SD:
-            return REJECT, (f'{avg_units_new:.1f} units from his own average '
-                            f'for this pitch type')
-        return ADOPT, f'{avg_units_new:.1f} units from his own average'
+    unit = 'min' if col in TIME_COLS else ''
+    band = own_band(col, pitcher, pitch_type)
+    if band is not None:
+        if dist > band:
+            return REJECT, (f'{dist:.1f}{unit} from his own centre, outside the '
+                            f'{band:.1f}{unit} band he throws for this pitch type')
+        return ADOPT, (f'{dist:.1f}{unit} from his own centre, inside his '
+                       f'{band:.1f}{unit} band')
 
-    # Drift. The size of the move is not the question; the direction is. A change
-    # that lands closer to the pitcher's own centre is an improvement whatever
-    # its size. A change that lands further out, past the gate, makes the sheet
-    # worse — Hunter Brown's curveball 2624 -> 1403 against a 2561 average.
-    avg_units_old = fill_units(col, pitcher, pitch_type, old)
-    if avg_units_old is None:
-        return (ADOPT if avg_units_new <= FILL_REVIEW_SD else REJECT,
-                f'{avg_units_new:.1f} units from his own average')
-    if avg_units_new <= avg_units_old:
-        return ADOPT, (f'moves toward his average '
-                       f'({avg_units_old:.1f} -> {avg_units_new:.1f} units)')
-
-    # Moving away. The absolute gate is not enough on its own: Josh Hader's
-    # slider sat at 2493 against a 2492 average and the feed proposed 2147, which
-    # is 3.9 units out and slipped under FILL_REVIEW_SD, so it was recommended
-    # for adoption. The current value being dead on his average is itself the
-    # evidence that the current value is right. So the test is how much distance
-    # the change ADDS, measured in the same noise unit the rest of the module
-    # uses for "a real change" rather than a new number invented here.
-    added = avg_units_new - avg_units_old
-    if added > DRIFT_REVIEW_SD or avg_units_new > FILL_REVIEW_SD:
-        return REJECT, (f'moves away from his average by {added:.1f} units '
-                        f'({avg_units_old:.1f} -> {avg_units_new:.1f})')
-    return ADOPT, (f'moves away by only {added:.1f} units '
-                   f'({avg_units_old:.1f} -> {avg_units_new:.1f})')
+    # Too few pitches for a band. Fall back to the pooled gate, which is coarser
+    # but is all there is when a pitcher has thrown a pitch type a handful of
+    # times.
+    units = fill_units(col, pitcher, pitch_type, new)
+    if units is None:
+        return ADOPT, 'no baseline for this pitcher and pitch type'
+    if units > FILL_REVIEW_SD:
+        return REJECT, (f'{units:.1f} noise units out, and too few pitches of '
+                        f'this type to measure his own band')
+    return ADOPT, (f'{units:.1f} noise units out, and too few pitches of this '
+                   f'type to measure his own band')
 
 
 # ── Diff ─────────────────────────────────────────────────────────────────────
@@ -1203,7 +1276,7 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     from openpyxl.utils import get_column_letter
     from openpyxl.worksheet.datavalidation import DataValidation
 
-    SCALES, MEDIANS = baselines()
+    SCALES, MEDIANS, _ = baselines()
     GROUP_N = group_sizes()
 
     wb = Workbook()
@@ -1251,7 +1324,8 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
 
         openpyxl cannot create a real Excel form-control checkbox, and a real one
         would not survive a round trip through Sheets or Numbers anyway. A
-        validated character does, and it reads back reliably. is_ticked() accepts
+        validated character does, and it reads back reliably. is_override()
+        accepts
         a typed x or any tick glyph as well, so a round trip that rewrites the
         character cannot lose a decision.
         """
@@ -1291,26 +1365,43 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
          'ignores whether an earlier sweep already raised this value.'
          % (ADOPT, REJECT)),
         ('Reject',
-         'Tick the box to do the OPPOSITE of Recommend. Recommended adopt plus a '
-         'tick means leave the cell alone; recommended do-not-adopt plus a tick '
-         'means write it. Leave every box alone to accept all recommendations.'),
+         'CHANGE the box to do the OPPOSITE of Recommend. Deleting the box '
+         'counts, and so does a tick or a typed x — whatever your app lets you '
+         'do. Numbers strips the dropdown, so deleting is the way there. Leave a '
+         'box untouched to accept the recommendation on that row.'),
+        ('Reject, worked example',
+         'Recommended "%s" plus an override means leave the cell alone. '
+         'Recommended "%s" plus an override means write it.' % (ADOPT, REJECT)),
         ('Send it back',
          'python3 -m scrapers.backfill_full --apply --decisions-from <this file>'),
         ('Rows are sorted',
          'Everything I recommend against is at the TOP of each tab, so the rows '
-         'most likely to need a tick are the first ones you see.'),
+         'most likely to need an override are the first ones you see.'),
         ('Change: cell is blank',
          'The cell is empty and the source has a value.'),
         ('Change: value changed at source',
          'Both have a value and they differ by more than %s of the column\'s '
          'own spread within a pitcher and pitch type.' % DRIFT_REVIEW_SD),
+        ('How a row is judged',
+         'A value is recommended against only when it falls OUTSIDE the range '
+         'that pitcher actually occupies for that pitch type, measured from his '
+         'own pitches. The direction of a change is not held against it, so a '
+         'value moving from very typical to merely typical is still adopted.'),
         ('Off usual',
-         'Proposed value minus that pitcher\'s median for that pitch type. '
-         'This is the number that says whether a change is believable.'),
+         'Proposed value minus that pitcher\'s median for that pitch type. Shown '
+         'only for the pitch-metric columns, because his median says nothing '
+         'about a per-event value like xSLG or a hitter\'s swing length.'),
+        ('_FILLS BY PITCH',
+         'A read-only rollup: one row per pitch instead of per cell, so a pitch '
+         'that gained its whole tracking block reads as one thing. Decide on the '
+         'per-column tabs.'),
+        ('_ALREADY RAISED (not written)',
+         'Values an earlier sweep already put in front of you, plus the ones you '
+         'had deleted before the first sweep ran. Nothing here is written; it is '
+         'a record. Override a row to bring that value back.'),
         ('Not listed here',
-         'Extra-decimal rewrites, drift below stored precision, drift below one '
-         'noise unit, and anything an earlier sweep already raised. Counted on '
-         'SUMMARY and written without asking.'),
+         'Extra-decimal rewrites, drift below stored precision, and drift below '
+         'one noise unit. Counted on SUMMARY and written without asking.'),
         ('EP pitches',
          'Position players. Release, movement, spin and approach columns are '
          'skipped for them. Count, Description, Event and batted-ball data are '
@@ -1568,17 +1659,44 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                        f'{worst.pitcher}: blank -> {worst.new}'])
         fit(ws)
 
-    # ---- Suppressed, gathered in one place ---------------------------------
+    # ---- Values an earlier sweep already raised -----------------------------
+    # These are NOT written. They are here so the record is visible, and they
+    # carry the same Pitch Type, pitcher average and override box as the review
+    # tabs — Wally's ask 2026-08-17, because a row cannot be judged without
+    # knowing what the pitch was and what he normally does with it. Overriding
+    # one here brings it back: _wanted() lets a decision beat the kind filter.
     supp = [r for r in changes if r.kind == 'suppressed']
     if supp:
-        ws = sheet('_SUPPRESSED', ['Team', 'Column', 'Pitcher', 'Game Date',
-                                   'PitchID', 'Proposed', 'Previously rejected',
-                                   'Recorded'])
-        supp.sort(key=lambda r: (r.col, r.tab, r.pitcher, r.pitch_id))
+        ws = sheet('_ALREADY RAISED (not written)',
+                   ['Team', 'Column', 'Pitcher', 'Pitch Type', 'Game Date',
+                    'GameID', 'PitchID', 'Sheet row', 'Current', 'Proposed',
+                    'Recommend', 'Reject', 'Why',
+                    'Pitcher avg on this type', 'Off usual', 'n for avg',
+                    'First raised', 'Values already declined'])
+        supp.sort(key=lambda r: (r.rec != REJECT, r.col, r.tab, r.pitcher,
+                                 r.pitch_id))
         for r in supp:
             e = ledger.entries.get((r.pitch_id, r.col)) or {}
-            ws.append([r.tab, r.col, r.pitcher, r.game_date, r.pitch_id, r.new,
-                       ', '.join(e.get('rejected', [])), e.get('asof', '')])
+            avg = ((MEDIANS.get(r.col) or {}).get((r.pitcher, r.pitch_type))
+                   if r.col in PITCH_METRIC_COLS else None)
+            if avg is None:
+                avg_disp, off = '', ''
+            elif r.col in TIME_COLS:
+                avg_disp = f'{(int(avg) // 60) or 12}:{int(avg) % 60:02d}'
+                off = tilt_gap(r.new, avg_disp)
+            else:
+                dp = PRECISION.get(r.col, 3)
+                avg_disp = round(avg, dp)
+                nv = as_float(r.new)
+                off = round(nv - avg, dp) if nv is not None else ''
+            ws.append([r.tab, r.col, r.pitcher, r.pitch_type, r.game_date,
+                       r.pitch_id.split('_')[0], r.pitch_id, r.row,
+                       r.old, r.new, r.rec, None, r.rec_why,
+                       avg_disp, off if off is not None else '',
+                       GROUP_N.get((r.pitcher, r.pitch_type), ''),
+                       e.get('asof', ''),
+                       ', '.join(e.get('rejected', []))])
+        add_checkboxes(ws, 'L', len(supp))
         fit(ws)
 
     wb.save(path)
@@ -1727,8 +1845,7 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
             all_missing.extend(missing)
 
             if apply:
-                todo = [c for c in changes if c.kind in kinds]
-                todo = [c for c in todo if _accepted(c, decisions)]
+                todo = [c for c in changes if _wanted(c, decisions, kinds)]
                 if todo:
                     n = apply_changes(ws, header, todo)
                     print(f"  wrote {n} cells")
@@ -1745,8 +1862,8 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
               f"are repaired; {len(unexplained_zones)} at-bats do not match any "
               f"hitter in their game and are reported instead")
         all_changes.extend(zc)
-        if apply and zc and ({'zone_fix', 'zone_fix_nodonor'} & kinds):
-            zc = [c for c in zc if c.kind in kinds and _accepted(c, decisions)]
+        if apply and zc:
+            zc = [c for c in zc if _wanted(c, decisions, kinds)]
             for tab, group in collections.groupby(
                     sorted(zc, key=lambda c: c.tab), key=lambda c: c.tab):
                 ws, header = tab_handles[tab]
@@ -1783,7 +1900,21 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
     if report:
         os.makedirs(REPORT_DIR, exist_ok=True)
         stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        path = os.path.join(REPORT_DIR, f'backfill_full_{stamp}.xlsx')
+        # The team code goes in the filename. Wally's ask 2026-08-17: with one
+        # workbook per tab in flight at a time, a bare timestamp gives no way to
+        # tell which is which in Downloads. Uses the tabs actually walked rather
+        # than the --teams argument, so a whole-season run says ALL and a run
+        # whose tabs were filtered names them.
+        walked = sorted({c.tab for c in all_changes} | {m[1].get('_PTeam', '')
+                                                        for m in all_missing})
+        walked = [t for t in walked if t]
+        if not walked:
+            label = 'none'
+        elif len(walked) > 6:
+            label = f'ALL{len(walked)}'
+        else:
+            label = '-'.join(walked)
+        path = os.path.join(REPORT_DIR, f'backfill_{label}_{stamp}.xlsx')
         write_report(all_changes, all_missing, ledger, path,
                      unexplained_zones=unexplained_zones)
         print(f"\nReport: {path}")
