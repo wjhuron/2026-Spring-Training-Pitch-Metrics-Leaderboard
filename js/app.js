@@ -82,6 +82,14 @@
   const rocMode = (new URLSearchParams(window.location.search)).get('roc') === '1';
   window._rocMode = rocMode;
 
+  // CatchProbCalc rides the same secret link (2026-08-17). The nav entry ships
+  // display:none in index.html so it never flashes, and only ?roc=1 reveals it.
+  // TradeBoard has no nav entry at all and is not revealed by any flag.
+  if (rocMode) {
+    const catchTab = document.getElementById('catch-tab');
+    if (catchTab) catchTab.style.display = 'inline-block';
+  }
+
   // Called once the heavy chunk + Aggregator are ready: undo the degraded
   // no-micro state that setupFilters applied during the core-only window.
   function enableMicroFilters() {
