@@ -45,6 +45,7 @@ if _ROOT not in _sys.path:
 
 import argparse
 import collections
+import re
 import gzip
 import json
 import math
@@ -107,6 +108,33 @@ assert not (set(FEED_COLS) & SAVANT_COL_SET), 'a column has two authorities'
 
 # The precision policy and the formatter live in scrapers/sheet_precision.py so
 # this module and backfill_supplement.py cannot disagree about a column's depth.
+
+
+# ── Position players (EP) ────────────────────────────────────────────────────
+# EP is the eephus, and in this sheet it is a clean marker for a position player
+# on the mound. Measured 2026-08-17: 1,746 EP pitches from 52 pitchers, and for
+# every one of the 52 the EP count equals his TOTAL pitch count, so not one of
+# them is a real pitcher with an eephus in his arsenal.
+#
+# Wally's call 2026-08-17: do not touch the pitch-characteristic columns on these
+# rows. Release, movement, spin and approach are not meaningful for a shortstop
+# lobbing one in, and a measured value there is noise dressed as data.
+#
+# Everything else on an EP row IS kept and reviewed: Count, Description, Event,
+# and the whole batted-ball block. An EP pitch still has a real count, a real
+# result and a real batted ball, and one of ARI's Count corrections sits on one.
+#
+# PlateZ, PlateX, SzTop and SzBot are deliberately NOT in this set. Location is
+# measured the same way whoever throws the pitch, and the zone belongs to the
+# hitter, not the pitcher. VAA and HAA ARE in it, because they are derived from
+# velocity and movement and inherit their meaninglessness here.
+EP_PITCH_TYPE = 'EP'
+EP_SKIP_COLS = {
+    'Velocity', 'Spin Rate', 'RTilt', 'OTilt',
+    'IndVertBrk', 'HorzBrk', 'xIndVrtBrk', 'xHorzBrk',
+    'RelPosZ', 'RelPosX', 'Extension', 'ArmAngle',
+    'VAA', 'HAA',
+}
 
 
 # ── Feed cache ───────────────────────────────────────────────────────────────
@@ -561,6 +589,39 @@ class DecisionLedger:
             self.new_rejections[key] = value
 
 
+# ── What a sweep has already surfaced ────────────────────────────────────────
+# Wally's rule 2026-08-17: once a sweep picks up a data point, it must not be
+# picked up again by a later sweep unless the source value changes again.
+#
+# So the ledger is a record of "this cell was offered this exact value", not a
+# record of a manual decision. At the end of every sweep each reviewable and
+# each held-back change is written into it. The next sweep compares its proposal
+# against that record: the same value is skipped, a different value is surfaced.
+# Nothing has to be marked up by hand.
+#
+# The bootstrap entries from the 2026-07-06 snapshots live in the same store and
+# behave identically. They are simply the values that were already declined
+# before the first sweep ran.
+#
+# --no-record turns the write-back off, for an exploratory run that should not
+# silence anything.
+RECORDED_KINDS = {'new', 'drift', 'suppressed', 'fill_implausible',
+                  'blocked_source'}
+
+
+def record_sweep(changes, ledger):
+    """Note every value this sweep surfaced or held back, so it does not recur.
+
+    Returns how many (PitchID, column, value) triples were newly recorded.
+    """
+    before = sum(len(e['rejected']) for e in ledger.entries.values())
+    for ch in changes:
+        if ch.kind in RECORDED_KINDS and ch.new:
+            ledger.record(ch.pitch_id, ch.col, ch.new)
+    after = sum(len(e['rejected']) for e in ledger.entries.values())
+    return after - before
+
+
 # ── Diff ─────────────────────────────────────────────────────────────────────
 # One row per proposed cell change.
 Change = collections.namedtuple(
@@ -871,7 +932,11 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
                 'sheet_SzTop': cell('SzTop'), 'sheet_SzBot': cell('SzBot'),
             })
 
+        ep_row = pitch_type.strip().upper() == EP_PITCH_TYPE
+
         for col in live:
+            if ep_row and col in EP_SKIP_COLS:
+                continue
             c_idx = col_idx[col]
             old = (row[c_idx] if c_idx < len(row) else '') or ''
             old = old.strip()
@@ -885,13 +950,18 @@ def diff_tab(tab, rows, header, feed_by_pid, savant_lookup, ledger, zone_obs):
             delta = (n - o) if (o is not None and n is not None) else None
             units = None
 
-            if kind == 'new':
-                # Gate 0: the source is wrong for this whole game and column.
+            # Gate 0: a value this exact cell has already declined, whether it
+            # would arrive as a fill or as an overwrite. The bootstrap only ever
+            # covered blank fills in LEDGER_COLS, but a rejection typed into a
+            # reviewed workbook means "never write this here", and that has to
+            # hold for a drift overwrite too — otherwise every run re-proposes
+            # Hunter Brown's 1403 rpm curveball.
+            if kind in ('new', 'drift') and ledger.suppresses(pid, col, new):
+                kind = 'suppressed'
+            elif kind == 'new':
+                # Gate 1: the source is wrong for this whole game and column.
                 if (pid.split('_')[0], col) in KNOWN_BAD_SOURCE:
                     kind = 'blocked_source'
-                # Gate 1: a value already rejected for this exact cell.
-                elif col in LEDGER_COLS and ledger.suppresses(pid, col, new):
-                    kind = 'suppressed'
                 else:
                     # Gate 2: is the candidate even plausible for this pitcher?
                     units = fill_units(col, pitcher, pitch_type, new)
@@ -950,9 +1020,43 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
         ws.freeze_panes = 'A2'
         return ws
 
+
     def autosize(ws, widths):
         for i, w in enumerate(widths, start=1):
             ws.column_dimensions[get_column_letter(i)].width = w
+
+    ws = sheet('HOW TO READ', ['', ''])
+    for k, v in [
+        ('What this file is',
+         'A dry run. Nothing has been written to any sheet.'),
+        ('Each value appears once',
+         'Every value in this file has been recorded in '
+         'data/backfill_decisions.json. A later sweep will NOT raise it again '
+         'unless the source value changes to something different.'),
+        ('If you do nothing',
+         'The change is not applied, and it will not come back. Re-run with '
+         '--apply to write, or delete the cell entry from the ledger to see it '
+         'again.'),
+        ('To see everything again',
+         'Delete data/backfill_decisions.json, or run with --no-record so a '
+         'sweep does not record what it surfaced.'),
+        ('Change: new', 'The cell is blank and the source has a value.'),
+        ('Change: drift',
+         'Both have a value and they differ by more than %s of the column\'s '
+         'own spread within a pitcher and pitch type.' % DRIFT_REVIEW_SD),
+        ('Off usual',
+         'Proposed value minus that pitcher\'s median for that pitch type. '
+         'This is the number that says whether a change is believable.'),
+        ('Not listed here',
+         'Precision rewrites and drift below the review threshold. They are '
+         'counted on SUMMARY and written without asking.'),
+        ('EP pitches',
+         'Position players. Release, movement, spin and approach columns are '
+         'skipped for them. Count, Description, Event and batted-ball data are '
+         'kept.'),
+    ]:
+        ws.append([k, v])
+    autosize(ws, [26, 120])
 
     by_col = collections.defaultdict(list)
     for ch in changes:
@@ -1094,8 +1198,9 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
                 else:
                     bits.append(f'{r.col}={r.new} '
                                 f'(avg {avg:.{PRECISION.get(r.col, 3)}f})')
-            ws.append([tab, pit, pt, gd, pid.split('_')[0], pid, row, len(rs),
-                       round(max(us), 2) if us else '', ', '.join(bits)])
+            ws.append([tab, pit, pt, gd, pid.split('_')[0], pid, row,
+                       len(rs), round(max(us), 2) if us else '',
+                       ', '.join(bits)])
         autosize(ws, [7, 24, 11, 12, 10, 18, 10, 15, 16, 110])
 
     # ---- Drift auto-written, rolled up by column and month ------------------
@@ -1241,7 +1346,7 @@ def apply_changes(ws, header, changes, chunk=40000):
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
-         report=True):
+         report=True, record=True):
     kinds = kinds or {'new', 'drift', 'drift_sub', 'drift_small',
                   'precision', 'zone_fix', 'zone_fix_nodonor'}
     print(f"Mode: {'APPLY' if apply else 'DRY RUN (nothing is written)'}")
@@ -1402,9 +1507,17 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
                      unexplained_zones=unexplained_zones)
         print(f"\nReport: {path}")
 
-    ledger.save()
-    print(f"Ledger: {os.path.relpath(LEDGER_PATH, _ROOT)} "
-          f"({len(ledger.entries)} entries)")
+    if record:
+        n_new = record_sweep(all_changes, ledger)
+        ledger.save()
+        print(f"\nRecorded {n_new} newly surfaced values in "
+              f"{os.path.relpath(LEDGER_PATH, _ROOT)} ({len(ledger.entries)} "
+              f"cells tracked). A later sweep will not raise these again unless "
+              f"the source value changes.")
+    else:
+        print(f"\n--no-record: nothing written to "
+              f"{os.path.relpath(LEDGER_PATH, _ROOT)}; a later sweep will raise "
+              f"these same values again.")
     return all_changes, all_missing
 
 
@@ -1421,10 +1534,16 @@ if __name__ == '__main__':
                     default=('new,drift,drift_sub,drift_small,precision,'
                              'zone_fix,zone_fix_nodonor'),
                     help='which change classes --apply writes')
+    ap.add_argument('--no-record', action='store_true',
+                    help='do not write what this sweep surfaced into '
+                         'data/backfill_decisions.json. Use for an exploratory '
+                         'run that should not stop a later sweep from raising '
+                         'the same values again.')
     ap.add_argument('--no-report', action='store_true')
     a = ap.parse_args()
     main(filter_teams=[t.strip().upper() for t in a.teams.split(',')] if a.teams else None,
          apply=a.apply,
          refresh_feed=a.refresh_feed,
          kinds={k.strip() for k in a.kinds.split(',') if k.strip()},
-         report=not a.no_report)
+         report=not a.no_report,
+         record=not a.no_record)
