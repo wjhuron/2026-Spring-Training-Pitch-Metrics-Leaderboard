@@ -11,8 +11,12 @@
 changed=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^(js|css)/.*\.(js|css)$')
 [ -z "$changed" ] && exit 0
 
+# Pages must match bump_asset_version() in pipeline/process_data.py.
+# catch.html was absent here until 2026-08-17, so a local js/css commit left
+# it on a stale cache key (the same failure the pipeline hit on 2026-08-15).
+# trade.html was dropped on 2026-08-17: it is in .vercelignore now.
 stamp=$(date +%Y%m%d%H%M%S)
-for page in index.html trade.html; do
+for page in index.html catch.html; do
   [ -f "$page" ] || continue
   grep -qE '\?v=[A-Za-z0-9_-]+' "$page" || continue
   perl -pi -e "s/\?v=[\w-]+/?v=$stamp/g" "$page"
