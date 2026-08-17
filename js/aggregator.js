@@ -16,7 +16,7 @@ var QUAL = {
   // leaderboard exactly: empirically, IP >= 0.30 × teamGames reproduces
   // FG's qualified-reliever set with zero mismatches across all 30 teams.
   // ROC reliever (0.24) keeps the same 0.80 ROC-to-MLB scaling as
-  // starters. Keep in sync with pipeline_utils.py QUAL_* constants.
+  // starters. Keep in sync with pipeline/utils.py QUAL_* constants.
   SP_IP_PER_GAME:      1.0,  // MLB starter
   RP_IP_PER_GAME:      0.30, // MLB reliever (FanGraphs-matched)
   SP_IP_PER_GAME_MILB: 0.8,  // ROC / MiLB starter

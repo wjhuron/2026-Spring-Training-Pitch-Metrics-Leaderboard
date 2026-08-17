@@ -13,7 +13,7 @@ REPO = '/Users/wallyhuron/Huronalytics'
 OUT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, REPO)
 
-from pipeline_fetch import read_all_pitches_from_sheets, read_new_tab_pitches
+from pipeline.fetch import read_all_pitches_from_sheets, read_new_tab_pitches
 
 rs = read_all_pitches_from_sheets()
 print(f"captured {len(rs)} RS rows")
