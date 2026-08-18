@@ -2469,8 +2469,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
             # measured over the window. Say what the percentiles rank against,
             # because that is the one thing a reader cannot infer.
             _notes = (
-                '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+ are on wRC+\'s scale, '
-                'where 100 is average\n'
+                '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+: 100 is league '
+                'average and each point is 1% better or worse, the way wRC+ reads.\n'
                 '•  GB% is colored so that lower = better.\n'
                 '•  Every value AND every percentile is measured over this date '
                 'window only, against all MLB hitters over the same window.'
@@ -2488,8 +2488,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
             )
         else:
             _notes = (
-                '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+ are on wRC+\'s scale, '
-                'where 100 is average\n'
+                '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+: 100 is league '
+                'average and each point is 1% better or worse, the way wRC+ reads.\n'
                 '•  GB% is colored so that lower = better.\n'
                 '•  Z-Swing% and Z-Contact% count in-zone pitches only: swings at '
                 'strikes, and contact on those swings.'
