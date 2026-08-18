@@ -2717,7 +2717,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 def main():
     # ── Settings (edit these directly or override via command line) ──
     team           = "ROC"                   # Team filter (e.g., "NYY"), or None for all teams
-    filter_hitters = "Ortiz, Abimelec; Wallace, Cayden; King, Seaver; Morales, Yohandy; Pinckney, Andrew; Glasser, Phillip; "       # Semicolon-separated "Last, First" names, or "" for all
+    filter_hitters = ""       # Semicolon-separated "Last, First" names, or "" for all
     year_label     = "2026 Season"        # Display label on the card
     output_dir     = OUTPUT_DIR
 

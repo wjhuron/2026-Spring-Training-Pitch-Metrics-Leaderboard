@@ -567,7 +567,7 @@ def scrape_milb_transactions(start_date, end_date):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    start_date  = '2026-06-01'
+    start_date  = '2026-08-02'
     end_date    = datetime.now().strftime('%Y-%m-%d')
 
     # ── CLI overrides (optional) ──

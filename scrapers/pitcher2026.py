@@ -1025,12 +1025,11 @@ class BaseballSavantFocusedDownloader:
                         # Rounded here rather than in the display pass below, so
                         # raw_precision has to opt out of it too or Extension
                         # would be the one "feet" column stuck at 2 decimals.
-                        if extension_raw is None:
-                            extension = None
-                        elif raw_precision:
-                            extension = extension_raw
-                        else:
-                            extension = round(extension_raw, 2)
+                        # NO rounding here. The precision map below owns every
+                        # depth. Rounding to 2 first is what made a freshly scraped
+                        # Extension arrive as 6.1500 — two real decimals padded to
+                        # four, which looks like precision and is not.
+                        extension = extension_raw
 
                         # Strike zone boundaries
                         sz_top = pitch.get('pitchData', {}).get('strikeZoneTop')
@@ -1167,28 +1166,38 @@ class BaseballSavantFocusedDownloader:
             # Format numeric columns with appropriate decimal places
             # Use pd.to_numeric to handle any non-numeric values (empty strings, etc.)
             # that can appear in early Spring Training games or incomplete data
-            numeric_round_1 = ['Velocity', 'IndVertBrk', 'HorzBrk', 'xIndVrtBrk', 'xHorzBrk',
-                               'ExitVelo', 'BatSpeed', 'SwingLength',
-                               'AttackAngle', 'AttackDirection', 'SwingPathTilt',
-                               'ArmAngle']
-            numeric_round_2 = ['VAA', 'HAA', 'HC_X', 'HC_Y',
-                               'RelPosZ', 'RelPosX', 'Extension']
-            numeric_round_3 = ['PlateZ', 'PlateX', 'SzTop', 'SzBot',
-                               'RunExp', 'xBA', 'xSLG', 'xwOBA']
-            numeric_int = ['LaunchAngle', 'Distance']
+            # Depths come from scrapers/sheet_precision.py, never from a list here.
+            #
+            # They used to be hardcoded, and on 2026-08-17 that split in two: the
+            # backfill's policy moved to 4 decimals for feet and 3 for degrees while
+            # this block still wrote 2 and 2. Wally caught it by downloading a game
+            # and seeing RelPosZ come through as 5.1800 — a 2-decimal value padded to
+            # 4 by the column format, not a 4-decimal measurement.
+            #
+            # Left alone, every newly scraped game would arrive truncated and the next
+            # sweep would "upgrade" the same cells, forever. Exactly the two-homes
+            # drift CLAUDE.md warns about, and the warning is written at the top of
+            # sheet_precision.py, which made leaving this file out of it worse.
+            from scrapers.sheet_precision import PRECISION as _PREC
 
-            for col in numeric_round_1:
-                if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors='coerce').apply(lambda x: f"{x:.1f}" if pd.notna(x) else '')
-            for col in numeric_round_2:
-                if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors='coerce').apply(lambda x: f"{x:.2f}" if pd.notna(x) else '')
-            for col in numeric_round_3:
-                if col in df.columns:
-                    df[col] = pd.to_numeric(df[col], errors='coerce').apply(lambda x: f"{x:.3f}" if pd.notna(x) else '')
+            # Kept as Int64 rather than a formatted string: these are genuinely
+            # integral and Int64 keeps them that way through the CSV and the append.
+            numeric_int = ['LaunchAngle', 'Distance']
             for col in numeric_int:
                 if col in df.columns:
                     df[col] = pd.to_numeric(df[col], errors='coerce').astype('Int64')
+
+            for col, _dp in _PREC.items():
+                if col not in df.columns or col in numeric_int or col == 'Spin Rate':
+                    continue
+                df[col] = pd.to_numeric(df[col], errors='coerce').apply(
+                    lambda x, d=_dp: '' if pd.isna(x) else (
+                        # Strip a sign that means nothing: a value rounding to zero
+                        # from below renders "-0.000", which Sheets stores as 0 and
+                        # every later comparison then reads as a change.
+                        f"{x:.{d}f}"[1:] if (f"{x:.{d}f}".startswith('-')
+                                             and float(f"{x:.{d}f}") == 0.0)
+                        else f"{x:.{d}f}"))
 
             # Spin Rate: round to 0 decimals, then Int64
             if 'Spin Rate' in df.columns:
@@ -2011,7 +2020,7 @@ def main():
     end_date        = "2026-07-16"
     pitchers_only   = True
 
-    game_id         = ""          # Game PK (e.g., "831437") — leave blank for team/date lookup
+    game_id         = "824514"          # Game PK (e.g., "831437") — leave blank for team/date lookup
     filter_team     = None        # Optional team filter for game ID mode (e.g., "CAN")
     output_name     = ""          # Optional custom filename (without .csv)
 
