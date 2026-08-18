@@ -113,6 +113,54 @@ def fetch_mlb_hitters(year=2026):
     return out
 
 
+def fetch_mlb_hitters_range(start_date, end_date, year=2026):
+    """FanGraphs hitter wRC+ for a CUSTOM DATE RANGE.
+
+    FanGraphs does serve date ranges - `month=1000` is its custom-range
+    selector, with startdate/enddate alongside. This exists so a date-window
+    card shows FG's wRC+ for that window instead of the pipeline's own
+    formula, which differs by a couple of points (Wood over 2026-03-26 to
+    2026-07-12: FG 166, pipeline 168).
+
+    Also returns the OFFICIAL counting line for the range. This is the window
+    equivalent of the season path's boxscore merge, and it exists because a
+    no-pitch intentional walk leaves no pitch to count: Wood over
+    2026-03-26..2026-07-12 is 449 PA from pitches against an official 454,
+    which drags BB% to 16.5% from 17.4% and OBP to .403 from .410.
+
+    IBB policy, which FanGraphs' fields already follow and which matches the
+    season path: an IBB is a PA, and for HITTERS it counts as a walk (PA and
+    BB% both include it). Pitcher BB% uses unintentional walks only, but an
+    IBB still counts toward a pitcher's batters faced.
+
+    Returns {xMLBAMID(str): {...}}. Raises on a failed fetch.
+    """
+    params = (
+        f'pos=all&stats=bat&lg=all&qual=0&type=1'
+        f'&season={year}&seasonEnd={year}&month=1000'
+        f'&startdate={start_date}&enddate={end_date}'
+        f'&ind=0&pageitems=5000&pagenum=1'
+    )
+    payload = _http_get_json(f'{FG_API}?{params}')
+    out = {}
+    for r in payload.get('data', []):
+        mid = r.get('xMLBAMID')
+        if mid is None:
+            continue
+        out[str(int(mid))] = {
+            'name': r.get('PlayerName'),
+            'wRCplus': (int(round(r['wRC+'])) if r.get('wRC+') is not None else None),
+            'pa': r.get('PA'), 'ab': r.get('AB'), 'h': r.get('H'),
+            'doubles': r.get('2B'), 'triples': r.get('3B'), 'hr': r.get('HR'),
+            'bb': r.get('BB'), 'ibb': r.get('IBB'), 'so': r.get('SO'),
+            'hbp': r.get('HBP'), 'sf': r.get('SF'),
+            'avg': r.get('AVG'), 'obp': r.get('OBP'), 'slg': r.get('SLG'),
+            'ops': r.get('OPS'), 'wOBA': r.get('wOBA'),
+            'bbPct': r.get('BB%'), 'kPct': r.get('K%'), 'babip': r.get('BABIP'),
+        }
+    return out
+
+
 def fetch_mlb_pitchers(year=2026):
     """Returns dict keyed by xMLBAMID with FIP, xFIP, SIERA, IP, name."""
     params = (

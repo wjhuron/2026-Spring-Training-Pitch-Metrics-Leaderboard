@@ -1445,7 +1445,9 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
             _t0 = _time.time()
             h_row = score_window_against_season(
                 (hitter_name, h_row.get('team') or team),
-                hitter_pitches, all_pitches, hitter_lb, metadata)
+                hitter_pitches, all_pitches, hitter_lb, metadata,
+                date_range=date_filter,
+                identity_mlb_id=_season_row.get('mlbId'))
             h_row.update({k: v for k, v in _season_row.items()
                           if k in ('mlbId', 'age', 'throws', 'position',
                                    'stands', 'sprintSpeed', 'sprintSpeed_pctl')
@@ -2422,9 +2424,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+: 100 is league '
                 'average and each point is 1% better or worse, the way wRC+ reads.\n'
                 '•  GB% is colored so that lower = better.\n'
-                '•  Values are measured over this date window. Percentiles rank '
-                'those values against the FULL-SEASON MLB pool, with no minimum '
-                'sample: a hot stretch is allowed to read elite.'
+                '•  Values are for this date window. Percentiles rank them against '
+                'the full-season MLB pool, with no minimum sample.'
             )
         elif date_filter is not None:
             # Window card with no pool. Say plainly which numbers are missing

@@ -138,8 +138,43 @@ def add_season_percentiles(row, season_rows, stats=None):
     return row
 
 
+_FG_RANGE_CACHE = {}
+
+
+def _fg_range_line(start_date, end_date):
+    """The official hitting line for a date range, memoised per range.
+
+    Degrades to {} rather than raising: FanGraphs Cloudflare-blocks some IPs,
+    and a card should still render with our computed wRC+ if the fetch fails.
+    The degrade announces itself.
+    """
+    key = (start_date, end_date)
+    if key in _FG_RANGE_CACHE:
+        return _FG_RANGE_CACHE[key]
+    try:
+        from pipeline.fg_overrides import fetch_mlb_hitters_range
+        out = fetch_mlb_hitters_range(start_date, end_date)
+    except Exception as e:
+        print(f"    WARNING: FanGraphs range fetch failed "
+              f"({type(e).__name__}: {e}) — using our computed wRC+")
+        out = {}
+    _FG_RANGE_CACHE[key] = out
+    return out
+
+
+def _season_mlb_id(season_rows, hitter_key):
+    for r in season_rows:
+        if (r.get('hitter'), r.get('team')) == hitter_key and r.get('mlbId'):
+            return r['mlbId']
+    for r in season_rows:            # any team row for the same name
+        if r.get('hitter') == hitter_key[0] and r.get('mlbId'):
+            return r['mlbId']
+    return None
+
+
 def score_window_against_season(hitter_key, window_pitches, all_pitches,
-                                season_rows, metadata, verbose=True):
+                                season_rows, metadata, verbose=True,
+                                date_range=None, identity_mlb_id=None):
     """The whole job: one hitter, one date range, season-ranked.
 
     hitter_key is (hitter, team). Returns the row, ready for the card.
@@ -210,18 +245,57 @@ def score_window_against_season(hitter_key, window_pitches, all_pitches,
     else:
         row['hitterPlus'] = None
 
-    # ── wRC+ / xWRC+ from the window's wOBA, season Guts, season park factor ──
+    # ── wRC+ : FanGraphs' own value FOR THIS DATE RANGE. FG serves custom
+    # ranges (month=1000 + startdate/enddate), so there is no reason to
+    # substitute our formula, which reads a couple of points different.
+    # xWRC+ stays ours - FG does not publish it.
     pf = _load_park_factors().get(hitter_key[1], 1.0)
     lgw, sc, rpa = G.get('lgWOBA'), G.get('wOBAScale'), G.get('lgRPA')
     w = row.get('wOBA')
     if lgw and sc and rpa and rpa > 0 and w is not None:
-        wraa = (w - lgw) / sc
-        row['wRCplus'] = round((wraa + rpa + (rpa - pf * rpa)) / rpa * 100)
+        row['wRCplus'] = round(((w - lgw) / sc + rpa + (rpa - pf * rpa)) / rpa * 100)
         xw = row.get('xwOBA')
         row['xWRCplus'] = (round((((xw - lgw) / sc) + rpa) / rpa * 100)
                            if xw is not None else None)
     else:
         row['wRCplus'] = row['xWRCplus'] = None
+
+    # ── OFFICIAL LINE for the range. Exactly the role the boxscore merge
+    # plays for a season row, and for the same reason: a no-pitch intentional
+    # walk leaves no pitch, so a pitch-derived PA runs short and drags BB%,
+    # K% and OBP with it. An IBB is a PA and, for a hitter, a walk - which is
+    # what FanGraphs' PA/BB/BB% already carry.
+    #
+    # Only the official ledger is overridden. Everything Statcast-derived
+    # (xwOBA, EV, barrels, swing rates, bat tracking) and the whole + family
+    # stay pitch-derived, same split as the season card.
+    mid = (identity_mlb_id if identity_mlb_id is not None
+           else _season_mlb_id(season_rows, hitter_key))
+    if mid is not None and date_range:
+        hit = _fg_range_line(date_range[0], date_range[1]).get(str(int(mid)))
+        if hit and hit.get('pa'):
+            _b = (row.get('pa'), row.get('bbPct'), row.get('kPct'), row.get('obp'))
+            for src, nd in (('pa', 0), ('ab', 0), ('hr', 0), ('doubles', 0),
+                            ('triples', 0), ('avg', 3), ('obp', 3), ('slg', 3),
+                            ('ops', 3), ('wOBA', 3), ('babip', 3),
+                            ('bbPct', 4), ('kPct', 4)):
+                v = hit.get(src)
+                if v is not None:
+                    row[src] = int(v) if nd == 0 else round(v, nd)
+            if row.get('slg') is not None and row.get('avg') is not None:
+                row['iso'] = round(row['slg'] - row['avg'], 3)
+            if hit.get('bb') and hit.get('so'):
+                row['bbToK'] = hit['bb'] / hit['so']
+            if hit.get('wRCplus') is not None:
+                row['wRCplus'] = hit['wRCplus']
+            if verbose:
+                print(f"    official line for the range: PA {_b[0]}→{row['pa']}"
+                      f" (IBB {hit.get('ibb')}), BB% {_b[1]}→{row['bbPct']}, "
+                      f"K% {_b[2]}→{row['kPct']}, OBP {_b[3]}→{row['obp']}, "
+                      f"wRC+ {row.get('wRCplus')}")
+        elif verbose:
+            print(f"    no official row for this range — keeping the "
+                  f"pitch-derived line, which runs short by any no-pitch IBBs")
 
     add_season_percentiles(row, season_rows)
     return row
