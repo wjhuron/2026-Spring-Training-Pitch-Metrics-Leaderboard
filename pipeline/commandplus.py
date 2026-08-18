@@ -112,10 +112,11 @@ targets — so ROC needs no MLB baseline translation (unlike Stuff+/Loc+).
 ROC pitchers are scored from their own pitches and excluded from the
 normalization pool, per the site convention.
 
-Normalization: commandPlus = 100 + 10 * (lg_miss - miss) / sigma over the
-qualified MLB pool (higher = better command). Both anchors are recomputed
-from the pool on every run — there is no stored scale constant to re-fit
-when the scorer changes.
+Normalization: commandPlus = 200 - 100 * miss / lg_miss over the qualified
+MLB pool (higher = better command). One point is one percent: a 115 misses by
+15% less distance than league average. The anchor is recomputed from the pool
+on every run — there is no stored scale constant to re-fit when the scorer
+changes.
 
 Pure Python by design (no numpy/sklearn in the pipeline).
 """
@@ -128,7 +129,11 @@ from pipeline.utils import safe_float
 MIN_CELL = 20                          # min pitches to fit a cell
 
 MIN_POOL = 300                         # pitches to enter the (mu, sigma) pool
-CMD_SCALE_K = 10                       # display points per pool SD
+CMD_SCALE_K = 10                       # RETIRED 2026-08-18. Command+ is now
+                                       # 200 - 100*miss/lg (one point = one
+                                       # percent), not a z-ruler. Kept only so
+                                       # a stale import cannot break; delete
+                                       # once nothing references it.
 
 # RE-MEASURED 2026-08-12 on the cascade scorer (scripts/research/commandplus/commandplus_gate_measure.py):
 # split-half r=0.5 crossing at the rendered unit (pitcher-season), random
@@ -267,10 +272,31 @@ def score_misses(pitches_by_key):
 
 
 def normalize(results, pool_filter):
-    """Adds 'commandPlus' to each result: 100 + 10*(lg - miss)/sigma, with
-    (lg, sigma) from qualified MLB pool rows (pool_filter(key) True and
-    n_pitches >= MIN_POOL). ROC keys are scored, never pooled. Mutates and
-    returns results plus the (lg, sigma) anchors."""
+    """Adds 'commandPlus' on the "+" contract: 200 - 100*miss/lg_miss.
+
+    100 is league average and one point is one percent, the way wRC+ reads:
+    a 115 misses by 15% less distance than the league does. Before 2026-08-18
+    this was 100 + 10*(lg - miss)/sigma, a standard-deviation ruler, so 115
+    meant "1.5 SD better" and a reader applying the wRC+ reading got a wrong
+    answer.
+
+    Why a self-ratio rather than a run-denominated scale, which is what
+    Stuff+/Loc+/Pitching+ would need: command has almost no same-season run
+    signal. Measured over 2021-2026 in
+    scripts/research/misc/pitcher_plus_scale_atlas.py, r against runs
+    prevented ran +0.019 to +0.229 (mean +0.103), and forcing slope 1 in 2023
+    would have produced a 99-to-101 dead column. But raw_miss is average miss
+    distance in inches — strictly positive with a real zero at perfect
+    command — so the ratio is meaningful on its own terms. That scale is also
+    the most stable thing in the study: SD 5.4-6.0 and a range near 83-118 in
+    every one of the six seasons. Same resolution CT+ reached on the hitter
+    side.
+
+    (lg, sigma) still come from qualified MLB pool rows (pool_filter(key) True
+    and n_pitches >= MIN_POOL). sigma is no longer used to scale, and is
+    returned only because callers log it. ROC keys are scored against the MLB
+    lg, never pooled into it. Mutates and returns results plus the anchors.
+    """
     pool = [v['raw_miss'] for k, v in results.items()
             if pool_filter(k) and v['n_pitches'] >= MIN_POOL]
     if len(pool) < 10:
@@ -280,8 +306,11 @@ def normalize(results, pool_filter):
     mu = sum(pool) / len(pool)
     sigma = math.sqrt(sum((x - mu) ** 2 for x in pool) / len(pool))
     for v in results.values():
-        if sigma > 1e-9:
-            v['commandPlus'] = round(100.0 + CMD_SCALE_K * (mu - v['raw_miss']) / sigma, 1)
+        # Guard on the DENOMINATOR now, not the spread: a zero-spread pool is
+        # fine for a ratio, a zero league miss is not (and cannot happen with
+        # real data, since a miss distance is strictly positive).
+        if mu > 1e-9:
+            v['commandPlus'] = round(200.0 - 100.0 * v['raw_miss'] / mu, 1)
         else:
             v['commandPlus'] = None
     return results, (mu, sigma)
