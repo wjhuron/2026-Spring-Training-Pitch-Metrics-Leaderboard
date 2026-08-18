@@ -3013,8 +3013,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 def main():
     # ── Settings (edit these directly or override via command line) ──
     team           = "WSH"                   # Team filter (e.g., "NYY"), or None for all teams
-    start_date     = "2026-03-26"                 # Set to None for full season
-    end_date       = "2026-07-12"                 # Set to a date for date range, or None for single day
+    start_date     = None                         # Set to None for full season
+    end_date       = None                         # Set to a date for date range, or None for single day
     filter_hitters = ""       # Semicolon-separated "Last, First" names, or "" for all
     year_label     = "2026 Season"        # Display label on the card
     output_dir     = OUTPUT_DIR
