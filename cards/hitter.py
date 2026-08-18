@@ -1225,11 +1225,120 @@ def _render_percentile_bubbles(fig, h_row):
 
 
 # ─────────────────────────────────────────────────────────────────────
+# Date-window rows
+# ─────────────────────────────────────────────────────────────────────
+# The season leaderboard row is not valid inside a date window, so a
+# windowed card rebuilds every number it can from the window's own pitches.
+# The pipeline functions do the arithmetic, so a window value cannot drift
+# from the shipped season definition of the same stat.
+#
+# Three families stay out of the row, and therefore render as "—":
+#   * wRC+ — the shipped value comes from FanGraphs, which publishes no
+#     window equivalent. Our own formula would be a different quantity
+#     under the same name.
+#   * SD+, CT+, BB+, Hitter+ — each needs a whole-league cell table (SD+,
+#     CT+) or the league xwOBAcon anchor (BB+) measured over the SAME
+#     window, which only a pipeline run can produce.
+#   * every *_pctl — a percentile needs an all-MLB pool over the same
+#     window. Without it the bubbles render in the neutral greige.
+#
+# Known gap: a no-pitch intentional walk leaves no pitch, so it is absent
+# from the window PA count. The season card takes PA from the official
+# boxscore and does not have this gap. Measured on Wood 2026 (the full
+# season fed through this function, compared against the shipped row):
+# 529 PA against 535, all six the walks. Every other key matched exactly,
+# and OBP/OPS/BB%/K% moved only by that denominator.
+WINDOW_UNAVAILABLE = ('wRCplus', 'xWRCplus', 'wRC',
+                      'sdPlus', 'ctPlus', 'bbPlus', 'hitterPlus')
+
+
+class _SkipFGOverride(Exception):
+    """Sentinel: the FanGraphs season override does not apply to this card."""
+
+
+def _build_window_hitter_row(season_row, window_pitches, metadata):
+    """Rebuild one hitter's leaderboard row from a date window's pitches."""
+    from pipeline.compute import compute_hitter_stats, compute_expected_stats
+    from pipeline.utils import (NON_PA_EVENTS, HIT_EVENTS, K_EVENTS, BB_EVENTS,
+                                HBP_EVENTS, SF_EVENTS, SH_EVENTS, CI_EVENTS)
+
+    _dates = [p.get('Game Date') for p in window_pitches if p.get('Game Date')]
+    row = {
+        'hitter': season_row.get('hitter'),
+        'team': season_row.get('team'),
+        'stands': season_row.get('stands'),
+        'mlbId': season_row.get('mlbId'),
+        'age': season_row.get('age'),
+        'throws': season_row.get('throws'),
+        'position': season_row.get('position'),
+        '_isROC': season_row.get('_isROC'),
+        'count': len(window_pitches),
+        'lastGameDate': max(_dates) if _dates else None,
+    }
+    row.update(compute_hitter_stats(window_pitches))
+    row.update(compute_expected_stats(
+        window_pitches, woba_weights=metadata.get('wobaWeights')))
+
+    # Slash line. compute_hitter_stats owns pa/ab/hr/babip; it does not
+    # return AVG/OBP/SLG, because the season pipeline takes those from the
+    # official boxscore. A window has no boxscore, so count the events.
+    pa_pitches = [p for p in window_pitches
+                  if p.get('Event') and p['Event'] not in NON_PA_EVENTS]
+    n_pa = len(pa_pitches)
+    n_h = sum(1 for p in pa_pitches if p['Event'] in HIT_EVENTS)
+    n_2b = sum(1 for p in pa_pitches if p['Event'] == 'Double')
+    n_3b = sum(1 for p in pa_pitches if p['Event'] == 'Triple')
+    n_hr = sum(1 for p in pa_pitches if p['Event'] == 'Home Run')
+    n_k = sum(1 for p in pa_pitches if p['Event'] in K_EVENTS)
+    n_bb = sum(1 for p in pa_pitches if p['Event'] in BB_EVENTS)   # incl. IBB
+    n_hbp = sum(1 for p in pa_pitches if p['Event'] in HBP_EVENTS)
+    n_sf = sum(1 for p in pa_pitches if p['Event'] in SF_EVENTS)
+    n_sh = sum(1 for p in pa_pitches if p['Event'] in SH_EVENTS)
+    n_ci = sum(1 for p in pa_pitches if p['Event'] in CI_EVENTS)
+    n_ab = n_pa - n_bb - n_hbp - n_sf - n_sh - n_ci
+    n_tb = n_h + n_2b + 2 * n_3b + 3 * n_hr
+    obp_denom = n_ab + n_bb + n_hbp + n_sf
+
+    row['tb'] = n_tb
+    row['avg'] = round(n_h / n_ab, 3) if n_ab > 0 else None
+    row['obp'] = round((n_h + n_bb + n_hbp) / obp_denom, 3) if obp_denom > 0 else None
+    row['slg'] = round(n_tb / n_ab, 3) if n_ab > 0 else None
+    row['ops'] = (round(row['obp'] + row['slg'], 3)
+                  if row['obp'] is not None and row['slg'] is not None else None)
+    row['iso'] = (round(row['slg'] - row['avg'], 3)
+                  if row['slg'] is not None and row['avg'] is not None else None)
+    # Hitter BB% uses TOTAL walks, matching the season row.
+    row['kPct'] = round(n_k / n_pa, 4) if n_pa > 0 else None
+    row['bbPct'] = round(n_bb / n_pa, 4) if n_pa > 0 else None
+    row['bbToK'] = (n_bb / n_k) if n_k > 0 else None
+
+    for k in WINDOW_UNAVAILABLE:
+        row[k] = None
+    # xwOBAsp is deliberately ABSENT rather than None: render_hitter_card
+    # reads it with a default, and the default is the value it computed from
+    # this window's own batted balls.
+    row.pop('xwOBAsp', None)
+    return row
+
+
+# ─────────────────────────────────────────────────────────────────────
 # Card render
 # ─────────────────────────────────────────────────────────────────────
 def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
-                       output_dir=OUTPUT_DIR, layout='bubbles', la_view='damage'):
-    """Render a seasonal hitter card.
+                       output_dir=OUTPUT_DIR, layout='bubbles', la_view='damage',
+                       date_filter=None, date_display=None, date_slug=None):
+    """Render a seasonal hitter card, or a card for one date window.
+
+    date_filter:
+        None (default) renders the full season from the leaderboard row.
+        A ('YYYY-MM-DD', 'YYYY-MM-DD') pair keeps only the pitches inside
+        that window, then rebuilds every stat from those pitches. See
+        _build_window_hitter_row for what a window cannot rebuild.
+    date_display:
+        Label drawn under the player name. Replaces the season "Through
+        {date}" stamp when a window is set.
+    date_slug:
+        Filename component. Replaces the year_label slug when set.
 
     layout:
         'bubbles' — default. Single-column percentile bubble grid
@@ -1239,7 +1348,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
             left, LA × Spray on the right, Contact Profile + Pitch Group table
             at the bottom. Still selectable via --layout classic.
     """
-    print(f"Generating hitter card: {hitter_name} ({team_abbrev or 'auto'}) — {year_label} [layout={layout}]")
+    _span = date_display or year_label
+    print(f"Generating hitter card: {hitter_name} ({team_abbrev or 'auto'}) — {_span} [layout={layout}]")
 
     # Load data — load_pitch_data auto-refreshes from the CI Release if the
     # local pickle is stale or missing (the pipeline uploads it on every run,
@@ -1269,7 +1379,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     # is a physical tool (Statcast hardware is MLB-only), so an MLB reading
     # is valid context on an AAA card; nothing else from the MLB row is
     # merged. Rendered as its own "BAT TRACKING (MLB)" bubble section.
-    if team == 'ROC':
+    if team == 'ROC' and date_filter is None:
         _mid = h_row.get('mlbId')
         _mlb_rows = [r for r in hitter_lb
                      if r.get('hitter') == hitter_name
@@ -1291,6 +1401,24 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     if not hitter_pitches:
         print(f"  ERROR: no pitches found for {hitter_name}")
         return False
+
+    # Date window. Every stat below reads hitter_pitches or h_row, so the
+    # filter and the row rebuild together move the whole card onto the window.
+    if date_filter is not None:
+        _lo, _hi = date_filter
+        _season_n = len(hitter_pitches)
+        hitter_pitches = [p for p in hitter_pitches
+                          if p.get('Game Date')
+                          and _lo <= p['Game Date'] <= _hi]
+        if not hitter_pitches:
+            print(f"  ERROR: no pitches for {hitter_name} between {_lo} and {_hi}")
+            return False
+        print(f"  Date window {_lo} → {_hi}: "
+              f"{len(hitter_pitches)} of {_season_n} season pitches")
+        h_row = _build_window_hitter_row(h_row, hitter_pitches, metadata)
+        print(f"  Rebuilt from window pitches: {h_row.get('pa')} PA, "
+              f"{h_row.get('nBip')} BIP. wRC+ and the + family read '—'.")
+
     print(f"  {len(hitter_pitches)} pitches faced")
 
     # Compute SzTop/SzBot (already constant per hitter in current data)
@@ -1416,23 +1544,26 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     #   2. max Game Date in hitter_pitches — fallback when the leaderboard
     #      row doesn't yet have lastGameDate (older pipeline run).
     #   3. metadata.generatedAt — last-resort fallback.
+    # A window card already names its own span, so it takes no "Through"
+    # stamp — the stamp would repeat the window's end date.
     _date_suffix = ''
-    try:
-        from datetime import datetime
-        _latest = h_row.get('lastGameDate')
-        if not _latest:
-            _hitter_dates = [p.get('Game Date') for p in hitter_pitches
-                              if p.get('Game Date')]
-            _latest = max(_hitter_dates) if _hitter_dates else None
-        if not _latest:
-            _gen_at = metadata.get('generatedAt', '')
-            _latest = _gen_at[:10] if _gen_at else None
-        if _latest:
-            _dt = datetime.strptime(_latest[:10], '%Y-%m-%d')
-            _date_suffix = f"  ·  Through {_dt.strftime('%B %-d').lstrip('0')}"
-    except Exception:
-        _date_suffix = ''
-    ax_main.text(text_x, photo_top - 1.80, year_label + _date_suffix,
+    if date_display is None:
+        try:
+            from datetime import datetime
+            _latest = h_row.get('lastGameDate')
+            if not _latest:
+                _hitter_dates = [p.get('Game Date') for p in hitter_pitches
+                                  if p.get('Game Date')]
+                _latest = max(_hitter_dates) if _hitter_dates else None
+            if not _latest:
+                _gen_at = metadata.get('generatedAt', '')
+                _latest = _gen_at[:10] if _gen_at else None
+            if _latest:
+                _dt = datetime.strptime(_latest[:10], '%Y-%m-%d')
+                _date_suffix = f"  ·  Through {_dt.strftime('%B %-d').lstrip('0')}"
+        except (ValueError, TypeError):
+            _date_suffix = ''
+    ax_main.text(text_x, photo_top - 1.80, (date_display or year_label) + _date_suffix,
                   fontsize=17, fontfamily='IBM Plex Sans', color=TEXT_SECONDARY,
                   va='top', fontweight='600')
 
@@ -1448,7 +1579,11 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     # override pipeline run). MLB hitters get wRC+ + xwOBA + xBA + xSLG;
     # AAA hitters get wRC+ only (FG doesn't publish the Statcast
     # expected stats for AAA).
+    # A window card skips this: FanGraphs publishes season totals only, so
+    # the override would put four season values back onto a window card.
     try:
+        if date_filter is not None:
+            raise _SkipFGOverride
         from pipeline.fg_overrides import refresh_if_stale as _fg_refresh
         _fg_cache = _fg_refresh(max_age_hours=24, verbose=True)
         _group_key = 'aaaHitters' if is_roc else 'mlbHitters'
@@ -1471,6 +1606,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                         if not _h_row_modified:
                             h_row = dict(h_row); _h_row_modified = True
                         h_row[row_k] = _fg_player[cache_k]
+    except _SkipFGOverride:
+        pass
     except Exception as _e:
         # Never block the card render on FG scraper failure.
         print(f'  WARNING: FG override unavailable ({type(_e).__name__}: {_e})')
@@ -2195,12 +2332,24 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         # Ordered to follow the rail above: RESULT's "+" family, then Quality of
         # Contact's GB%, then Plate Discipline's Swing%. Bulleted so each note
         # reads as its own item rather than one running paragraph.
-        _notes = (
-            '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+ are on wRC+\'s scale, '
-            'where 100 is average\n'
-            '•  GB% is colored so that lower = better.\n'
-            '•  Swing% is colored so that higher = more aggressive. Does NOT necessarily mean better.'
-        )
+        if date_filter is not None:
+            # Window card. Say plainly which numbers are missing and why the
+            # bubbles are grey, so a blank cell is not read as a zero.
+            _notes = (
+                '•  Every value on this card is computed from this date '
+                'window\'s pitches only.\n'
+                '•  Hitter+, Batted Ball+, Contact+, Swing Decisions+ and '
+                'wRC+ need a full-season pipeline run, so they read "—".\n'
+                '•  Percentile bars are grey: a percentile needs an all-MLB '
+                'pool measured over the same window.'
+            )
+        else:
+            _notes = (
+                '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+ are on wRC+\'s scale, '
+                'where 100 is average\n'
+                '•  GB% is colored so that lower = better.\n'
+                '•  Swing% is colored so that higher = more aggressive. Does NOT necessarily mean better.'
+            )
         fig.text(0.020, 0.068, _notes, fontsize=13, color=TEXT_MUTED, va='top',
                  ha='left', fontfamily='IBM Plex Sans', fontweight='600',
                  linespacing=1.5)
@@ -2212,7 +2361,9 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         # Save with _bubbles suffix so the two layouts can coexist.
         safe_name = display_name.replace(' ', '_').replace('.', '').replace(',', '')
         out_path = os.path.join(output_dir,
-                                  f'HitterCard_{safe_name}_{year_label.replace(" ", "_")}_bubbles.png')
+                                  f'HitterCard_{safe_name}_'
+                                  f'{date_slug or year_label.replace(" ", "_")}'
+                                  f'_bubbles.png')
         plt.savefig(out_path, dpi=SAVE_DPI, facecolor=BG, bbox_inches='tight')
         plt.close(fig)
         print(f"  Saved: {out_path}")
@@ -2704,7 +2855,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     # Save
     safe_name = display_name.replace(' ', '_').replace('.', '').replace(',', '')
     out_path = os.path.join(output_dir,
-                              f'HitterCard_{safe_name}_{year_label.replace(" ", "_")}.png')
+                              f'HitterCard_{safe_name}_'
+                              f'{date_slug or year_label.replace(" ", "_")}.png')
     plt.savefig(out_path, dpi=SAVE_DPI, facecolor=BG, bbox_inches='tight')
     plt.close(fig)
     print(f"  Saved: {out_path}")
@@ -2716,7 +2868,9 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 # ─────────────────────────────────────────────────────────────────────
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team           = "ROC"                   # Team filter (e.g., "NYY"), or None for all teams
+    team           = "WSH"                   # Team filter (e.g., "NYY"), or None for all teams
+    start_date     = None                 # Set to None for full season
+    end_date       = None                 # Set to a date for date range, or None for single day
     filter_hitters = ""       # Semicolon-separated "Last, First" names, or "" for all
     year_label     = "2026 Season"        # Display label on the card
     output_dir     = OUTPUT_DIR
@@ -2725,6 +2879,10 @@ def main():
     parser = argparse.ArgumentParser(description='Generate hitter stat cards')
     parser.add_argument('--team', default=None,
                          help='Team abbreviation — only render hitters on this team')
+    parser.add_argument('--start', default=None,
+                         help='Start date YYYY-MM-DD, or "none" for full season')
+    parser.add_argument('--end', default=None,
+                         help='End date YYYY-MM-DD. Omit for a single day.')
     parser.add_argument('--hitters', default=None,
                          help='Semicolon-separated "Last, First" names; empty string = all qualified hitters')
     parser.add_argument('--year-label', default=None,
@@ -2744,6 +2902,8 @@ def main():
     args = parser.parse_args()
 
     if args.team is not None: team = args.team
+    if args.start is not None: start_date = None if args.start.lower() == 'none' else args.start
+    if args.end is not None: end_date = None if args.end.lower() == 'none' else args.end
     if args.hitters is not None: filter_hitters = args.hitters
     if args.year_label is not None: year_label = args.year_label
     if args.output_dir is not None: output_dir = args.output_dir
@@ -2755,16 +2915,48 @@ def main():
         hitter_names = [h.strip() for h in filter_hitters.split(';') if h.strip()]
     else:
         hitter_names = None
+
+    # Resolve the date window. Same rules as cards/pitcher.py: a same-day
+    # range collapses to a single date, and no dates means the full season.
+    from datetime import datetime as _dt_cls
+    if end_date is not None and end_date == start_date:
+        end_date = None
+    if start_date is None and end_date is None:
+        date_filter = None
+        date_display = None
+        date_slug = None
+        date_label = 'full season'
+    elif end_date is None:
+        date_filter = (start_date, start_date)
+        _d = _dt_cls.strptime(start_date, '%Y-%m-%d')
+        date_display = _d.strftime('%B %d, %Y').replace(' 0', ' ')
+        date_slug = _d.strftime('%m%d%Y')
+        date_label = start_date
+    else:
+        date_filter = (start_date, end_date)
+        _s = _dt_cls.strptime(start_date, '%Y-%m-%d')
+        _e = _dt_cls.strptime(end_date, '%Y-%m-%d')
+        date_display = (f"{_s.strftime('%b %d').replace(' 0', ' ')} – "
+                        f"{_e.strftime('%b %d, %Y').replace(' 0', ' ')}")
+        date_slug = f"{_s.strftime('%m%d')}-{_e.strftime('%m%d%Y')}"
+        date_label = f"{start_date} to {end_date}"
     # ──────────────────────────────────────────────────────────
+
+    span_label = date_display or year_label
+    if date_filter is not None:
+        print(f"Date window: {date_label}. Every stat is rebuilt from the "
+              f"window's pitches; wRC+ and the + family read '—'.")
 
     if hitter_names:
         team_label = team if team else 'auto-resolve team'
         print(f"═══ Generating hitter cards for {', '.join(hitter_names)} "
-              f"({team_label}) — {year_label} ═══\n")
+              f"({team_label}) — {span_label} ═══\n")
         for name in hitter_names:
             render_hitter_card(name, team_abbrev=team,
                                 year_label=year_label, output_dir=output_dir,
-                                layout=layout, la_view=la_view)
+                                layout=layout, la_view=la_view,
+                                date_filter=date_filter,
+                                date_display=date_display, date_slug=date_slug)
     else:
         # No specific names: render every (qualified) hitter, optionally filtered by team
         leaderboard = load_hitter_leaderboard()
@@ -2773,11 +2965,13 @@ def main():
             targets = [r for r in targets if r.get('team') == team]
         team_label = team if team else 'all teams'
         print(f"═══ Generating hitter cards for {len(targets)} hitters "
-              f"({team_label}) — {year_label} ═══\n")
+              f"({team_label}) — {span_label} ═══\n")
         for r in targets:
             render_hitter_card(r.get('hitter'), team_abbrev=r.get('team'),
                                 year_label=year_label, output_dir=output_dir,
-                                layout=layout, la_view=la_view)
+                                layout=layout, la_view=la_view,
+                                date_filter=date_filter,
+                                date_display=date_display, date_slug=date_slug)
 
 
 if __name__ == '__main__':
