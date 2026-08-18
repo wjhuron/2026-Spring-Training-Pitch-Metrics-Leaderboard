@@ -285,3 +285,6 @@ Keep this file under 500 lines. It loads into every session, and long context ma
 - Barrel is the official `launch_speed_angle` column. Never substitute the EV/LA recompute, which undercounts by about 5%.
 - Percentile pools are all MLB players. Qualification is a render-time coloring gate, not a pool filter.
 - Hitter qualification is 3.1 PA times team games played. Never substitute swing count or BIP count.
+- Never run bare `git commit` here. Use `git commit -- <paths>`. The index routinely holds work in progress (the `pitcher2026.py` settings block, R-scripts, cards), and a bare commit takes everything staged. On 2026-08-17 `c3b9ba28` swept five unrelated files into a commit whose message described only a scraper fix.
+- `scripts/auto-pull.sh` runs `git pull --rebase --autostash` on a launchd timer. It can fire mid-session and leave the artifacts in `data/` conflicted, which makes the next commit fail. Reset them to HEAD; they are all regenerable.
+- Column decimal depth is single-homed in `scrapers/sheet_precision.py`. `pitcher2026.py`, `backfill_full.py` and `backfill_supplement.py` all read it and none of them may carry a rounding list of its own, or a fresh scrape writes truncated values that the next sweep re-upgrades forever.
