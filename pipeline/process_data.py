@@ -1259,13 +1259,29 @@ def _scoring_only_groups(scoring_only):
     return dict(by_pitcher), dict(by_type)
 
 
+class _SkipSeasonOverride(Exception):
+    """Sentinel: a season-scoped merge does not apply to a date-window run."""
+
+
 def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
-                      scoring_only=None):
+                      scoring_only=None, window_mode=False):
     """Process a set of pitches into all leaderboard outputs.
 
     Args:
         all_pitches: list of pitch dicts
         label: 'ST' or 'RS' (for logging)
+        window_mode: True when all_pitches covers a DATE WINDOW rather than a
+            whole season. Everything computed from all_pitches is already
+            correct for the window, including the boxscore merge (its dates
+            are derived from all_pitches below), every league average, the
+            SD+/CT+ cell tables, the BB+ anchor, the Hitter+ standardization
+            and every percentile pool. This flag exists only to suppress the
+            three merges that pull SEASON-scoped numbers from outside
+            all_pitches, which would otherwise put season values on window
+            rows: Savant sprint speed and the two FanGraphs overrides.
+            FanGraphs publishes season totals only, so a window run keeps the
+            pipeline's own wRC+/FIP/xFIP/SIERA. Never set this on a run whose
+            output is written to a shipped `_rs` artifact.
         mlb_id_cache: shared MLB ID cache dict (mutated in place)
         mlb_id_cache_path: path to MLB ID cache file
         scoring_only: pitch dicts to GRADE but never publish (the NEW tab).
@@ -2898,7 +2914,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         hitter_leaderboard.append(row)
 
     # --- Merge Sprint Speed from Baseball Savant ---
-    sprint_speeds = fetch_sprint_speed()
+    # Savant publishes ONE season figure per runner, with no date split, so a
+    # window run leaves the column empty rather than stamping a season number
+    # onto a window row.
+    sprint_speeds = {} if window_mode else fetch_sprint_speed()
     sprint_merged = 0
     for row in hitter_leaderboard:
         mlb_id = row.get('mlbId')
@@ -2912,7 +2931,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             row['sprintSpeed'] = None
             row['nCompRuns'] = 0
             row['sprintQual'] = False
-    print(f"  Sprint speed merged for {sprint_merged}/{len(hitter_leaderboard)} hitters")
+    if window_mode:
+        print("  Sprint speed SKIPPED (window run — Savant has no date split)")
+    else:
+        print(f"  Sprint speed merged for {sprint_merged}/{len(hitter_leaderboard)} hitters")
 
     # --- Determine primary MLB position per hitter (max games, MLB only) ---
     # Source: MLB Stats API per-player season fielding stats. A player with
@@ -3855,7 +3877,12 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # - wOBA / AVG / OBP / SLG / BABIP / OPS / ISO: NOT overridden —
     #   pipeline matches FG to within ±0.0005 (rounding noise), so the
     #   override would be cosmetically identical to the pipeline value.
+    if window_mode:
+        print("  FG hitter override SKIPPED (window run — FG publishes season "
+              "wRC+ only; keeping the pipeline's window wRC+)")
     try:
+        if window_mode:
+            raise _SkipSeasonOverride
         from pipeline.fg_overrides import refresh_if_stale as _fg_refresh
         _fg = _fg_refresh(max_age_hours=24, verbose=True)
         _fg_mlb_h = _fg.get('mlbHitters', {})
@@ -3886,6 +3913,8 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                     # the same Statcast micro). wRC+ has no pipeline equivalent, so
                     # it still comes from FanGraphs.
         print(f"  FG hitter override: wRC+ {n_mlb_wrc}/{n_mlb} MLB + {n_aaa_wrc}/{n_aaa} AAA")
+    except _SkipSeasonOverride:
+        pass
     except Exception as _e:
         print(f"  WARNING: FG hitter override failed ({type(_e).__name__}: {_e})")
 
@@ -4265,6 +4294,8 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # cross-reference. AAA pitchers (_isROC) keep the pipeline values
     # since FG doesn't publish AAA-baseline FIP/xFIP/SIERA cleanly.
     try:
+        if window_mode:
+            raise _SkipSeasonOverride
         from pipeline.fg_overrides import refresh_if_stale as _fg_refresh_pit
         _fg_pit_cache = _fg_refresh_pit(max_age_hours=24, verbose=False)
         _fg_pit = _fg_pit_cache.get('mlbPitchers', {})
@@ -4293,6 +4324,9 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 n_pit_replaced += 1
         print(f"  FG FIP/xFIP/SIERA override: replaced "
               f"{n_pit_replaced}/{n_pit} MLB pitchers with FanGraphs values")
+    except _SkipSeasonOverride:
+        print("  FG pitcher override SKIPPED (window run — FG publishes season "
+              "FIP/xFIP/SIERA only)")
     except Exception as _e:
         print(f"  WARNING: FG pitcher override failed ({type(_e).__name__}: {_e})")
 
