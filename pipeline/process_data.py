@@ -3941,15 +3941,32 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             continue
         _compute_hitter_lg_avg(stat)
 
-    # ── Hitter+ → run-truth scale (2026-08-15, supersedes the plain wRC+
-    # match of 2026-07-13) ──
-    # Measured (scripts/research/hitter/hitter_spread_atlas.py, 2021-2026 replicates):
-    # Hitter+ agrees with same-season wRC+ at r = .815 (range .77-.84), so
-    # one SD of Hitter+ carries 0.82 SD of wRC+ — displaying it at the FULL
-    # wRC+ spread overstated the implied production by 1/r. Target spread is
-    # therefore HITTER_RUN_TRUTH x the pool's live wRC+ SD: points stay
-    # honest wRC+ points, and the anchor stays live (wRC+'s spread deflates
-    # ~23 mid-season -> ~20 full-season; the FACTOR is the season-invariant
+    # ── Hitter+ → run-truth scale (LIVE r since 2026-08-18) ──
+    # THE CONTRACT: Hitter+ is a "+" stat, so one point must be one percent.
+    # 115 means the hitter is 15% better than league average at producing
+    # runs, exactly the way 115 wRC+ does. That is a slope-1 requirement:
+    #
+    #     slope = r x SD(wRC+) / SD(Hitter+)
+    #
+    # so the slope is 1 if and only if SD(Hitter+) = r x SD(wRC+). Note the
+    # direction: matching Hitter+ to wRC+'s FULL spread would BREAK the
+    # contract, not honour it — at SD 20.6 the slope falls to r = 0.795 and a
+    # 115 would be worth only 11.9%. The deflation IS the wRC+ scale.
+    #
+    # r is now measured live every run rather than frozen at the 6-season
+    # mean of 0.82 (per Wally, 2026-08-18): a frozen constant leaves the slope
+    # wherever this season's r happens to sit — it was 0.970 on 2026-08-18,
+    # so a 115 read 14.6% instead of 15.0%. Live r pins it to 1.000 by
+    # construction, every run.
+    # The cost, accepted deliberately: the ruler now moves as r drifts, so a
+    # Hitter+ quoted in May is not the identical ruler as one quoted in
+    # September. Same trade the component re-anchor already makes. The live r
+    # is published in metadata (wrcScaleMatch.r) so any quoted value can be
+    # reconstructed. Guarded below — a thin or degenerate pool falls back to
+    # the frozen constant rather than shipping a wild scale.
+    # Historical context (scripts/research/hitter/hitter_spread_atlas.py,
+    # 2021-2026 replicates): r ran .815 mean, range .77-.84
+    # (wRC+'s spread deflates
     # measured quantity, the SD it multiplies is intentionally current, so
     # the "gap vs wRC+ = process vs results" reading holds all season).
     # Linear around 100: ranks, percentiles, and coloring are unchanged.
@@ -3971,18 +3988,48 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         def _psd(vals):
             m = sum(vals) / len(vals)
             return math.sqrt(sum((x - m) ** 2 for x in vals) / len(vals))
-        HITTER_RUN_TRUTH = 0.82   # measured r(Hitter+, wRC+), 6-season mean
+        HITTER_RUN_TRUTH = 0.82   # fallback only: r(Hitter+, wRC+), 6-season mean
+        # Live r over the qualified pool. r is invariant to the affine rescale
+        # below, so measuring it on the pre-rescale values is the same as
+        # measuring it after.
+        def _pearson(xs, ys):
+            n = len(xs)
+            mx, my = sum(xs) / n, sum(ys) / n
+            sxy = sum((a - mx) * (b - my) for a, b in zip(xs, ys))
+            sxx = sum((a - mx) ** 2 for a in xs)
+            syy = sum((b - my) ** 2 for b in ys)
+            if sxx <= 0 or syy <= 0:
+                return None
+            return sxy / math.sqrt(sxx * syy)
+
         _sd_hp, _sd_wrc = _psd(_pool_hp), _psd(_pool_wrc)
+        # Guard the live measurement. A thin pool (April) or a degenerate
+        # correlation would otherwise ship a wild ruler. The band is wide
+        # enough to admit every season 2021-2026 (.77-.84) and narrow enough
+        # to catch a broken pool.
+        _r_live = _pearson(_pool_hp, _pool_wrc) if len(_pool_hp) >= 30 else None
+        _R_MIN, _R_MAX = 0.40, 0.98
+        if _r_live is not None and _R_MIN <= _r_live <= _R_MAX:
+            _r_used, _r_src = _r_live, 'live'
+        else:
+            _r_used, _r_src = HITTER_RUN_TRUTH, 'frozen'
+            print(f"  Hitter+ run-truth: live r unusable "
+                  f"(r={_r_live if _r_live is not None else 'n/a'}, "
+                  f"n={len(_pool_hp)}) — falling back to the frozen "
+                  f"{HITTER_RUN_TRUTH} constant.")
         if _sd_hp > 1e-9 and _sd_wrc > 1e-9:
-            _f = (HITTER_RUN_TRUTH * _sd_wrc) / _sd_hp
+            _f = (_r_used * _sd_wrc) / _sd_hp
             for _row in hitter_leaderboard:
                 if _row.get('hitterPlus') is not None:
                     _row['hitterPlus'] = round(100.0 + (_row['hitterPlus'] - 100.0) * _f, 1)
             hitter_plus_standardization['wrcScaleMatch'] = {
                 'poolWrcSd': round(_sd_wrc, 3), 'poolHpSd': round(_sd_hp, 3),
-                'factor': round(_f, 4), 'n': len(_pool_hp)}
-            print(f"  Hitter+ rescaled to the wRC+ spread (pool wRC+ SD {_sd_wrc:.1f}, "
-                  f"factor {_f:.3f}, n={len(_pool_hp)}).")
+                'factor': round(_f, 4), 'n': len(_pool_hp),
+                'r': round(_r_used, 4), 'rSource': _r_src,
+                'rLive': (round(_r_live, 4) if _r_live is not None else None)}
+            print(f"  Hitter+ rescaled to slope 1.000 using the {_r_src} "
+                  f"r={_r_used:.3f} (pool wRC+ SD {_sd_wrc:.1f}, factor "
+                  f"{_f:.3f}, n={len(_pool_hp)}). One point = one percent.")
     else:
         print("  Hitter+ wRC+ scale match skipped (wRC+ pool too small) — SD-40 scale stands.")
 
@@ -4033,16 +4080,40 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             m = sum(vals) / len(vals)
             return math.sqrt(sum((x - m) ** 2 for x in vals) / len(vals))
 
-        BB_RUN_TRUTH = 0.66      # measured r(BB+, wRC+), 6-season mean
-        SKILL_RULER_SD = 10.0    # SD+/CT+: Command+-style z-ruler
+        # 2026-08-18, per Wally: the "+" suffix is a CONTRACT with the reader.
+        # If a stat is named X+, then 100 is league average and each point is
+        # one percent better or worse at the thing the stat measures. The
+        # 2026-08-15 spread targeting broke that contract while keeping the
+        # name: it stretched CT+ by 1.41x and squeezed SD+ by 0.59x to force a
+        # pool SD of 10, after which 105 meant "0.5 SD better", not "5% better".
+        #
+        # The ratio-to-league scale each component module already produces IS
+        # the contract, and the multiplicative re-anchor above already pins the
+        # all-MLB PA-weighted mean to 100. So the factor is now 1.0 and only
+        # the tiny additive residual is applied. What each percent is IN:
+        #   BB+  xwOBAcon                      (league ~0.374)
+        #   SD+  mean decision run value       (league ~0.046)
+        #   CT+  actual / expected contact     (league ~1.0 by construction)
+        #
+        # Verified over 2021-2026 (data/_hitter_spread_cache.json) that no
+        # component crosses zero, which is the only thing that would make a
+        # ratio scale incoherent. Lowest raw values across six seasons:
+        # BB+ 0.277, SD+ 0.0163, CT+ 0.745 — all comfortably positive.
+        #
+        # The spreads this produces are deliberately unequal, because the
+        # skills genuinely differ: roughly BB+ 73-158, SD+ 35-145, CT+ 74-124.
+        # A point therefore means the same THING everywhere but not the same
+        # RARITY, which is the trade the "+" convention makes by definition.
+        #
+        # Hitter+ is NOT touched here. It is built above from these three and
+        # is already on the wRC+ point scale, where a point is one percent of
+        # league run production. It satisfies the same contract in run units.
         _sd_wrc_c = _cpsd([r['wRCplus'] for r in _comp_pool])
         for _stat in ('bbPlus', 'sdPlus', 'ctPlus'):
             _sd_c = _cpsd([r[_stat] for r in _comp_pool])
             if _sd_wrc_c <= 1e-9 or _sd_c <= 1e-9:
                 continue
-            _target = (BB_RUN_TRUTH * _sd_wrc_c if _stat == 'bbPlus'
-                       else SKILL_RULER_SD)
-            _f = _target / _sd_c
+            _f = 1.0
             # Rescale around 100 first, unrounded. ROC rows are rescaled with
             # the MLB factor but excluded from the mean, same convention as the
             # multiplicative re-anchor and the percentile pool.
@@ -4068,9 +4139,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             plus_wrc_scale[_stat] = {'factor': round(_f, 6), 'shift': round(_shift, 4)}
         plus_wrc_scale['poolWrcSd'] = round(_sd_wrc_c, 3)
         plus_wrc_scale['n'] = len(_comp_pool)
-        print(f"  BB+/SD+/CT+ rescaled (pool wRC+ SD "
-              f"{_sd_wrc_c:.1f}, n={len(_comp_pool)}): " + ", ".join(
-                  f"{_s} x{plus_wrc_scale[_s]['factor']:.3f}"
+        print(f"  BB+/SD+/CT+ on the ratio-to-league '+' scale "
+              f"(100 = league, 1 point = 1% better at the skill; n="
+              f"{len(_comp_pool)}): " + ", ".join(
+                  f"{_s} SD {_cpsd([r[_s] for r in _comp_pool]):.1f}"
                   for _s in ('bbPlus', 'sdPlus', 'ctPlus') if _s in plus_wrc_scale))
 
         # ── xwRC+ run-truth cap (2026-08-15) ──
