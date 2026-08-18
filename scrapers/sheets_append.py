@@ -369,11 +369,21 @@ def _df_to_rows(df):
     return out
 
 
-def push_team_data(df, team, gc=None, verbose=True):
+def push_team_data(df, team, gc=None, verbose=True, dedupe=True):
     """Append `df` (already filtered to one team's rows) to the sheet tab
     named `team` in whichever workbook owns that team.
 
-    Returns (next_row, n_appended) on success, or None if skipped.
+    dedupe=True (the default) drops any incoming row whose PitchID is already
+    in the tab, so a push can never duplicate what is already there. That makes
+    every pull idempotent: pull a game at the 5th inning, pull it again when it
+    is final, and only the pitches that were not there before get appended.
+
+    This is not hypothetical. On 2026-07-13 a backfill appended 1,187 duplicate
+    rows because nothing checked. Before this guard existed the ONLY protection
+    was remembering not to re-pull.
+
+    Returns (next_row, n_appended) on success, or None if skipped or if
+    everything was already present.
     """
     wb_id = _workbook_id_for_team(team)
     if wb_id is None:
@@ -423,6 +433,33 @@ def push_team_data(df, team, gc=None, verbose=True):
             f"First diffs: {'; '.join(diffs)}. If the schema just changed, "
             f"run the column migration (scripts/archive/migrate_sheets_grade_columns.py) "
             f"or update Pitcher2026's final_columns to match.")
+
+    # ── PitchID dedupe ── Read the tab's existing PitchIDs and drop anything
+    # already present. One extra column read per push, and it is what makes a
+    # re-pull of a partially-scraped game safe.
+    if dedupe:
+        if 'PitchID' not in expected:
+            if verbose:
+                print(f"  [sheets] {team}: no PitchID column — dedupe SKIPPED, "
+                      f"a re-push of the same rows would duplicate them")
+        else:
+            pid_col = expected.index('PitchID') + 1     # gspread is 1-based
+            existing = set(_sheets_retry(
+                lambda: ws.col_values(pid_col),
+                label=f'{team} PitchID read')[1:])      # drop the header cell
+            pid_i = pid_col - 1
+            before = len(rows)
+            rows = [r for r in rows
+                    if pid_i < len(r) and str(r[pid_i]) not in existing]
+            skipped = before - len(rows)
+            if verbose and skipped:
+                print(f"  [sheets] {team}: {skipped} of {before} rows already "
+                      f"in the tab — appending {len(rows)}")
+            if not rows:
+                if verbose:
+                    print(f"  [sheets] {team}: all {before} rows already "
+                          f"present, nothing to append")
+                return None
 
     # First blank row in column A. Header row 1 stays untouched. Using
     # col_values('A') is more reliable than get_all_values() because trailing

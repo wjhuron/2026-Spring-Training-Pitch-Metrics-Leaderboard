@@ -12,11 +12,13 @@ Approach, cheapest path first:
      NOTE the cache lists 23 gamePks under two date keys, three of them with
      disagreeing IBB totals, so games are de-duplicated by MAX before counting.
 
-SCOPE LIMIT: MLB only. The MLB boxscore cache holds no MiLB games, so ROC/AAA
-no-pitch IBBs are NOT enumerated here. Eleven PITCHED intent walks already in
-the pitch cache sit in MiLB game_pks (815xxx-816xxx) outside this cache
-entirely, which is the tell. Covering ROC needs the
-fetch_and_aggregate_milb_boxscores path and is a separate pass.
+ROC/AAA (--source roc) is covered too, on a different path, because the MLB
+boxscore cache holds no MiLB games. Rochester's game_pks come from the pitch
+cache instead, and each one needs a boxscore fetch as well as a playByPlay so
+the pitcher's TEAM NAME is known. Routing follows the scraper's own rule
+(pitcher2026.normalize_aaa_labels): "Rochester Red Wings" becomes ROC and
+every other club becomes AAA, so a Rochester pitcher's row lands in the ROC
+tab and every opposing pitcher's row lands in AAA.
   2. Anything already present as a PITCHED intent walk is subtracted, using
      the pitch cache keyed on (game_pk, batter).
   3. Only the remaining games get a playByPlay fetch. A play qualifies when
@@ -54,6 +56,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 sys.path.insert(0, ROOT)
 DATA = os.path.join(ROOT, 'data')
 PBP = "https://statsapi.mlb.com/api/v1/game/{pk}/playByPlay"
+BOX = "https://statsapi.mlb.com/api/v1/game/{pk}/boxscore"
+ROCHESTER = 'Rochester Red Wings'      # pitcher2026.normalize_aaa_labels
+_NAME_CACHE = {}
 
 
 def _fetch(pk):
@@ -66,8 +71,101 @@ def _fetch(pk):
         return pk, {'_error': f'{type(e).__name__}: {e}'}
 
 
+def _get(url, pk):
+    try:
+        req = urllib.request.Request(url.format(pk=pk),
+                                     headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read())
+    except Exception as e:
+        return {'_error': f'{type(e).__name__}: {e}'}
+
+
+def _lastfirst(pid, fullname=None):
+    """Canonical "Last, First" for a player id. MiLB boxscores omit
+    lastFirstName, so fall back to the people API (cached)."""
+    if pid in _NAME_CACHE:
+        return _NAME_CACHE[pid]
+    out = None
+    d = _get("https://statsapi.mlb.com/api/v1/people/{pk}", pid)
+    if not d.get('_error'):
+        people = d.get('people') or []
+        if people:
+            out = people[0].get('lastFirstName')
+    if not out and fullname and ' ' in fullname:
+        first, _, last = fullname.partition(' ')
+        out = f"{last}, {first}"
+    _NAME_CACHE[pid] = out
+    return out
+
+
+def _roc_rows(have, verbose=True):
+    """No-pitch IBBs in Rochester games. Game list comes from the pitch cache,
+    since the MLB boxscore cache has no MiLB games."""
+    with open(os.path.join(DATA, 'all_pitches_rs_cache.pkl'), 'rb') as f:
+        pks = sorted({int(str(p['PitchID']).split('_')[0])
+                      for p in pickle.load(f)
+                      if p.get('_sheet_tab') in ('ROC', 'AAA') and p.get('PitchID')})
+    print(f"ROC/AAA: {len(pks)} games from the pitch cache")
+    rows, errors = [], []
+    for n, pk in enumerate(pks, 1):
+        if verbose and n % 25 == 0:
+            print(f"    {n}/{len(pks)}...")
+        pbp = _get(PBP, pk)
+        if pbp.get('_error'):
+            errors.append((pk, pbp['_error']))
+            continue
+        iw = [p for p in pbp.get('allPlays', [])
+              if (p.get('result') or {}).get('eventType') == 'intent_walk'
+              and not any(e.get('isPitch') for e in (p.get('playEvents') or []))]
+        if not iw:
+            continue
+        box = _get(BOX, pk)                      # only fetched when needed
+        if box.get('_error'):
+            errors.append((pk, box['_error']))
+            continue
+        team_of, date = {}, None
+        for side in ('away', 'home'):
+            td = (box.get('teams') or {}).get(side) or {}
+            tname = ((td.get('team') or {}).get('name'))
+            tag = 'ROC' if tname == ROCHESTER else 'AAA'
+            for key, pl in (td.get('players') or {}).items():
+                pid = (pl.get('person') or {}).get('id')
+                if pid:
+                    team_of[pid] = tag
+        for play in iw:
+            about, m = play.get('about') or {}, play.get('matchup') or {}
+            bid = (m.get('batter') or {}).get('id')
+            pid = (m.get('pitcher') or {}).get('id')
+            ab = about.get('atBatIndex')
+            rows.append({
+                'gamePk': pk,
+                'gameDate': (about.get('startTime') or '')[:10] or None,
+                'atBatIndex': ab,
+                'PitchID': f"{pk}_{ab:03d}_00" if ab is not None else '',
+                'sheetTab': team_of.get(pid),
+                'PTeam': team_of.get(pid),
+                'Pitcher': _lastfirst(pid, (m.get('pitcher') or {}).get('fullName')),
+                'pitcherMlbId': pid,
+                'Throws': (m.get('pitchHand') or {}).get('code'),
+                'BTeam': team_of.get(bid),
+                'Batter': _lastfirst(bid, (m.get('batter') or {}).get('fullName')),
+                'batterMlbId': bid,
+                'Bats': (m.get('batSide') or {}).get('code'),
+                'Outs': (play.get('count') or {}).get('outs'),
+                'inning': about.get('inning'),
+                'halfInning': about.get('halfInning'),
+                'Event': 'Intent Walk',
+                'alreadyInData': int(bool(have.get((pk, None)))),
+            })
+    if errors:
+        print(f"  *** {len(errors)} ROC games failed to fetch: {errors[:3]}")
+    return rows
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument('--source', choices=['mlb', 'roc', 'both'], default='both')
     ap.add_argument('--out', default=os.path.join(DATA, '_missing_ibb.csv'))
     ap.add_argument('--limit', type=int, default=0, help='cap games, for a smoke test')
     ap.add_argument('--workers', type=int, default=8)
@@ -75,6 +173,8 @@ def main():
 
     with open(os.path.join(DATA, 'boxscore_cache.json')) as f:
         box = json.load(f)
+    do_mlb = a.source in ('mlb', 'both')
+    do_roc = a.source in ('roc', 'both')
 
     # ── candidate games + the identity maps the sheet row needs ──
     # 23 gamePks appear under two date keys, and three of those disagree on
@@ -109,6 +209,8 @@ def main():
                 have[(int(str(p['PitchID']).split('_')[0]), p.get('Batter'))] += 1
     print(f"pitch cache already holds {sum(have.values())} pitched intent walks")
 
+    if not do_mlb:
+        cand = {}
     pks = sorted(cand)
     if a.limit:
         pks = pks[:a.limit]
@@ -156,6 +258,10 @@ def main():
                     'alreadyInData': int(bool(have.get((pk, bname)))),
                 })
 
+    n_mlb = len(rows)
+    if do_roc:
+        rows.extend(_roc_rows(have))
+        print(f"  ROC/AAA no-pitch intent walks: {len(rows) - n_mlb}")
     rows.sort(key=lambda r: (r['gameDate'] or '', r['gamePk'], r['atBatIndex'] or 0))
     with open(a.out, 'w', newline='') as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()) if rows else ['gamePk'])
@@ -163,10 +269,18 @@ def main():
         w.writerows(rows)
 
     unresolved = [r for r in rows if not r['sheetTab'] or not r['Batter']]
-    print(f"\nno-pitch intent walks found: {len(rows)}")
+    n_roc = len(rows) - n_mlb
+    print(f"\nno-pitch intent walks found: {len(rows)}"
+          f"  (MLB {n_mlb}, ROC/AAA {n_roc})")
     print(f"  pitched intent walks skipped (already representable): {pitched_seen}")
-    print(f"  reconciles against {official} official IBB: "
-          f"{len(rows)} + {pitched_seen} = {len(rows) + pitched_seen}")
+    if do_mlb:
+        ok = (n_mlb + pitched_seen) == official
+        print(f"  MLB reconciliation: {n_mlb} + {pitched_seen} = "
+              f"{n_mlb + pitched_seen} against {official} official "
+              f"{'OK' if ok else '*** MISMATCH ***'}")
+    if do_roc:
+        print(f"  ROC/AAA has no official IBB source to reconcile against "
+              f"(the boxscore cache is MLB-only), so {n_roc} is feed-derived only")
     if unresolved:
         print(f"  *** {len(unresolved)} rows missing a team or batter name — "
               f"these need resolving before any write")
