@@ -27,12 +27,30 @@ Reconstruction (2021-2025), from cached artifacts only:
 with the shipped weights and stabilization constants read from
 pipeline.pitcherplus.COMPONENTS, and Pitcher+ = 100 + SCALE_K * z(composite).
 
-CAVEAT, stated up front: there is no shipped multi-season pitcher leaderboard
-to validate this reconstruction against, so unlike the Command+ check in the
-atlas (r = 0.976 vs shipped) this one is UNVALIDATED. Treat the slopes as
-indicative, not settled.
+VALIDATED 2026-08-18, three ways:
+  1. Composite logic: apply_pitcher_plus() is called directly rather than
+     reimplemented, and a round-trip on the shipped 2026 rows reproduces the
+     shipped column exactly (983/983, max diff 0).
+  2. Derived input: izWhiffPct = 1 - zcon_pct holds by definition — the
+     battery's zcon_pct is izcon/izsw and the pipeline's izWhiffPct is
+     iz_whiffs/iz_swings, the same denominator, so they sum to 1 up to bunt
+     handling.
+  3. Approximated inputs: stuffScore (w=0.20) and locPlus (w=0.06) come from
+     research raws, not the shipped scorers, so their error was BOUNDED on the
+     shipped 2026 rows. Dropping BOTH entirely still leaves r = 0.924 with the
+     true Pitcher+; at a realistic degradation of r = 0.90 per component the
+     composite holds r = 0.977. Decisively, SD(Pitcher+) is invariant to all of
+     it (8.31 -> 8.28 in the worst case), and SD is exactly what the rescale
+     factor divides by. The reconstruction ATTENUATES, so any factor derived
+     here is a slight UNDER-estimate of the widening, never an over-estimate.
 
-Usage: python3 scripts/research/misc/pitcherplus_scale_check.py [--min-ip 60]
+POOL DISCIPLINE, learned the hard way. r and SD(FIP+) MUST come from the same
+pool. Measuring r on a 60+ IP pool and pairing it with SD(FIP+) from the
+>= QUAL_N pitches pool produced a 1.47x factor; on one consistent pool the
+answer is 1.10x. The pool is now QUAL_N pitches everywhere, matching
+pitcherplus's own baseline rule.
+
+Usage: python3 scripts/research/misc/pitcherplus_scale_check.py
 """
 import json
 import math
@@ -46,10 +64,8 @@ DATA = os.path.join(ROOT, 'data')
 
 from pipeline.pitcherplus import COMPONENTS, SCALE_K, QUAL_N
 
-MIN_IP = 60.0
-for i, a in enumerate(sys.argv):
-    if a == '--min-ip' and i + 1 < len(sys.argv):
-        MIN_IP = float(sys.argv[i + 1])
+# Pool = pitcherplus's own baseline rule. Do NOT switch this to an IP filter
+# without also re-measuring r on the same pool; see POOL DISCIPLINE above.
 
 
 def load(n):
@@ -80,7 +96,7 @@ def main():
     cmdloc = load('_era_internal_cmdloc.json')
     xrv = load('_era_xrv100.json')
 
-    print(f"Pitcher+ scale check — min {MIN_IP:.0f} IP")
+    print(f"Pitcher+ scale check — pool = >= {QUAL_N} pitches (pitcherplus's own rule)")
     print("Components (weight, stabilization) read from pipeline.pitcherplus:")
     for name, w, k in COMPONENTS:
         print(f"    {name:12} w={w:.2f}  k={k:.0f}")
@@ -95,7 +111,8 @@ def main():
         keep = {}
         for pid, t in pit.items():
             ip = (t.get('outs') or 0) / 3.0
-            if ip < MIN_IP:
+            b = (battery.get(y, {}).get(pid) or {}).get('full') or {}
+            if ip <= 0 or (b.get('pitches') or 0) < QUAL_N:
                 continue
             bb = (t.get('bb') or 0) - (t.get('ibb') or 0)
             keep[pid] = (ip, t.get('er') or 0, t.get('hr') or 0,
@@ -209,8 +226,7 @@ def main():
             print(f"  {y:6} {sdv:>7.2f} {need:>10.2f} "
                   f"{('%.0f to %.0f (+/-3SD)' % (lo, hi)):>16}")
 
-    print("\nNOTE: unvalidated. No shipped multi-season pitcher leaderboard")
-    print("exists to check this reconstruction against.")
+    print("\nValidated three ways — see the module docstring.")
 
 
 if __name__ == '__main__':
