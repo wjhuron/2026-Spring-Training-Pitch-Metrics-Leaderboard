@@ -870,23 +870,38 @@ BUBBLE_COLUMNS = [
         ('GB%',         'gbPct',        'gbPct_pctl',        'pct1'),
     ]),
     ('PLATE DISCIPLINE', [
+        # Outcomes first, then the swing itself in the order it happens:
+        # DECIDE (which pitches he offers at, then the differential those two
+        # rates feed) and then EXECUTE (whether the swing connected).
         ('BB%',         'bbPct',        'bbPct_pctl',        'pct1'),
         ('K%',          'kPct',         'kPct_pctl',         'pct1'),
-        # Ordered outcomes, then swing rates, then contact. Chase% sits
-        # directly above the differential it feeds rather than below it.
-        ('Swing%',      'swingPct',     'swingPct_pctl',     'pct1'),
+        # -- decision --
+        # Z-Swing% replaced Swing% on 2026-08-18 per Wally. Overall Swing% is
+        # directionally ambiguous (more swings only helps if they are aimed
+        # well), which is why it needed its own "higher is not better" note on
+        # the card. Restricting the denominator to strikes removes the
+        # ambiguity: swinging at a strike is the good outcome, so the row
+        # reads higher = better and colors that way with no caveat. izSwingPct
+        # is NOT in HITTER_INVERT_PCTL, so the shipped percentile already runs
+        # in that direction. Same label as the site column (js/leaderboard.js).
+        ('Z-Swing%',    'izSwingPct',   'izSwingPct_pctl',   'pct1'),
+        ('Chase%',      'chasePct',     'chasePct_pctl',     'pct1'),
+        # The differential sits directly under the two rates it subtracts, so
+        # a reader can see both inputs and the result without hunting.
+        # Same label as the site column. Short enough that 'Swing Decisions+'
+        # stays the longest label, so it does not eat into the bar width the
+        # way the fully spelled-out version did.
+        ('Z-Sw% - Chase%', 'izSwChase', 'izSwChase_pctl', 'pct1'),
+        # -- execution --
         # Whiff% restored 2026-08-12 per Wally. Statistically it is close to a
         # triplicate of things already here (r = -0.92 with Z-Contact%, -0.92
         # with Contact+, +0.91 with K%), which is why the 2026-07-20 prune
         # dropped it. It earns the row on readability rather than on new
         # information: swing-and-miss is the number a scout asks for by name.
         ('Whiff%',      'whiffPct',     'whiffPct_pctl',     'pct1'),
-        ('Chase%',      'chasePct',     'chasePct_pctl',     'pct1'),
-        # Z-Swing% minus Chase%: attacking strikes while laying off junk.
-        # Same label as the site column (js/leaderboard.js). Short enough that
-        # 'Swing Decisions+' stays the longest label, so it does not eat into
-        # the bar width the way the fully spelled-out version did.
-        ('Z-Sw% - Chase%', 'izSwChase', 'izSwChase_pctl', 'pct1'),
+        # Whiff% over every swing, then the same idea over in-zone swings
+        # only: the pair reads "misses" then "misses on the pitches he should
+        # not miss".
         ('Z-Contact%',  'izContactPct', 'izContactPct_pctl', 'pct1'),
     ]),
 ]
@@ -2348,7 +2363,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+ are on wRC+\'s scale, '
                 'where 100 is average\n'
                 '•  GB% is colored so that lower = better.\n'
-                '•  Swing% is colored so that higher = more aggressive. Does NOT necessarily mean better.'
+                '•  Z-Swing% and Z-Contact% count in-zone pitches only: swings at '
+                'strikes, and contact on those swings.'
             )
         fig.text(0.020, 0.068, _notes, fontsize=13, color=TEXT_MUTED, va='top',
                  ha='left', fontfamily='IBM Plex Sans', fontweight='600',
@@ -2869,8 +2885,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 def main():
     # ── Settings (edit these directly or override via command line) ──
     team           = "WSH"                   # Team filter (e.g., "NYY"), or None for all teams
-    start_date     = None                 # Set to None for full season
-    end_date       = None                 # Set to a date for date range, or None for single day
+    start_date     = None                         # Set to None for full season
+    end_date       = None                         # Set to a date for date range, or None for single day
     filter_hitters = ""       # Semicolon-separated "Last, First" names, or "" for all
     year_label     = "2026 Season"        # Display label on the card
     output_dir     = OUTPUT_DIR
@@ -2919,6 +2935,13 @@ def main():
     # Resolve the date window. Same rules as cards/pitcher.py: a same-day
     # range collapses to a single date, and no dates means the full season.
     from datetime import datetime as _dt_cls
+    # "--start none" means full season, so it clears end_date too. Without
+    # this, an end_date left in the settings block above sends a start-less
+    # range into strptime(None).
+    if start_date is None and end_date is not None:
+        print("  --start none: ignoring end_date "
+              f"{end_date} and rendering the full season.")
+        end_date = None
     if end_date is not None and end_date == start_date:
         end_date = None
     if start_date is None and end_date is None:
