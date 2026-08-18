@@ -22,7 +22,9 @@ therefore identical by construction to a season run:
 
 `window_mode=True` suppresses only the three merges that reach OUTSIDE the
 pitch set for season-scoped numbers: Savant sprint speed and the two
-FanGraphs overrides. See the docstring on process_game_type.
+FanGraphs overrides. FanGraphs itself DOES serve custom date ranges; it is
+our fg_overrides cache that is season-scoped, so there are no window-matched
+FG values to apply. See the docstring on process_game_type.
 
 Output
 ------

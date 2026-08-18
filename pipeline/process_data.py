@@ -1279,9 +1279,15 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             three merges that pull SEASON-scoped numbers from outside
             all_pitches, which would otherwise put season values on window
             rows: Savant sprint speed and the two FanGraphs overrides.
-            FanGraphs publishes season totals only, so a window run keeps the
-            pipeline's own wRC+/FIP/xFIP/SIERA. Never set this on a run whose
-            output is written to a shipped `_rs` artifact.
+            NOTE on FanGraphs: FG itself DOES serve custom date ranges (its
+            leaderboard takes a start/end range). What is season-scoped is our
+            CACHE — pipeline/fg_overrides.py fetches with season=/seasonEnd=
+            and no dates, so a window run has no matching FG values to apply
+            and keeps the pipeline's own wRC+/FIP/xFIP/SIERA. Teaching
+            fg_overrides to pass the window dates would let the override stay
+            on; it is not wired up yet.
+            Never set this on a run whose output is written to a shipped
+            `_rs` artifact.
         mlb_id_cache: shared MLB ID cache dict (mutated in place)
         mlb_id_cache_path: path to MLB ID cache file
         scoring_only: pitch dicts to GRADE but never publish (the NEW tab).
@@ -3878,8 +3884,8 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     #   pipeline matches FG to within ±0.0005 (rounding noise), so the
     #   override would be cosmetically identical to the pipeline value.
     if window_mode:
-        print("  FG hitter override SKIPPED (window run — FG publishes season "
-              "wRC+ only; keeping the pipeline's window wRC+)")
+        print("  FG hitter override SKIPPED (window run — our FG cache is "
+              "season-scoped; keeping the pipeline's window wRC+)")
     try:
         if window_mode:
             raise _SkipSeasonOverride
@@ -4325,8 +4331,8 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         print(f"  FG FIP/xFIP/SIERA override: replaced "
               f"{n_pit_replaced}/{n_pit} MLB pitchers with FanGraphs values")
     except _SkipSeasonOverride:
-        print("  FG pitcher override SKIPPED (window run — FG publishes season "
-              "FIP/xFIP/SIERA only)")
+        print("  FG pitcher override SKIPPED (window run — our FG cache is "
+              "season-scoped)")
     except Exception as _e:
         print(f"  WARNING: FG pitcher override failed ({type(_e).__name__}: {_e})")
 

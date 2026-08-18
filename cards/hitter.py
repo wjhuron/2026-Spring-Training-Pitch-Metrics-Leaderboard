@@ -1248,9 +1248,11 @@ def _render_percentile_bubbles(fig, h_row):
 # from the shipped season definition of the same stat.
 #
 # Three families stay out of the row, and therefore render as "—":
-#   * wRC+ — the shipped value comes from FanGraphs, which publishes no
-#     window equivalent. Our own formula would be a different quantity
-#     under the same name.
+#   * wRC+ — the shipped value comes from FanGraphs, and our fg_overrides
+#     cache is fetched season-scoped, so there is no window-matched FG value
+#     to use. (FanGraphs DOES serve custom date ranges; we just do not ask
+#     it for them yet.) Our own formula would be a different quantity under
+#     the same name.
 #   * SD+, CT+, BB+, Hitter+ — each needs a whole-league cell table (SD+,
 #     CT+) or the league xwOBAcon anchor (BB+) measured over the SAME
 #     window, which only a pipeline run can produce.
@@ -1669,8 +1671,9 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     # override pipeline run). MLB hitters get wRC+ + xwOBA + xBA + xSLG;
     # AAA hitters get wRC+ only (FG doesn't publish the Statcast
     # expected stats for AAA).
-    # A window card skips this: FanGraphs publishes season totals only, so
-    # the override would put four season values back onto a window card.
+    # A window card skips this: our fg_overrides cache is fetched
+    # season-scoped, so the override would put four SEASON values back onto a
+    # window card. FanGraphs itself does serve custom date ranges.
     try:
         if date_filter is not None:
             # A window pool already ran with window_mode=True, which skipped
@@ -3010,8 +3013,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 def main():
     # ── Settings (edit these directly or override via command line) ──
     team           = "WSH"                   # Team filter (e.g., "NYY"), or None for all teams
-    start_date     = None                         # Set to None for full season
-    end_date       = None                         # Set to a date for date range, or None for single day
+    start_date     = "2026-03-26"                 # Set to None for full season
+    end_date       = "2026-07-12"                 # Set to a date for date range, or None for single day
     filter_hitters = ""       # Semicolon-separated "Last, First" names, or "" for all
     year_label     = "2026 Season"        # Display label on the card
     output_dir     = OUTPUT_DIR
