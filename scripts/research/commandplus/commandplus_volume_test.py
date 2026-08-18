@@ -134,6 +134,10 @@ def main():
             and r.get('Team') != 'ROC']
     mu = sum(pool) / len(pool)
     sigma = math.sqrt(sum((x - mu) ** 2 for x in pool) / len(pool))
+    # STALE SINCE 2026-08-18: Command+ is no longer a z-ruler. It ships as
+    # 200 - 100*miss/lg, so points per inch is now 100/lg_miss (~9.1), not
+    # CMD_SCALE_K/sigma. This script's volume conclusions still hold in RANK
+    # terms; only the points-per-inch translation below is wrong.
     pts_per_inch = CMD_SCALE_K / sigma
     print(f'MLB pool (n={len(pool)}): mean miss {mu:.3f}"  sigma {sigma:.3f}"'
           f'   ->  1 inch = {pts_per_inch:.1f} Command+ points\n')
