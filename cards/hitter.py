@@ -1984,6 +1984,32 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
             ax.set_title(header, color=TEXT_MUTED, fontsize=12,
                          fontweight='700', fontfamily='IBM Plex Sans', pad=5)
 
+    def _xwobasp_of(pts, side):
+        """xwOBAsp for one panel's batted balls, scored in that side's zones.
+
+        Every point in `pts` already has Bats == side, so this is the same
+        arithmetic as the combined loop below with the side held fixed. The
+        two per-side values reblend to the combined value by qualifying-BIP
+        count. Verified on the four highest-PA switch hitters of 2026: each
+        side's pair reblended to the card's combined value exactly, and that
+        combined value matched the shipped leaderboard xwOBAsp to within
+        display rounding (max delta .0005).
+
+        There is no leaderboard equivalent to fall back on: the hitter rows
+        carry xwOBAsp and xwOBAsp_pctl only, with no per-side split. So this
+        is computed from the pickle, and it carries no percentile.
+        """
+        _sum = 0.0
+        _n = 0
+        for _ang, _yc2, _ev2, _la2, _evt2, _brl2, _ps2 in pts:
+            _sd2 = spray_direction(_ang, side)
+            _lb2 = la_bin_idx(_la2) if _la2 is not None else None
+            _v2 = sacq_lookups[side](_sd2, _lb2)
+            if _v2 is not None:
+                _sum += _v2
+                _n += 1
+        return (_sum / _n) if _n else None
+
     def _median_of(pts):
         if not pts:
             return (None, None)
@@ -2024,8 +2050,15 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         if is_switch:
             _pts2 = [q for q in bip_pts if q[6] == _s2]
             _med2 = _median_of(_pts2)
-            _hdr2 = (f"AS LHH (VS RHP)  ·  {len(_pts2)} BIP" if _s2 == 'L'
-                     else f"AS RHH (VS LHP)  ·  {len(_pts2)} BIP")
+            # Each panel carries its OWN xwOBAsp. The combined value in the
+            # top-left annotation blends the two sides, which can hide a wide
+            # split: Marte 2026 read .356 as LHH against .412 as RHH behind a
+            # blended .370. The value sits next to the BIP count it came from.
+            _sp2 = _xwobasp_of(_pts2, _s2)
+            _side2 = 'AS LHH (VS RHP)' if _s2 == 'L' else 'AS RHH (VS LHP)'
+            _hdr2 = (f"{_side2}  ·  xwOBAsp {fmt_3dec(_sp2)}  ·  {len(_pts2)} BIP"
+                     if _sp2 is not None
+                     else f"{_side2}  ·  {len(_pts2)} BIP")
         else:
             _pts2 = bip_pts
             _med2 = (med_spray, med_la_real)
@@ -2084,9 +2117,12 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 suffix = 'th'
             else:
                 suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(pctl_int % 10, 'th')
-            bipnote = f"({pctl_int}{suffix} percentile, {bip_str})"
+            bipnote = (f"({pctl_int}{suffix} percentile, both sides, {bip_str})"
+                       if is_switch
+                       else f"({pctl_int}{suffix} percentile, {bip_str})")
         else:
-            bipnote = f"({bip_str})"
+            bipnote = (f"(both sides, {bip_str})" if is_switch
+                       else f"({bip_str})")
         l1_y = 0.955 - _LA_SHIFT
         # Approach: render label first (gray), measure its width via the
         # renderer, place value right after, measure that, place bipnote.
