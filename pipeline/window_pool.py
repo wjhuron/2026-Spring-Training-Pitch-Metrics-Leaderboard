@@ -1,0 +1,241 @@
+#!/usr/bin/env python3
+"""window_pool.py — score ONE hitter over ANY date range, ranked against the
+SEASON pool.
+
+THE RULE (Wally, 2026-08-18, after I got this wrong twice):
+
+    The VALUES come from the date range. The PERCENTILES come from the
+    season, for everybody. There is no sample-size gate.
+
+So a three-week window that produces an elite rate reads as an elite
+percentile, because that is the point: "for these three weeks he was the best
+hitter in baseball." Comparing a pre-break window to a post-break window then
+works, because both are ranked against the same fixed season ruler.
+
+WHAT I BUILT FIRST AND THREW AWAY. A window-specific all-MLB pool: every
+hitter recomputed over the same range, percentiles ranked inside it, cell
+tables rebuilt over the window. That is a different and worse question. It
+made every window its own ruler, so two windows were not comparable to each
+other, and it needed a qualification gate that returned nothing on short
+ranges. It also mirrored ~150 lines of process_data sequencing and grew four
+bugs in an afternoon. None of that is needed.
+
+WHAT THIS DOES INSTEAD:
+  * window values: computed from the window's pitches by the pipeline's own
+    functions (compute_hitter_stats, compute_expected_stats).
+  * BB+ / SD+ / CT+ / Hitter+: the hitter's WINDOW pitches scored against the
+    SEASON league anchors and cell tables, so the number means "at season
+    league rates, this is what he did over the window".
+  * percentiles: the window value's rank inside the SHIPPED season
+    leaderboard's distribution for that stat, honouring HITTER_INVERT_PCTL.
+    No minimum PA, no qualification, no pool rebuild.
+"""
+
+import math
+
+from pipeline.compute import (
+    compute_hitter_stats, compute_expected_stats,
+    HITTER_STAT_KEYS, HITTER_INVERT_PCTL,
+)
+from pipeline.utils import (
+    NON_PA_EVENTS, HIT_EVENTS, K_EVENTS, BB_EVENTS,
+    HBP_EVENTS, SF_EVENTS, SH_EVENTS, CI_EVENTS,
+)
+
+EXPECTED_KEYS = ['wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon']
+AAA_TEAMS = ('ROC', 'AAA')
+
+HITTER_PLUS_W_BB = 0.52
+HITTER_PLUS_W_SD = 0.17
+HITTER_PLUS_W_CT = 0.31
+
+
+def _is_combined(t):
+    return isinstance(t, str) and t.endswith('TM') and t[:-2].isdigit()
+
+
+def build_window_hitter_row(pitches, metadata, identity=None):
+    """One hitter's raw window row: everything computable from the pitches
+    alone. The + family and percentiles are layered on separately."""
+    row = dict(identity or {})
+    _d = [p.get('Game Date') for p in pitches if p.get('Game Date')]
+    row['count'] = len(pitches)
+    row['lastGameDate'] = max(_d) if _d else None
+    row.update(compute_hitter_stats(pitches))
+    row.update(compute_expected_stats(
+        pitches, woba_weights=metadata.get('wobaWeights')))
+
+    pa_p = [p for p in pitches
+            if p.get('Event') and p['Event'] not in NON_PA_EVENTS]
+    n_pa = len(pa_p)
+    n_h = sum(1 for p in pa_p if p['Event'] in HIT_EVENTS)
+    n_2b = sum(1 for p in pa_p if p['Event'] == 'Double')
+    n_3b = sum(1 for p in pa_p if p['Event'] == 'Triple')
+    n_hr = sum(1 for p in pa_p if p['Event'] == 'Home Run')
+    n_k = sum(1 for p in pa_p if p['Event'] in K_EVENTS)
+    n_bb = sum(1 for p in pa_p if p['Event'] in BB_EVENTS)
+    n_hbp = sum(1 for p in pa_p if p['Event'] in HBP_EVENTS)
+    n_sf = sum(1 for p in pa_p if p['Event'] in SF_EVENTS)
+    n_sh = sum(1 for p in pa_p if p['Event'] in SH_EVENTS)
+    n_ci = sum(1 for p in pa_p if p['Event'] in CI_EVENTS)
+    n_ab = n_pa - n_bb - n_hbp - n_sf - n_sh - n_ci
+    n_tb = n_h + n_2b + 2 * n_3b + 3 * n_hr
+    obp_d = n_ab + n_bb + n_hbp + n_sf
+    row['tb'] = n_tb
+    row['avg'] = round(n_h / n_ab, 3) if n_ab > 0 else None
+    row['obp'] = round((n_h + n_bb + n_hbp) / obp_d, 3) if obp_d > 0 else None
+    row['slg'] = round(n_tb / n_ab, 3) if n_ab > 0 else None
+    row['ops'] = (round(row['obp'] + row['slg'], 3)
+                  if row['obp'] is not None and row['slg'] is not None else None)
+    row['iso'] = (round(row['slg'] - row['avg'], 3)
+                  if row['slg'] is not None and row['avg'] is not None else None)
+    row['kPct'] = round(n_k / n_pa, 4) if n_pa > 0 else None
+    row['bbPct'] = round(n_bb / n_pa, 4) if n_pa > 0 else None
+    row['bbToK'] = (n_bb / n_k) if n_k > 0 else None
+    return row
+
+
+def _season_anchor(season_rows, plus_key, raw_key):
+    """Recover the season league anchor from the shipped leaderboard.
+
+    plus = 100 * raw / lg, so lg = 100 * raw / plus. Taken as the median over
+    every row that has both, which is exact up to display rounding and needs
+    no constant to be re-derived or stored.
+    """
+    v = [100.0 * r[raw_key] / r[plus_key] for r in season_rows
+         if r.get(plus_key) and r.get(raw_key)]
+    if not v:
+        return None
+    v.sort()
+    return v[len(v) // 2]
+
+
+def add_season_percentiles(row, season_rows, stats=None):
+    """Rank each of `row`'s values inside the SEASON distribution.
+
+    No qualification and no minimum sample: a window value is ranked for what
+    it is. Inverted stats (K%, Chase%, Whiff%, GB%...) are flipped, matching
+    process_data's separate inversion pass.
+    """
+    if stats is None:
+        stats = HITTER_STAT_KEYS + EXPECTED_KEYS
+    for stat in stats:
+        val = row.get(stat)
+        pk = stat + '_pctl'
+        if val is None:
+            row[pk] = None
+            continue
+        pool = [r[stat] for r in season_rows if r.get(stat) is not None]
+        if len(pool) < 10:
+            row[pk] = None
+            continue
+        below = sum(1 for x in pool if x < val)
+        equal = sum(1 for x in pool if x == val)
+        p = (below + 0.5 * equal) / len(pool) * 100.0
+        if stat in HITTER_INVERT_PCTL:
+            p = 100.0 - p
+        row[pk] = max(0, min(100, round(p)))
+    return row
+
+
+def score_window_against_season(hitter_key, window_pitches, all_pitches,
+                                season_rows, metadata, verbose=True):
+    """The whole job: one hitter, one date range, season-ranked.
+
+    hitter_key is (hitter, team). Returns the row, ready for the card.
+    """
+    row = build_window_hitter_row(
+        window_pitches, metadata,
+        {'hitter': hitter_key[0], 'team': hitter_key[1],
+         '_isROC': hitter_key[1] in AAA_TEAMS})
+
+    G = metadata.get('gutsConstants') or {}
+
+    # ── BB+ : window xwOBAcon against the SEASON league xwOBAcon ──
+    lg_con = _season_anchor(season_rows, 'bbPlus', 'xwOBAcon')
+    n0 = metadata.get('bbPlusShrinkN0') or 60
+    xc, nb = row.get('xwOBAcon'), row.get('nBip') or 0
+    row['bbPlus'] = (round((nb * (100.0 * xc / lg_con) + n0 * 100.0) / (nb + n0), 1)
+                     if xc is not None and lg_con else None)
+
+    # ── SD+ / CT+ : the hitter's WINDOW swings scored against the SEASON cell
+    # tables. all_pitches builds the league table, so the tables and the
+    # regression anchor are season-scoped; only this hitter's pitches are the
+    # window's. Everyone else is passed at full season so the league mean is
+    # the season's, not a one-hitter artifact.
+    from collections import defaultdict
+    from pipeline.utils import ALL_TEAMS
+    from pipeline.sdplus import compute_sd_plus
+    from pipeline.contact import compute_ct_plus
+    by = defaultdict(list)
+    for p in all_pitches:
+        if p.get('_roc_pitcher_pitch'):
+            continue
+        b, bt = p.get('Batter'), p.get('BTeam')
+        if b and bt and bt in ALL_TEAMS:
+            by[(b, bt)].append(p)
+    by[hitter_key] = window_pitches          # this hitter only, window-scoped
+    if verbose:
+        print(f"    scoring SD+/CT+ against season tables "
+              f"({len(all_pitches)} league pitches)...")
+    sd_res, _ = compute_sd_plus(all_pitches, dict(by),
+                                lg_woba=G.get('lgWOBA'),
+                                woba_scale=G.get('wOBAScale'))
+    ct_res, _ = compute_ct_plus(all_pitches, dict(by),
+                                lg_woba=G.get('lgWOBA'),
+                                woba_scale=G.get('wOBAScale'))
+    s, c = sd_res.get(hitter_key), ct_res.get(hitter_key)
+    row['sdPlus'] = s['sdPlus'] if s else None
+    row['sdPlusRaw'] = round(s['raw_sd_adj'], 5) if s else None
+    row['sdPlusN'] = s['n_decisions'] if s else 0
+    row['ctPlus'] = c['ctPlus'] if c else None
+    row['ctPlusRaw'] = round(c['raw_ct_adj'], 5) if c else None
+    row['ctPlusN'] = c['n_swings'] if c else 0
+
+    # ── Hitter+ : composite on the SEASON standardization, so a window number
+    # sits on the same ruler as the season card and as every other window.
+    std = metadata.get('hitterPlusStandardization') or {}
+    wsm = std.get('wrcScaleMatch') or {}
+    ok = all(std.get(k, {}).get('sd') for k in ('bbPlus', 'sdPlus', 'ctPlus'))
+    if ok and all(row.get(k) is not None for k in ('bbPlus', 'sdPlus', 'ctPlus')):
+        z = (HITTER_PLUS_W_BB * (row['bbPlus'] - std['bbPlus']['mean']) / std['bbPlus']['sd']
+             + HITTER_PLUS_W_SD * (row['sdPlus'] - std['sdPlus']['mean']) / std['sdPlus']['sd']
+             + HITTER_PLUS_W_CT * (row['ctPlus'] - std['ctPlus']['mean']) / std['ctPlus']['sd'])
+        v = 100.0 + (std.get('scale') or 40.0) * z
+        shift = (metadata.get('plusReanchor') or {}).get('hitterPlusShift') or 0.0
+        v += shift
+        if wsm.get('factor'):
+            v = 100.0 + (v - 100.0) * wsm['factor']
+        row['hitterPlus'] = round(v, 1)
+    else:
+        row['hitterPlus'] = None
+
+    # ── wRC+ / xWRC+ from the window's wOBA, season Guts, season park factor ──
+    pf = _load_park_factors().get(hitter_key[1], 1.0)
+    lgw, sc, rpa = G.get('lgWOBA'), G.get('wOBAScale'), G.get('lgRPA')
+    w = row.get('wOBA')
+    if lgw and sc and rpa and rpa > 0 and w is not None:
+        wraa = (w - lgw) / sc
+        row['wRCplus'] = round((wraa + rpa + (rpa - pf * rpa)) / rpa * 100)
+        xw = row.get('xwOBA')
+        row['xWRCplus'] = (round((((xw - lgw) / sc) + rpa) / rpa * 100)
+                           if xw is not None else None)
+    else:
+        row['wRCplus'] = row['xWRCplus'] = None
+
+    add_season_percentiles(row, season_rows)
+    return row
+
+
+def _load_park_factors():
+    """Park factors for wRC+, from data/fg_manual.json (the same fallback the
+    pipeline uses; the live FanGraphs fetch is Cloudflare-blocked locally)."""
+    import json as _json
+    import os
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        'data', 'fg_manual.json')
+    try:
+        with open(path) as f:
+            return (_json.load(f) or {}).get('parkFactors') or {}
+    except (OSError, ValueError):
+        return {}

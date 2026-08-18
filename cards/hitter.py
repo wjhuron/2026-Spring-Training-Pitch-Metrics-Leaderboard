@@ -36,6 +36,7 @@ if _ROOT not in _sys.path:
 
 import argparse
 import json
+import time as _time
 import os
 import pickle
 import sys
@@ -1269,46 +1270,6 @@ WINDOW_UNAVAILABLE = ('wRCplus', 'xWRCplus', 'wRC',
                       'sdPlus', 'ctPlus', 'bbPlus', 'hitterPlus')
 
 
-def window_pool_paths(date_filter):
-    """Paths to the window leaderboard + metadata for a (start, end) filter.
-
-    Must stay in step with scripts/builders/build_window_leaderboard.py, which
-    writes them. Both sides derive the slug the same way from the same pair of
-    dates, so a mismatch shows up as a missing file rather than a wrong pool.
-    """
-    _lo, _hi = date_filter
-    slug = f"{_lo.replace('-', '')}_{_hi.replace('-', '')}"
-    return (slug,
-            os.path.join(_REPO, 'data', f'_window_{slug}_hitter_leaderboard.json'),
-            os.path.join(_REPO, 'data', f'_window_{slug}_metadata.json'))
-
-
-def load_window_pool(date_filter):
-    """Load the window leaderboard + metadata, or (None, None, slug) if absent.
-
-    When present, this is the ONLY honest source for percentile bubbles and
-    the + family on a window card: it was produced by process_game_type over
-    exactly this window, so every value and every percentile pool matches how
-    a season card is built. When absent the card degrades to a row rebuilt
-    from the hitter's own pitches, which cannot carry a percentile.
-    """
-    slug, lb_path, md_path = window_pool_paths(date_filter)
-    if not (os.path.exists(lb_path) and os.path.exists(md_path)):
-        return None, None, slug
-    try:
-        with open(lb_path) as f:
-            rows = json.load(f)
-        with open(md_path) as f:
-            md = json.load(f)
-    except (OSError, ValueError) as e:
-        print(f"  WARNING: window pool {slug} exists but will not load ({e}) — "
-              f"falling back to a pitch-rebuilt row")
-        return None, None, slug
-    if not rows:
-        return None, None, slug
-    return rows, md, slug
-
-
 class _SkipFGOverride(Exception):
     """Sentinel: the FanGraphs season override does not apply to this card."""
 
@@ -1428,6 +1389,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         single = [r for r in hitter_rows if not (str(r.get('team', '')).endswith('TM'))]
         hitter_rows = single or hitter_rows
     h_row = hitter_rows[0]
+    _season_row = dict(h_row)   # identity fields a window row cannot derive
     team = h_row.get('team') or team_abbrev or '???'
     bats = h_row.get('stands') or 'R'
 
@@ -1474,42 +1436,30 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         print(f"  Date window {_lo} → {_hi}: "
               f"{len(hitter_pitches)} of {_season_n} season pitches")
 
-        # Prefer a window POOL built by scripts/builders/build_window_leaderboard.py.
-        # That pool came out of process_game_type over exactly this window, so
-        # its rows and percentiles are built the same way a season card's are:
-        # PA and the slash line from the window's own official boxscores, the
-        # SD+/CT+ cell tables and BB+ anchor rebuilt over the window, and every
-        # percentile ranked against the window's all-MLB pool.
-        _pool_rows, _pool_md, _slug = load_window_pool(date_filter)
-        if _pool_rows is not None:
-            _cands = [r for r in _pool_rows if r.get('hitter') == hitter_name]
-            if team_abbrev:
-                _cands = [r for r in _cands if r.get('team') == team_abbrev]
-            if len(_cands) > 1:
-                _single = [r for r in _cands
-                           if not str(r.get('team', '')).endswith('TM')]
-                _cands = _single or _cands
-            if _cands:
-                h_row = _cands[0]
-                metadata = _pool_md
-                window_pool = True
-                print(f"  Window pool {_slug}: {len(_pool_rows)} hitter rows. "
-                      f"Percentiles and the + family are measured over this "
-                      f"window, the same way a season card measures them.")
-                print(f"  {h_row.get('pa')} PA (official boxscore), "
-                      f"Hitter+ {h_row.get('hitterPlus')}, "
-                      f"wRC+ {h_row.get('wRCplus')}")
-            else:
-                print(f"  WARNING: window pool {_slug} has no row for "
-                      f"{hitter_name} — falling back to a pitch-rebuilt row")
-        if not window_pool:
-            h_row = _build_window_hitter_row(h_row, hitter_pitches, metadata)
-            print(f"  Rebuilt from window pitches: {h_row.get('pa')} PA, "
-                  f"{h_row.get('nBip')} BIP. No percentiles: a percentile needs "
-                  f"an all-MLB pool over the same window.")
-            print(f"  For bubbles and the + family, build the window pool first:")
-            print(f"    python3 scripts/builders/build_window_leaderboard.py "
-                  f"{_lo} {_hi}")
+        # Values from the window; percentiles from the SEASON pool, for every
+        # stat, with no sample-size gate. A hot three-week stretch is allowed
+        # to read as an elite percentile — that is the whole point, and it is
+        # what makes two windows comparable to each other.
+        try:
+            from pipeline.window_pool import score_window_against_season
+            _t0 = _time.time()
+            h_row = score_window_against_season(
+                (hitter_name, h_row.get('team') or team),
+                hitter_pitches, all_pitches, hitter_lb, metadata)
+            h_row.update({k: v for k, v in _season_row.items()
+                          if k in ('mlbId', 'age', 'throws', 'position',
+                                   'stands', 'sprintSpeed', 'sprintSpeed_pctl')
+                          and v is not None})
+            window_pool = True
+            print(f"  Scored in {_time.time() - _t0:.1f}s. "
+                  f"{h_row.get('pa')} PA, Hitter+ {h_row.get('hitterPlus')}, "
+                  f"wRC+ {h_row.get('wRCplus')}. Percentiles rank this window "
+                  f"against the full-season MLB pool.")
+        except Exception as _e:
+            import traceback; traceback.print_exc()
+            print(f"  WARNING: window scoring failed ({_e}) — "
+                  f"falling back to a pitch-rebuilt row with no percentiles")
+            h_row = _build_window_hitter_row(_season_row, hitter_pitches, metadata)
 
     print(f"  {len(hitter_pitches)} pitches faced")
 
@@ -2472,8 +2422,9 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+: 100 is league '
                 'average and each point is 1% better or worse, the way wRC+ reads.\n'
                 '•  GB% is colored so that lower = better.\n'
-                '•  Every value AND every percentile is measured over this date '
-                'window only, against all MLB hitters over the same window.'
+                '•  Values are measured over this date window. Percentiles rank '
+                'those values against the FULL-SEASON MLB pool, with no minimum '
+                'sample: a hot stretch is allowed to read elite.'
             )
         elif date_filter is not None:
             # Window card with no pool. Say plainly which numbers are missing
