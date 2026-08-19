@@ -46,8 +46,64 @@ and calibration are MLB).
 import json
 import os
 
-from pipeline.utils import DATA_DIR
-PARK_PATH = os.path.join(DATA_DIR, 'era_park_factors.json')
+from pipeline.utils import DATA_DIR, TEAM_ABBREV_TO_ID, MLB_TEAMS
+PARK_PATH = os.path.join(DATA_DIR, 'park_factors.json')
+
+
+def _load_park(season):
+    """{team abbrev -> runs park factor, 100 = neutral} for `season`.
+
+    Reads data/park_factors.json — the SAME Savant file the hpERA weights
+    were fit on (scripts/research/era/era_weights_final.py, through
+    era_estimator_screen.park_exposure) — and resolves it through
+    TEAM_ABBREV_TO_ID.
+
+    The file is keyed by NUMERIC MLB club id on purpose. An abbreviation
+    key silently misses whenever two sources spell a club differently, and
+    that is exactly what happened: data/era_park_factors.json was a
+    hand-copied 2026 snapshot keyed AZ/KC/SD/SF/TB with no Athletics row
+    at all, while the leaderboard rows read ARI/KCR/SDP/SFG/TBR/ATH. Six
+    clubs, 167 pitcher rows, scored hpERA against a neutral park from
+    2026-08-15 to 2026-08-19. A club id cannot be spelled two ways.
+
+    A club that fails to resolve is a bug, not a neutral park, so it is
+    announced. Multi-team labels (2TM..10TM) and ROC are not franchises
+    and stay neutral in silence.
+    """
+    try:
+        with open(PARK_PATH) as f:
+            allpf = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        print('  eraplus WARNING: data/park_factors.json missing — '
+              'ALL PARKS NEUTRAL. Rebuild with '
+              'scripts/builders/park_factors_pull.py')
+        return {}
+    key = str(season)
+    if key not in allpf:
+        avail = sorted(k for k in allpf if k.isdigit())
+        if not avail:
+            print('  eraplus WARNING: park_factors.json holds no season — '
+                  'ALL PARKS NEUTRAL')
+            return {}
+        key = avail[-1]
+        print(f'  eraplus WARNING: no park factors for {season}, '
+              f'falling back to {key}')
+    byid = allpf[key]
+    park = {}
+    missing = []
+    for abbr in MLB_TEAMS:
+        tid = TEAM_ABBREV_TO_ID.get(abbr)
+        pf = byid.get(str(tid)) if tid is not None else None
+        if pf is None:
+            if abbr != 'WBC':
+                missing.append(abbr)
+            continue
+        park[abbr] = pf
+    if missing:
+        print(f'  eraplus WARNING: no {key} park factor for '
+              f'{", ".join(sorted(missing))} — those rows score NEUTRAL. '
+              f'Rebuild with scripts/builders/park_factors_pull.py')
+    return park
 
 POOL_MIN_OUTS = 90          # 30 IP: z-pool and anchor population
 QUAL_OUTS = 180             # 60 IP: percentile pool (site convention)
@@ -174,7 +230,7 @@ def _channels(row, xrv_map, park, is_combined):
 
 
 def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
-                   is_combined_fn=None):
+                   is_combined_fn=None, season=None):
     """Set hdERA / hpERA / hdERAPlus / hpERAPlus (+ _pctl each) in place.
     Returns the constants bundle for metadata, or None if the pool is too
     thin. `pitches` = the MLB+MiLB pitch dicts (sheet schema) for the
@@ -183,12 +239,10 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
     if is_combined_fn is None:
         def is_combined_fn(team):
             return isinstance(team, str) and team.endswith('TM')
-    try:
-        with open(PARK_PATH) as f:
-            park = json.load(f)
-    except (OSError, json.JSONDecodeError):
-        park = {}
-        print('  eraplus WARNING: park factors missing, all parks neutral')
+    if season is None:
+        from datetime import datetime as _dt
+        season = _dt.now().year
+    park = _load_park(season)
 
     xrv_map = compute_xrv_map(pitches, aaa)
 
@@ -310,7 +364,7 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
             'locScaleK': LOC_SCALE_K}
 
 
-def score_scratch_row(row, pitches, g, gs, team, const):
+def score_scratch_row(row, pitches, g, gs, team, const, season=None):
     """Best-effort (hdERA, hpERA) for a WINDOW/SCRATCH pitcher (NEW-tab
     season cards): the same channels, z-scored against the PUBLISHED pool
     stats from `const` (metadata eraPlusConstants). Two documented
@@ -377,12 +431,10 @@ def score_scratch_row(row, pitches, g, gs, team, const):
     else:
         zs['xrv'] = None
     zs['gs'] = z('gs', (gs or 0) / g) if g else None
-    try:
-        with open(PARK_PATH) as f:
-            park = json.load(f)
-    except (OSError, json.JSONDecodeError):
-        park = {}
-    zs['park'] = z('park', park.get(team, 100.0) / 100.0)
+    if season is None:
+        from datetime import datetime as _dt
+        season = _dt.now().year
+    zs['park'] = z('park', _load_park(season).get(team, 100.0) / 100.0)
 
     ph = None
     if all(zs.get(c) is not None for c in W_PH):
