@@ -3287,10 +3287,27 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # Mirrored in js/aggregator.js via metadata bbPlusWeights /
     # bbPlusShrinkN0Con / bbPlusShrinkN0Ev / bbPlusEvPct — BB+ is the ONLY
     # "+" recomputed client-side, so both sides move in the same commit.
-    BB_PLUS_W_CON = 0.30
-    BB_PLUS_W_EV  = 0.70
+    # REVERTED 2026-08-19 to pure xwOBAcon+ at the measured n0=60.
+    #
+    # The 0.30/0.70 xwOBAcon/EV95 blend shipped earlier today was WRONG and
+    # is withdrawn. It blended two ratio-to-league quantities in
+    # incommensurable units: SD(conPlus) is about 15 and SD(evPlus) about
+    # 2.6, so "one percent" means something ~4x larger on the EV channel.
+    # The derivation that chose the weights maximised held-out CORRELATION,
+    # which is scale-invariant and therefore blind to units, so nothing in
+    # it could catch this. The result printed at slope 3.19 on true
+    # xwOBAcon%: BB+ 114 meant 44% above league, not 14%, and the whole
+    # qualified pool collapsed to SD 4.6 (range 89.5-113.7) against 12.9.
+    #
+    # The EV95 channel itself is real — it carries +.0311 held-out
+    # descriptive and +.0270 predictive over pure xwOBAcon, 6/6 seasons and
+    # 5/5 pairs. It returns once the derivation is redone with both channels
+    # in xwOBAcon units and re-validated under nested leave-one-season-out.
+    # Do NOT reinstate the blend from the old constants.
+    BB_PLUS_W_CON = 1.0
+    BB_PLUS_W_EV  = 0.0
     BB_PLUS_W_SP  = 0.0
-    BB_PLUS_N0_CON = 200
+    BB_PLUS_N0_CON = 60
     BB_PLUS_N0_EV  = 0
     BB_PLUS_EV_PCT = 95
     # Display floor only. Below it a score is mostly prior, not worth a cell.
@@ -3304,11 +3321,16 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         sv = row.get('sprayVal')
         n_bip = row.get('nBip') or 0
         sp_ok = (BB_PLUS_W_SP == 0.0 or sv is not None)
-        if (xc is not None and ev is not None and sp_ok
-                and lg_xwobacon_bb and lg_ev95_bb
+        # An ingredient is only REQUIRED when it carries weight. Without this
+        # a zero-weighted EV term still blanks every hitter missing ev95 —
+        # which is every ROC hitter before the minors supplement lands.
+        # Mirrors the same guard in js/aggregator.js.
+        ev_ok = (BB_PLUS_W_EV == 0.0 or (ev is not None and lg_ev95_bb))
+        if (xc is not None and ev_ok and sp_ok
+                and lg_xwobacon_bb
                 and n_bip >= BB_PLUS_MIN_BIP):
             con_plus = 100.0 * xc / lg_xwobacon_bb
-            ev_plus = 100.0 * ev / lg_ev95_bb
+            ev_plus = (100.0 * ev / lg_ev95_bb) if BB_PLUS_W_EV else 100.0
             # sprayPlus: the residual re-expressed on the xwOBAcon scale so
             # the ratio-to-100 convention holds (100 + 100·resid/lg).
             sp_plus = (100.0 * (lg_xwobacon_bb + sv) / lg_xwobacon_bb
@@ -3321,7 +3343,8 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                              + BB_PLUS_W_EV * ev_adj
                              + BB_PLUS_W_SP * sp_plus)
         else:
-            if xc is not None and ev is None and n_bip >= BB_PLUS_MIN_BIP:
+            if (BB_PLUS_W_EV and xc is not None and ev is None
+                    and n_bip >= BB_PLUS_MIN_BIP):
                 _bb_missing_ev += 1
             row['bbPlus'] = None
     if _bb_missing_ev:

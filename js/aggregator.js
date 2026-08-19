@@ -2494,7 +2494,7 @@ const Aggregator = {
       // metadata gap degrades to the shipped definition, not to a wrong one.
       const bbN0Con = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusShrinkN0Con);
       const bbN0Ev = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusShrinkN0Ev);
-      const n0Con = (bbN0Con != null) ? bbN0Con : 200;
+      const n0Con = (bbN0Con != null) ? bbN0Con : 60;
       const n0Ev = (bbN0Ev != null) ? bbN0Ev : 0;
       const lgEV95 = hLgAvgs.ev95;
       const bbMinBip = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusMinBip) || 30;
