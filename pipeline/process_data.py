@@ -3419,9 +3419,9 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         # ranks against MLB, doesn't contribute to the MLB baseline).
         if _row.get('_isROC') or _row.get('_isCombined'):
             continue
+        # Loop skips _isROC and _isCombined above, so this is always a real
+        # MLB club. Never fall back to a league-wide max here.
         _team_g = team_games_played.get(_row.get('team'))
-        if _team_g is None and team_games_played:
-            _team_g = max(team_games_played.values())
         _pa_thresh = _hitter_pa_per_game(False) * (_team_g or 0)
         if _team_g and _row.get('pa', 0) >= _pa_thresh and \
            _row.get('bbPlus') is not None and _row.get('sdPlus') is not None and _row.get('ctPlus') is not None:
@@ -3982,9 +3982,9 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     for _row in hitter_leaderboard:
         if _row.get('_isROC') or _row.get('_isCombined'):
             continue
+        # Loop skips _isROC and _isCombined above, so this is always a real
+        # MLB club. Never fall back to a league-wide max here.
         _team_g = team_games_played.get(_row.get('team'))
-        if _team_g is None and team_games_played:
-            _team_g = max(team_games_played.values())
         if not _team_g or _row.get('pa', 0) < _hitter_pa_per_game(False) * _team_g:
             continue
         if _row.get('hitterPlus') is None or _row.get('wRCplus') is None:
@@ -4071,9 +4071,9 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     for _row in hitter_leaderboard:
         if _row.get('_isROC') or _row.get('_isCombined'):
             continue
+        # Loop skips _isROC and _isCombined above, so this is always a real
+        # MLB club. Never fall back to a league-wide max here.
         _team_g = team_games_played.get(_row.get('team'))
-        if _team_g is None and team_games_played:
-            _team_g = max(team_games_played.values())
         if not _team_g or _row.get('pa', 0) < _hitter_pa_per_game(False) * _team_g:
             continue
         if _row.get('wRCplus') is None:
@@ -4447,25 +4447,40 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # is kept for correctness/consistency with the frontend.
     from pipeline.utils import (
         hitter_pa_per_game, pitcher_ip_per_game, SP_GS_RATIO,
+        is_combined_team, player_key, current_team_by_player,
     )
 
+    # Which club supplies the denominator. A combined 2TM/3TM row resolves to
+    # the team the player is on now; everything else uses its own team. This
+    # mirrors Utils.buildQualContext in js/utils.js — the two must agree or the
+    # shipped percentiles and the site's render gate disagree.
+    _pitcher_current_team = current_team_by_player(pitcher_leaderboard, 'pitcher', AAA_TEAMS)
+    _hitter_current_team = current_team_by_player(hitter_leaderboard, 'hitter', AAA_TEAMS)
+
+    def _qual_team_games(row, name_key, current_team):
+        team = row.get('team')
+        if is_combined_team(team):
+            # The label is a player, not a franchise, so it has no schedule.
+            # This used to fall through to max(team_games_played.values()),
+            # which made every traded player clear the league's longest
+            # schedule (127) instead of his own club's.
+            team = current_team.get(player_key(row, name_key))
+        # No entry means no rate, and "unknown" is not "qualified".
+        return team_games_played.get(team) or 0
+
     def _hitter_qualified_for_pctl(row):
-        pa = row.get('pa', 0) or 0
-        tg = team_games_played.get(row.get('team'))
-        if tg is None and team_games_played:
-            tg = max(team_games_played.values())
+        tg = _qual_team_games(row, 'hitter', _hitter_current_team)
         if not tg:
             return False
+        pa = row.get('pa', 0) or 0
         return pa >= hitter_pa_per_game(bool(row.get('_isROC'))) * tg
 
     def _pitcher_qualified_for_pctl(row):
-        ip_str = row.get('ip')
-        ip_f = ip_str_to_float(ip_str) if ip_str is not None else 0
-        tg = team_games_played.get(row.get('team'))
-        if tg is None and team_games_played:
-            tg = max(team_games_played.values())
+        tg = _qual_team_games(row, 'pitcher', _pitcher_current_team)
         if not tg:
             return False
+        ip_str = row.get('ip')
+        ip_f = ip_str_to_float(ip_str) if ip_str is not None else 0
         g = row.get('g') or 0
         gs = row.get('gs') or 0
         is_starter = g > 0 and (gs / g) > SP_GS_RATIO

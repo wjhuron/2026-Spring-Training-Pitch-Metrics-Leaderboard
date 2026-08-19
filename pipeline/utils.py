@@ -149,6 +149,56 @@ def pitcher_ip_per_game(is_starter, is_roc):
     return QUAL_SP_IP_PER_GAME_MLB if is_starter else QUAL_RP_IP_PER_GAME_MLB
 
 
+def is_combined_team(team):
+    """'2TM', '3TM' ... '10TM'. A multi-team LABEL, not a franchise.
+
+    It has no schedule of its own, so it must never supply a team-games
+    denominator. Mirrors Utils.isCombinedTeam in js/utils.js.
+    """
+    return isinstance(team, str) and team.endswith('TM') and team[:-2].isdigit()
+
+
+def player_key(row, name_key):
+    """Group a player's per-team and combined rows.
+
+    Keys on mlbId when present so two players sharing a name (two 'Max Muncy')
+    do not collide. Mirrors Utils.playerKey in js/utils.js and the local
+    _player_key in pipeline/compute.py.
+    """
+    mid = row.get('mlbId')
+    if mid is not None and mid != '':
+        return 'id:' + str(mid)
+    return 'nm:' + str(row.get(name_key) or '')
+
+
+def current_team_by_player(rows, name_key, roc_teams):
+    """Map player key -> the MLB club the player most recently played for.
+
+    A multi-team player is measured against the club he is on now (Wally,
+    2026-08-19). Only MLB stints count, so a player sent down still measures
+    against his last MLB club rather than against Rochester. Reads the
+    lastGameDate that both row builders in process_data emit.
+
+    Mirrors the denomTeam resolution in Utils.buildQualContext (js/utils.js);
+    the two must agree or the site and the shipped percentiles diverge.
+    """
+    best = {}
+    for row in rows:
+        team = row.get('team')
+        if is_combined_team(team) or team in roc_teams:
+            continue
+        date = row.get('lastGameDate')
+        if not date:
+            continue
+        key = player_key(row, name_key)
+        prev = best.get(key)
+        # A tie is impossible in practice: one player plays for one club on one
+        # date. Break it on team code so the answer never depends on row order.
+        if prev is None or date > prev[0] or (date == prev[0] and team < prev[1]):
+            best[key] = (date, team)
+    return {k: v[1] for k, v in best.items()}
+
+
 def box_key(name, team, mlb_id):
     """Aggregation / lookup key for boxscore stats.
 
