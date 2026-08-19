@@ -16,7 +16,6 @@ from collections import defaultdict
 
 # ── Pipeline modules ─────────────────────────────────────────────────────
 from pipeline.utils import (
-    real_pitches,
     safe_float, normalize_date, _today_et, avg, median, round_metric,
     is_barrel, spray_angle, spray_direction,
     break_tilt_to_minutes, circular_mean_minutes, minutes_to_tilt_display,
@@ -1748,9 +1747,8 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             'team': team,
             'throws': throws,
             'pitchType': pitch_type,
-            'count': len(real_pitches(pitches)),  # no-pitch PA markers are not pitches
-            'usagePct': (round(len(real_pitches(pitches)) / total_for_pitcher, 4)
-                         if total_for_pitcher > 0 else None),
+            'count': len(pitches),
+            'usagePct': round(len(pitches) / total_for_pitcher, 4) if total_for_pitcher > 0 else None,
             'mlbId': get_mlb_id(pitcher, team),
             '_isROC': team in AAA_TEAMS,
         }
@@ -2206,7 +2204,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             'pitcher': pitcher,
             'team': team,
             'throws': throws,
-            'count': len(real_pitches(pitches)),  # no-pitch PA markers are not pitches
+            'count': len(pitches),
             'mlbId': get_mlb_id(pitcher, team),
             '_isROC': team in AAA_TEAMS,
         }
@@ -2886,7 +2884,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             'hitter': hitter,
             'team': team,
             'stands': stands,
-            'count': len(real_pitches(pitches)),  # no-pitch PA markers are not pitches
+            'count': len(pitches),
             'mlbId': get_mlb_id(hitter, team),
             '_isROC': team in AAA_TEAMS,
             'lastGameDate': last_game_date,
@@ -3082,7 +3080,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
 
     hitter_pitch_leaderboard = []
     for (hitter, team), pitches in hitter_groups.items():
-        total_count = len(real_pitches(pitches))  # no-pitch PA markers are not pitches
+        total_count = len(pitches)
         stands_set = set(p.get('Bats') for p in pitches if p.get('Bats'))
         stands = 'S' if len(stands_set) > 1 else (stands_set.pop() if stands_set else None)
 

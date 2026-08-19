@@ -2250,10 +2250,7 @@ def render_card(config, pitches, output_file):
         ax_table = fig.add_axes([TABLE_LEFT_FIG, 0.015, TABLE_RIGHT_FIG-TABLE_LEFT_FIG, 0.205])
     ax_table.axis('off'); ax_table.set_facecolor(BG)
 
-    # No-pitch PA markers are not pitches: keep them out of the usage
-    # denominator on the arsenal table.
-    from pipeline.utils import real_pitches as _real
-    tc = len(_real(pitches))
+    tc = len(pitches)
     pitch_stats = []
     is_season = bool(config.get('mvn_models'))
     # Per-pitch-type Loc+ (location quality, 100 = pitch-type group avg). Comes
@@ -3594,8 +3591,7 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
                                   compute_pitcher_batted_ball, compute_xrv)
 
     pitches = ctx['norm_by_pitcher'].get(pitcher_name) or []
-    from pipeline.utils import real_pitches as _real
-    n = len(_real(pitches))          # PA markers are not pitches
+    n = len(pitches)
     if n == 0:
         return None, {}, {}
     throws = pitches[0].get('Throws')

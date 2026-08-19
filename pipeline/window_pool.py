@@ -38,7 +38,6 @@ from pipeline.compute import (
     HITTER_STAT_KEYS, HITTER_INVERT_PCTL,
 )
 from pipeline.utils import (
-    real_pitches,
     NON_PA_EVENTS, HIT_EVENTS, K_EVENTS, BB_EVENTS,
     HBP_EVENTS, SF_EVENTS, SH_EVENTS, CI_EVENTS,
 )
@@ -60,7 +59,7 @@ def build_window_hitter_row(pitches, metadata, identity=None):
     alone. The + family and percentiles are layered on separately."""
     row = dict(identity or {})
     _d = [p.get('Game Date') for p in pitches if p.get('Game Date')]
-    row['count'] = len(real_pitches(pitches))   # PA markers are not pitches
+    row['count'] = len(pitches)
     row['lastGameDate'] = max(_d) if _d else None
     row.update(compute_hitter_stats(pitches))
     row.update(compute_expected_stats(

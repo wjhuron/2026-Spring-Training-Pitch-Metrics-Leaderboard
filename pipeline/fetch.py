@@ -464,16 +464,42 @@ def read_new_tab_pitches(gc=None):
     return rows
 
 
-def read_all_pitches_from_sheets():
+def read_all_pitches_from_sheets(include_no_pitch=False):
     """Read all RS pitches from the six 2026 division workbooks (the Sheets the
     site reads). NLE2026's ROC/AAA tabs come in via extra_tabs; FCL is skipped
-    (not in MLB_TEAMS)."""
+    (not in MLB_TEAMS).
+
+    No-pitch plate appearances are EXCLUDED by default. Since 2017 an automatic
+    intentional walk contains no pitches, and those PAs are now recorded in the
+    sheets as marker rows (PitchID ending _00) so the source of truth is
+    complete. But roughly fifty places downstream count rows as pitches and
+    only about five count plate appearances, so the safe default is "pitches"
+    and PA-level callers opt in.
+
+    Filtering here, at the ONE boundary, is what makes every existing consumer
+    correct without touching it. The alternative - teaching each per-pitch
+    denominator to skip these rows - was tried on 2026-08-18 and did not
+    converge: `c[0] += 1` in four micro loops, `usagePct`'s denominator, and a
+    `not in BALL_DESCRIPTIONS` numerator that counted a no-pitch row as a
+    STRIKE were each found only after the previous fix looked complete.
+
+    include_no_pitch=True is for PA-level work: the completeness audit, and any
+    research that needs pitch-derived PA to reconcile to official totals.
+    """
     gc = _gspread_client()
     pitches = []
     for name, wid in DIVISION_WORKBOOK_IDS.items():
         extra = {'ROC', 'AAA'} if name == 'NLE2026' else None
         pitches += read_pitches_from_sheet(gc, wid, extra_tabs=extra)
-    return pitches
+    if include_no_pitch:
+        return pitches
+    from pipeline.utils import real_pitches
+    kept = real_pitches(pitches)
+    n_dropped = len(pitches) - len(kept)
+    if n_dropped:
+        print(f"  Excluded {n_dropped} no-pitch PA markers (intentional walks). "
+              f"Pass include_no_pitch=True for PA-level work.")
+    return kept
 
 
 # ── MLB ID lookup ────────────────────────────────────────────────────────
