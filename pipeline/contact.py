@@ -38,10 +38,24 @@ Cells are (zone × count × FB/BRK/OFF) since 2026-08-15, with the same
 cascade shrinkage as SD+: cell → (zone × cat) → zone, k=CELL_SHRINK_K
 per level.
 The old "pitch-type expansion added <1% residual variance" claim did not
-survive replicate testing — cat3 won split-half reliability 6/6 seasons
-2021-2026 and next-season prediction 4/4 pairs (+0.005/+0.004), and wins
-at the Hitter+ composite level (scripts/research/hitter/hitter_phase2b_followup.py,
-hitterplus_weights_v2.py).
+survive replicate testing — cat3 wins next-season prediction 4/4 pairs
+(+0.005) and wins at the Hitter+ composite level
+(scripts/research/hitter/hitter_phase2b_followup.py, hitterplus_weights_v2.py).
+
+cat3 is justified by PREDICTION ONLY. Its split-half reliability gain is
+NOT evidence and must not be quoted as such: the permuted-label placebo in
+scripts/research/hitter/hitter_meta_validation.py reproduces it and then
+some. Measured 2026-08-19 over 18 season-seed cells, 2021-2026:
+
+    ct_zc (no cat3)      rel 0.7123
+    ct_cat3 (shipped)    rel 0.7157     beats the placebo in only 2/18
+    ct_cat3_placebo      rel 0.7216     beats no-cat3 in 18/18
+
+So the whole reliability gain is parameter flexibility. The predictive
+separation is the real signal — there the placebo (+0.0131) is
+indistinguishable from no cat3 (+0.0132) while real cat3 reaches +0.0178.
+A prior comment here claimed the 6/6 reliability win as supporting
+evidence; it does not survive its own placebo.
 """
 import math
 from collections import defaultdict
