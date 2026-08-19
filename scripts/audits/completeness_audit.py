@@ -5,7 +5,10 @@ events in the SHEETS pitch data per game, with the two BY-DESIGN absences
 accounted for:
 
   1. No-pitch intentional walks — since 2017 an automatic IBB contains no
-     pitches, so it can never appear in pitch-level data (~290/season).
+     pitches. BACKFILLED 2026-08-18: 320 marker rows (312 MLB + 8 ROC/AAA,
+     PitchID ending _00) were appended to the sheets, so this absence should
+     now be CLOSED when read with include_no_pitch=True. A remaining gap here
+     means the backfill missed something.
   2. Position-player pitching — historical only: through 2026-07-13 the
      pipeline dropped every EP-appearance pitch before the cache, so cache
      audits under-counted (~437 PAs). Policy changed the same day: EP PAs now
@@ -33,7 +36,10 @@ from pipeline.utils import NON_PA_EVENTS
 
 def sheet_pitches():
     from pipeline.fetch import read_all_pitches_from_sheets
-    return read_all_pitches_from_sheets()
+    # PA-level audit: opt in to the no-pitch IBB markers. They are excluded by
+    # default (see the docstring there) because ~50 downstream consumers count
+    # rows as pitches; this is one of the few places that counts PAs.
+    return read_all_pitches_from_sheets(include_no_pitch=True)
 
 
 def cache_pitches():
