@@ -330,6 +330,29 @@ def median(values):
     return (nums[n // 2 - 1] + nums[n // 2]) / 2
 
 
+def percentile(values, q):
+    """Linear-interpolated percentile, ignoring None values. q is 0-100.
+
+    Matches numpy.percentile's default ('linear') method, which is what the
+    BB+ EV-ingredient derivation was run on
+    (scripts/research/hitter/bbplus_ev_derivation.py).
+
+    MIRRORED in js/aggregator.js as `percentileLinear`. BB+ is the one "+"
+    the client recomputes under filters, so the two implementations must
+    agree exactly or a filtered BB+ drifts from the shipped one. Change one
+    and change the other in the same commit.
+    """
+    nums = sorted(v for v in values if v is not None)
+    if not nums:
+        return None
+    idx = (len(nums) - 1) * q / 100.0
+    lo = math.floor(idx)
+    hi = math.ceil(idx)
+    if lo == hi:
+        return nums[int(idx)]
+    return nums[lo] + (nums[hi] - nums[lo]) * (idx - lo)
+
+
 def round_metric(key, value):
     """Round a metric value according to its type."""
     if value is None:

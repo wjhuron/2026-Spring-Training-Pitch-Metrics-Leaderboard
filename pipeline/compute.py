@@ -5,7 +5,7 @@ import math
 from collections import defaultdict
 
 from pipeline.utils import (
-    safe_float, median, is_barrel, is_swing,
+    safe_float, median, percentile, is_barrel, is_swing,
     spray_angle, spray_direction,
     SWING_DESCRIPTIONS, HIT_EVENTS, K_EVENTS, BB_EVENTS, HBP_EVENTS,
     SF_EVENTS, SH_EVENTS, CI_EVENTS, NON_PA_EVENTS, BUNT_BB_TYPES,
@@ -47,7 +47,7 @@ PITCHER_INVERT_PCTL = {'bbPct', 'babip', 'era', 'fip', 'xFIP', 'siera'}
 HITTER_STAT_KEYS = [
     'avg', 'obp', 'slg', 'ops', 'iso', 'babip', 'kPct', 'bbPct', 'bbToK',
     'wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'xwOBAsp', 'sprayVal', 'bbPlus',
-    'avgEVAll', 'ev50', 'maxEV', 'hardHitPct', 'barrelPct',
+    'avgEVAll', 'ev50', 'ev95', 'maxEV', 'hardHitPct', 'barrelPct',
     'gbPct', 'ldPct', 'fbPct', 'puPct', 'hrFbPct',
     'pullPct', 'middlePct', 'oppoPct', 'airPullPct',
     'swingPct', 'izSwingPct', 'chasePct', 'izSwChase', 'contactPct', 'izContactPct', 'whiffPct', 'sdPlus', 'ctPlus',
@@ -496,10 +496,16 @@ def compute_hitter_stats(pitches):
     all_evs = [safe_float(p.get('ExitVelo')) for p in bip]
     all_evs = [v for v in all_evs if v is not None]
     ev50 = None
+    ev95 = None
     if all_evs:
         sorted_evs = sorted(all_evs, reverse=True)
         top_half = sorted_evs[:max(1, len(sorted_evs) // 2)]
         ev50 = round(sum(top_half) / len(top_half), 1)
+        # BB+ ingredient. A mean of a heavy-tailed per-BIP quantity is a weak
+        # estimator of contact-quality skill; a high EV percentile is far more
+        # stable. Stored rounded so the server value and the client's filtered
+        # recompute in js/aggregator.js agree exactly.
+        ev95 = round(percentile(all_evs, 95), 1)
 
     has_barrel_col = any(str(p.get('Barrel', '')).strip() != '' for p in bip)
     if has_barrel_col:
@@ -621,6 +627,7 @@ def compute_hitter_stats(pitches):
         'xbh': xbh,
         'avgEVAll': round(sum(ev_valid) / len(ev_valid), 1) if ev_valid else None,
         'ev50': ev50,
+        'ev95': ev95,
         'maxEV': round(max(ev_valid), 1) if ev_valid else None,
         'medLA': round(median(all_la), 1) if all_la else None,
         'medSpray': round(median(all_spray), 1) if all_spray else None,

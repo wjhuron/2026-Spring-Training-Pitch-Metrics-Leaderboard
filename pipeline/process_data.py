@@ -3207,7 +3207,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 'wOBA', 'xBA', 'xSLG', 'xwOBA', 'rv100', 'xRv100',
                 'swingPct', 'izSwingPct', 'chasePct', 'izSwChase', 'contactPct', 'izContactPct', 'whiffPct'}
     # Batted ball stats weighted by nBip
-    bip_stats = {'avgEVAll', 'ev50', 'maxEV', 'medLA', 'hardHitPct', 'barrelPct',
+    bip_stats = {'avgEVAll', 'ev50', 'ev95', 'maxEV', 'medLA', 'hardHitPct', 'barrelPct',
                  'xwOBAcon', 'xwOBAsp', 'sprayVal',
                  'gbPct', 'ldPct', 'fbPct', 'puPct',
                  'pullPct', 'middlePct', 'oppoPct', 'airPullPct'}
@@ -3238,51 +3238,97 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     hitter_league_avgs['count'] = len(hitter_lb_mlb)
 
     # BB+ — batted-ball contact-quality index indexed to 100 = league avg.
-    # 2026-07-13 redefinition (multi-season derivation): BB+ is PURE
-    # xwOBAcon+. The 0.15 spray weight (prior-informed, 2026-07-02) was
-    # retired by the 2021-2025 season-pair test (scripts/
-    # derive_weights_multiseason.py, 1,181 hitter-pairs, year-N components →
-    # year-N+1 wOBA): sprayVal's univariate r was -0.03 and its ridge beta
-    # NEGATIVE; the pure-con BB+ beat the 85/15 mix in every leave-one-
-    # pair-out fold. sprayVal stays a display/scouting stat — it's a real
-    # trait (split-half r=.33), it just adds nothing to forecasting value
-    # once xwOBAcon is in the composite.
-    BB_PLUS_W_CON = 1.0
+    #
+    # TWO INGREDIENTS since 2026-08-19: mean xwOBAcon and the 95th-percentile
+    # exit velocity. BB+ was pure xwOBAcon+, and a mean of a heavy-tailed
+    # per-BIP quantity is a weak estimator of the underlying skill. EV95
+    # measures the same skill far more stably, so the two are blended.
+    #
+    #     raw = W_CON·shrink(conPlus, nBip, N0_CON)
+    #         + W_EV ·shrink(evPlus,  nBip, N0_EV)
+    #
+    # Each ingredient is shrunk at its OWN n0 BEFORE blending, which is NOT
+    # the same as blending then shrinking once — but only because the two n0
+    # differ. Shrinkage is linear, so with one shared n0 and one denominator
+    # the two forms are algebraically identical. The whole gain here comes
+    # from xwOBAcon needing heavy shrinkage (200) while EV95 needs none (0).
+    #
+    # Derivation: scripts/research/hitter/bbplus_ev_derivation.py, results in
+    # data/_bbplus_ev_derivation.json. Leave-one-SEASON-out (the folds inside
+    # a season share games, so seasons are the independent unit), 3 seeds,
+    # 2021-2026, config and composite weights fitted on training seasons only.
+    # Held-out gain over pure-xwOBAcon BB+: +.0311 descriptive on actual wOBA
+    # (6/6 seasons) and +.0270 predictive on next-season wOBA (5/5 pairs).
+    #
+    # W_EV 0.70 reads alarming and is not: the ingredients have very different
+    # spreads, SD(conPlus) ≈ 15 against SD(evPlus) ≈ 2.6, so 0.70 in plus
+    # units buys EV about 28% of the standardised variance.
+    #
+    # Constants, labelled honestly. Percentile 95: p90 and p95 are
+    # indistinguishable (.5601 vs .5610) — a FLAT region, not a bracketed
+    # peak; p95 is the consistent argmax (6/6 nested picks) and carries no
+    # sample-size penalty (see below). W_EV 0.70: a genuine interior optimum
+    # with curvature both sides. N0_CON 200: interior optimum but flat to
+    # .0003 across 130-280, so anything in that band works. N0_EV 0: the
+    # argmax and a real endpoint, meaning EV95 is not shrunk at all.
+    #
+    # DO NOT substitute max EV. It won the raw percentile sweep and is an
+    # artifact: a maximum grows mechanically with the number of batted balls,
+    # BIP count tracks playing time, and playing time tracks quality. maxEV
+    # correlates .389 with nBip against .225 for p95; with log(nBip)
+    # controlled it LOSES. Within sample-size bands p90 and p95 are identical
+    # (.141/.141, .088/.089) and only maxEV stays contaminated (.158, .186).
+    #
+    # sprayVal was retired as an ingredient on 2026-07-13 (ridge beta
+    # negative; the pure-con BB+ beat the 85/15 mix in every fold). The
+    # weight is kept in the metadata contract at 0.0 so the JS mirror stays
+    # general.
+    #
+    # Mirrored in js/aggregator.js via metadata bbPlusWeights /
+    # bbPlusShrinkN0Con / bbPlusShrinkN0Ev / bbPlusEvPct — BB+ is the ONLY
+    # "+" recomputed client-side, so both sides move in the same commit.
+    BB_PLUS_W_CON = 0.30
+    BB_PLUS_W_EV  = 0.70
     BB_PLUS_W_SP  = 0.0
-    # Reliability handling: Bayesian shrinkage toward league (100), matching
-    # the SD+/CT+ convention, replacing the old hard 80-BIP gate. n0 = 60:
-    # the same-protocol split-half study (scripts/research/hitter/bbplus_n0_cliff_test.py +
-    # n0_remeasure_ship.py, 2021-2026) put the implied n0 at 54-66 at EVERY
-    # sample size tested (59 consensus for the pure-con definition) — a
-    # near-perfect rel(n)=n/(n+n0) fit. Sub-80-BIP signal is real (50-79
-    # BIP band predicts next-season wOBA at r=+.33 vs +.38 for 80+), so
-    # shrink it, don't hide it. MIN_BIP=30 is a display floor only (below
-    # it a score is >2/3 prior — not worth a cell).
-    # Mirrored in js/aggregator.js via metadata bbPlusWeights/bbPlusShrinkN0
-    # (the only place BB+ is recomputed client-side).
-    BB_PLUS_SHRINK_N0 = 60
+    BB_PLUS_N0_CON = 200
+    BB_PLUS_N0_EV  = 0
+    BB_PLUS_EV_PCT = 95
+    # Display floor only. Below it a score is mostly prior, not worth a cell.
     BB_PLUS_MIN_BIP = 30
     lg_xwobacon_bb = hitter_league_avgs.get('xwOBAcon')
+    lg_ev95_bb = hitter_league_avgs.get('ev95')
+    _bb_missing_ev = 0
     for row in hitter_leaderboard:
         xc = row.get('xwOBAcon')
+        ev = row.get('ev95')
         sv = row.get('sprayVal')
         n_bip = row.get('nBip') or 0
         sp_ok = (BB_PLUS_W_SP == 0.0 or sv is not None)
-        if (xc is not None and sp_ok and lg_xwobacon_bb
+        if (xc is not None and ev is not None and sp_ok
+                and lg_xwobacon_bb and lg_ev95_bb
                 and n_bip >= BB_PLUS_MIN_BIP):
             con_plus = 100.0 * xc / lg_xwobacon_bb
+            ev_plus = 100.0 * ev / lg_ev95_bb
             # sprayPlus: the residual re-expressed on the xwOBAcon scale so
             # the ratio-to-100 convention holds (100 + 100·resid/lg).
-            # Weight is 0.0 as of 2026-07-13; term kept so the metadata
-            # weight contract (and the JS mirror) stays general.
             sp_plus = (100.0 * (lg_xwobacon_bb + sv) / lg_xwobacon_bb
                        if sv is not None else 100.0)
-            raw = BB_PLUS_W_CON * con_plus + BB_PLUS_W_SP * sp_plus
-            row['bbPlus'] = round(
-                (n_bip * raw + BB_PLUS_SHRINK_N0 * 100.0)
-                / (n_bip + BB_PLUS_SHRINK_N0), 1)
+            con_adj = ((n_bip * con_plus + BB_PLUS_N0_CON * 100.0)
+                       / (n_bip + BB_PLUS_N0_CON))
+            ev_adj = ((n_bip * ev_plus + BB_PLUS_N0_EV * 100.0)
+                      / (n_bip + BB_PLUS_N0_EV))
+            row['bbPlus'] = round(BB_PLUS_W_CON * con_adj
+                                  + BB_PLUS_W_EV * ev_adj
+                                  + BB_PLUS_W_SP * sp_plus, 1)
         else:
+            if xc is not None and ev is None and n_bip >= BB_PLUS_MIN_BIP:
+                _bb_missing_ev += 1
             row['bbPlus'] = None
+    if _bb_missing_ev:
+        # Fail loud: an EV feed gap silently blanks BB+ and therefore Hitter+.
+        print(f"  WARNING: {_bb_missing_ev} hitters have xwOBAcon but no ev95 "
+              f"— BB+ and Hitter+ are None for them. Check the ExitVelo "
+              f"column in the sheets before publishing.")
     hitter_league_avgs['bbPlus'] = 100.0
 
     # PD+ is retired. Superseded by SD+ (decision) and CT+ (contact-frequency).
@@ -3582,8 +3628,11 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         # BB+ component weights + shrinkage — single source of truth, read by
         # js/aggregator.js so the client recompute can never drift from the
         # server again (the 0.6/0.4 → 0.585/0.415 desync shipped for months).
-        'bbPlusWeights': {'con': BB_PLUS_W_CON, 'sp': BB_PLUS_W_SP},
-        'bbPlusShrinkN0': BB_PLUS_SHRINK_N0,
+        'bbPlusWeights': {'con': BB_PLUS_W_CON, 'ev': BB_PLUS_W_EV,
+                          'sp': BB_PLUS_W_SP},
+        'bbPlusShrinkN0Con': BB_PLUS_N0_CON,
+        'bbPlusShrinkN0Ev': BB_PLUS_N0_EV,
+        'bbPlusEvPct': BB_PLUS_EV_PCT,
         'bbPlusMinBip': BB_PLUS_MIN_BIP,
         # Tier 2: 3D xwOBA table used to fill ROC BIP xwOBA (no Savant
         # per-pitch xwOBA available for AAA). For transparency / audit.

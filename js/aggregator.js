@@ -2208,10 +2208,24 @@ const Aggregator = {
       return arr.length % 2 === 1 ? arr[mid] : (arr[mid - 1] + arr[mid]) / 2;
     }
 
+    // Linear-interpolated percentile, q in 0-100. MIRRORS
+    // pipeline/utils.py:percentile (numpy's default 'linear' method), which
+    // is what the BB+ EV-ingredient derivation was run on. BB+ is the only
+    // "+" recomputed here, so the two implementations must agree exactly or
+    // a filtered BB+ drifts from the shipped one. Change one, change both.
+    function percentileLinear(arr, q) {
+      if (arr.length === 0) return null;
+      const s = arr.slice().sort(function (a, b) { return a - b; });
+      const idx = (s.length - 1) * q / 100;
+      const lo = Math.floor(idx), hi = Math.ceil(idx);
+      if (lo === hi) return s[idx];
+      return s[lo] + (s[hi] - s[lo]) * (idx - lo);
+    }
+
     const HITTER_STAT_KEYS = [
       'avg', 'obp', 'slg', 'ops', 'iso', 'wOBA', 'babip', 'kPct', 'bbPct', 'bbToK',
       'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'xwOBAsp', 'sprayVal', 'bbPlus',
-      'avgEVAll', 'ev50', 'maxEV', 'hardHitPct', 'barrelPct',
+      'avgEVAll', 'ev50', 'ev95', 'maxEV', 'hardHitPct', 'barrelPct',
       'gbPct', 'ldPct', 'fbPct', 'puPct', 'hrFbPct',
       'pullPct', 'airPullPct',
       'swingPct', 'izSwingPct', 'chasePct', 'izSwChase', 'contactPct', 'izContactPct', 'whiffPct', 'sdPlus', 'ctPlus',
@@ -2327,6 +2341,12 @@ const Aggregator = {
         ev50 = Math.round(topHalf.reduce(function (s, v) { return s + v; }, 0) / topHalf.length * 10) / 10;
       }
 
+      // EV95 — the BB+ exit-velocity ingredient. Rounded to 1 decimal, the
+      // same as the server stores it, so the filtered recompute below lands
+      // on the identical value.
+      const ev95 = evsAll.length > 0
+        ? Math.round(percentileLinear(evsAll, 95) * 10) / 10 : null;
+
       // hardHitPct and barrelPct: use EV-valid count as denominator (not total BIP)
       const hardHitPct = evsAll.length > 0 ? hardHit / evsAll.length : null;
 
@@ -2396,6 +2416,7 @@ const Aggregator = {
         babip: babip_val,
         avgEVAll: avgEVAll,
         ev50: ev50,
+        ev95: ev95,
         maxEV: maxEV,
         medLA: medLA,
         hardHitPct: hardHitPct,
@@ -2466,16 +2487,32 @@ const Aggregator = {
       // (Hitter+ is pass-through season value, not recomputed client-side,
       // so it's gated server-side instead.)
       const bbW = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusWeights) || null;
-      const bbN0 = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusShrinkN0) || 60;
+      // Two ingredients since 2026-08-19, each shrunk at its OWN n0 BEFORE
+      // blending. That is not the same as blending then shrinking once,
+      // because the two n0 differ (xwOBAcon 200, EV95 0) — see the BB+ block
+      // in pipeline/process_data.py. Defaults mirror the derived config so a
+      // metadata gap degrades to the shipped definition, not to a wrong one.
+      const bbN0Con = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusShrinkN0Con);
+      const bbN0Ev = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusShrinkN0Ev);
+      const n0Con = (bbN0Con != null) ? bbN0Con : 200;
+      const n0Ev = (bbN0Ev != null) ? bbN0Ev : 0;
+      const lgEV95 = hLgAvgs.ev95;
       const bbMinBip = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusMinBip) || 30;
       const nBipBB = obj.nBip || 0;
       const spOk = bbW && (bbW.sp === 0 || obj.sprayVal != null);
-      if (obj.xwOBAcon != null && spOk && lgXC && bbW && nBipBB >= bbMinBip) {
+      const wEv = (bbW && bbW.ev != null) ? bbW.ev : 0;
+      // The EV ingredient is required whenever it carries weight. Blanking
+      // BB+ is the correct degrade: silently dropping the term would ship a
+      // BB+ on a different scale from the server's.
+      const evOk = (wEv === 0) || (obj.ev95 != null && lgEV95);
+      if (obj.xwOBAcon != null && spOk && evOk && lgXC && bbW && nBipBB >= bbMinBip) {
         const conPlus = 100 * obj.xwOBAcon / lgXC;
+        const evPlus = (wEv === 0) ? 100 : 100 * obj.ev95 / lgEV95;
         const spPlus = obj.sprayVal != null ? 100 * (lgXC + obj.sprayVal) / lgXC : 100;
-        const rawBB = bbW.con * conPlus + bbW.sp * spPlus;
+        const conAdj = (nBipBB * conPlus + n0Con * 100) / (nBipBB + n0Con);
+        const evAdj = (nBipBB * evPlus + n0Ev * 100) / (nBipBB + n0Ev);
         // Shrink BEFORE the re-anchor, mirroring the server order.
-        const shrunkBB = (nBipBB * rawBB + bbN0 * 100) / (nBipBB + bbN0);
+        const shrunkBB = bbW.con * conAdj + wEv * evAdj + bbW.sp * spPlus;
         // Mirror the server's re-anchor (all-MLB PA-weighted mean = 100).
         // sd/ct/hitterPlus are pass-through; bbPlus is the only "+"
         // recomputed client-side, so it must apply the same factor.
