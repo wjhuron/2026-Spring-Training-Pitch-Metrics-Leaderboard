@@ -481,7 +481,11 @@ def regress_and_normalize(hitter_raw, n_prior=HITTER_PRIOR_N,
 
     for v in eligible.values():
         if abs(lg_mean) > 1e-6:
-            v['sdPlus'] = round(100.0 * v['raw_sd_adj'] / lg_mean, 1)
+            # Unrounded on purpose. sdPlus passes through a re-anchor and a
+            # wRC+ scale match in process_data before it is stored, and
+            # rounding at each stage accumulated up to 0.1. Rounded ONCE, at
+            # the end of that chain (search: FINAL PRECISION PASS).
+            v['sdPlus'] = 100.0 * v['raw_sd_adj'] / lg_mean
         else:
             v['sdPlus'] = 100.0
     return eligible

@@ -239,6 +239,15 @@ def _bridge():
     leaderboard, which carries both. Absent that file, 2026 is skipped."""
     p = os.path.join(ROOT, 'data', '_bt_seasons.json')
     if not os.path.exists(p):
+        # Announce the degrade. Without this file the 2026 rows keep their
+        # name keys, never join to the id-keyed seasons, and silently vanish
+        # from every fold — the results would still print, one replicate
+        # short, with nothing to say so.
+        print(f"WARNING: {p} missing — 2026 cannot be bridged from name keys "
+              f"to MLBAM ids, so it is DROPPED from every fold. Results below "
+              f"are 2021-2025 only. Repull with the Savant bat-tracking "
+              f"leaderboard (seasonStart/seasonEnd, not season).",
+              file=sys.stderr)
         return None
     m = {}
     for y in ('2026', '2025', '2024'):

@@ -354,7 +354,9 @@ def regress_and_normalize(hitter_raw, n_prior=HITTER_PRIOR_N,
 
     for v in eligible.values():
         if abs(lg_mean) > 1e-6:
-            v['ctPlus'] = round(100.0 * v['raw_ct_adj'] / lg_mean, 1)
+            # Unrounded on purpose — see the note in sdplus.py. Rounded
+            # ONCE at the end of the chain (search: FINAL PRECISION PASS).
+            v['ctPlus'] = 100.0 * v['raw_ct_adj'] / lg_mean
         else:
             v['ctPlus'] = 100.0
     return eligible

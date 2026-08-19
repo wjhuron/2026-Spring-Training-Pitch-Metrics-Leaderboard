@@ -2530,7 +2530,12 @@ const Aggregator = {
         if (bbWrc && bbWrc.factor) {
           bbVal = 100 + (bbVal - 100) * bbWrc.factor + (bbWrc.shift || 0);
         }
-        obj.bbPlus = Math.round(bbVal * 10) / 10;
+        // 6 dp, matching PLUS_STORE_DP in pipeline/process_data.py. The
+        // server now rounds ONCE at the end of its chain, so rounding here
+        // to the same precision is what makes a filtered BB+ agree with the
+        // shipped one instead of landing 0.1 away. Display is an integer
+        // (Utils.formatInt), so this precision is never shown.
+        obj.bbPlus = Math.round(bbVal * 1e6) / 1e6;
       } else {
         obj.bbPlus = null;
       }

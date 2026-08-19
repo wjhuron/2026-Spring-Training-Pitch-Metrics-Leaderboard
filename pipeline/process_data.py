@@ -3317,9 +3317,9 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                        / (n_bip + BB_PLUS_N0_CON))
             ev_adj = ((n_bip * ev_plus + BB_PLUS_N0_EV * 100.0)
                       / (n_bip + BB_PLUS_N0_EV))
-            row['bbPlus'] = round(BB_PLUS_W_CON * con_adj
-                                  + BB_PLUS_W_EV * ev_adj
-                                  + BB_PLUS_W_SP * sp_plus, 1)
+            row['bbPlus'] = (BB_PLUS_W_CON * con_adj
+                             + BB_PLUS_W_EV * ev_adj
+                             + BB_PLUS_W_SP * sp_plus)
         else:
             if xc is not None and ev is None and n_bip >= BB_PLUS_MIN_BIP:
                 _bb_missing_ev += 1
@@ -3514,7 +3514,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
 
     for row in hitter_leaderboard:
         z = _composite_z(row)
-        row['hitterPlus'] = round(100 + _scale * z, 1) if z is not None else None
+        row['hitterPlus'] = (100 + _scale * z) if z is not None else None
     hitter_league_avgs['hitterPlus'] = 100.0
     print(f"  Hitter+ computed (BB+/SD+/CT+ composite, weights "
           f"{HITTER_PLUS_W_BB:.0%}/{HITTER_PLUS_W_SD:.0%}/{HITTER_PLUS_W_CT:.0%}, "
@@ -3547,6 +3547,11 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         _wsum = sum(_w for _, _w in _pairs)
         return sum(_v * _w for _v, _w in _pairs) / _wsum if _wsum > 0 else None
 
+    # Scaling factors published in metadata AND applied to the values must be
+    # the same number. round_floats_inplace() caps artifact floats at 6 dp, so
+    # 6 is the ceiling the client can ever read; anything finer is applied by
+    # the server and invisible to js/aggregator.js.
+    PLUS_FACTOR_DP = 6
     plus_reanchor = {}
     # Populated much later (needs wRC+, which the boxscore merge computes
     # below); declared here so the metadata dict can hold the reference.
@@ -3554,11 +3559,19 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     for _stat in ('bbPlus', 'sdPlus', 'ctPlus'):
         _mean = _all_mlb_pa_weighted_mean(_stat)
         if _mean and abs(_mean) > 1e-9:
-            _f = 100.0 / _mean
-            plus_reanchor[_stat] = round(_f, 6)
+            # PUBLISHED PRECISION IS APPLIED PRECISION. js/aggregator.js
+            # multiplies its filtered BB+ by this factor, and it can only read
+            # what reaches the artifact — where round_floats_inplace() caps
+            # every float at 6 decimals. So round HERE, before applying, and
+            # publish the same number. Raising the published precision instead
+            # is a no-op: the writer flattens it back to 6 and the server ends
+            # up applying a factor the client cannot see, which is what left
+            # BB+ 2e-5 off on every row.
+            _f = round(100.0 / _mean, PLUS_FACTOR_DP)
+            plus_reanchor[_stat] = _f
             for _r in hitter_leaderboard:
                 if _r.get(_stat) is not None:
-                    _r[_stat] = round(_r[_stat] * _f, 1)
+                    _r[_stat] = _r[_stat] * _f
             # Keep the Hitter+ standardization metadata consistent with the
             # re-anchored component scale (mean & sd scale by the factor).
             _sd_meta = hitter_plus_standardization.get(_stat)
@@ -3567,11 +3580,11 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 _sd_meta['sd'] = round(_sd_meta['sd'] * _f, 3)
     _mean_h = _all_mlb_pa_weighted_mean('hitterPlus')
     if _mean_h is not None:
-        _shift = 100.0 - _mean_h
-        plus_reanchor['hitterPlusShift'] = round(_shift, 4)
+        _shift = round(100.0 - _mean_h, PLUS_FACTOR_DP)
+        plus_reanchor['hitterPlusShift'] = _shift
         for _r in hitter_leaderboard:
             if _r.get('hitterPlus') is not None:
-                _r['hitterPlus'] = round(_r['hitterPlus'] + _shift, 1)
+                _r['hitterPlus'] = _r['hitterPlus'] + _shift
     # 100 = PA-weighted mean of ALL MLB hitters (FG/Savant convention).
     hitter_league_avgs['bbPlus'] = 100.0
     hitter_league_avgs['sdPlus'] = 100.0
@@ -4077,7 +4090,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             _f = (_r_used * _sd_wrc) / _sd_hp
             for _row in hitter_leaderboard:
                 if _row.get('hitterPlus') is not None:
-                    _row['hitterPlus'] = round(100.0 + (_row['hitterPlus'] - 100.0) * _f, 1)
+                    _row['hitterPlus'] = 100.0 + (_row['hitterPlus'] - 100.0) * _f
             hitter_plus_standardization['wrcScaleMatch'] = {
                 'poolWrcSd': round(_sd_wrc, 3), 'poolHpSd': round(_sd_hp, 3),
                 'factor': round(_f, 4), 'n': len(_pool_hp),
@@ -4169,7 +4182,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             _sd_c = _cpsd([r[_stat] for r in _comp_pool])
             if _sd_wrc_c <= 1e-9 or _sd_c <= 1e-9:
                 continue
-            _f = 1.0
+            _f = round(1.0, PLUS_FACTOR_DP)
             # Rescale around 100 first, unrounded. ROC rows are rescaled with
             # the MLB factor but excluded from the mean, same convention as the
             # multiplicative re-anchor and the percentile pool.
@@ -4183,16 +4196,18 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 if _w > 0:
                     _num += _v * _w
                     _den += _w
-            _shift = (100.0 - _num / _den) if _den > 0 else 0.0
+            # Rounded before it is applied, same reason as plus_reanchor.
+            _shift = round((100.0 - _num / _den) if _den > 0 else 0.0,
+                           PLUS_FACTOR_DP)
             for _r, _v in _scaled:
-                _r[_stat] = round(_v + _shift, 1)
+                _r[_stat] = _v + _shift
             # Keep the published component scale in step with the shipped
             # values (documentation only — nothing reads it back).
             _sd_meta = hitter_plus_standardization.get(_stat)
             if _sd_meta:
                 _sd_meta['mean'] = round(100.0 + (_sd_meta['mean'] - 100.0) * _f + _shift, 3)
                 _sd_meta['sd'] = round(_sd_meta['sd'] * _f, 3)
-            plus_wrc_scale[_stat] = {'factor': round(_f, 6), 'shift': round(_shift, 4)}
+            plus_wrc_scale[_stat] = {'factor': _f, 'shift': _shift}
         plus_wrc_scale['poolWrcSd'] = round(_sd_wrc_c, 3)
         plus_wrc_scale['n'] = len(_comp_pool)
         print(f"  BB+/SD+/CT+ on the ratio-to-league '+' scale "
@@ -4238,6 +4253,43 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     else:
         print("  BB+/SD+/CT+ wRC+ scale match skipped (pool too small) — "
               "ratio-to-league scale stands.")
+
+    # ── FINAL PRECISION PASS for the hitter "+" family ─────────────────
+    # BB+, SD+, CT+ and Hitter+ each pass through three stages before they
+    # reach the artifact: the component build, the all-MLB re-anchor, and
+    # the wRC+ scale match. Every stage used to round to 1 decimal and the
+    # error accumulated — 34% of hitters landed 0.1 away from a single-pass
+    # recomputation of the same formula, which is exactly what the client
+    # does under filters in js/aggregator.js. Measured 2026-08-19.
+    #
+    # Every stage above is now unrounded and the rounding happens HERE,
+    # once, at the end of the chain. Same rule runValue / xRunValue /
+    # rv100 / xRv100 already follow.
+    #
+    # Placed after the whole scale-match branch, at this indent, ON PURPOSE:
+    # the scale steps are conditional (both the `if len(_comp_pool) >= 10`
+    # arm and its else), the rounding is not. Leaving a raw float in the
+    # artifact when a scale step is skipped would bloat the payload and vary
+    # by run. It still runs BEFORE the percentile pass, which is what lets
+    # the ranks break on real values instead of on 1-decimal ties.
+    #
+    # PLUS_STORE_DP = 6 is not a free choice: round_floats_inplace() caps
+    # every artifact float at 6 dp on write, so 6 is what ships regardless.
+    # Doing it HERE as well is deliberate — the percentile pass runs before
+    # the writer, so without this the ranks would be computed on raw floats
+    # while the stored value was 6 dp, and two rows could ship an identical
+    # BB+ with different percentiles. Rounding first makes the ranked value
+    # and the stored value the same object.
+    #
+    # The DISPLAYED number is an integer (Utils.formatInt, both leaderboard
+    # and player page), so six decimals is far past anything visible.
+    # js/aggregator.js rounds its filtered BB+ to the same precision.
+    PLUS_STORE_DP = 6
+    for _row in hitter_leaderboard:
+        for _stat in ('bbPlus', 'sdPlus', 'ctPlus', 'hitterPlus'):
+            _v = _row.get(_stat)
+            if _v is not None:
+                _row[_stat] = round(_v, PLUS_STORE_DP)
 
     # Compute total ER and outs for league ERA (needed for SIERA constant calibration)
     # Use ALL MLB pitchers from boxscore data (including EP pitchers excluded from leaderboard)
