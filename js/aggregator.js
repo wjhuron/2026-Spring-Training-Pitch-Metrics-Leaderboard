@@ -346,6 +346,19 @@ const Aggregator = {
       : ('nm:' + (row.pitcher || row.hitter || ''));
   },
 
+  // Resolve a row's combined (2TM/3TM) row, or null when it has none.
+  // A ROC/AAA stint NEVER resolves one: the pipeline builds the combined row
+  // from MLB stints only, so a ROC row that shares an mlbId with a traded
+  // player would otherwise inherit MLB innings/PA and the MLB team-games
+  // denominator while still being scored on the MiLB multiplier. That made
+  // Jake Bird's 1.1 ROC innings "Qualified" off his 34.2 MLB innings and hid
+  // Zak Kent's genuinely qualified 31.1 ROC innings behind a 14.1-inning MLB
+  // stint. Accepts either a key->row or a key->true map. (2026-08-19)
+  _combinedRowFor: function (map, row) {
+    if (this._isROCTeam(row.team)) return null;
+    return map[this._combinedKey(row)] || null;
+  },
+
   _bisectLeft: function (arr, val) {
     let lo = 0, hi = arr.length;
     while (lo < hi) {
@@ -905,7 +918,7 @@ const Aggregator = {
     for (let cg = 0; cg < rows.length; cg++) {
       const cr = rows[cg];
       const crKey = Aggregator._combinedKey(cr);
-      if (combinedByPitcher[crKey] && !Aggregator._isCombinedTeam(cr.team)) {
+      if (Aggregator._combinedRowFor(combinedByPitcher, cr) && !Aggregator._isCombinedTeam(cr.team)) {
         const tgv = teamGames[cr.team] || 0;
         if (tgv > (cumTeamGames[crKey] || 0)) cumTeamGames[crKey] = tgv;
       }
@@ -915,7 +928,7 @@ const Aggregator = {
     for (let qi = 0; qi < rows.length; qi++) {
       const r = rows[qi];
       const rKey = Aggregator._combinedKey(r);
-      const mtRow = combinedByPitcher[rKey];
+      const mtRow = Aggregator._combinedRowFor(combinedByPitcher, r);
       const tg = mtRow ? (cumTeamGames[rKey] || 0) : (teamGames[r.team] || 0);
       const ipFloat = Utils.parseIP(mtRow ? mtRow.ip : r.ip);
       const isStarter = Utils.isStarter(mtRow ? mtRow.g : r.g, mtRow ? mtRow.gs : r.gs);
@@ -981,7 +994,7 @@ const Aggregator = {
         // multi-team players so stint-view pages can look up their split row
         // by (name, team). Their percentiles interpolate vs the combined-row
         // pool above (_inPool === false), so the comparison group is unchanged.
-        if (combinedByPitcher[Aggregator._combinedKey(r)] && !self._isCombinedTeam(r.team)) return !!filters.keepStints;
+        if (Aggregator._combinedRowFor(combinedByPitcher, r) && !self._isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
@@ -1837,7 +1850,7 @@ const Aggregator = {
     }
     for (let pi2 = 0; pi2 < rows.length; pi2++) {
       const rp = rows[pi2];
-      rp._inPool = !(combinedByPitchRowEarly[Aggregator._combinedKey(rp)] && !Aggregator._isCombinedTeam(rp.team));
+      rp._inPool = !(Aggregator._combinedRowFor(combinedByPitchRowEarly, rp) && !Aggregator._isCombinedTeam(rp.team));
     }
     } // end player-mode merge
 
@@ -1998,7 +2011,7 @@ const Aggregator = {
       for (var ckey in ipLookup) {
         const ent = ipLookup[ckey];
         const entKey = Aggregator._combinedKey(ent);
-        if (combinedByPitchRow[entKey] && !Aggregator._isCombinedTeam(ent.team)) {
+        if (Aggregator._combinedRowFor(combinedByPitchRow, ent) && !Aggregator._isCombinedTeam(ent.team)) {
           const tgv = teamGames[ent.team] || 0;
           if (tgv > (cumTeamGamesPitch[entKey] || 0)) cumTeamGamesPitch[entKey] = tgv;
         }
@@ -2006,7 +2019,7 @@ const Aggregator = {
       rows = rows.filter(function (r) {
         const rKey = Aggregator._combinedKey(r);
         // For multi-team players use their combined row's IP + cumulative team games
-        if (combinedByPitchRow[rKey]) {
+        if (Aggregator._combinedRowFor(combinedByPitchRow, r)) {
           const numTeams = Object.keys(ipLookup).filter(function (k) {
             return Aggregator._combinedKey(ipLookup[k]) === rKey && Aggregator._isCombinedTeam(ipLookup[k].team);
           });
@@ -2038,7 +2051,7 @@ const Aggregator = {
       rows = rows.filter(function (r) {
         // includeROC/keepStints: see the pitcher narrowing — player-page platoon only.
         if (self._isROCTeam(r.team)) return !!filters.includeROC;
-        if (combinedByPitchRow[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
+        if (Aggregator._combinedRowFor(combinedByPitchRow, r) && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
@@ -2653,7 +2666,7 @@ const Aggregator = {
     }
     for (let hpi = 0; hpi < rows.length; hpi++) {
       const hr = rows[hpi];
-      hr._inPool = !(combinedByHitter[Aggregator._combinedKey(hr)] && !Aggregator._isCombinedTeam(hr.team));
+      hr._inPool = !(Aggregator._combinedRowFor(combinedByHitter, hr) && !Aggregator._isCombinedTeam(hr.team));
     }
 
     // Mark each hitter row qualified for percentile-pool inclusion.
@@ -2672,7 +2685,7 @@ const Aggregator = {
     for (let cti = 0; cti < rows.length; cti++) {
       const cr = rows[cti];
       const crKey = Aggregator._combinedKey(cr);
-      if (_combinedRowByHitter[crKey] && !Aggregator._isCombinedTeam(cr.team)) {
+      if (Aggregator._combinedRowFor(_combinedRowByHitter, cr) && !Aggregator._isCombinedTeam(cr.team)) {
         const tgv = hitterTg[cr.team] || 0;
         if (tgv > (_cumTg[crKey] || 0)) _cumTg[crKey] = tgv;
       }
@@ -2680,7 +2693,7 @@ const Aggregator = {
     for (let qi = 0; qi < rows.length; qi++) {
       const r = rows[qi];
       const rKey = Aggregator._combinedKey(r);
-      const mt = _combinedRowByHitter[rKey];
+      const mt = Aggregator._combinedRowFor(_combinedRowByHitter, r);
       let _tg, _pa;
       if (mt) {
         _tg = _cumTg[rKey] || 0;
@@ -2728,14 +2741,14 @@ const Aggregator = {
       for (let ht = 0; ht < rows.length; ht++) {
         const hrr = rows[ht];
         const hrrKey = Aggregator._combinedKey(hrr);
-        if (combinedByHitter[hrrKey] && !Aggregator._isCombinedTeam(hrr.team)) {
+        if (Aggregator._combinedRowFor(combinedByHitter, hrr) && !Aggregator._isCombinedTeam(hrr.team)) {
           const tgv = tgHitter[hrr.team] || 0;
           if (tgv > (cumTgH[hrrKey] || 0)) cumTgH[hrrKey] = tgv;
         }
       }
       rows = rows.filter(function (r) {
         const rKey = Aggregator._combinedKey(r);
-        const mt = combinedByHitter[rKey];
+        const mt = Aggregator._combinedRowFor(combinedByHitter, r);
         const isROC = Aggregator._isROCTeam(r.team);
         if (mt) {
           const tg = cumTgH[rKey] || 0;
@@ -2760,7 +2773,7 @@ const Aggregator = {
         // it, so the All-Teams board still hides ROC.
         if (self3._isROCTeam(r.team)) return !!filters.includeROC;
         // keepStints: see the pitcher narrowing — player-page platoon only.
-        if (combinedByHitter[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
+        if (Aggregator._combinedRowFor(combinedByHitter, r) && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
@@ -3162,7 +3175,7 @@ const Aggregator = {
     }
     for (let hpi2 = 0; hpi2 < rows.length; hpi2++) {
       const rp = rows[hpi2];
-      rp._inPool = !(combinedByHitterPT[Aggregator._combinedKey(rp)] && !Aggregator._isCombinedTeam(rp.team));
+      rp._inPool = !(Aggregator._combinedRowFor(combinedByHitterPT, rp) && !Aggregator._isCombinedTeam(rp.team));
     }
     }
 
@@ -3209,7 +3222,7 @@ const Aggregator = {
         // includeROC/keepStints: see the hitter narrowing above — player-page
         // platoon aggregations only.
         if (self4._isROCTeam(r.team)) return !!filters.includeROC;
-        if (combinedByHitterPT[Aggregator._combinedKey(r)] && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
+        if (Aggregator._combinedRowFor(combinedByHitterPT, r) && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
