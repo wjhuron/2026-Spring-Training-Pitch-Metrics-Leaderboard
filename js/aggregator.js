@@ -331,32 +331,16 @@ const Aggregator = {
     return !!this._rocTeamSet[team];
   },
 
-  // Helper: combined multi-team label — "2TM", "3TM", etc.
+  // Helper: combined multi-team label — "2TM", "3TM", … "10TM".
+  // Single home is Utils.isCombinedTeam; this alias keeps the call sites short.
   _isCombinedTeam: function (team) {
-    return typeof team === 'string' && /^\d+TM$/.test(team);
+    return Utils.isCombinedTeam(team);
   },
 
-  // Key for grouping a player's per-team + combined (2TM/3TM) rows. Uses mlbId
-  // when present so two distinct players sharing a name (e.g. two "Max Muncy")
-  // don't collide; falls back to name only when no id exists. Behavior-preserving
-  // for normal players since a player's rows all share one mlbId.
+  // Key for grouping a player's per-team + combined rows. Single home is
+  // Utils.playerKey; this alias keeps the call sites short.
   _combinedKey: function (row) {
-    return (row.mlbId != null && row.mlbId !== '')
-      ? ('id:' + row.mlbId)
-      : ('nm:' + (row.pitcher || row.hitter || ''));
-  },
-
-  // Resolve a row's combined (2TM/3TM) row, or null when it has none.
-  // A ROC/AAA stint NEVER resolves one: the pipeline builds the combined row
-  // from MLB stints only, so a ROC row that shares an mlbId with a traded
-  // player would otherwise inherit MLB innings/PA and the MLB team-games
-  // denominator while still being scored on the MiLB multiplier. That made
-  // Jake Bird's 1.1 ROC innings "Qualified" off his 34.2 MLB innings and hid
-  // Zak Kent's genuinely qualified 31.1 ROC innings behind a 14.1-inning MLB
-  // stint. Accepts either a key->row or a key->true map. (2026-08-19)
-  _combinedRowFor: function (map, row) {
-    if (this._isROCTeam(row.team)) return null;
-    return map[this._combinedKey(row)] || null;
+    return Utils.playerKey(row);
   },
 
   _bisectLeft: function (arr, val) {
@@ -903,39 +887,20 @@ const Aggregator = {
     const teamGames = this.getTeamGamesPlayed();
 
     // Multi-team handling: players with a 2TM/3TM row. Per-team rows inherit the
-    // combined row's qualification (cumulative IP across teams) and its team-games
-    // denominator (sum of the per-team team games). Percentile pool uses combined
-    // rows only — per-team rows of multi-team players interpolate against it.
-    const combinedByPitcher = {};
-    for (let ci2 = 0; ci2 < rows.length; ci2++) {
-      if (Aggregator._isCombinedTeam(rows[ci2].team)) {
-        combinedByPitcher[Aggregator._combinedKey(rows[ci2])] = rows[ci2];
-      }
-    }
-    // Multi-team qualifier denominator: max(team games) across the player's MLB
-    // teams — approximates tenure span. Summing over-inflates the threshold.
-    const cumTeamGames = {};
-    for (let cg = 0; cg < rows.length; cg++) {
-      const cr = rows[cg];
-      const crKey = Aggregator._combinedKey(cr);
-      if (Aggregator._combinedRowFor(combinedByPitcher, cr) && !Aggregator._isCombinedTeam(cr.team)) {
-        const tgv = teamGames[cr.team] || 0;
-        if (tgv > (cumTeamGames[crKey] || 0)) cumTeamGames[crKey] = tgv;
-      }
-    }
+    // combined row's qualification (its cumulative IP) and are measured against
+    // the team the player is on now. Percentile pool uses combined rows only —
+    // per-team rows of multi-team players interpolate against it.
+    const qualCtx = Utils.buildQualContext(
+      rows, teamGames, Aggregator._isROCTeam.bind(Aggregator), window.PITCHER_DATA || rows);
+    const combinedByPitcher = qualCtx.combined;
 
     // Mark each row as qualified or not
     for (let qi = 0; qi < rows.length; qi++) {
       const r = rows[qi];
-      const rKey = Aggregator._combinedKey(r);
-      const mtRow = Aggregator._combinedRowFor(combinedByPitcher, r);
-      const tg = mtRow ? (cumTeamGames[rKey] || 0) : (teamGames[r.team] || 0);
-      const ipFloat = Utils.parseIP(mtRow ? mtRow.ip : r.ip);
-      const isStarter = Utils.isStarter(mtRow ? mtRow.g : r.g, mtRow ? mtRow.gs : r.gs);
-      const _isROC = Aggregator._isROCTeam(r.team);
-      r._qualified = ipFloat >= tg * Utils.pitcherIpPerGame(isStarter, _isROC);
+      const res = Utils.resolveQual(r, qualCtx, true);
+      r._qualified = res.qualified;
       // Per-team row of a multi-team player: interpolate against the combined-row pool
-      r._inPool = mtRow && r !== mtRow ? false : true;
+      r._inPool = res.combinedRow && r !== res.combinedRow ? false : true;
     }
     // Set bipQual flag BEFORE percentiles so BIP stats can use it
     for (let bqi = 0; bqi < rows.length; bqi++) {
@@ -994,7 +959,7 @@ const Aggregator = {
         // multi-team players so stint-view pages can look up their split row
         // by (name, team). Their percentiles interpolate vs the combined-row
         // pool above (_inPool === false), so the comparison group is unchanged.
-        if (Aggregator._combinedRowFor(combinedByPitcher, r) && !self._isCombinedTeam(r.team)) return !!filters.keepStints;
+        if (combinedByPitcher[Utils.playerKey(r)] && !Utils.isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
@@ -1850,7 +1815,7 @@ const Aggregator = {
     }
     for (let pi2 = 0; pi2 < rows.length; pi2++) {
       const rp = rows[pi2];
-      rp._inPool = !(Aggregator._combinedRowFor(combinedByPitchRowEarly, rp) && !Aggregator._isCombinedTeam(rp.team));
+      rp._inPool = !(!Aggregator._isROCTeam(rp.team) && combinedByPitchRowEarly[Utils.playerKey(rp)] && !Utils.isCombinedTeam(rp.team));
     }
     } // end player-mode merge
 
@@ -2000,45 +1965,21 @@ const Aggregator = {
     // For multi-team players, qualification uses the combined 2TM/3TM row's IP and
     // the sum of team games across their MLB teams (cumulative per-player view).
     if (filters.minIp === 'Q') {
+      // Pitch-type rows carry no IP, so qualification is answered on the
+      // pitcher's season row (window.PITCHER_DATA) and applied to every pitch
+      // type he throws.
       const teamGames = this.getTeamGamesPlayed();
-      const ipLookup = {};
       const preAggIP = window.PITCHER_DATA || [];
+      const ipLookup = {};
       for (var ipi = 0; ipi < preAggIP.length; ipi++) {
         ipLookup[preAggIP[ipi].pitcher + '|' + preAggIP[ipi].team] = preAggIP[ipi];
       }
-      // Precompute cumulative team games per multi-team pitcher
-      const cumTeamGamesPitch = {};
-      for (var ckey in ipLookup) {
-        const ent = ipLookup[ckey];
-        const entKey = Aggregator._combinedKey(ent);
-        if (Aggregator._combinedRowFor(combinedByPitchRow, ent) && !Aggregator._isCombinedTeam(ent.team)) {
-          const tgv = teamGames[ent.team] || 0;
-          if (tgv > (cumTeamGamesPitch[entKey] || 0)) cumTeamGamesPitch[entKey] = tgv;
-        }
-      }
+      const pitchQualCtx = Utils.buildQualContext(
+        preAggIP, teamGames, Aggregator._isROCTeam.bind(Aggregator));
       rows = rows.filter(function (r) {
-        const rKey = Aggregator._combinedKey(r);
-        // For multi-team players use their combined row's IP + cumulative team games
-        if (Aggregator._combinedRowFor(combinedByPitchRow, r)) {
-          const numTeams = Object.keys(ipLookup).filter(function (k) {
-            return Aggregator._combinedKey(ipLookup[k]) === rKey && Aggregator._isCombinedTeam(ipLookup[k].team);
-          });
-          const combinedKey = numTeams[0];
-          const cp = combinedKey ? ipLookup[combinedKey] : null;
-          if (!cp) return false;
-          const tg = cumTeamGamesPitch[rKey] || 0;
-          const ipFloat = Utils.parseIP(cp.ip);
-          const isStarter = Utils.isStarter(cp.g, cp.gs);
-          const isROC = Aggregator._isROCTeam(r.team);
-          return ipFloat >= tg * Utils.pitcherIpPerGame(isStarter, isROC);
-        }
-        var p = ipLookup[r.pitcher + '|' + r.team];
+        const p = ipLookup[r.pitcher + '|' + r.team];
         if (!p) return false;
-        var tg = teamGames[r.team] || 0;
-        var ipFloat = Utils.parseIP(p.ip);
-        var isStarter = Utils.isStarter(p.g, p.gs);
-        var isROC = Aggregator._isROCTeam(r.team);
-        return ipFloat >= tg * Utils.pitcherIpPerGame(isStarter, isROC);
+        return Utils.isQualified(p, pitchQualCtx, true);
       });
     }
 
@@ -2051,7 +1992,7 @@ const Aggregator = {
       rows = rows.filter(function (r) {
         // includeROC/keepStints: see the pitcher narrowing — player-page platoon only.
         if (self._isROCTeam(r.team)) return !!filters.includeROC;
-        if (Aggregator._combinedRowFor(combinedByPitchRow, r) && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
+        if (combinedByPitchRow[Utils.playerKey(r)] && !Utils.isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
@@ -2666,43 +2607,19 @@ const Aggregator = {
     }
     for (let hpi = 0; hpi < rows.length; hpi++) {
       const hr = rows[hpi];
-      hr._inPool = !(Aggregator._combinedRowFor(combinedByHitter, hr) && !Aggregator._isCombinedTeam(hr.team));
+      hr._inPool = !(!Aggregator._isROCTeam(hr.team) && combinedByHitter[Utils.playerKey(hr)] && !Utils.isCombinedTeam(hr.team));
     }
 
     // Mark each hitter row qualified for percentile-pool inclusion.
     // Mirrors the display-filter logic at the bottom of this function: a row
     // qualifies when overall-season PA >= 3.1 × team games played. Multi-team
     // players are evaluated on their combined 2TM/3TM row's PA against the
-    // largest single-team games count among the teams they played for.
+    // games played by the team they are on now.
     const hitterTg = this.getTeamGamesPlayed();
-    const _combinedRowByHitter = {};
-    for (let cbi = 0; cbi < rows.length; cbi++) {
-      if (Aggregator._isCombinedTeam(rows[cbi].team)) {
-        _combinedRowByHitter[Aggregator._combinedKey(rows[cbi])] = rows[cbi];
-      }
-    }
-    const _cumTg = {};
-    for (let cti = 0; cti < rows.length; cti++) {
-      const cr = rows[cti];
-      const crKey = Aggregator._combinedKey(cr);
-      if (Aggregator._combinedRowFor(_combinedRowByHitter, cr) && !Aggregator._isCombinedTeam(cr.team)) {
-        const tgv = hitterTg[cr.team] || 0;
-        if (tgv > (_cumTg[crKey] || 0)) _cumTg[crKey] = tgv;
-      }
-    }
+    const hitterQualCtx = Utils.buildQualContext(
+      rows, hitterTg, Aggregator._isROCTeam.bind(Aggregator), window.HITTER_DATA || rows);
     for (let qi = 0; qi < rows.length; qi++) {
-      const r = rows[qi];
-      const rKey = Aggregator._combinedKey(r);
-      const mt = Aggregator._combinedRowFor(_combinedRowByHitter, r);
-      let _tg, _pa;
-      if (mt) {
-        _tg = _cumTg[rKey] || 0;
-        _pa = (mt.paAll != null ? mt.paAll : mt.pa) || 0;
-      } else {
-        _tg = hitterTg[r.team] || 0;
-        _pa = (r.paAll != null ? r.paAll : r.pa) || 0;
-      }
-      r._qualified = _tg > 0 && _pa >= _tg * Utils.hitterPaPerGame(Aggregator._isROCTeam(r.team));
+      rows[qi]._qualified = Utils.isQualified(rows[qi], hitterQualCtx, false);
     }
 
     // Compute percentiles. Pool: ALL MLB hitters (no qualifier) — matches
@@ -2736,29 +2653,7 @@ const Aggregator = {
     // so that platoon/date filters don't drop overall-qualified hitters from the board.
     // Multi-team hitters qualify on cumulative PA against the sum of team games.
     if (filters.minCount === 'Q') {
-      const tgHitter = this.getTeamGamesPlayed();
-      const cumTgH = {};
-      for (let ht = 0; ht < rows.length; ht++) {
-        const hrr = rows[ht];
-        const hrrKey = Aggregator._combinedKey(hrr);
-        if (Aggregator._combinedRowFor(combinedByHitter, hrr) && !Aggregator._isCombinedTeam(hrr.team)) {
-          const tgv = tgHitter[hrr.team] || 0;
-          if (tgv > (cumTgH[hrrKey] || 0)) cumTgH[hrrKey] = tgv;
-        }
-      }
-      rows = rows.filter(function (r) {
-        const rKey = Aggregator._combinedKey(r);
-        const mt = Aggregator._combinedRowFor(combinedByHitter, r);
-        const isROC = Aggregator._isROCTeam(r.team);
-        if (mt) {
-          const tg = cumTgH[rKey] || 0;
-          const pa = (mt.paAll != null ? mt.paAll : mt.pa) || 0;
-          return pa >= tg * Utils.hitterPaPerGame(isROC);
-        }
-        var tg = tgHitter[r.team] || 0;
-        var pa = (r.paAll != null ? r.paAll : r.pa) || 0;
-        return pa >= tg * Utils.hitterPaPerGame(isROC);
-      });
+      rows = rows.filter(function (r) { return r._qualified; });
     }
 
     // Apply view-narrowing filters AFTER percentiles (don't change comparison group)
@@ -2773,7 +2668,7 @@ const Aggregator = {
         // it, so the All-Teams board still hides ROC.
         if (self3._isROCTeam(r.team)) return !!filters.includeROC;
         // keepStints: see the pitcher narrowing — player-page platoon only.
-        if (Aggregator._combinedRowFor(combinedByHitter, r) && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
+        if (combinedByHitter[Utils.playerKey(r)] && !Utils.isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }
@@ -3175,7 +3070,7 @@ const Aggregator = {
     }
     for (let hpi2 = 0; hpi2 < rows.length; hpi2++) {
       const rp = rows[hpi2];
-      rp._inPool = !(Aggregator._combinedRowFor(combinedByHitterPT, rp) && !Aggregator._isCombinedTeam(rp.team));
+      rp._inPool = !(!Aggregator._isROCTeam(rp.team) && combinedByHitterPT[Utils.playerKey(rp)] && !Utils.isCombinedTeam(rp.team));
     }
     }
 
@@ -3222,7 +3117,7 @@ const Aggregator = {
         // includeROC/keepStints: see the hitter narrowing above — player-page
         // platoon aggregations only.
         if (self4._isROCTeam(r.team)) return !!filters.includeROC;
-        if (Aggregator._combinedRowFor(combinedByHitterPT, r) && !Aggregator._isCombinedTeam(r.team)) return !!filters.keepStints;
+        if (combinedByHitterPT[Utils.playerKey(r)] && !Utils.isCombinedTeam(r.team)) return !!filters.keepStints;
         return true;
       });
     }

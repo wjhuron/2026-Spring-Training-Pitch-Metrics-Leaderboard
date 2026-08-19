@@ -327,45 +327,32 @@ const DataStore = {
           : ((this.metadata && this.metadata.teamGames) || {}))
       : {};
 
-    // Multi-team support: scan once to build player→combined-row map and cumulative team games.
-    // When "All Teams" is selected, per-team rows of multi-team players are hidden; the 2TM/3TM
-    // row stands in. Qualification for multi-team players uses combined IP/PA and summed team games.
+    // Multi-team support: "All Teams" hides the per-team rows of multi-team
+    // players and shows the 2TM/3TM row in their place.
+    var playerKey = Utils.playerKey;
+    var isCombinedTeam = Utils.isCombinedTeam;
     var combinedByPlayer = {};
-    var isCombinedRe = /^\d+TM$/;
-    // Key on mlbId when present so two distinct players sharing a name (e.g. two
-    // "Max Muncy") don't collide; fall back to name only when no id exists.
-    var playerKey = function (r) {
-      return (r.mlbId != null && r.mlbId !== '')
-        ? ('id:' + r.mlbId)
-        : ('nm:' + (r.pitcher || r.hitter || ''));
-    };
     for (var di2 = 0; di2 < source.length; di2++) {
       var drow = source[di2];
-      if (isCombinedRe.test(drow.team)) {
-        if (drow.pitcher || drow.hitter) combinedByPlayer[playerKey(drow)] = drow;
+      if (isCombinedTeam(drow.team) && (drow.pitcher || drow.hitter)) {
+        combinedByPlayer[playerKey(drow)] = drow;
       }
     }
-    // For multi-team players, the qualifier denominator is max(team games) across
-    // their MLB teams — approximates tenure span. Summing would double-count and
-    // inflate the threshold past what any traded player could realistically meet.
-    var cumTeamGames = {};
-    if (filters.minIp === 'Q' || filters.minCount === 'Q') {
-      for (var di3 = 0; di3 < source.length; di3++) {
-        var drow2 = source[di3];
-        var pk2 = playerKey(drow2);
-        if ((drow2.pitcher || drow2.hitter) && combinedByPlayer[pk2] && !isCombinedRe.test(drow2.team)) {
-          var tgv = _teamGames[drow2.team] || 0;
-          if (tgv > (cumTeamGames[pk2] || 0)) cumTeamGames[pk2] = tgv;
-        }
-      }
-    }
+    // Qualification itself is answered by the one shared helper, so this path
+    // and the Aggregator cannot drift apart. Before 2026-08-19 they disagreed
+    // on 16 MLB players, because this path fed the combined LABEL to the
+    // team-games map: "2TM" resolved to 144 games, "3TM" to 109, and "4TM" to
+    // nothing at all, which zeroed the threshold.
+    var qualCtx = (filters.minIp === 'Q' || filters.minCount === 'Q')
+      ? Utils.buildQualContext(source, _teamGames, function (t) { return !!rocTeamSet[t]; })
+      : null;
     return source.filter(function (row) {
       // Hide ROC players unless user explicitly selected their team
       if (rocTeamSet[row.team] && filters.team !== row.team) return false;
       // Multi-team: "All Teams" view shows only the combined row for multi-team players.
       // Specific-team view shows only per-team rows (combined row hidden).
       var pkey = playerKey(row);
-      var isCombinedRow = isCombinedRe.test(row.team);
+      var isCombinedRow = isCombinedTeam(row.team);
       if (filters.team === 'all') {
         if (combinedByPlayer[pkey] && !isCombinedRow) return false;
       } else {
@@ -407,22 +394,10 @@ const DataStore = {
       if (hasPitchType && selectedPitchTypes.indexOf('all') === -1) {
         if (selectedPitchTypes.indexOf(row.pitchType) === -1) return false;
       }
-      // For multi-team players, qualification uses the combined row's stats and
-      // the cumulative team games across their MLB teams.
-      var mtRow = combinedByPlayer[pkey];
-      var _tg = (mtRow && !isCombinedRow) ? (cumTeamGames[pkey] || 0) : (_teamGames[row.team] || 0);
-      var _qPa = (mtRow && !isCombinedRow) ? (mtRow.pa || 0) : (row.pa || 0);
-      var _qIp = (mtRow && !isCombinedRow) ? mtRow.ip : row.ip;
-      var _qG = (mtRow && !isCombinedRow) ? mtRow.g : row.g;
-      var _qGs = (mtRow && !isCombinedRow) ? mtRow.gs : row.gs;
-      // ROC-aware qualification (3.1 PA×TG MLB / 2.7 ROC for hitters;
-      // 1.0/0.5 MLB & 0.8/0.4 ROC IP×TG for pitchers).
-      var _isROC = (typeof Aggregator !== 'undefined') &&
-                   Aggregator._isROCTeam && Aggregator._isROCTeam(row.team);
       // Min count: use PA for hitters, pitch count for pitchers and hitterPitch
       if (tab === 'hitter') {
         if (filters.minCount === 'Q') {
-          if (_qPa < _tg * Utils.hitterPaPerGame(_isROC)) return false;
+          if (!Utils.isQualified(row, qualCtx, false)) return false;
         } else if ((row.pa || 0) < filters.minCount) return false;
       } else {
         if (row.count < filters.minCount) return false;
@@ -431,10 +406,7 @@ const DataStore = {
       if (tab === 'pitcher' && filters.minTbf && (row.pa || 0) < filters.minTbf) return false;
       if (tab === 'pitcher' && filters.minIp) {
         if (filters.minIp === 'Q') {
-          var ipFloat = Utils.parseIP(_qIp);
-          var isStarter = Utils.isStarter(_qG, _qGs);
-          var ipThresh = _tg * Utils.pitcherIpPerGame(isStarter, _isROC);
-          if (ipFloat < ipThresh) return false;
+          if (!Utils.isQualified(row, qualCtx, true)) return false;
         } else if ((row.ip || 0) < filters.minIp) return false;
       }
       if ((tab === 'pitcher' || tab === 'hitter') && filters.minBip && row.nBip != null && row.nBip < filters.minBip) return false;

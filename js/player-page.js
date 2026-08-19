@@ -1038,30 +1038,23 @@ var PlayerPage = {
   },
 
 
-  // Team games used for the qualification threshold. Multi-team (2TM/3TM) rows
-  // have no teamGames entry for the combined label, so fall back to the
-  // cumulative (max across the player's stint teams) games — matching the
-  // aggregator's cumTeamGames so the player page agrees with the leaderboard.
-  // Returning 0 here (rather than an undefined→0 that zeroes the threshold) lets
-  // the callers' `tg > 0` guard correctly treat a genuinely non-qualifying
-  // multi-team player as unqualified.
-  _qualifyingTeamGames: function (data, isPitcher) {
-    var teamGames = Aggregator.loaded ? Aggregator.getTeamGamesPlayed() : {};
-    if (!(Aggregator.loaded && Aggregator._isCombinedTeam(data.team))) {
-      return teamGames[data.team] || 0;
-    }
+  // Qualification context for this page. Answered by the one shared helper in
+  // Utils, so a player page and the leaderboard can no longer disagree: a
+  // traded player's stint page is qualified exactly when his season is, and a
+  // multi-team player measures against the club he is on now.
+  _qualContext: function (isPitcher) {
+    var stamp = (isPitcher ? 'p' : 'h') + '|' + (Aggregator.loaded ? '1' : '0');
+    if (this._qualCtxStamp === stamp) return this._qualCtx;
     var rows = (isPitcher ? window.PITCHER_DATA : window.HITTER_DATA) || [];
-    var maxTg = 0;
-    for (var i = 0; i < rows.length; i++) {
-      var r = rows[i];
-      if (r.mlbId === data.mlbId && !Aggregator._isCombinedTeam(r.team)) {
-        var tgv = teamGames[r.team] || 0;
-        if (tgv > maxTg) maxTg = tgv;
-      }
-    }
-    return maxTg;
+    var teamGames = Aggregator.loaded
+      ? Aggregator.getTeamGamesPlayed()
+      : ((typeof DataStore !== 'undefined' && DataStore.metadata && DataStore.metadata.teamGames) || {});
+    this._qualCtx = Utils.buildQualContext(rows, teamGames, function (t) {
+      return !!(Aggregator.loaded && Aggregator._isROCTeam(t));
+    });
+    this._qualCtxStamp = stamp;
+    return this._qualCtx;
   },
-
 
   _renderPercentiles: function (data, statsDef, append) {
     var container = document.getElementById('player-percentiles');
@@ -1071,17 +1064,7 @@ var PlayerPage = {
 
     // Determine if player qualifies based on team games played
     // Micro data is already game-type-specific, so no date range needed
-    var tg = this._qualifyingTeamGames(data, isPitcher);
-    var isQualified;
-    var _isROC = Aggregator.loaded && Aggregator._isROCTeam(data.team);
-    if (isPitcher) {
-      var ipFloat = Utils.parseIP(data.ip);
-      var isStarter = Utils.isStarter(data.g, data.gs);
-      var ipThreshold = tg * Utils.pitcherIpPerGame(isStarter, _isROC);
-      isQualified = tg > 0 && ipFloat >= ipThreshold;
-    } else {
-      isQualified = tg > 0 && (data.pa || 0) >= tg * Utils.hitterPaPerGame(_isROC);
-    }
+    var isQualified = Utils.isQualified(data, this._qualContext(isPitcher), isPitcher);
     var alwaysColorKeys = isPitcher ? { ffVelo: true, siVelo: true } : { maxEV: true };
 
     var dynamicVeloStats = [];
@@ -1347,10 +1330,7 @@ var PlayerPage = {
 
     // Qualification (PA × team games, ROC-aware: 3.1 MLB / 2.7 ROC) —
     // same gate the generic _renderPercentiles uses for hitter rate stats.
-    var tg = this._qualifyingTeamGames(data, false);
-    var pa = data.pa || 0;
-    var _isROC = Aggregator.loaded && Aggregator._isROCTeam(data.team);
-    var isQualified = tg > 0 && pa >= tg * Utils.hitterPaPerGame(_isROC);
+    var isQualified = Utils.isQualified(data, this._qualContext(false), false);
 
     var xRv100 = data.xRv100;
     var pctl = data.xRv100_pctl;

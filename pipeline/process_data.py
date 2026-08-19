@@ -2200,6 +2200,12 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     EXPECTED_PITCHER_INVERT = {'wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon'}
     pitcher_leaderboard = []
     for (pitcher, team, throws), pitches in pitcher_groups.items():
+        # Latest game date in this pitcher's pitch data. The client resolves a
+        # multi-team player's qualification denominator from the team he most
+        # recently played for, so every stint row needs its own stamp. The
+        # synthesized 2TM/3TM group pools all stints, so its row gets the max
+        # for free. Mirrors the hitter row's lastGameDate.
+        _pitcher_dates = [p.get('Game Date') for p in pitches if p.get('Game Date')]
         row = {
             'pitcher': pitcher,
             'team': team,
@@ -2207,6 +2213,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             'count': len(pitches),
             'mlbId': get_mlb_id(pitcher, team),
             '_isROC': team in AAA_TEAMS,
+            'lastGameDate': max(_pitcher_dates) if _pitcher_dates else None,
         }
         for col in PITCHER_METRIC_COLS:
             values = [safe_float(p.get(col)) for p in pitches]

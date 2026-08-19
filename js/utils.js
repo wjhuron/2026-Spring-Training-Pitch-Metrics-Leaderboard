@@ -236,6 +236,155 @@ const Utils = {
     return isStarter ? QUAL.SP_IP_PER_GAME : QUAL.RP_IP_PER_GAME;
   },
 
+  // ── Canonical qualification ──────────────────────────────────────────
+  // ONE home for "is this row qualified?". Before 2026-08-19 the Aggregator,
+  // DataStore.filterRows (the pre-microData first paint) and the player page
+  // each answered it separately, and they disagreed on 16 MLB players.
+
+  // "2TM"/"3TM"/…/"10TM". A multi-team LABEL, not a franchise: it has no
+  // schedule, so it must never supply a team-games denominator.
+  isCombinedTeam: function (team) {
+    return typeof team === 'string' && /^\d+TM$/.test(team);
+  },
+
+  // Group a player's per-team and combined rows. Key on mlbId when present so
+  // two distinct players sharing a name (two "Max Muncy") do not collide.
+  playerKey: function (row) {
+    return (row.mlbId != null && row.mlbId !== '')
+      ? ('id:' + row.mlbId)
+      : ('nm:' + (row.pitcher || row.hitter || ''));
+  },
+
+  /**
+   * Build the lookups a qualification test needs. Call once per row set, then
+   * pass the result to isQualified/resolveQual for each row.
+   *
+   * @param rows        every row of the set being tested: each MLB stint, each
+   *                    ROC stint, and the combined 2TM/3TM row. Unfiltered.
+   * @param teamGames   team code -> distinct game dates.
+   * @param isROCFn     function(team) -> true for a ROC/AAA team.
+   * @param rosterRows  optional. Where the most-recent-team answer is read
+   *                    from. Defaults to `rows`. The Aggregator re-aggregates
+   *                    under the active filters and does not carry
+   *                    lastGameDate, so it passes the shipped leaderboard rows
+   *                    (window.PITCHER_DATA / window.HITTER_DATA) here. Which
+   *                    club a player is on does not depend on a date filter.
+   */
+  buildQualContext: function (rows, teamGames, isROCFn, rosterRows) {
+    var self = this;
+    var ctx = {
+      teamGames: teamGames || {},
+      isROC: isROCFn || function () { return false; },
+      combined: {},
+      denomTeam: {},
+      datelessPlayers: [],
+    };
+    var i, k;
+    // The combined row supplies the IP/PA/G/GS a multi-team player is judged
+    // on, so it must come from the set being tested.
+    for (i = 0; i < rows.length; i++) {
+      if (self.isCombinedTeam(rows[i].team)) ctx.combined[self.playerKey(rows[i])] = rows[i];
+    }
+
+    // A multi-team player is measured against the team he is on now, i.e. the
+    // one he most recently played for (Wally, 2026-08-19). The combined label
+    // cannot supply this: "2TM" spans 144 distinct dates because it pools every
+    // traded player in the league, "3TM" spans only 109, and "4TM" has no entry
+    // at all, which zeroed the threshold and put a 133-PA hitter on the
+    // qualified board.
+    //
+    // Only MLB stints count. A ROC appearance belongs to another league and
+    // cannot set an MLB denominator, so a player sent down still measures
+    // against his last MLB club.
+    var roster = rosterRows || rows;
+    var rosterCombined = {};
+    for (i = 0; i < roster.length; i++) {
+      if (self.isCombinedTeam(roster[i].team)) rosterCombined[self.playerKey(roster[i])] = true;
+    }
+    var stints = {};
+    for (i = 0; i < roster.length; i++) {
+      var r = roster[i], t = r.team;
+      if (self.isCombinedTeam(t) || ctx.isROC(t)) continue;
+      k = self.playerKey(r);
+      if (!rosterCombined[k]) continue;
+      (stints[k] || (stints[k] = [])).push(r);
+    }
+    for (k in stints) {
+      var list = stints[k], pick = null, dated = true, j;
+      for (j = 0; j < list.length; j++) { if (!list[j].lastGameDate) { dated = false; break; } }
+      if (dated) {
+        for (j = 0; j < list.length; j++) {
+          // A tie is impossible in practice: one player plays for one club on
+          // one date. Break it on team code so the answer never depends on row
+          // order.
+          if (!pick || list[j].lastGameDate > pick.lastGameDate ||
+              (list[j].lastGameDate === pick.lastGameDate && list[j].team < pick.team)) {
+            pick = list[j];
+          }
+        }
+      } else {
+        // Announced degrade: an embed built before the stint rows carried
+        // lastGameDate. Fall back to the longest schedule among his clubs,
+        // which is the pre-2026-08-19 behaviour.
+        ctx.datelessPlayers.push(k);
+        for (j = 0; j < list.length; j++) {
+          var gj = ctx.teamGames[list[j].team] || 0;
+          var gp = pick ? (ctx.teamGames[pick.team] || 0) : -1;
+          if (!pick || gj > gp || (gj === gp && list[j].team < pick.team)) pick = list[j];
+        }
+      }
+      if (pick) ctx.denomTeam[k] = pick.team;
+    }
+    if (ctx.datelessPlayers.length && !this._qualDateWarned) {
+      this._qualDateWarned = true;
+      console.warn('Qualification: ' + ctx.datelessPlayers.length + ' multi-team player(s) have a ' +
+                   'stint row with no lastGameDate. Falling back to the longest schedule among ' +
+                   'their clubs. Rebuild the embed to restore the current-team rule.');
+    }
+    return ctx;
+  },
+
+  /**
+   * Resolve every input the qualification test uses, so callers that need the
+   * combined row or the threshold do not recompute them.
+   * @param isPitcher true for IP x team games, false for PA x team games.
+   */
+  resolveQual: function (row, ctx, isPitcher) {
+    var isROCRow = ctx.isROC(row.team);
+    // A ROC/AAA stint is its own league and never inherits the combined row.
+    // That row is built from MLB stints only, so borrowing its innings put
+    // Jake Bird's 1.1 ROC innings on the qualified ROC board. (2026-08-19)
+    var mt = isROCRow ? null : (ctx.combined[this.playerKey(row)] || null);
+    var src = mt || row;
+    var tg;
+    if (mt) {
+      var dt = ctx.denomTeam[this.playerKey(row)];
+      tg = (dt && ctx.teamGames[dt]) || 0;
+    } else {
+      tg = ctx.teamGames[row.team] || 0;
+    }
+    var amount = isPitcher
+      ? this.parseIP(src.ip)
+      : ((src.paAll != null ? src.paAll : src.pa) || 0);
+    var perGame = isPitcher
+      ? this.pitcherIpPerGame(this.isStarter(src.g, src.gs), isROCRow)
+      : this.hitterPaPerGame(isROCRow);
+    return {
+      combinedRow: mt,
+      denomTeam: mt ? ctx.denomTeam[this.playerKey(row)] : row.team,
+      teamGames: tg,
+      amount: amount,
+      threshold: tg * perGame,
+      // No team games means no rate, and "unknown" is not "qualified". This
+      // guard is why a 4TM row can no longer clear a threshold of zero.
+      qualified: tg > 0 && amount >= tg * perGame,
+    };
+  },
+
+  isQualified: function (row, ctx, isPitcher) {
+    return this.resolveQual(row, ctx, isPitcher).qualified;
+  },
+
   // Create a pitch badge <span> element (small or regular size)
   createPitchBadge: function (pitchType, small) {
     var badge = document.createElement('span');
