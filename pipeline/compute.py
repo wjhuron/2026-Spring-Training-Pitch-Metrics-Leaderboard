@@ -5,6 +5,7 @@ import math
 from collections import defaultdict
 
 from pipeline.utils import (
+    real_pitches,
     safe_float, median, is_barrel, is_swing,
     spray_angle, spray_direction,
     SWING_DESCRIPTIONS, HIT_EVENTS, K_EVENTS, BB_EVENTS, HBP_EVENTS,
@@ -191,6 +192,16 @@ def compute_expected_stats(pitches, woba_weights=None):
 
 def compute_stats(pitches):
     """Compute IZ%, Whiff%, CSW%, Chase%, GB%, K%, BB%, K-BB%, BABIP from a list of pitch dicts."""
+    # A no-pitch IBB is a plate appearance with nothing thrown. Rebind so EVERY
+    # per-pitch subset below drops it, keeping the full list under all_rows for
+    # the one PA-level subset that must keep it.
+    #
+    # Rebinding beats guarding each denominator, because the sites are not all
+    # denominators. `n_strikes` is `Description not in BALL_DESCRIPTIONS`, and
+    # None is not in that set, so a no-pitch row was counted as a STRIKE - an
+    # inflated NUMERATOR, the opposite shape. Found by ibb_injection_test.py.
+    all_rows = pitches
+    pitches = real_pitches(pitches)
     total = len(pitches)
     if total == 0:
         empty = {k: None for k in STAT_KEYS}
@@ -217,7 +228,7 @@ def compute_stats(pitches):
     bip = [p for p in pitches if p.get('BBType') is not None and p.get('BBType') not in BUNT_BB_TYPES]
     gb = sum(1 for p in bip if p.get('BBType') == 'ground_ball')
 
-    pa_pitches = [p for p in pitches if p.get('Event') and p['Event'] not in NON_PA_EVENTS]
+    pa_pitches = [p for p in all_rows if p.get('Event') and p['Event'] not in NON_PA_EVENTS]
     n_pa = len(pa_pitches)
     n_h = sum(1 for p in pa_pitches if p['Event'] in HIT_EVENTS)
     n_hr = sum(1 for p in pa_pitches if p['Event'] == 'Home Run')
@@ -263,19 +274,27 @@ def compute_stats(pitches):
     one_one_wins = sum(1 for p in one_one_pitches if p.get('Description') not in BALL_DESCRIPTIONS)
     one_one_win_pct = one_one_wins / len(one_one_pitches) if one_one_pitches else None
 
+    # earlyActionPct is about pitch SEQUENCING, so a plate appearance with no
+    # pitches has no sequence and belongs on neither side of the ratio. Both
+    # numerator and denominator therefore run over pitched PAs only. Counting
+    # it in the denominator alone (n_pa) would make the metric drift down as
+    # no-pitch IBBs are backfilled, for no real change in how anyone pitched.
+    # Note '00' parses as <= 3, so an unguarded numerator would also have
+    # scored a no-pitch IBB as early action.
     early_action = 0
-    for p in pitches:
+    n_pa_pitched = 0
+    for p in pitches:                   # already excludes no-pitch PA markers
         ev = p.get('Event')
         if ev and ev not in NON_PA_EVENTS:
-            pid = p.get('PitchID') or ''
-            parts = pid.split('_')
+            n_pa_pitched += 1
+            parts = (p.get('PitchID') or '').split('_')
             if len(parts) == 3:
                 try:
                     if int(parts[2]) <= 3:
                         early_action += 1
                 except ValueError:
                     pass
-    early_action_pct = early_action / n_pa if n_pa > 0 else None
+    early_action_pct = early_action / n_pa_pitched if n_pa_pitched > 0 else None
 
     return {
         'pa': n_pa,
@@ -433,6 +452,11 @@ def compute_pitcher_batted_ball(pitches):
 
 def compute_hitter_stats(pitches):
     """Compute hitter stats from a list of pitch dicts for all hitter leaderboard tabs."""
+    # Same rebinding as compute_stats. Per-pitch subsets drop no-pitch IBB
+    # markers; the PA-level one keeps them, because an IBB is a plate
+    # appearance and, for a hitter, a walk.
+    all_rows = pitches
+    pitches = real_pitches(pitches)
     total = len(pitches)
     if total == 0:
         empty = {k: None for k in HITTER_STAT_KEYS}
@@ -440,7 +464,7 @@ def compute_hitter_stats(pitches):
                       'doubles': 0, 'triples': 0, 'hr': 0, 'xbh': 0})
         return empty
 
-    pa_pitches = [p for p in pitches if p.get('Event') and p['Event'] not in NON_PA_EVENTS]
+    pa_pitches = [p for p in all_rows if p.get('Event') and p['Event'] not in NON_PA_EVENTS]
     n_pa = len(pa_pitches)
 
     n_2b = sum(1 for p in pa_pitches if p['Event'] == 'Double')

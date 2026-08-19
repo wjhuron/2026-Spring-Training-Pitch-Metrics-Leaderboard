@@ -58,6 +58,37 @@ NON_PA_EVENTS = {
 }
 BUNT_BB_TYPES = {'bunt', 'bunt_grounder', 'bunt_popup', 'bunt_line_drive'}
 
+
+# ── No-pitch plate appearances ────────────────────────────────────────────
+# Since 2017 an automatic intentional walk contains no pitches, so it is a PA
+# with nothing thrown. Those rows carry PitchID `{game_pk}_{atbat}_00`; real
+# pitch numbers are 1-based, so `_00` is unambiguous (verified: zero existing
+# PitchIDs end in _00).
+#
+# The row must COUNT as a plate appearance and, for a hitter, as a walk. It
+# must NOT count as a pitch. Every per-pitch denominator therefore has to
+# exclude it, and the ones that do were found by measurement rather than by
+# reading code — see scripts/research/misc/ibb_injection_test.py, which
+# injects rows into the golden harness and diffs the whole pipeline.
+#
+# Most filters are already safe because they key on a column being None
+# (BBType, InZone, Description), which a no-pitch row has. The ones that are
+# NOT safe count rows directly, and those are the call sites of real_pitches.
+
+def is_no_pitch(row):
+    """True for a plate-appearance marker row with no pitch thrown."""
+    pid = row.get('PitchID')
+    return bool(pid) and str(pid).endswith('_00')
+
+
+def real_pitches(rows):
+    """Only rows where a pitch was actually thrown.
+
+    Use for any denominator that counts PITCHES. Do NOT use where the
+    denominator is plate appearances — a no-pitch IBB is a real PA.
+    """
+    return [r for r in rows if not is_no_pitch(r)]
+
 # ── Team sets ────────────────────────────────────────────────────────────
 MLB_TEAMS = {
     'ARI', 'ATH', 'ATL', 'BAL', 'BOS', 'CHC', 'CIN', 'CLE', 'COL', 'CWS',

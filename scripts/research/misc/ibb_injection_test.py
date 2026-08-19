@@ -69,8 +69,9 @@ PER_PITCH = {'count', 'swingPct', 'izSwingPct', 'chasePct', 'izSwChase',
              'contactPct', 'izContactPct', 'whiffPct', 'izWhiffPct', 'nSwings',
              'twoStrikeWhiffPct', 'firstPitchSwingPct', 'rv100', 'xRv100',
              'runValue', 'xRunValue', 'strikePct', 'izPct', 'cswPct',
-             'swStrRate', 'swStrPct', 'fpsPct', 'earlyActionPct',
-             'oneOneWinPct'}
+             'swStrRate', 'swStrPct', 'fpsPct', 'oneOneWinPct'}
+# earlyActionPct is PA-denominated, not per-pitch. It is held neutral by
+# running BOTH sides over pitched PAs only; see compute_stats.
 BIP_RATES = {'nBip', 'gbPct', 'fbPct', 'ldPct', 'puPct', 'airPullPct',
              'pullPct', 'middlePct', 'oppoPct', 'hardHitPct', 'barrelPct',
              'avgEVAll', 'maxEV', 'ev50'}

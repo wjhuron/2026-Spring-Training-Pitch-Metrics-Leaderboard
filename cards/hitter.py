@@ -577,6 +577,10 @@ def compute_group_stats(group_pitches, sacq_lookups, bats):
 
     sacq_lookups is a dict of per-hand lookup fns ({'L':..., 'R':...}); each BIP
     is scored by its own Bats so switch hitters are not mirror-flipped."""
+    # No-pitch PA markers are not pitches: they must not enter Swing%,
+    # RV/100 or xRV/100 denominators.
+    from pipeline.utils import real_pitches as _real
+    group_pitches = _real(group_pitches)
     n = len(group_pitches)
     if n == 0:
         return None
