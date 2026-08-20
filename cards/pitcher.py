@@ -1667,13 +1667,15 @@ def _render_single_game_panel(fig, pitches, config=None):
     # end higher, which real 2-3 pitch reliever cards render fine.
     _usage([0.55, 0.25, 0.22, 0.17], usage['R'], tot['R'], 'VS RHH', 'R')
     _usage([0.77, 0.25, 0.22, 0.17], usage['L'], tot['L'], 'VS LHH', 'L')
-    # Tick key — same style + baseline as the W/B/H key under the VS LHH
-    # panel (LOC_BOTTOM 0.25 - 0.006), centered under the pair of usage
-    # groups: their axes span 0.55-0.99, midpoint 0.77 (per Wally
-    # 2026-08-20).
+    # Tick key — same style as the W/B/H key, centered under the pair of
+    # usage groups (axes span 0.55-0.99, midpoint 0.77) and vertically
+    # centered between a full six-row block's bottom track edge and the
+    # table's top border, equal gaps both ways (per Wally 2026-08-20).
+    # y calibrated on the RENDERED output, not raw figure fractions —
+    # savefig runs bbox_inches='tight', which shifts the pixel mapping.
     if _season_u.get('R') or _season_u.get('L'):
-        fig.text(0.77, 0.244, '| = his season usage vs that side',
-                 fontsize=8, color='#000000', va='top', ha='center',
+        fig.text(0.77, 0.234, '| = his season usage vs. that handedness',
+                 fontsize=8, color='#000000', va='center', ha='center',
                  fontfamily='IBM Plex Sans', fontweight='bold')
 
 
