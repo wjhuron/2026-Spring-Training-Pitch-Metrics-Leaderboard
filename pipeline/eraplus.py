@@ -40,8 +40,18 @@ data/era_final_constants.json and the 2026-08-15 research notes.
 
 Called from stuff_plus/train_stuff.py --inject (needs the fresh
 stuffScore, like Pitcher+). Keys survive process_data-only runs via
-XRVOE_KEYS carry-over. AAA/ROC rows get None (the pool, park factors,
-and calibration are MLB).
+XRVOE_KEYS carry-over.
+
+ROC/AAA ROWS SCORE hpERA AND NOT hdERA (2026-08-19). They are scored
+against the MLB pool and never enter it -- no league rate, no z statistic,
+no anchor -- the same translation framing Stuff+, Loc+ and xRVOE already
+use for Rochester. The split is measured, not assumed: on ~800 pitcher-
+seasons appearing at both levels in the same season, 2023-2025
+(scripts/research/era/aaa_level_correction.py), the within-pitcher shift
+is +0.077 ERA for hpERA and +0.765 for hdERA. hpERA survives because its
+channels cancel and hdERA does not because it is nearly pure xwOBA. Their
+home park is NEUTRAL: Savant publishes no minor-league park factors, so
+the park channel z-scores a flat 1.00 for every ROC row.
 """
 import json
 import os
@@ -156,9 +166,19 @@ def _ip_outs(ip_str):
 from pipeline.utils import _pctl  # single-homed percentile convention
 
 
-def compute_xrv_map(pitches, aaa_teams):
-    """(Pitcher, PTeam) -> batter-positive xRV/100 over MLB pitches, plus
-    a per-pitcher pooled entry for combined 2TM/3TM rows."""
+def compute_xrv_map(pitches, aaa_teams, roc_pitches=None):
+    """(Pitcher, PTeam) -> batter-positive xRV/100, plus a per-pitcher
+    pooled entry for combined 2TM/3TM rows.
+
+    `roc_pitches` adds Triple-A entries so a ROC row can score the xRV
+    channel. They are kept OUT of the pooled entry on purpose: the pooled
+    value exists only to serve combined 2TM/3TM rows, and a traded pitcher
+    with a Rochester stint would otherwise have his MLB pooled xRV diluted
+    by minor-league pitches. Callers must hand in ROC pitches whose RunExp
+    is ALREADY in MLB currency (train_stuff.py rescales them in place via
+    compute_runexp_scale before inject); a MiLB-denominated RunExp would
+    run about 1.2x hot and read as a worse pitcher.
+    """
     from pipeline.sdplus import make_rv_xrv
     from collections import defaultdict
     rv_fn = make_rv_xrv(XRV_LG, XRV_SCALE)
@@ -182,6 +202,18 @@ def compute_xrv_map(pitches, aaa_teams):
     for name, (s, n) in pooled.items():
         if n > 0:
             out[(name, None)] = (100.0 * s / n, n)
+    if roc_pitches:
+        roc = defaultdict(lambda: [0.0, 0])
+        for p in roc_pitches:
+            v = rv_fn(p)
+            if v is None:
+                continue
+            a = roc[(p.get('Pitcher'), p.get('PTeam'))]
+            a[0] += v
+            a[1] += 1
+        for key, (s, n) in roc.items():
+            if n > 0:
+                out[key] = (100.0 * s / n, n)
     return out
 
 
@@ -230,7 +262,7 @@ def _channels(row, xrv_map, park, is_combined):
 
 
 def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
-                   is_combined_fn=None, season=None):
+                   is_combined_fn=None, season=None, roc_pitches=None):
     """Set hdERA / hpERA / hdERAPlus / hpERAPlus (+ _pctl each) in place.
     Returns the constants bundle for metadata, or None if the pool is too
     thin. `pitches` = the MLB+MiLB pitch dicts (sheet schema) for the
@@ -244,7 +276,7 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
         season = _dt.now().year
     park = _load_park(season)
 
-    xrv_map = compute_xrv_map(pitches, aaa)
+    xrv_map = compute_xrv_map(pitches, aaa, roc_pitches)
 
     mlb = [r for r in rows if r.get('team') not in aaa]
     pool_rows = [r for r in mlb
@@ -287,8 +319,12 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
     anchor = sum(r['era'] for r in pool_rows) / len(pool_rows)
 
     # z statistics per channel over the pool
+    # ROC rows are SCORED against the MLB pool, never in it: they shape no
+    # league rate, no z statistic and no anchor. Same translation framing
+    # Stuff+, Loc+ and xRVOE already use for Rochester.
+    scored = mlb + [r for r in rows if r.get('team') in aaa]
     raw = {id(r): _channels(r, xrv_map, park, is_combined_fn(r.get('team')))
-           for r in mlb}
+           for r in scored}
     mu_sd = {}
     for c in PH_CHANNELS:
         v = [raw[id(r)][c] for r in pool_rows if raw[id(r)][c] is not None]
@@ -306,11 +342,12 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
         return (val - m) / sd
 
     for r in rows:
-        if r.get('team') in aaa:
+        is_aaa = r.get('team') in aaa
+        ch = raw.get(id(r))
+        if ch is None:
             for k in ('hdERA', 'hpERA', 'hdERAPlus', 'hpERAPlus'):
                 r[k] = None
             continue
-        ch = raw[id(r)]
         zxw = z('xw', ch['xw'])
         dh = (anchor + DH_B * zxw) if zxw is not None else None
         # Every pitcher scores (SIERA convention, per Wally 2026-08-15):
@@ -323,10 +360,29 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
         zs = {c: z(c, ch[c]) for c in W_PH}
         if all(zs[c] is not None for c in W_PH):
             ph = anchor + sum(W_PH[c] * zs[c] for c in W_PH)
-        r['hdERA'] = round(dh, 2) if dh is not None else None
+        # hpERA ships for ROC; hdERA does NOT. Measured on ~800 paired
+        # pitcher-seasons at both levels, 2023-2025
+        # (scripts/research/era/aaa_level_correction.py):
+        #
+        #   hpERA   +0.077 ERA   the composite is level-neutral because its
+        #                        channels cancel -- Triple-A flatters the
+        #                        four outcome channels by +0.262 and its
+        #                        stuff and location give back -0.185
+        #   hdERA   +0.765 ERA   nearly pure xwOBA, so nothing offsets it
+        #
+        # and hdERA's honest correction is a REGRESSION, not a shift:
+        # MLB = 3.630 + 0.226 * AAA, r = 0.209. That maps the whole
+        # Triple-A range (1.58-5.93) into 3.99-4.97, so a corrected column
+        # would read 4.2/4.3/4.4 down the page and look informative while
+        # measuring the anchor. Blank is more honest than near-constant.
+        if is_aaa:
+            r['hdERA'] = None
+            r['hdERAPlus'] = None
+        else:
+            r['hdERA'] = round(dh, 2) if dh is not None else None
+            r['hdERAPlus'] = (round(200.0 - 100.0 * dh / anchor)
+                              if dh is not None else None)
         r['hpERA'] = round(ph, 2) if ph is not None else None
-        r['hdERAPlus'] = (round(200.0 - 100.0 * dh / anchor)
-                          if dh is not None else None)
         r['hpERAPlus'] = (round(200.0 - 100.0 * ph / anchor)
                           if ph is not None else None)
 
@@ -346,8 +402,13 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
 
     n_dh = sum(1 for r in rows if r.get('hdERA') is not None)
     n_ph = sum(1 for r in rows if r.get('hpERA') is not None)
+    n_roc = sum(1 for r in rows
+                if r.get('team') in aaa and r.get('hpERA') is not None)
+    if roc_pitches and not n_roc:
+        print('  eraplus WARNING: roc_pitches supplied but 0 ROC rows '
+              'scored hpERA — check the xRV channel keying (Pitcher, PTeam)')
     print(f'  eraplus: anchor {anchor:.2f} (pool {len(pool_rows)}), '
-          f'hdERA {n_dh} rows, hpERA {n_ph} rows')
+          f'hdERA {n_dh} rows, hpERA {n_ph} rows ({n_roc} of them ROC/AAA)')
     from pipeline.locplus import LOC_SCALE_K
     return {'anchor': round(anchor, 3), 'dhB': DH_B, 'weights': W_PH,
             'n0': {'xw': N0_XW, 'k': N0_K}, 'poolMinOuts': POOL_MIN_OUTS,

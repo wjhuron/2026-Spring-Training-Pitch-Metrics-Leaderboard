@@ -1363,7 +1363,7 @@ def main():
         xrvoe_pt, xrvoe_ov = compute_xrvoe(df, pitches,
                                            roc_df=roc_df, roc_pitches=roc_pitches)
         inject(agg, overall, league, xrvoe_pt=xrvoe_pt, xrvoe_ov=xrvoe_ov,
-               pc_maps=pc_maps, mlb_pitches=pitches)
+               pc_maps=pc_maps, mlb_pitches=pitches, roc_pitches=roc_pitches)
     else:
         print('  (skipped leaderboard injection; run with --inject to surface)')
 
@@ -1639,7 +1639,7 @@ def compute_xrvoe(df, pitches, roc_df=None, roc_pitches=None):
 
 
 def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None,
-           mlb_pitches=None):
+           mlb_pitches=None, roc_pitches=None):
     """Write stuffScore into BOTH leaderboards.
 
     Percentile convention (site standard, aligned 2026-07-02): the pool that
@@ -1819,8 +1819,13 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None,
     # stuffScore + locPlusRaw + rate stats). Also sets the default
     # leaderboard row order (hpERA good -> bad).
     from pipeline.eraplus import apply_era_plus, sort_rows_default
+    _era_roc_pitches = roc_pitches
     if mlb_pitches is not None:
-        _era_const = apply_era_plus(pp, mlb_pitches)
+        # roc_pitches carry MLB-currency RunExp (rescaled in place above),
+        # which the xRV channel needs; without them a ROC row has no xRV
+        # and hpERA stays None for every Rochester arm.
+        _era_const = apply_era_plus(pp, mlb_pitches,
+                                    roc_pitches=_era_roc_pitches)
     else:
         # No pitch list handed in (unexpected caller): keep the carried
         # hdERA/hpERA values rather than dying mid-inject.
