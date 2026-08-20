@@ -1882,6 +1882,12 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
         if ev < 105: return 430
         return 540
 
+    # Set (via mutation — the panel draws inside a nested function) when the
+    # damage-concentration ellipse actually renders, so the legend can key it
+    # (audit 2026-08-20: it was the one mark on the chart with no key).
+    # Outcome view never draws it.
+    _damage_ellipse_drawn = {'flag': False}
+
     def _draw_spray_panel(ax, side, pts, hand_zones_p, pool_zones_p,
                           med_pair, first_panel=True, header=None):
         """One LA x Spray panel: zone overlay + grid + BIP scatter + median
@@ -1967,6 +1973,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                                           angle=_th, facecolor='none',
                                           edgecolor='#9a3b1e', linewidth=2.0,
                                           linestyle=(0, (5, 3)), zorder=2.6))
+                    _damage_ellipse_drawn['flag'] = True
         else:
             # OUTCOME VIEW: outs first (back), then hits by weight
             _OUTCOME_Z = {'Out': 0, '1B': 1, '2B': 2, '3B': 3, 'HR': 4}
@@ -2325,6 +2332,10 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     row1_w += DIV_HALF_GAP + DIV_W + DIV_HALF_GAP
     row1_w += 2 * DOT_RADIUS + 0.006 + _measure_text('Size = EV', LEGEND_FONTSIZE) + ITEM_GAP
     row1_w += 2 * AVG_HALO_RADIUS + 0.006 + _measure_text('Avg Placement', LEGEND_FONTSIZE)
+    # Damage-zone swatch (dashed ring) — only when the chart drew the
+    # concentration ellipse, so the key never lists an absent mark.
+    if _damage_ellipse_drawn['flag']:
+        row1_w += ITEM_GAP + 2 * DOT_RADIUS + 0.006 + _measure_text('Damage Zone', LEGEND_FONTSIZE)
     cur_x = legend_center_x - row1_w / 2
 
     for i, (label, hexcolor, _cat) in enumerate(OUTCOME_LEGEND):
@@ -2369,7 +2380,18 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                    transform=fig.transFigure, figure=fig, zorder=11)
     fig.add_artist(core)
     cur_x += 2 * AVG_HALO_RADIUS + 0.006
-    _draw_text(cur_x, legend_y_dots, 'Avg Placement', LEGEND_FONTSIZE, TEXT_DIMMED)
+    cur_x = _draw_text(cur_x, legend_y_dots, 'Avg Placement', LEGEND_FONTSIZE, TEXT_DIMMED)
+
+    # Damage-zone swatch: dashed ring in the ellipse's own stroke style.
+    if _damage_ellipse_drawn['flag']:
+        cur_x += ITEM_GAP
+        _dz = Circle((cur_x + DOT_RADIUS, legend_y_dots), DOT_RADIUS,
+                     facecolor='none', edgecolor='#9a3b1e', linewidth=1.6,
+                     linestyle=(0, (3, 2)), transform=fig.transFigure,
+                     figure=fig, zorder=10)
+        fig.add_artist(_dz)
+        cur_x += 2 * DOT_RADIUS + 0.006
+        _draw_text(cur_x, legend_y_dots, 'Damage Zone', LEGEND_FONTSIZE, TEXT_DIMMED)
 
     # Row 2 — MLB wOBAcon gradient (label + .000 + bar + 1.000+)
     grad_label = 'MLB wOBAcon: '
@@ -2421,8 +2443,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
             # measured over the window. Say what the percentiles rank against,
             # because that is the one thing a reader cannot infer.
             _notes = (
-                '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+: 100 is league '
-                'average and each point is 1% better or worse, the way wRC+ reads.\n'
+                '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+: 100 is league\n'
+                '    average and each point is 1% better or worse, the way wRC+ reads.\n'
                 '•  GB% is colored so that lower = better.\n'
                 '•  Values are for this date window. Percentiles rank them against '
                 'the full-season MLB pool, with no minimum sample.'
@@ -2440,8 +2462,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
             )
         else:
             _notes = (
-                '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+: 100 is league '
-                'average and each point is 1% better or worse, the way wRC+ reads.\n'
+                '•  Hitter+, Batted Ball+, Contact+ and Swing Decisions+: 100 is league\n'
+                '    average and each point is 1% better or worse, the way wRC+ reads.\n'
                 '•  GB% is colored so that lower = better.\n'
                 '•  Z-Swing% and Z-Contact% count in-zone pitches only: swings at '
                 'strikes, and contact on those swings.'

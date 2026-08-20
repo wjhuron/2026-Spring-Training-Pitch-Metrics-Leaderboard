@@ -1834,7 +1834,6 @@ def render_card(config, pitches, output_file):
     if config.get('mvn_models'):
         _FB_POOL = ('FF', 'FA', 'SI')
         _velo_by_start = defaultdict(list)
-        _fb_counts = defaultdict(int)
         for p in pitches:
             _pt_ = p.get('Pitch Type')
             if _pt_ not in _FB_POOL:
@@ -1842,9 +1841,6 @@ def render_card(config, pitches, output_file):
             _v = sf(p.get('Velocity')); _gd = p.get('Game Date')
             if _v is not None and _gd:
                 _velo_by_start[_gd].append(_v)
-                _fb_counts[_pt_] += 1
-        # dominant type just picks the accent color for the season-high dot
-        _fb_type = max(_fb_counts, key=_fb_counts.get) if _fb_counts else 'FF'
         _sdates = sorted(_velo_by_start)
         if len(_sdates) >= 3:
             _svelos = [float(np.mean(_velo_by_start[d])) for d in _sdates]
@@ -1864,8 +1860,12 @@ def render_card(config, pitches, output_file):
             ax_spark.scatter(_sxs, _svelos, s=16, c=TEXT_MUTED, zorder=3)
             # accent the season high + latest start
             _shi = int(np.argmax(_svelos))
-            ax_spark.scatter([_shi], [_svelos[_shi]], s=22,
-                             c=PITCH_COLORS.get(_fb_type, '#0072B2'), zorder=4)
+            # Neutral dark ink for the season-high dot (was the dominant
+            # fastball's pitch color until 2026-08-20, per Wally): the series
+            # pools FF/FA/SI, so a pitch-type color wrongly implied the line
+            # tracked one pitch.
+            _max_col = TEXT_PRIMARY
+            ax_spark.scatter([_shi], [_svelos[_shi]], s=22, c=_max_col, zorder=4)
             ax_spark.scatter([_sxs[-1]], [_svelos[-1]], s=22, c=ACCENT, zorder=4)
             ax_spark.axis('off')
 
@@ -1873,10 +1873,28 @@ def render_card(config, pitches, output_file):
             ax_main.text(photo_left, _label_y, 'FB VELO BY OUTING', fontsize=8.5,
                          color=TEXT_SECONDARY, fontweight='bold',
                          fontfamily='IBM Plex Sans', va='bottom')
-            ax_main.text(photo_left + strip_w_in, _label_y,
-                         f'{_svelos[-1]:.1f} last  ·  {_savg:.1f} avg  ·  {max(_svelos):.1f} max',
-                         fontsize=8.5, color=TEXT_MUTED, fontweight='bold',
-                         fontfamily='IBM Plex Sans', va='bottom', ha='right')
+            # The caption doubles as the dot key: "last" wears the accent red
+            # of the last-start dot and "max" wears the season-high dot's
+            # fastball color, so the two special dots decode with zero added
+            # ink (audit 2026-08-20). Segments draw right-to-left, each
+            # measured through the renderer, because matplotlib text has no
+            # per-span color.
+            _cap_segs = [
+                (f'{_svelos[-1]:.1f} last', ACCENT),
+                ('  ·  ', TEXT_MUTED),
+                (f'{_savg:.1f} avg', TEXT_MUTED),
+                ('  ·  ', TEXT_MUTED),
+                (f'{max(_svelos):.1f} max', _max_col),
+            ]
+            _cap_rend = fig.canvas.get_renderer()
+            _cap_x = photo_left + strip_w_in
+            for _seg_txt, _seg_col in reversed(_cap_segs):
+                _seg = ax_main.text(_cap_x, _label_y, _seg_txt, fontsize=8.5,
+                                    color=_seg_col, fontweight='bold',
+                                    fontfamily='IBM Plex Sans', va='bottom',
+                                    ha='right')
+                _cap_x -= _seg.get_window_extent(renderer=_cap_rend) \
+                    .transformed(ax_main.transData.inverted()).width
 
             def _fmt_spark_date(d):
                 try:
