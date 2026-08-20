@@ -31,6 +31,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.patheffects as mpe
 from matplotlib.patches import Ellipse, FancyBboxPatch, Rectangle
 
 # Register the bundled print-identity fonts (Bitter, IBM Plex Sans / Condensed)
@@ -1671,7 +1672,13 @@ def render_card(config, pitches, output_file):
             try:
                 desc = p.get('Description', '')
                 is_b = str(p.get('Barrel', '')).strip() == '6'
-                locations[bh][pt].append((float(px), float(pz), desc, is_b))
+                # Non-barrel hard-hit: official EV >= 95 on a ball in play.
+                # Barrel stays the official launch_speed_angle column; the
+                # two marks are mutually exclusive (B wins).
+                _ev = sf(p.get('ExitVelo'))
+                is_hh = (desc == 'In Play' and not is_b
+                         and _ev is not None and _ev >= 95)
+                locations[bh][pt].append((float(px), float(pz), desc, is_b, is_hh))
             except Exception: pass
         if szt is not None and szt != '' and szb is not None and szb != '':
             try: sz_tops.append(float(szt)); sz_bots.append(float(szb))
@@ -2104,9 +2111,10 @@ def render_card(config, pitches, output_file):
                     mx, my = np.mean(xs), np.mean(ys)
                     _pc = PITCH_COLORS[pt]
                     # Outline-only ellipse + center dot at the per-type mean —
-                    # one format on both layouts. The center dot is the ONLY
-                    # dot: per-pitch dots and W/B marks were removed
-                    # 2026-08-13, per Wally.
+                    # one format on both layouts. Daily cards layer per-pitch
+                    # dots + W/B/H marks back on top (removed 2026-08-13,
+                    # restored 2026-08-20, per Wally); season panels stay
+                    # center-dot-only.
                     ax.add_patch(Ellipse(
                         (mx, my),
                         2 * 1.0 * np.sqrt(vals[1]), 2 * 1.0 * np.sqrt(vals[0]),
@@ -2116,6 +2124,38 @@ def render_card(config, pitches, output_file):
                     ))
                     ax.scatter([mx], [my], c=_pc, s=32, alpha=1.0,
                                edgecolors=TEXT_PRIMARY, linewidths=0.6, zorder=4)
+        # Per-pitch marks — single-game cards only. Every pitch draws a dot
+        # (s=30, down from the pre-declutter 55); a whiff draws a W instead,
+        # a barrel a B, a non-barrel hard-hit ball (In Play, EV >= 95) an H.
+        # The letter replaces the dot. Letters carry a paper-color halo so
+        # they stay legible across ellipse strokes and neighbor dots, and sit
+        # above the per-type center dots (zorder 5 vs 4) so an outcome on top
+        # of a mean never hides. Chosen from a 6-variant comparison 2026-08-20,
+        # per Wally. Season panels stay center-dot-only.
+        if not is_season:
+            for pt in PITCH_ORDER:
+                if pt not in locations[hand]: continue
+                color = PITCH_COLORS[pt]
+                for px_val, pz_val, desc, barrel_flag, hh_flag in locations[hand][pt]:
+                    if desc == 'Swinging Strike':
+                        _mark = 'W'
+                    elif barrel_flag:
+                        _mark = 'B'
+                    elif hh_flag:
+                        _mark = 'H'
+                    else:
+                        ax.scatter([px_val], [pz_val], c=[color], s=30,
+                                   edgecolors='none', zorder=3)
+                        continue
+                    # clip_on: scatter clips to the axes automatically, text
+                    # does not — without it a far-outside pitch stamps its
+                    # letter into the titles/footnotes.
+                    ax.text(px_val, pz_val, _mark, fontsize=9,
+                            fontweight='bold', color=color, ha='center',
+                            va='center', zorder=5, clip_on=True,
+                            fontfamily='IBM Plex Sans',
+                            path_effects=[mpe.withStroke(
+                                linewidth=2.2, foreground=PLOT_PANEL)])
 
     # loc_hands restricts which zone panels are drawn. A platoon-split card
     # holds pitches to one side only, so the other panel would render as an
@@ -2164,6 +2204,14 @@ def render_card(config, pitches, output_file):
     if not is_season_loc:
         _fx = _x if len(_loc_hands) == 1 else LOC_L_X
         fig.text(_fx, LOC_BOTTOM - 0.006, f'Min. {zone_ellipse_min} pitches for ellipse',
+                 fontsize=8, color='#000000', va='top', ha='left',
+                 fontfamily='IBM Plex Sans', fontweight='bold')
+        # W/B/H letter key (returned with the per-pitch marks 2026-08-20).
+        # Two panels: under the VS LHH plot, mirroring the ellipse note.
+        # One panel: second line under the ellipse note.
+        _lx, _ly = ((LOC_R_X, LOC_BOTTOM - 0.006)
+                    if len(_loc_hands) > 1 else (_fx, LOC_BOTTOM - 0.026))
+        fig.text(_lx, _ly, 'W = Whiff, B = Barrel, H = Hard-Hit (non-barrel)',
                  fontsize=8, color='#000000', va='top', ha='left',
                  fontfamily='IBM Plex Sans', fontweight='bold')
 
