@@ -1620,7 +1620,12 @@ def _render_single_game_panel(fig, pitches, config=None):
         if bh in ('L', 'R') and pt:
             usage[bh][pt] += 1; tot[bh] += 1
 
-    def _usage(rect, data, total, title):
+    # Season per-hand usage for the bar ticks (config['season_hand_usage'],
+    # computed in main from ALL of this pitcher's rows in the tabs read this
+    # run). Empty dict → no ticks, no note.
+    _season_u = (config or {}).get('season_hand_usage') or {}
+
+    def _usage(rect, data, total, title, hand):
         ax = fig.add_axes(rect); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
         ax.axis('off'); ax.set_facecolor(BG)
         # Pitch count in the title: the bars are percentages, so without it a
@@ -1643,13 +1648,31 @@ def _render_single_game_panel(fig, pitches, config=None):
                 ax.add_patch(Rectangle((0.17, y - rh * 0.28), 0.58 * pct, rh * 0.56, facecolor=color, edgecolor='none'))
             ax.text(0.78, y, ("< 1%" if 0 < pct*100 < 1 else f'{pct*100:.1f}%'), fontsize=10, va='center', ha='left',
                     color=TEXT_PRIMARY, fontweight='bold', fontfamily='IBM Plex Sans')
+            # Season-usage tick: the track is a 0-100% ruler, so the tick
+            # rides the TRACK, not the colored fill — an under-average night
+            # puts it on empty tan past the fill. Paper halo under dark ink
+            # keeps it legible on both the fill and the track.
+            _sp = _season_u.get(hand, {}).get(pt)
+            if _sp is not None:
+                _tx = 0.17 + 0.58 * _sp
+                ax.plot([_tx, _tx], [y - rh * 0.34, y + rh * 0.34], color=BG,
+                        linewidth=3.2, solid_capstyle='butt', zorder=4)
+                ax.plot([_tx, _tx], [y - rh * 0.34, y + rh * 0.34],
+                        color=TEXT_PRIMARY, linewidth=1.3,
+                        solid_capstyle='butt', zorder=5)
 
     # Anchor y=0.25 bottom-aligns a full six-row block with the location
     # panels' bottom edge (2026-08-20, per Wally; was 0.32). One fixed
     # geometry for every card — smaller arsenals keep this title height and
     # end higher, which real 2-3 pitch reliever cards render fine.
-    _usage([0.55, 0.25, 0.22, 0.17], usage['R'], tot['R'], 'VS RHH')
-    _usage([0.77, 0.25, 0.22, 0.17], usage['L'], tot['L'], 'VS LHH')
+    _usage([0.55, 0.25, 0.22, 0.17], usage['R'], tot['R'], 'VS RHH', 'R')
+    _usage([0.77, 0.25, 0.22, 0.17], usage['L'], tot['L'], 'VS LHH', 'L')
+    # Tick key — same style + baseline as the W/B/H key under the VS LHH
+    # panel (LOC_BOTTOM 0.25 - 0.006, per Wally 2026-08-20).
+    if _season_u.get('R') or _season_u.get('L'):
+        fig.text(0.55, 0.244, '| = his season usage vs that side',
+                 fontsize=8, color='#000000', va='top', ha='left',
+                 fontfamily='IBM Plex Sans', fontweight='bold')
 
 
 def render_card(config, pitches, output_file):
@@ -2114,19 +2137,25 @@ def render_card(config, pitches, output_file):
                     angle = np.degrees(np.arctan2(vecs[1, 1], vecs[0, 1]))
                     mx, my = np.mean(xs), np.mean(ys)
                     _pc = PITCH_COLORS[pt]
-                    # Outline-only ellipse + center dot at the per-type mean —
-                    # one format on both layouts. Daily cards layer per-pitch
-                    # dots + W/B/H marks back on top (removed 2026-08-13,
-                    # restored 2026-08-20, per Wally); season panels stay
-                    # center-dot-only.
+                    # Outline-only ellipse + center dot at the per-type mean.
+                    # Daily cards layer per-pitch dots + W/B/H marks back on
+                    # top (removed 2026-08-13, restored 2026-08-20, per
+                    # Wally), so their strokes THIN + DIM to sit behind the
+                    # full-alpha dots, and the mean dot GROWS to stay findable
+                    # among same-size pitch dots. Bracketed by eye 2026-08-20:
+                    # 1.2/0.50 too faint, 1.7/0.80 too busy, mean dot 32 lost
+                    # in the field. Season panels carry no per-pitch marks and
+                    # keep the heavier strokes.
+                    _ell_a, _ell_lw, _ctr_s = ((0.95, 2.2, 32) if is_season
+                                               else (0.65, 1.4, 48))
                     ax.add_patch(Ellipse(
                         (mx, my),
                         2 * 1.0 * np.sqrt(vals[1]), 2 * 1.0 * np.sqrt(vals[0]),
                         angle=angle, fill=False,
-                        edgecolor=_rgba(_pc, 0.95),
-                        linewidth=2.2, zorder=1
+                        edgecolor=_rgba(_pc, _ell_a),
+                        linewidth=_ell_lw, zorder=1
                     ))
-                    ax.scatter([mx], [my], c=_pc, s=32, alpha=1.0,
+                    ax.scatter([mx], [my], c=_pc, s=_ctr_s, alpha=1.0,
                                edgecolors=TEXT_PRIMARY, linewidths=0.6, zorder=4)
         # Per-pitch marks — single-game cards only. Every pitch draws a dot
         # (s=30, down from the pre-declutter 55); a whiff draws a W instead,
@@ -4136,6 +4165,26 @@ def main():
     pitcher_names = sorted(pitches_by_pitcher.keys())
     print(f"  Found {len(pitcher_names)} pitchers across {len(game_dates_seen)} game dates: {', '.join(pitcher_names)}")
 
+    # Season per-hand usage for the daily usage-bar ticks: ALL of a card
+    # pitcher's rows in the tabs read this run, not just the date window
+    # (all_rows is the full tab, so this is free). Scope caveat: a midseason
+    # acquisition's rows cover his time on this card's team tab only, while
+    # the table's shading baselines come from the all-team leaderboard row.
+    season_hand_usage_by_pitcher = {}
+    for row in all_rows:
+        nm = row.get('Pitcher', '')
+        if not nm or nm not in pitches_by_pitcher:
+            continue
+        bh, pt = row.get('Bats', ''), row.get('Pitch Type', '')
+        if bh in ('L', 'R') and pt:
+            d = season_hand_usage_by_pitcher.setdefault(
+                nm, {'L': defaultdict(int), 'R': defaultdict(int)})
+            d[bh][pt] += 1
+    for nm, d in season_hand_usage_by_pitcher.items():
+        for bh in ('L', 'R'):
+            tot = sum(d[bh].values())
+            d[bh] = ({pt: c / tot for pt, c in d[bh].items()} if tot else {})
+
     # Season cards: stamp the latest game date for freshness (matches the
     # hitter card's "Through May 31"). game_dates_seen hold 'YYYY-MM-DD'.
     if start_date is None and end_date is None and game_dates_seen:
@@ -4432,6 +4481,8 @@ def main():
             # DAILY ONLY — his own season baselines (see _season_pitch_lb_for).
             'season_pitch_lb': _season_pitch_lb_for(pitcher_name, eff_team,
                                                     pitch_lb_by_pitcher),
+            # DAILY ONLY — season per-hand usage for the usage-bar ticks.
+            'season_hand_usage': season_hand_usage_by_pitcher.get(pitcher_name, {}),
             'opponent': _opponent_label(pitches),
         }
 
