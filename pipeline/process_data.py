@@ -3287,33 +3287,112 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # Mirrored in js/aggregator.js via metadata bbPlusWeights /
     # bbPlusShrinkN0Con / bbPlusShrinkN0Ev / bbPlusEvPct — BB+ is the ONLY
     # "+" recomputed client-side, so both sides move in the same commit.
-    # REVERTED 2026-08-19 to pure xwOBAcon+ at the measured n0=60.
+    # BB+ — batted-ball contact-quality index, 100 = league average.
     #
-    # The 0.30/0.70 xwOBAcon/EV95 blend shipped earlier today was WRONG and
-    # is withdrawn. It blended two ratio-to-league quantities in
-    # incommensurable units: SD(conPlus) is about 15 and SD(evPlus) about
-    # 2.6, so "one percent" means something ~4x larger on the EV channel.
-    # The derivation that chose the weights maximised held-out CORRELATION,
-    # which is scale-invariant and therefore blind to units, so nothing in
-    # it could catch this. The result printed at slope 3.19 on true
-    # xwOBAcon%: BB+ 114 meant 44% above league, not 14%, and the whole
-    # qualified pool collapsed to SD 4.6 (range 89.5-113.7) against 12.9.
+    # TWO INGREDIENTS: mean xwOBAcon and the 95th-percentile exit velocity.
+    # A mean of a heavy-tailed per-BIP quantity is a weak estimator of the
+    # skill; an EV ceiling measures the same skill far more stably.
     #
-    # The EV95 channel itself is real — it carries +.0311 held-out
-    # descriptive and +.0270 predictive over pure xwOBAcon, 6/6 seasons and
-    # 5/5 pairs. It returns once the derivation is redone with both channels
-    # in xwOBAcon units and re-validated under nested leave-one-season-out.
-    # Do NOT reinstate the blend from the old constants.
-    BB_PLUS_W_CON = 1.0
-    BB_PLUS_W_EV  = 0.0
+    #   ev_c   = 100 + (evPlus - 100) * BETA      <- into xwOBAcon-% units
+    #   raw    = (1-W)*shrink(conPlus, nBip, N0_CON) + W*shrink(ev_c, nBip, N0_EV)
+    #   bbPlus = 100 + (raw - 100) * SLOPE_MATCH
+    #
+    # THE UNIT CONVERSION IS NOT OPTIONAL. conPlus and evPlus are both
+    # "percent of league", but of different quantities: SD(conPlus) is about
+    # 15 and SD(evPlus) about 2.6, so one percent of EV is roughly four
+    # percent of xwOBAcon. A first version of this metric blended them raw
+    # and shipped on 2026-08-19 badly wrong — it printed at slope 3.19 on
+    # true xwOBAcon% (BB+ 114 meant 44% above league) and the qualified pool
+    # collapsed to SD 4.6. It was reverted the same day. BETA is what makes
+    # the two channels commensurable; never blend them without it.
+    #
+    # SLOPE_MATCH exists because the two weights are constrained to sum to 1,
+    # and a convex blend cannot be unbiased in general. It is the missing
+    # degree of freedom, not a patch. Being a pure scale it CANNOT change any
+    # correlation, so the estimator shape (weights, shrinkage) and the units
+    # (this constant) are independent concerns and were settled separately.
+    #
+    # DERIVATION: scripts/research/hitter/bbplus_ev_derivation.py.
+    # Nested leave-one-SEASON-out (the folds inside a season share games, so
+    # seasons are the independent unit), 3 seeds, 2021-2026, config chosen on
+    # training seasons only, graded against an OUTCOME target (the other
+    # half's actual wOBA — an xwOBA target is model-family biased toward EV
+    # channels and produced a false positive on an earlier screen).
+    #   BB+     r .2902 -> .3134  (+.0232)  6/6 seasons
+    #   Hitter+ r .3645 -> .3954  (+.0309)  6/6 seasons
+    #
+    # CONSTANTS, labelled honestly. n0_con 130 and n0_ev 0 were unanimous
+    # across all six held-out seasons. w_ev 0.40 and the percentile are a
+    # FLAT region, not a peak: p85/p90/p95 differ by .0006 in r and disagree
+    # on which is best, so p95 is a convention (it was already computed).
+    # SLOPE_MATCH was measured at PRODUCTION sample size (~364 BIP) by a
+    # ratio estimator against the pure-xwOBAcon BB+, whose MMSE shrinkage
+    # puts its own slope at 1. Measuring it on half-season folds gives 1.30
+    # and would over-correct by 6% — the classic "tune at the sample size
+    # you will actually run at" trap, which this metric fell into once
+    # already with a different constant.
+    BB_PLUS_W_CON = 0.60
+    BB_PLUS_W_EV  = 0.40
     BB_PLUS_W_SP  = 0.0
-    BB_PLUS_N0_CON = 60
+    BB_PLUS_N0_CON = 130
     BB_PLUS_N0_EV  = 0
     BB_PLUS_EV_PCT = 95
+    BB_PLUS_SLOPE_MATCH = 1.2352
+    # BETA is measured LIVE from the current pool, matching how Hitter+
+    # handles its own run-truth. Frozen fallback is the 2021-2026 mean; the
+    # per-season values were 4.017 / 4.017 / 4.393 / 4.099 / 4.326 / 4.378,
+    # a 9% spread, and live vs frozen changed held-out r by less than .0001.
+    # Live is preferred so a real league shift self-corrects; the band exists
+    # so a thin or broken pool cannot silently move the scale.
+    BB_PLUS_BETA_FROZEN = 4.205
+    BB_PLUS_BETA_BAND = (3.0, 6.0)
+    BB_PLUS_BETA_MIN_POOL = 40
+    BB_PLUS_BETA_GATE_BIP = 80
+    # Published precision IS applied precision: round_floats_inplace() caps
+    # artifact floats at 6 dp, and js/aggregator.js can only apply what it
+    # reads. Round before use, publish the same number.
+    BB_PLUS_FACTOR_DP = 6
     # Display floor only. Below it a score is mostly prior, not worth a cell.
     BB_PLUS_MIN_BIP = 30
     lg_xwobacon_bb = hitter_league_avgs.get('xwOBAcon')
     lg_ev95_bb = hitter_league_avgs.get('ev95')
+
+    # ── BETA: league OLS slope of conPlus on evPlus, current pool ────────
+    _beta_bb = BB_PLUS_BETA_FROZEN
+    _beta_src = 'frozen'
+    if BB_PLUS_W_EV and lg_xwobacon_bb and lg_ev95_bb:
+        _bx, _by = [], []
+        for _r in hitter_leaderboard:
+            if _r.get('_isROC') or _r.get('_isCombined'):
+                continue
+            _xc, _ev = _r.get('xwOBAcon'), _r.get('ev95')
+            if (_xc is not None and _ev is not None
+                    and (_r.get('nBip') or 0) >= BB_PLUS_BETA_GATE_BIP):
+                _bx.append(100.0 * _ev / lg_ev95_bb)
+                _by.append(100.0 * _xc / lg_xwobacon_bb)
+        if len(_bx) >= BB_PLUS_BETA_MIN_POOL:
+            _mx = sum(_bx) / len(_bx)
+            _my = sum(_by) / len(_by)
+            _num = sum((a - _mx) * (b - _my) for a, b in zip(_bx, _by))
+            _den = sum((a - _mx) ** 2 for a in _bx)
+            if _den > 1e-9:
+                _cand = _num / _den
+                if BB_PLUS_BETA_BAND[0] <= _cand <= BB_PLUS_BETA_BAND[1]:
+                    _beta_bb, _beta_src = _cand, 'live'
+                else:
+                    print(f"  WARNING: BB+ live beta {_cand:.3f} outside "
+                          f"{BB_PLUS_BETA_BAND} — using frozen "
+                          f"{BB_PLUS_BETA_FROZEN}. The EV-to-xwOBAcon unit "
+                          f"conversion is suspect; check the ev95 column.")
+        else:
+            print(f"  WARNING: BB+ beta pool is {len(_bx)} hitters "
+                  f"(< {BB_PLUS_BETA_MIN_POOL}) — using frozen "
+                  f"{BB_PLUS_BETA_FROZEN}.")
+    _beta_bb = round(_beta_bb, BB_PLUS_FACTOR_DP)
+    _slope_bb = round(BB_PLUS_SLOPE_MATCH, BB_PLUS_FACTOR_DP)
+    print(f"  BB+ beta ({_beta_src}): {_beta_bb:.3f}  "
+          f"slope-match: {_slope_bb:.4f}")
+
     _bb_missing_ev = 0
     for row in hitter_leaderboard:
         xc = row.get('xwOBAcon')
@@ -3322,26 +3401,30 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         n_bip = row.get('nBip') or 0
         sp_ok = (BB_PLUS_W_SP == 0.0 or sv is not None)
         # An ingredient is only REQUIRED when it carries weight. Without this
-        # a zero-weighted EV term still blanks every hitter missing ev95 —
-        # which is every ROC hitter before the minors supplement lands.
+        # a zero-weighted term still blanks every hitter missing that input.
         # Mirrors the same guard in js/aggregator.js.
         ev_ok = (BB_PLUS_W_EV == 0.0 or (ev is not None and lg_ev95_bb))
         if (xc is not None and ev_ok and sp_ok
                 and lg_xwobacon_bb
                 and n_bip >= BB_PLUS_MIN_BIP):
             con_plus = 100.0 * xc / lg_xwobacon_bb
-            ev_plus = (100.0 * ev / lg_ev95_bb) if BB_PLUS_W_EV else 100.0
+            # evPlus -> xwOBAcon-percent units BEFORE blending.
+            ev_plus = ((100.0 + (100.0 * ev / lg_ev95_bb - 100.0) * _beta_bb)
+                       if BB_PLUS_W_EV else 100.0)
             # sprayPlus: the residual re-expressed on the xwOBAcon scale so
-            # the ratio-to-100 convention holds (100 + 100·resid/lg).
+            # the ratio-to-100 convention holds.
             sp_plus = (100.0 * (lg_xwobacon_bb + sv) / lg_xwobacon_bb
                        if sv is not None else 100.0)
+            # Each ingredient shrinks at its OWN n0 BEFORE blending. That is
+            # only distinct from blend-then-shrink because the n0 differ:
+            # shrinkage is linear, so a shared n0 makes the two identical.
             con_adj = ((n_bip * con_plus + BB_PLUS_N0_CON * 100.0)
                        / (n_bip + BB_PLUS_N0_CON))
             ev_adj = ((n_bip * ev_plus + BB_PLUS_N0_EV * 100.0)
                       / (n_bip + BB_PLUS_N0_EV))
-            row['bbPlus'] = (BB_PLUS_W_CON * con_adj
-                             + BB_PLUS_W_EV * ev_adj
-                             + BB_PLUS_W_SP * sp_plus)
+            _raw = (BB_PLUS_W_CON * con_adj + BB_PLUS_W_EV * ev_adj
+                    + BB_PLUS_W_SP * sp_plus)
+            row['bbPlus'] = 100.0 + (_raw - 100.0) * _slope_bb
         else:
             if (BB_PLUS_W_EV and xc is not None and ev is None
                     and n_bip >= BB_PLUS_MIN_BIP):
@@ -3666,6 +3749,12 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         # server again (the 0.6/0.4 → 0.585/0.415 desync shipped for months).
         'bbPlusWeights': {'con': BB_PLUS_W_CON, 'ev': BB_PLUS_W_EV,
                           'sp': BB_PLUS_W_SP},
+        # The client recomputes BB+ under filters, so it needs the exact beta
+        # and slope the server applied — not its own recomputation, which
+        # would use a different pool.
+        'bbPlusBeta': _beta_bb,
+        'bbPlusBetaSource': _beta_src,
+        'bbPlusSlopeMatch': _slope_bb,
         'bbPlusShrinkN0Con': BB_PLUS_N0_CON,
         'bbPlusShrinkN0Ev': BB_PLUS_N0_EV,
         'bbPlusEvPct': BB_PLUS_EV_PCT,

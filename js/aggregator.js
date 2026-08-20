@@ -2494,9 +2494,11 @@ const Aggregator = {
       // metadata gap degrades to the shipped definition, not to a wrong one.
       const bbN0Con = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusShrinkN0Con);
       const bbN0Ev = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusShrinkN0Ev);
-      const n0Con = (bbN0Con != null) ? bbN0Con : 60;
+      const n0Con = (bbN0Con != null) ? bbN0Con : 130;
       const n0Ev = (bbN0Ev != null) ? bbN0Ev : 0;
       const lgEV95 = hLgAvgs.ev95;
+      const bbBeta = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusBeta) || 4.205;
+      const bbSlope = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusSlopeMatch) || 1.2352;
       const bbMinBip = (DataStore && DataStore.metadata && DataStore.metadata.bbPlusMinBip) || 30;
       const nBipBB = obj.nBip || 0;
       const spOk = bbW && (bbW.sp === 0 || obj.sprayVal != null);
@@ -2507,12 +2509,22 @@ const Aggregator = {
       const evOk = (wEv === 0) || (obj.ev95 != null && lgEV95);
       if (obj.xwOBAcon != null && spOk && evOk && lgXC && bbW && nBipBB >= bbMinBip) {
         const conPlus = 100 * obj.xwOBAcon / lgXC;
-        const evPlus = (wEv === 0) ? 100 : 100 * obj.ev95 / lgEV95;
+        // evPlus is converted into xwOBAcon-PERCENT units before it is
+        // blended. Both channels are "percent of league", but of different
+        // quantities — SD(conPlus) ~15 against SD(evPlus) ~2.6 — so a raw
+        // blend lands in a mixed unit and breaks the "+" contract. beta comes
+        // from metadata: it must be the value the SERVER used, because a
+        // client-side refit would use the filtered pool and drift.
+        const evPlus = (wEv === 0) ? 100
+          : 100 + (100 * obj.ev95 / lgEV95 - 100) * bbBeta;
         const spPlus = obj.sprayVal != null ? 100 * (lgXC + obj.sprayVal) / lgXC : 100;
         const conAdj = (nBipBB * conPlus + n0Con * 100) / (nBipBB + n0Con);
         const evAdj = (nBipBB * evPlus + n0Ev * 100) / (nBipBB + n0Ev);
-        // Shrink BEFORE the re-anchor, mirroring the server order.
-        const shrunkBB = bbW.con * conAdj + wEv * evAdj + bbW.sp * spPlus;
+        // Shrink BEFORE the re-anchor, mirroring the server order. The slope
+        // match puts the blend back on the xwOBAcon-percent scale; the two
+        // weights sum to 1, so the blend alone cannot be unbiased.
+        const rawBB = bbW.con * conAdj + wEv * evAdj + bbW.sp * spPlus;
+        const shrunkBB = 100 + (rawBB - 100) * bbSlope;
         // Mirror the server's re-anchor (all-MLB PA-weighted mean = 100).
         // sd/ct/hitterPlus are pass-through; bbPlus is the only "+"
         // recomputed client-side, so it must apply the same factor.
