@@ -1644,8 +1644,12 @@ def _render_single_game_panel(fig, pitches, config=None):
             ax.text(0.78, y, ("< 1%" if 0 < pct*100 < 1 else f'{pct*100:.1f}%'), fontsize=10, va='center', ha='left',
                     color=TEXT_PRIMARY, fontweight='bold', fontfamily='IBM Plex Sans')
 
-    _usage([0.55, 0.32, 0.22, 0.17], usage['R'], tot['R'], 'VS RHH')
-    _usage([0.77, 0.32, 0.22, 0.17], usage['L'], tot['L'], 'VS LHH')
+    # Anchor y=0.25 bottom-aligns a full six-row block with the location
+    # panels' bottom edge (2026-08-20, per Wally; was 0.32). One fixed
+    # geometry for every card — smaller arsenals keep this title height and
+    # end higher, which real 2-3 pitch reliever cards render fine.
+    _usage([0.55, 0.25, 0.22, 0.17], usage['R'], tot['R'], 'VS RHH')
+    _usage([0.77, 0.25, 0.22, 0.17], usage['L'], tot['L'], 'VS LHH')
 
 
 def render_card(config, pitches, output_file):
