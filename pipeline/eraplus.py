@@ -217,7 +217,62 @@ def compute_xrv_map(pitches, aaa_teams, roc_pitches=None):
     return out
 
 
-def _channels(row, xrv_map, park, is_combined):
+def combined_park_map(rows, park, aaa_teams, is_combined_fn):
+    """{id(row) -> home park factor} for every combined 2TM/3TM/... row,
+    IP-weighted over the pitcher's own MLB stint rows.
+
+    A combined row carries a LABEL, not a franchise, so park.get('2TM') has
+    always fallen through to a neutral 100 -- and a traded pitcher did not
+    pitch in a neutral park. Measured on the 2026 board: 55 of 93 combined
+    rows move at least 0.05 ERA once this is applied, up to 0.523.
+
+    WEIGHTED BY INNINGS, which is a deliberate divergence from the research
+    harness. era_estimator_screen.park_exposure takes an UNWEIGHTED mean
+    over the pitcher's clubs, and the two disagree by a mean of 0.051 ERA
+    and up to 0.278 on the 2026 board. Senzatela threw 52.3 innings at Coors
+    and 4.7 at Milwaukee: unweighted calls that a 111 park, innings-weighted
+    calls it 125. The weighted figure is the one that describes where he
+    actually pitched. The fitted weight W_PH['park'] = 0.168 was estimated
+    against the unweighted exposure, so it is if anything attenuated by the
+    noisier measure -- the same direction as the abbreviation fix, and a
+    refit belongs in the next replicate-validated battery.
+
+    ROC/AAA stints are excluded: they have no MLB park factor and would
+    otherwise pull a traded pitcher's exposure toward neutral.
+    """
+    from collections import defaultdict
+    stints = defaultdict(list)
+    for r in rows:
+        t = r.get('team')
+        if t in aaa_teams or is_combined_fn(t) or t not in park:
+            continue
+        key = r.get('mlbId') or r.get('pitcher')
+        if key is None:
+            continue
+        o = _ip_outs(r.get('ip'))
+        if o > 0:
+            stints[key].append((park[t], o))
+    out, unresolved = {}, []
+    for r in rows:
+        if not is_combined_fn(r.get('team')):
+            continue
+        sr = stints.get(r.get('mlbId') or r.get('pitcher')) or []
+        tot = sum(o for _, o in sr)
+        if tot > 0:
+            out[id(r)] = sum(pf * o for pf, o in sr) / tot
+        else:
+            unresolved.append(r.get('pitcher'))
+    if unresolved:
+        # Neutral is a real park factor, so a silent fallback would look
+        # like a measurement. Say which rows took it.
+        print(f'  eraplus WARNING: {len(unresolved)} combined rows have no '
+              f'resolvable MLB stint and score a NEUTRAL park: '
+              f'{", ".join(sorted(unresolved)[:6])}'
+              + (' ...' if len(unresolved) > 6 else ''))
+    return out
+
+
+def _channels(row, xrv_map, park, is_combined, combined_park=None):
     """Raw channel values in ERA direction, or None where unavailable."""
     ch = {}
     pa = row.get('pa') or 0
@@ -257,7 +312,11 @@ def _channels(row, xrv_map, park, is_combined):
         ch['xrv'] = None
     g = row.get('g') or 0
     ch['gs'] = ((row.get('gs') or 0) / g) if g > 0 else None
-    ch['park'] = park.get(row.get('team'), 100.0) / 100.0
+    if is_combined and combined_park is not None:
+        pf = combined_park.get(id(row))
+        ch['park'] = (pf if pf is not None else 100.0) / 100.0
+    else:
+        ch['park'] = park.get(row.get('team'), 100.0) / 100.0
     return ch
 
 
@@ -323,7 +382,9 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
     # league rate, no z statistic and no anchor. Same translation framing
     # Stuff+, Loc+ and xRVOE already use for Rochester.
     scored = mlb + [r for r in rows if r.get('team') in aaa]
-    raw = {id(r): _channels(r, xrv_map, park, is_combined_fn(r.get('team')))
+    cpark = combined_park_map(rows, park, aaa, is_combined_fn)
+    raw = {id(r): _channels(r, xrv_map, park, is_combined_fn(r.get('team')),
+                            cpark)
            for r in scored}
     mu_sd = {}
     for c in PH_CHANNELS:
