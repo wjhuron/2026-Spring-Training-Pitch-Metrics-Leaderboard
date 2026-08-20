@@ -87,7 +87,28 @@ def _elev_map():
         return None
 
 
-def adapt_stuff(path, max_elev=None):
+# Measured cross-system geometry offsets, MLB minus AAA, on paired
+# pitcher-seasons: four-seamers only, both levels below 3,000 ft, n=463.
+# These are quantities a pitcher CANNOT change by crossing a league
+# boundary, so a nonzero value is the two Hawk-Eye installations
+# disagreeing, not the pitcher:
+#     release_extension  +0.1013 ft   t +28.71
+#     release_pos_z      -0.0639 ft   t -15.63
+#     arm_angle          +0.2321 deg  t  +2.85
+# Extension and arm angle are BASE_FEATS, so the disagreement feeds Stuff+
+# directly. --geom-fix adds them to the AAA side to ask how much of the
+# +2.77 Stuff+ gap is sensor rather than pitcher. Velocity (+0.3123 mph)
+# is deliberately NOT corrected: effort is a plausible pitcher mechanism,
+# so leaving it uncorrected keeps it as the separator.
+GEOM_FIX = {'Extension': 0.1013, 'ArmAngle': 0.2321, 'RelPosZ': -0.0639}
+# --velo-fix adds the measured velocity gap on top, to size how much of the
+# unexplained remainder is velocity. Correcting EVERY input would drive the
+# gap to zero by construction (Stuff+ is a function of the inputs), so this
+# is a share, not a further correction.
+VELO_FIX = {'Velocity': 0.3123}
+
+
+def adapt_stuff(path, max_elev=None, geom_fix=False, velo_fix=False):
     """Statcast DataFrame -> the sheet-shaped dicts build_df reads.
 
     max_elev drops every pitch thrown at a park above that elevation. It
@@ -158,6 +179,17 @@ def adapt_stuff(path, max_elev=None):
             'xwOBA': _f(r.estimated_woba_using_speedangle),
             'RunExp': _f(r.delta_pitcher_run_exp),
         })
+    if geom_fix:
+        fix = dict(GEOM_FIX)
+        if velo_fix:
+            fix.update(VELO_FIX)
+        for q in out:
+            for k, off in fix.items():
+                if q.get(k) is not None:
+                    q[k] += off
+        print(f'    geometry fix applied to {len(out)} pitches: '
+              + ', '.join(f'{k}{v:+.4f}' for k, v in fix.items()),
+              flush=True)
     del df, sub
     gc.collect()
     return out
@@ -214,6 +246,11 @@ def main():
     ap.add_argument('--max-elev', type=int, default=None,
                     help='drop pitches thrown above this elevation (ft)')
     ap.add_argument('--out', default=OUT)
+    ap.add_argument('--velo-fix', action='store_true',
+                    help='also add the measured velocity gap (needs --geom-fix)')
+    ap.add_argument('--geom-fix', action='store_true',
+                    help='add the measured cross-system geometry offsets '
+                         'to this side before scoring')
     a = ap.parse_args()
     out_path = a.out
     with open(BUNDLE, 'rb') as f:
@@ -233,7 +270,7 @@ def main():
                 print(f'{lvl} {y}: {rel} absent — skipped', flush=True)
                 continue
             print(f'{lvl} {y}: {rel}', flush=True)
-            pitches = adapt_stuff(p, a.max_elev)
+            pitches = adapt_stuff(p, a.max_elev, a.geom_fix, a.velo_fix)
             sc = score(pitches, B)
             del pitches
             gc.collect()
