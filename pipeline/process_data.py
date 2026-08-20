@@ -3338,6 +3338,45 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     BB_PLUS_N0_EV  = 0
     BB_PLUS_EV_PCT = 95
     BB_PLUS_SLOPE_MATCH = 1.2352
+    # KNOWN BIAS, MEASURED AND ACCEPTED: BB+ slightly over-rates hitters who
+    # hit the ball hard but on the ground, and under-rates steep fly-ball
+    # hitters. The xwOBAcon channel (60%) prices launch angle, because
+    # Savant's model is a function of EV and LA. The EV95 channel (40%) is
+    # angle-blind by construction — it only knows how hard the ball left.
+    #
+    # Measured 2021-2026, 3 seeds, 36 folds: the correlation between the
+    # residual (predicting the other half's xwOBAcon) and the hitter's mean
+    # launch angle is +0.089. Adding EV95 raised it from +0.039, so this
+    # change roughly doubled a bias that already existed. By launch-angle
+    # quintile the mean residual runs:
+    #
+    #     Q1  5.8 deg  -1.60      Q4  16.0 deg  +0.51
+    #     Q2 10.5 deg  -0.46      Q5  20.3 deg  +1.46
+    #     Q3 13.3 deg  +0.08
+    #
+    # in xwOBAcon-percent points; negative means BB+ promises more contact
+    # quality than the hitter delivers. The Q1-to-Q5 spread is 3.06 points,
+    # about 23% of BB+'s 13.5 SD. A ground-ball hitter near the bottom reads
+    # roughly 1.5 points too high (Guerrero Jr. 2026 is the type case: EV95
+    # 110.7 against a league 105.8, but 48% GB and a BELOW-league barrel
+    # rate).
+    #
+    # THE FIX EXISTS AND WAS DELIBERATELY NOT TAKEN. A third ingredient —
+    # mean launch angle converted into xwOBAcon units by a within-slice
+    # QUADRATIC (the relationship is concave, peaking near 17 deg, so a
+    # linear map over-credits extreme fly-ball hitters), w_la 0.15, n0_la 0 —
+    # removes 35% of the bias at exactly zero cost to guarded held-out
+    # accuracy (.4450 either way), unanimous in 6/6 seasons. Rejected on
+    # cost, not on evidence: a third ingredient, a live quadratic fit and a
+    # third scale constant, all mirrored in js/aggregator.js, to move the
+    # worst archetype by about half a point. If it is ever wanted, the
+    # derivation reruns from data/_bbplus_ev_atoms.json and K must be
+    # re-measured (1.2352 -> 1.6864 at w_la 0.30).
+    #
+    # Do NOT try to fix it with la_sd, mean EV, ev_p50 or hard-hit rate. All
+    # four were tested at the same weight and every one makes the bias WORSE
+    # (0/6 seasons improved), even though three of them nudge accuracy up.
+    #
     # BETA is measured LIVE from the current pool, matching how Hitter+
     # handles its own run-truth. Frozen fallback is the 2021-2026 mean; the
     # per-season values were 4.017 / 4.017 / 4.393 / 4.099 / 4.326 / 4.378,
