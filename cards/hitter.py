@@ -1077,15 +1077,18 @@ def _render_percentile_bubbles(fig, h_row):
             for spec in metrics:
                 if spec[1] != 'batSpeed':
                     _m.append(spec)
+                elif h_row.get('batSpeed') is not None:
+                    # AAA bat speed exists for ROC hitters as of 2026-08-21
+                    # (Savant MiLB event-pitch values, applied to the AAA
+                    # tab's BatSpeed column). Show it like any other row.
+                    _m.append(spec)
                 elif h_row.get('_mlbBatSpeed') is not None:
-                    # ROC hitter with an MLB stint: show that bat speed,
+                    # No AAA reading but an MLB stint: show that bat speed,
                     # labeled as MLB-sourced (injected by render_hitter_card —
                     # the only MLB field allowed onto a ROC card).
                     _m.append(('Bat Speed (MLB)', '_mlbBatSpeed',
                                '_mlbBatSpeed_pctl', 'mph'))
-                # else: dropped. Bat tracking is MLB-only Statcast hardware,
-                # so the AAA value will never exist — a permanent "—" row is
-                # dead space, not missing data.
+                # else: dropped. A permanent "—" row is dead space.
             _columns.append((name, _m))
         else:
             _columns.append((name, metrics))
