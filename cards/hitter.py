@@ -2992,7 +2992,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 # ─────────────────────────────────────────────────────────────────────
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team           = "ROC"                   # Team filter (e.g., "NYY"), or None for all teams
+    team           = "WSH"                   # Team filter (e.g., "NYY"), or None for all teams
     start_date     = None                                 # Set to None for full season
     end_date       = None                                 # Set to a date for date range, or None for single day
     filter_hitters = ""       # Semicolon-separated "Last, First" names, or "" for all
