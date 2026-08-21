@@ -274,12 +274,16 @@ def main():
             base = fit_pred([e0_tr], [e0_te])
             full = fit_pred([e0_tr, trn[f'bs_{n}'], trn[f'squpc_{n}']],
                             [e0_te, ten[f'bs_{n}'], ten[f'squpc_{n}']])
+            squ = fit_pred([e0_tr, trn[f'squpc_{n}']],
+                           [e0_te, ten[f'squpc_{n}']])
             r0 = float(np.sqrt(np.mean((yv - base) ** 2)))
             r1 = float(np.sqrt(np.mean((yv - full) ** 2)))
-            out_t2[f'{y}_{n}'] = {'base': r0, 'bat': r1, 'n': len(ten)}
+            r2 = float(np.sqrt(np.mean((yv - squ) ** 2)))
+            out_t2[f'{y}_{n}'] = {'base': r0, 'bat': r1, 'squ_only': r2,
+                                  'n': len(ten)}
             tag = 'improves' if r1 < r0 else 'worse'
             print(f'  held-out {y} n={n:<4} base {r0:.4f} -> +bat {r1:.4f} '
-                  f'({tag}, test n={len(ten)})')
+                  f'({tag})  squpc-only {r2:.4f}')
             if n in (40, 80):
                 cells_n += 1
                 wins += (r1 < r0)
