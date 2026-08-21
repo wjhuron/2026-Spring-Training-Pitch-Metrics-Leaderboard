@@ -2523,7 +2523,27 @@ const Aggregator = {
         // Shrink BEFORE the re-anchor, mirroring the server order. The slope
         // match puts the blend back on the xwOBAcon-percent scale; the two
         // weights sum to 1, so the blend alone cannot be unbiased.
-        const rawBB = bbW.con * conAdj + wEv * evAdj + bbW.sp * spPlus;
+        let rawBB = bbW.con * conAdj + wEv * evAdj + bbW.sp * spPlus;
+        // Bat-tracking prior (D1, 2026-08-21) — mirrors the server block in
+        // pipeline/process_data.py and moves in the same commit, like every
+        // BB+ constant. Applied with the SERVER's season anchors on the
+        // filtered sample (the same season-anchor convention window scoring
+        // uses). No bbPlusBtPrior metadata (pre-prior artifact) or no bat
+        // tracking on the row = the unblended raw, which IS the shipped
+        // pre-prior definition.
+        const btP = (DataStore && DataStore.metadata &&
+                     DataStore.metadata.bbPlusBtPrior) || null;
+        const btN = obj.nCompSwings || 0;
+        if (btP && btP.anchors && obj.batSpeed != null &&
+            obj.squaredUpPct != null && btN > 0 &&
+            btP.anchors.bsSd > 0 && btP.anchors.squpSd > 0) {
+          const a = btP.anchors;
+          const prior = a.raw +
+            btP.betaBs * (obj.batSpeed - a.bsMean) / a.bsSd +
+            btP.betaSqup * (obj.squaredUpPct - a.squpMean) / a.squpSd;
+          const priorEff = (btN * prior + btP.s0 * 100) / (btN + btP.s0);
+          rawBB = (nBipBB * rawBB + btP.k * priorEff) / (nBipBB + btP.k);
+        }
         const shrunkBB = 100 + (rawBB - 100) * bbSlope;
         // Mirror the server's re-anchor (all-MLB PA-weighted mean = 100).
         // sd/ct/hitterPlus are pass-through; bbPlus is the only "+"

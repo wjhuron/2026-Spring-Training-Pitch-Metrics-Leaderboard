@@ -3432,6 +3432,80 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     print(f"  BB+ beta ({_beta_src}): {_beta_bb:.3f}  "
           f"slope-match: {_slope_bb:.4f}")
 
+    # ── BB+ bat-tracking prior, D1 (2026-08-21, per Wally) ──────────────
+    # The shrink center becomes bat-informed where bat tracking exists:
+    #   prior    = poolRawMean + BT_BETA_BS * z(batSpeed)
+    #                          + BT_BETA_SQUP * z(squaredUpPct)
+    #   priorEff = (nCompSwings * prior + BT_S0 * 100) / (nCompSwings + BT_S0)
+    #   raw      = (nBip * raw + BT_K * priorEff) / (nBip + BT_K)
+    # applied BEFORE the slope-match. Rows with no bat tracking (every ROC
+    # row — AAA has none — plus any MLB gap) keep the unblended raw: the
+    # fallback IS the shipped construction, and the applied/skipped split
+    # prints below so a silent feed gap has a tell.
+    #
+    # Standardized betas are FROZEN (scripts/research/hitter/
+    # bbplus_bt_prior_build.py + addendum, seasons 2024-2026, LOSO;
+    # per-season spread 13.78-14.71 / 4.31-5.89). The z-form (live pool
+    # mean/SD, like BETA) is what lets the constants survive the known
+    # sheet-vs-Savant instrument shifts (bat speed ~+2 mph, squared-up
+    # denominator set). BT_K=20: interior optimum on the small-sample
+    # objective, measured-FLAT 20-40 on the full-range one — 20 is the
+    # low-footprint end of a proven-flat region. BT_S0=10: interior.
+    # Full-season footprint: corr .9994 vs unblended, mean |d| 0.3 raw pts.
+    # The next-season skill test (addendum A4) showed the blend never
+    # degrades full-season prediction; the heavier D2 form did, and was
+    # rejected.
+    BB_PLUS_BT_BETA_BS = 14.24
+    BB_PLUS_BT_BETA_SQUP = 4.97
+    BB_PLUS_BT_K = 20
+    BB_PLUS_BT_S0 = 10
+    BB_PLUS_BT_MIN_POOL = 40
+    BB_PLUS_BT_POOL_SWINGS = 50    # pool-hygiene convention, not measured
+    # Frozen anchor fallbacks in PRODUCTION (sheet) currency — the 2026
+    # build pool. Used only when the live pool is thin (early season).
+    BB_PLUS_BT_FROZEN = {'raw': 99.932, 'bsMean': 71.197, 'bsSd': 2.688,
+                         'squpMean': 0.6463, 'squpSd': 0.0614}
+    _bt_pool = []
+    if lg_xwobacon_bb and lg_ev95_bb:
+        for _r in hitter_leaderboard:
+            if _r.get('_isROC') or _r.get('_isCombined'):
+                continue
+            _xc, _ev = _r.get('xwOBAcon'), _r.get('ev95')
+            _bs, _sq = _r.get('batSpeed'), _r.get('squaredUpPct')
+            if (_xc is None or _ev is None or _bs is None or _sq is None
+                    or (_r.get('nBip') or 0) < BB_PLUS_BETA_GATE_BIP
+                    or (_r.get('nCompSwings') or 0) < BB_PLUS_BT_POOL_SWINGS):
+                continue
+            _cp = 100.0 * _xc / lg_xwobacon_bb
+            _ep = 100.0 + (100.0 * _ev / lg_ev95_bb - 100.0) * _beta_bb
+            _bt_pool.append((BB_PLUS_W_CON * _cp + BB_PLUS_W_EV * _ep,
+                             _bs, _sq))
+    _bt_src = 'frozen'
+    _f = BB_PLUS_BT_FROZEN
+    _bt_mr, _bt_mbs, _bt_sbs = _f['raw'], _f['bsMean'], _f['bsSd']
+    _bt_msq, _bt_ssq = _f['squpMean'], _f['squpSd']
+    if len(_bt_pool) >= BB_PLUS_BT_MIN_POOL:
+        _n = float(len(_bt_pool))
+        _mr = sum(v[0] for v in _bt_pool) / _n
+        _mbs = sum(v[1] for v in _bt_pool) / _n
+        _msq = sum(v[2] for v in _bt_pool) / _n
+        _sbs = (sum((v[1] - _mbs) ** 2 for v in _bt_pool) / _n) ** 0.5
+        _ssq = (sum((v[2] - _msq) ** 2 for v in _bt_pool) / _n) ** 0.5
+        if _sbs > 1e-6 and _ssq > 1e-6:
+            _bt_mr, _bt_mbs, _bt_sbs = _mr, _mbs, _sbs
+            _bt_msq, _bt_ssq = _msq, _ssq
+            _bt_src = 'live'
+    if _bt_src == 'frozen':
+        print(f"  WARNING: BB+ bat-prior anchor pool is {len(_bt_pool)} "
+              f"(< {BB_PLUS_BT_MIN_POOL}) — frozen 2026 anchors in use.")
+    _bt_mr = round(_bt_mr, BB_PLUS_FACTOR_DP)
+    _bt_mbs, _bt_sbs = (round(_bt_mbs, BB_PLUS_FACTOR_DP),
+                        round(_bt_sbs, BB_PLUS_FACTOR_DP))
+    _bt_msq, _bt_ssq = (round(_bt_msq, BB_PLUS_FACTOR_DP),
+                        round(_bt_ssq, BB_PLUS_FACTOR_DP))
+    _bt_applied = 0
+    _bt_skipped = 0
+
     _bb_missing_ev = 0
     for row in hitter_leaderboard:
         xc = row.get('xwOBAcon')
@@ -3463,6 +3537,23 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                       / (n_bip + BB_PLUS_N0_EV))
             _raw = (BB_PLUS_W_CON * con_adj + BB_PLUS_W_EV * ev_adj
                     + BB_PLUS_W_SP * sp_plus)
+            # Bat-tracking prior blend (see the D1 block above). Mirrored in
+            # js/aggregator.js — the two move in the same commit, like every
+            # BB+ constant.
+            _bt_bs = row.get('batSpeed')
+            _bt_sq = row.get('squaredUpPct')
+            _bt_n = row.get('nCompSwings') or 0
+            if _bt_bs is not None and _bt_sq is not None and _bt_n > 0:
+                _prior = (_bt_mr
+                          + BB_PLUS_BT_BETA_BS * (_bt_bs - _bt_mbs) / _bt_sbs
+                          + BB_PLUS_BT_BETA_SQUP * (_bt_sq - _bt_msq) / _bt_ssq)
+                _prior_eff = ((_bt_n * _prior + BB_PLUS_BT_S0 * 100.0)
+                              / (_bt_n + BB_PLUS_BT_S0))
+                _raw = ((n_bip * _raw + BB_PLUS_BT_K * _prior_eff)
+                        / (n_bip + BB_PLUS_BT_K))
+                _bt_applied += 1
+            else:
+                _bt_skipped += 1
             row['bbPlus'] = 100.0 + (_raw - 100.0) * _slope_bb
         else:
             if (BB_PLUS_W_EV and xc is not None and ev is None
@@ -3474,6 +3565,12 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         print(f"  WARNING: {_bb_missing_ev} hitters have xwOBAcon but no ev95 "
               f"— BB+ and Hitter+ are None for them. Check the ExitVelo "
               f"column in the sheets before publishing.")
+    # The applied/skipped split is the degrade tell: skipped covers every
+    # ROC row (AAA has no bat tracking) plus real MLB gaps. "0 applied" on
+    # an MLB run means the bat-tracking columns are missing — a bad run
+    # even if it succeeds.
+    print(f"  BB+ bat prior ({_bt_src} anchors): applied {_bt_applied}, "
+          f"no bat tracking {_bt_skipped}")
     hitter_league_avgs['bbPlus'] = 100.0
 
     # PD+ is retired. Superseded by SD+ (decision) and CT+ (contact-frequency).
@@ -3798,6 +3895,17 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         'bbPlusShrinkN0Ev': BB_PLUS_N0_EV,
         'bbPlusEvPct': BB_PLUS_EV_PCT,
         'bbPlusMinBip': BB_PLUS_MIN_BIP,
+        # Bat-tracking prior (D1): the client applies the same blend under
+        # filters, with the SERVER's anchors — season anchors on a filtered
+        # sample, the same convention window scoring uses.
+        'bbPlusBtPrior': {'betaBs': BB_PLUS_BT_BETA_BS,
+                          'betaSqup': BB_PLUS_BT_BETA_SQUP,
+                          'k': BB_PLUS_BT_K, 's0': BB_PLUS_BT_S0,
+                          'source': _bt_src,
+                          'anchors': {'raw': _bt_mr,
+                                      'bsMean': _bt_mbs, 'bsSd': _bt_sbs,
+                                      'squpMean': _bt_msq,
+                                      'squpSd': _bt_ssq}},
         # Tier 2: 3D xwOBA table used to fill ROC BIP xwOBA (no Savant
         # per-pitch xwOBA available for AAA). For transparency / audit.
         'xwOBA3DTable': (importlib.import_module('pipeline.xwoba3d')
