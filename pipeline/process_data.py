@@ -3632,11 +3632,60 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # per zone × count cell), so swing-mix effects stay in SD+ where they
     # belong. See pipeline_contact.py.
     from pipeline.contact import compute_ct_plus
+    # ── CT+ bat-tracking prior (2026-08-21, per Wally; the CT+ analog of
+    # BB+'s e9a9080a, measured by ctplus_bt_prior_build.py). BAT SPEED
+    # ONLY — the squared-up coefficient flipped sign across seasons and
+    # dropping it improved held-out RMSE at every matched config. The beta
+    # is NEGATIVE (power/contact tradeoff as kinetics); Hitter+ still nets
+    # bat speed positive through BB+'s larger positive weight.
+    # CT_BT_K=40: interior (20 < 40 > 80, 12/12 cells). CT_BT_S0=10: a
+    # STATED CONVENTION — the harness's s0 curve is censored below 100
+    # tracked swings (its universe floor), and 10 is cheap insurance for
+    # the fresh-callup case the harness cannot see, consistent with BB+'s
+    # measured gate. Invariance: corr .9994-.9996, mean |d| 0.0027 raw;
+    # next-season prediction improves both year-pairs.
+    CT_BT_BETA = -0.042082      # frozen bs-only std beta (24/25/26:
+                                # -0.0337 / -0.0448 / -0.0477)
+    CT_BT_K = 40
+    CT_BT_S0 = 10
+    CT_BT_MIN_POOL = 40
+    # Frozen anchor fallbacks, production (sheet) currency, 2026 pool:
+    CT_BT_FROZEN_BS = (71.3025, 2.6793)
+    _ct_bs_pool = [r['batSpeed'] for r in hitter_leaderboard
+                   if not r.get('_isROC') and not r.get('_isCombined')
+                   and r.get('batSpeed') is not None
+                   and (r.get('nCompSwings') or 0) >= BB_PLUS_BT_POOL_SWINGS]
+    if len(_ct_bs_pool) >= CT_BT_MIN_POOL:
+        _ct_mbs = sum(_ct_bs_pool) / len(_ct_bs_pool)
+        _ct_sbs = (sum((v - _ct_mbs) ** 2 for v in _ct_bs_pool)
+                   / len(_ct_bs_pool)) ** 0.5
+        _ct_bt_src = 'live'
+    else:
+        _ct_mbs, _ct_sbs = CT_BT_FROZEN_BS
+        _ct_bt_src = 'frozen'
+        print(f"  WARNING: CT+ bat-prior anchor pool is "
+              f"{len(_ct_bs_pool)} (< {CT_BT_MIN_POOL}) — frozen 2026 "
+              f"anchors in use.")
+    _ct_mbs, _ct_sbs = round(_ct_mbs, 6), round(_ct_sbs, 6)
+    _ct_bt_z = {}
+    if _ct_sbs > 0:
+        for r in hitter_leaderboard:
+            _bs, _nsw = r.get('batSpeed'), r.get('nCompSwings') or 0
+            if _bs is not None and _nsw > 0:
+                _ct_bt_z[(r['hitter'], r['team'])] = (
+                    (_bs - _ct_mbs) / _ct_sbs, _nsw)
     ct_results, ct_weights = compute_ct_plus(
         _sd_league, sd_pitches_by_hitter,
         lg_woba=GUTS_EXTRA.get('lgWOBA') if GUTS_EXTRA else None,
         woba_scale=GUTS_EXTRA.get('wOBAScale') if GUTS_EXTRA else None,
+        bt_z=_ct_bt_z, bt_beta=CT_BT_BETA, bt_k=CT_BT_K, bt_s0=CT_BT_S0,
     )
+    # Degrade tell, same convention as the BB+ prior: "0 with bat
+    # tracking" on an MLB run means the bat columns went missing.
+    _ct_scored = [k for k in ct_results]
+    _ct_with_bt = sum(1 for k in _ct_scored if k in _ct_bt_z)
+    print(f"  CT+ bat prior ({_ct_bt_src} anchors): {_ct_with_bt} of "
+          f"{len(_ct_scored)} scored hitters have bat tracking")
     for row in hitter_leaderboard:
         key = (row['hitter'], row['team'])
         r = ct_results.get(key)
@@ -3906,6 +3955,13 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                                       'bsMean': _bt_mbs, 'bsSd': _bt_sbs,
                                       'squpMean': _bt_msq,
                                       'squpSd': _bt_ssq}},
+        # CT+ bat prior (bat-speed-only, negative beta — see the CT+
+        # block). Server-side and window-pool consumer only: CT+ is
+        # pass-through on the client, no JS mirror.
+        'ctPlusBtPrior': {'betaBs': CT_BT_BETA, 'k': CT_BT_K,
+                          's0': CT_BT_S0, 'source': _ct_bt_src,
+                          'anchors': {'bsMean': _ct_mbs,
+                                      'bsSd': _ct_sbs}},
         # Tier 2: 3D xwOBA table used to fill ROC BIP xwOBA (no Savant
         # per-pitch xwOBA available for AAA). For transparency / audit.
         'xwOBA3DTable': (importlib.import_module('pipeline.xwoba3d')

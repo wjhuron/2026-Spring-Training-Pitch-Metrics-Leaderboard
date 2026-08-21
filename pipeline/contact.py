@@ -323,11 +323,29 @@ def compute_hitter_ct(pitches_by_hitter, table):
 
 
 def regress_and_normalize(hitter_raw, n_prior=HITTER_PRIOR_N,
-                          min_n=MIN_HITTER_SWINGS):
+                          min_n=MIN_HITTER_SWINGS, bt_z=None,
+                          bt_beta=0.0, bt_k=0, bt_s0=0):
     """Ratio-to-league scaling, matching BB+ convention:
         ctPlus = 100 × hitter_raw_adj / league_mean_raw_adj
     (raw_ct is the actual/expected contact ratio, league mean ≈ 1.0,
     so the ratio spread is naturally narrow.)
+
+    BAT-TRACKING PRIOR (2026-08-21, per Wally — the CT+ analog of BB+'s
+    e9a9080a, measured by scripts/research/hitter/ctplus_bt_prior_build.py):
+    bt_z maps a hitter key to (z_batSpeed, nCompSwings), z against the
+    caller's live pool anchors. The prior is BAT SPEED ONLY — the
+    squared-up coefficient flipped sign across seasons and its removal
+    IMPROVED held-out RMSE at every matched config — with a NEGATIVE
+    beta: conditional on identical early contact evidence, the harder
+    swing projects less remaining contact skill (the power/contact
+    tradeoff as kinetics; Hitter+ still nets bat speed positive through
+    BB+'s larger positive weight).
+        prior     = lg_raw + bt_beta * z_bs
+        prior_eff = (nsw * prior + bt_s0 * lg_raw) / (nsw + bt_s0)
+        adj       = (n * adj + bt_k * prior_eff) / (n + bt_k)
+    bt_z=None (or bt_k=0) reproduces the prior-free behavior EXACTLY.
+    The league ruler (lg_raw and the ratio denominator) is computed from
+    UNBLENDED values so the prior moves hitters, never the league.
     """
     eligible = {k: v for k, v in hitter_raw.items() if v['n_swings'] >= min_n}
     if not eligible:
@@ -345,11 +363,22 @@ def regress_and_normalize(hitter_raw, n_prior=HITTER_PRIOR_N,
             if _is_combined(k[1]) or k[:1] not in combined_ids}
 
     lg_raw = sum(v['raw_ct'] for v in pool.values()) / len(pool)
-    for v in eligible.values():
+    for k_, v in eligible.items():
         n = v['n_swings']
-        v['raw_ct_adj'] = (n * v['raw_ct'] + n_prior * lg_raw) / (n + n_prior)
+        adj = (n * v['raw_ct'] + n_prior * lg_raw) / (n + n_prior)
+        v['_adj_noprior'] = adj
+        _z = (bt_z or {}).get(k_)
+        if _z is not None and bt_k:
+            _z_bs, _nsw = _z
+            if _z_bs is not None and _nsw:
+                _prior = lg_raw + bt_beta * _z_bs
+                _pe = (_nsw * _prior + bt_s0 * lg_raw) / (_nsw + bt_s0)
+                adj = (n * adj + bt_k * _pe) / (n + bt_k)
+        v['raw_ct_adj'] = adj
 
-    adj_vals = [pool[k]['raw_ct_adj'] for k in pool]
+    # league ruler from UNBLENDED values — the prior moves hitters,
+    # never the league mean it is measured against
+    adj_vals = [pool[k]['_adj_noprior'] for k in pool]
     lg_mean = sum(adj_vals) / len(adj_vals)
 
     for v in eligible.values():
@@ -379,11 +408,14 @@ def serialize_weight_table(smoothed):
     return out
 
 
-def compute_ct_plus(all_pitches, pitches_by_hitter, lg_woba, woba_scale):
+def compute_ct_plus(all_pitches, pitches_by_hitter, lg_woba, woba_scale,
+                    bt_z=None, bt_beta=0.0, bt_k=0, bt_s0=0):
     """Main entry point. Returns (normalized_hitter_dict, weight_table_json).
 
     Matches compute_sd_plus signature for symmetric integration in
-    process_data.py.
+    process_data.py. The bt_* params are the bat-tracking prior
+    (regress_and_normalize docstring); defaults reproduce the prior-free
+    behavior exactly.
     """
     # Cell weight tables stay MLB-baselined (translation framing); ROC
     # hitters are looked up against this MLB table by compute_hitter_ct.
@@ -396,5 +428,7 @@ def compute_ct_plus(all_pitches, pitches_by_hitter, lg_woba, woba_scale):
     zone_means = zone_level_contact_means(swings, rv_fn)
     smoothed = shrink_contact_cells(raw, zone_means)
     hitter_raw = compute_hitter_ct(pitches_by_hitter, smoothed)
-    normalized = regress_and_normalize(hitter_raw)
+    normalized = regress_and_normalize(hitter_raw, bt_z=bt_z,
+                                       bt_beta=bt_beta, bt_k=bt_k,
+                                       bt_s0=bt_s0)
     return normalized, serialize_weight_table(smoothed)

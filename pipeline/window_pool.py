@@ -264,9 +264,26 @@ def score_window_against_season(hitter_key, window_pitches, all_pitches,
     sd_res, _ = compute_sd_plus(all_pitches, dict(by),
                                 lg_woba=G.get('lgWOBA'),
                                 woba_scale=G.get('wOBAScale'))
+    # CT+ bat prior for the window hitter: the WINDOW's bat speed and
+    # tracked-swing count against the SERVER's season anchors (metadata
+    # ctPlusBtPrior — same season-anchor convention as the BB+ chain
+    # above). Absent metadata (pre-prior artifact) or no bat tracking on
+    # the window = the prior-free definition, exactly.
+    _ctp = metadata.get('ctPlusBtPrior') or {}
+    _cta = _ctp.get('anchors') or {}
+    _ct_bt_z = None
+    _w_bs = row.get('batSpeed')
+    _w_nsw = row.get('nCompSwings') or 0
+    if (_ctp and _cta.get('bsSd') and _w_bs is not None and _w_nsw > 0):
+        _ct_bt_z = {hitter_key: ((_w_bs - _cta['bsMean']) / _cta['bsSd'],
+                                 _w_nsw)}
     ct_res, _ = compute_ct_plus(all_pitches, dict(by),
                                 lg_woba=G.get('lgWOBA'),
-                                woba_scale=G.get('wOBAScale'))
+                                woba_scale=G.get('wOBAScale'),
+                                bt_z=_ct_bt_z,
+                                bt_beta=_ctp.get('betaBs') or 0.0,
+                                bt_k=(_ctp.get('k') or 0) if _ct_bt_z else 0,
+                                bt_s0=_ctp.get('s0') or 0)
     s, c = sd_res.get(hitter_key), ct_res.get(hitter_key)
     row['sdPlus'] = s['sdPlus'] if s else None
     row['sdPlusRaw'] = round(s['raw_sd_adj'], 5) if s else None
