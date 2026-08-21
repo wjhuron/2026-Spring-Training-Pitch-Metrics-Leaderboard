@@ -3711,18 +3711,16 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
     row['xRunValue'] = xrv
     row['xRv100'] = xrv / n * 100 if xrv is not None else None
 
-    # fbVelo — avg velo of the most-used fastball (FF/SI), matching process_data.
-    fb_by_type = defaultdict(list)
-    for p in pitches:
-        if p.get('Pitch Type') in ('FF', 'SI'):
-            v = sf(p.get('Velocity'))
-            if v is not None:
-                fb_by_type[p['Pitch Type']].append(v)
-    if fb_by_type:
-        fbv = fb_by_type[max(fb_by_type, key=lambda t: len(fb_by_type[t]))]
-        row['fbVelo'] = round(sum(fbv) / len(fbv), 1)
-    else:
-        row['fbVelo'] = None
+    # fbVelo — mean velo over ALL fastballs (FF/FA/SI pooled), the same
+    # count-weighted definition the season bubble (_build_bubble_columns) and
+    # the FB VELO BY OUTING strip use. Was the primary type only until
+    # 2026-08-21, so a FF+SI arm's window card disagreed with his season card.
+    # The leaderboard's fbVelo (process_data) is still primary-type; that is
+    # the percentile's pool and is unchanged here.
+    fbv = [v for v in (sf(p.get('Velocity')) for p in pitches
+                       if p.get('Pitch Type') in ('FF', 'FA', 'SI'))
+           if v is not None]
+    row['fbVelo'] = round(sum(fbv) / len(fbv), 1) if fbv else None
 
     # extension — mean over all pitches, matching process_data's pitcher-level
     # METRIC_COLS aggregation, so a scratch card's Extension sits on the same
