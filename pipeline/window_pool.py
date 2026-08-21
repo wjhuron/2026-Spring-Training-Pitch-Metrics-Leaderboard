@@ -95,21 +95,6 @@ def build_window_hitter_row(pitches, metadata, identity=None):
     return row
 
 
-def _season_anchor(season_rows, plus_key, raw_key):
-    """Recover the season league anchor from the shipped leaderboard.
-
-    plus = 100 * raw / lg, so lg = 100 * raw / plus. Taken as the median over
-    every row that has both, which is exact up to display rounding and needs
-    no constant to be re-derived or stored.
-    """
-    v = [100.0 * r[raw_key] / r[plus_key] for r in season_rows
-         if r.get(plus_key) and r.get(raw_key)]
-    if not v:
-        return None
-    v.sort()
-    return v[len(v) // 2]
-
-
 def add_season_percentiles(row, season_rows, stats=None):
     """Rank each of `row`'s values inside the SEASON distribution.
 
@@ -186,12 +171,75 @@ def score_window_against_season(hitter_key, window_pitches, all_pitches,
 
     G = metadata.get('gutsConstants') or {}
 
-    # ── BB+ : window xwOBAcon against the SEASON league xwOBAcon ──
-    lg_con = _season_anchor(season_rows, 'bbPlus', 'xwOBAcon')
-    n0 = metadata.get('bbPlusShrinkN0') or 60
+    # ── BB+ : the window's pitches through the FULL shipped chain, against
+    # SEASON anchors (2026-08-21 — this block was two definitions stale:
+    # pure-xwOBAcon with a dead metadata key falling to n0=60, feeding a
+    # standardization computed from post-chain season values).
+    #
+    # Anchors come from metadata hitterLeagueAverages — the same values the
+    # js/aggregator.js mirror reads. The removed _season_anchor helper inverted
+    # the pre-2026-08-19 pure-ratio recipe and recovered a wrong league.
+    # Chain, in server order (see the BB+ block in process_data and its JS
+    # mirror): ingredients -> per-ingredient shrink toward 100 -> weight
+    # blend -> bat-tracking prior (metadata bbPlusBtPrior; absent on a
+    # pre-prior artifact -> stage skipped, which IS the pre-prior
+    # definition) -> slope-match -> re-anchor -> wRC scale.
+    #
+    # DELIBERATE divergence from the site: no bbPlusMinBip display floor.
+    # The window rule at the top of this file (no sample-size gate) wins —
+    # a short window's BB+ is now mostly prior, which is the honest
+    # estimate, not a blank. A full-season window can therefore show BB+
+    # where the season row is None (sub-30-BIP hitters); that is this rule
+    # working, not a bug.
+    _lg = metadata.get('hitterLeagueAverages') or {}
+    lg_con = _lg.get('xwOBAcon')
+    lg_ev95 = _lg.get('ev95')
+    _bw = metadata.get('bbPlusWeights') or {}
+    _w_con = _bw.get('con', 0.60)
+    _w_ev = _bw.get('ev', 0.40)
+    _n0_con = metadata.get('bbPlusShrinkN0Con')
+    _n0_con = 130 if _n0_con is None else _n0_con
+    _n0_ev = metadata.get('bbPlusShrinkN0Ev') or 0
+    _bb_beta = metadata.get('bbPlusBeta') or 4.205
+    _bb_slope = metadata.get('bbPlusSlopeMatch') or 1.2352
     xc, nb = row.get('xwOBAcon'), row.get('nBip') or 0
-    row['bbPlus'] = (round((nb * (100.0 * xc / lg_con) + n0 * 100.0) / (nb + n0), 1)
-                     if xc is not None and lg_con else None)
+    _ev95 = row.get('ev95')
+    _ev_ok = (_w_ev == 0) or (_ev95 is not None and lg_ev95)
+    if xc is not None and lg_con and _ev_ok and nb > 0:
+        _con_plus = 100.0 * xc / lg_con
+        _ev_c = (100.0 + (100.0 * _ev95 / lg_ev95 - 100.0) * _bb_beta
+                 if _w_ev else 100.0)
+        _con_adj = (nb * _con_plus + _n0_con * 100.0) / (nb + _n0_con)
+        _ev_adj = ((nb * _ev_c + _n0_ev * 100.0) / (nb + _n0_ev)
+                   if _n0_ev else _ev_c)
+        _raw = _w_con * _con_adj + _w_ev * _ev_adj
+        _btp = metadata.get('bbPlusBtPrior') or {}
+        _anch = _btp.get('anchors') or {}
+        _bs, _sq = row.get('batSpeed'), row.get('squaredUpPct')
+        _nsw = row.get('nCompSwings') or 0
+        if (_anch and _bs is not None and _sq is not None and _nsw > 0
+                and (_anch.get('bsSd') or 0) > 0
+                and (_anch.get('squpSd') or 0) > 0):
+            _prior = (_anch['raw']
+                      + _btp['betaBs'] * (_bs - _anch['bsMean'])
+                      / _anch['bsSd']
+                      + _btp['betaSqup'] * (_sq - _anch['squpMean'])
+                      / _anch['squpSd'])
+            _prior_eff = ((_nsw * _prior + _btp['s0'] * 100.0)
+                          / (_nsw + _btp['s0']))
+            _raw = (nb * _raw + _btp['k'] * _prior_eff) / (nb + _btp['k'])
+        _v = 100.0 + (_raw - 100.0) * _bb_slope
+        _v *= ((metadata.get('plusReanchor') or {}).get('bbPlus') or 1.0)
+        _wrc = (metadata.get('plusWrcScale') or {}).get('bbPlus') or {}
+        if _wrc.get('factor'):
+            _v = (100.0 + (_v - 100.0) * _wrc['factor']
+                  + (_wrc.get('shift') or 0.0))
+        # 6 dp, the PLUS_STORE_DP convention — this value feeds the Hitter+
+        # standardization below at computation precision; display rounds
+        # at the card layer.
+        row['bbPlus'] = round(_v, 6)
+    else:
+        row['bbPlus'] = None
 
     # ── SD+ / CT+ : the hitter's WINDOW swings scored against the SEASON cell
     # tables. all_pitches builds the league table, so the tables and the
