@@ -9,7 +9,7 @@ a hitter audience. Sections, top to bottom:
    headline stats strip
    (PA, AVG, OBP, SLG, BB%, K%, wRC+, SD+, CT+, BB+, Hitter+).
 3. LA x Spray scatter (right): MLB wOBAcon zone heatmap, EV-colored dots,
-   cyan Avg Placement marker, xwOBAsp annotation.
+   purple Median Placement marker (median LA x median spray), xwOBAsp annotation.
 4. BIP donut + per-pitch-group composition bars (Hard / Breaking / Offspeed).
 5. Per-pitch-group performance bars (vs RHP, vs LHP): bar length = usage,
    color = xwOBA performance.
@@ -847,7 +847,7 @@ def fmt_signed_decimal(v, decimals=1):
 # with Bat Speed folded in as the physical input. The standalone BAT TRACKING
 # section is gone — Squared-Up% and Blast% dropped, Bat Speed promoted here.
 # Directionality is handled by the stored percentiles, which are already
-# inverted for Swing% and GB% (HITTER_INVERT_PCTL in pipeline_compute.py), so
+# inverted for GB%, K%, Chase% and Whiff% (HITTER_INVERT_PCTL in pipeline/compute.py), so
 # "lower is better" needs no special casing at render time.
 BUBBLE_COLUMNS = [
     ('RESULT', [
@@ -2215,7 +2215,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
             bbox_fig = bbox.transformed(inv)
             return bbox_fig.x1
 
-        right = _place_text2(annot_x, l2_y, 'Avg Placement: ', 14, TEXT_MUTED, '600')
+        right = _place_text2(annot_x, l2_y, 'Median Placement: ', 14, TEXT_MUTED, '600')
         # Both spray-direction value and LA value share xwOBAsp percentile color
         # (matches hitter page — links Avg Placement visually to xwOBAsp)
         right = _place_text2(right, l2_y, f"{abs(med_spray):.1f}° {sd}",
@@ -2348,7 +2348,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
     row1_w -= ITEM_GAP
     row1_w += DIV_HALF_GAP + DIV_W + DIV_HALF_GAP
     row1_w += 2 * DOT_RADIUS + 0.006 + _measure_text('Size = EV', LEGEND_FONTSIZE) + ITEM_GAP
-    row1_w += 2 * AVG_HALO_RADIUS + 0.006 + _measure_text('Avg Placement', LEGEND_FONTSIZE)
+    row1_w += 2 * AVG_HALO_RADIUS + 0.006 + _measure_text('Median Placement', LEGEND_FONTSIZE)
     # Damage-zone swatch (dashed ring) — only when the chart drew the
     # concentration ellipse, so the key never lists an absent mark.
     if _damage_ellipse_drawn['flag']:
@@ -2397,7 +2397,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                    transform=fig.transFigure, figure=fig, zorder=11)
     fig.add_artist(core)
     cur_x += 2 * AVG_HALO_RADIUS + 0.006
-    cur_x = _draw_text(cur_x, legend_y_dots, 'Avg Placement', LEGEND_FONTSIZE, TEXT_DIMMED)
+    cur_x = _draw_text(cur_x, legend_y_dots, 'Median Placement', LEGEND_FONTSIZE, TEXT_DIMMED)
 
     # Damage-zone swatch: dashed ring in the ellipse's own stroke style.
     if _damage_ellipse_drawn['flag']:
@@ -2464,7 +2464,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 '    average and each point is 1% better or worse, the way wRC+ reads.\n'
                 '•  GB% is colored so that lower = better.\n'
                 '•  Values are for this date window. Percentiles rank them against '
-                'the full-season MLB pool, with no minimum sample.'
+                'the full-season MLB pool\n    (ROC and multi-team stint rows excluded), '
+                'with no minimum sample.'
             )
         elif date_filter is not None:
             # Window card with no pool. Say plainly which numbers are missing
@@ -2474,8 +2475,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 'window\'s pitches only.\n'
                 '•  Hitter+, Batted Ball+, Contact+, Swing Decisions+ and '
                 'wRC+ need the window pool, so they read "—".\n'
-                '•  Percentile bars are grey: a percentile needs an all-MLB '
-                'pool measured over the same window.'
+                '•  Percentile bars are grey: the season-pool scoring for this '
+                'window did not run.'
             )
         else:
             _notes = (
@@ -2485,6 +2486,15 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 '•  Z-Swing% and Z-Contact% count in-zone pitches only: swings at '
                 'strikes, and contact on those swings.'
             )
+            if h_row.get('team') == 'ROC' and h_row.get('batSpeed') is not None:
+                # AAA bat speed is served on event pitches only (balls in play
+                # and strikeouts), while MLB bat speed covers every tracked
+                # swing. The percentile ranks one against the other.
+                _notes += (
+                    '\n•  Bat Speed at AAA comes from balls in play and strikeouts '
+                    'only, not every swing.\n    The percentile ranks it against '
+                    'MLB all-swing values.'
+                )
         fig.text(0.020, 0.068, _notes, fontsize=13, color=TEXT_MUTED, va='top',
                  ha='left', fontfamily='IBM Plex Sans', fontweight='600',
                  linespacing=1.5)

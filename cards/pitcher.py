@@ -2254,8 +2254,8 @@ def render_card(config, pitches, output_file):
     # Footnote — single-game only: ellipse minimum under the bottom-left of
     # the first (VS RHH) plot (moved from right of the plots 2026-08-13, per
     # Wally; the W/B legend left with the per-pitch marks the same day).
-    # Season panels carry no footnote (the 10-pitch ellipse minimum still
-    # applies, just unlabeled).
+    # Season panels carry no footnote (the zone_ellipse_min pitch minimum,
+    # 4, still applies, just unlabeled).
     if not is_season_loc:
         _fx = _x if len(_loc_hands) == 1 else LOC_L_X
         fig.text(_fx, LOC_BOTTOM - 0.006, f'Min. {zone_ellipse_min} pitches for ellipse',
@@ -3107,8 +3107,8 @@ def render_card(config, pitches, output_file):
     if is_season and 'Stuff+' in col_headers:
         _sp_cell = table.get_celld()[(0, col_headers.index('Stuff+'))]
         _sp_x = _sp_cell.get_window_extent(renderer).x0 / fig_bbox.width
-        _sp_note = ('PitchRV/100 actual · xPitchRV/100 expected (luck-neutral) runs saved per 100 pitches: the gap is fortune\n'
-                    'Per-pitch Stuff+ and Loc+ graded vs same pitch type (100 = average for that type)\n'
+        _sp_note = ('PitchRV/100 actual · xPitchRV/100 expected (luck-neutral on contact) runs saved per 100 pitches: the gap is batted-ball fortune\n'
+                    'Per-pitch Stuff+ graded vs the same pitch type, Loc+ vs its pitch family (100 = average for that type or family)\n'
                     'Overall Stuff+ = pitch-weighted average of per-pitch grades\n'
                     'Faded values: sample too small to grade; they color in as pitches accumulate')
         fig.text(_sp_x, b - _below_off, _sp_note,
@@ -3129,9 +3129,9 @@ def render_card(config, pitches, output_file):
                    .get_window_extent(renderer).x0 / fig_bbox.width)
         fig.text(_nx, b - _below_off,
                  'Usage and Avg Velo are shaded against HIS OWN season average for that pitch; '
-                 'Zone% through Loc+ against LEAGUE average. Red = better, blue = worse.\n'
+                 'Zone% through xPitchRV against LEAGUE average. Red = better, blue = worse.\n'
                  'Usage simply reads red = higher. '
-                 'Full color on Usage/Avg Velo = 2 standard errors, so a faint cell there is a gap inside normal game-to-game noise.',
+                 'Full color on Usage/Avg Velo = 2x his normal game-to-game spread, so a faint cell there is a gap inside that noise.',
                  fontsize=8.5, ha='left', va='top', color='#000000',
                  fontfamily='IBM Plex Sans', linespacing=1.5)
     plt.savefig(output_file, dpi=SAVE_DPI, bbox_inches='tight', facecolor=BG, pad_inches=0.1)

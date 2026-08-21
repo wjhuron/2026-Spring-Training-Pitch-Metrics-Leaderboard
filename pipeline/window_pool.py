@@ -95,6 +95,27 @@ def build_window_hitter_row(pitches, metadata, identity=None):
     return row
 
 
+def _season_pool_rows(season_rows):
+    """The shipped percentile pool: MLB rows only, with a traded player's
+    per-team stint rows dropped in favour of his combined row. Mirrors
+    compute_percentile_ranks_with_aaa (pipeline/compute.py), which works from
+    the pipeline's _isROC / _isCombined flags; the leaderboard JSON has
+    neither, so the same split is read off `team`."""
+    from pipeline.utils import is_combined_team
+    def _key(r):
+        return r.get('mlbId') or r.get('hitter')
+    combined = {_key(r) for r in season_rows if is_combined_team(r.get('team'))}
+    out = []
+    for r in season_rows:
+        t = r.get('team')
+        if t in AAA_TEAMS:
+            continue
+        if not is_combined_team(t) and _key(r) in combined:
+            continue
+        out.append(r)
+    return out
+
+
 def add_season_percentiles(row, season_rows, stats=None):
     """Rank each of `row`'s values inside the SEASON distribution.
 
@@ -104,6 +125,7 @@ def add_season_percentiles(row, season_rows, stats=None):
     """
     if stats is None:
         stats = HITTER_STAT_KEYS + EXPECTED_KEYS
+    season_rows = _season_pool_rows(season_rows)
     for stat in stats:
         val = row.get(stat)
         pk = stat + '_pctl'

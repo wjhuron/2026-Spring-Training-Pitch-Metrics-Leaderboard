@@ -211,9 +211,10 @@ MLB_TEAMS = {
 # across 138 pitchers who threw at both levels in 2026, MLB vs MiLB season
 # means correlate r=0.991 with a 1.4 deg mean absolute difference.
 #
-# Bat tracking is the one genuinely MLB-only cluster — bat_speed,
-# swing_length, attack_angle, attack_direction, swing_path_tilt and
-# miss_distance are 100% null for MiLB, so SWING_CLUSTER_COLS stay empty.
+# Bat tracking was 100% null for MiLB when this was verified (2026-07-25).
+# As of 2026-08-21 Savant serves bat_speed on ROC EVENT pitches (balls in play
+# and strikeouts); those were applied to the AAA tab by hand from a Savant
+# search export. The minors CSV path here still does not write the cluster.
 #
 # Two quirks drive the code below:
 #   1. `team` is honoured only as the NUMERIC MiLB club id, not the three-letter
@@ -251,7 +252,8 @@ MILB_PLAYER_TYPES = ('pitcher', 'batter')
 #   Barrel (official launch_speed_angle 1-6) 100% of balls in play
 #   xwOBA 98.3% of in-play plus every K/BB/HBP | xBA/xSLG 96% of in-play
 # Deliberately EXCLUDED:
-#   - bat tracking (BatSpeed/SwingLength/Attack*/SwingPathTilt): 100% null.
+#   - bat tracking (BatSpeed/SwingLength/Attack*/SwingPathTilt): not served
+#     on this CSV; BatSpeed on the AAA tab came from a Savant search export.
 #   - Outs/Runners/Description: already 100% from the MLB Stats API feed.
 #   - ExitVelo/LaunchAngle/BBType/HC_X/HC_Y: already complete for balls in
 #     play. Savant additionally carries EV/LA on FOULS, which the feed does
