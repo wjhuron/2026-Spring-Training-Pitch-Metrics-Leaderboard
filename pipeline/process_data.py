@@ -2244,7 +2244,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                     if suffix_key in hand_ex:
                         row[suffix_key + hand_label] = hand_ex[suffix_key]
 
-        # Fastball velo: average velo of most-used fastball (FF/SI)
+        # Fastball velo: pitch-weighted mean over ALL fastballs (FF+SI pooled),
+        # the same set the site's 'Hard' category and the pitcher card pool.
+        # Was the primary type only until 2026-08-21 (per Wally: unify).
+        # primaryFbType is still the most-thrown of the two.
         fb_types = {'FF', 'SI'}
         fb_pitches_by_type = defaultdict(list)
         for p in pitches:
@@ -2255,7 +2258,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                     fb_pitches_by_type[pt].append(v)
         if fb_pitches_by_type:
             primary_fb_type = max(fb_pitches_by_type, key=lambda t: len(fb_pitches_by_type[t]))
-            fb_velos = fb_pitches_by_type[primary_fb_type]
+            fb_velos = [v for vs in fb_pitches_by_type.values() for v in vs]
             row['fbVelo'] = round(sum(fb_velos) / len(fb_velos), 1) if fb_velos else None
             row['primaryFbType'] = primary_fb_type
         else:

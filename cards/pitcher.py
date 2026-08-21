@@ -3715,8 +3715,8 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
     # count-weighted definition the season bubble (_build_bubble_columns) and
     # the FB VELO BY OUTING strip use. Was the primary type only until
     # 2026-08-21, so a FF+SI arm's window card disagreed with his season card.
-    # The leaderboard's fbVelo (process_data) is still primary-type; that is
-    # the percentile's pool and is unchanged here.
+    # The leaderboard's fbVelo (process_data) pools FF+SI the same way as of
+    # the same day, so the percentile pool and this value now agree.
     fbv = [v for v in (sf(p.get('Velocity')) for p in pitches
                        if p.get('Pitch Type') in ('FF', 'FA', 'SI'))
            if v is not None]
