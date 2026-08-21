@@ -857,6 +857,14 @@ BUBBLE_COLUMNS = [
         ('Swing Decisions+',  'sdPlus',       'sdPlus_pctl',       'int'),
         ('Bat Speed',         'batSpeed',     'batSpeed_pctl',     'mph'),
         ('xwOBA',             'xwOBA',        'xwOBA_pctl',        '3dec'),
+        # xwRC+ directly under xwOBA (2026-08-21, per Wally): the same
+        # quantity in the readable run currency — its percentile matches
+        # xwOBA's by construction (affine transform), and the row exists for
+        # interpretability plus the wRC+-vs-xwRC+ luck read against the
+        # strip. The pipeline computes it park-free on the x-side by design
+        # (see process_data: applying PF to a park-neutral model output
+        # over-corrected).
+        ('xwRC+',             'xWRCplus',     'xWRCplus_pctl',     'int'),
     ]),
     ('QUALITY OF CONTACT', [
         ('xwOBAcon',    'xwOBAcon',     'xwOBAcon_pctl',     '3dec'),
