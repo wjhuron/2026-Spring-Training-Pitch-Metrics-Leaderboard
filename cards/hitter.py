@@ -864,7 +864,13 @@ BUBBLE_COLUMNS = [
         # reads realized-vs-expected on contact — mismatched tints flag
         # batted-ball fortune. Hitter side is uninverted: high BABIP = red.
         ('BABIP',       'babip',        'babip_pctl',        '3dec'),
-        ('Max EV',      'maxEV',        'maxEV_pctl',        'mph'),
+        # EV95 replaced Max EV 2026-08-21, per Wally: max is the textbook
+        # nBIP-contaminated statistic (grows mechanically with sample), and
+        # EV95 is the exact BB+ ingredient the 2026-08-19 battery validated
+        # (percentile sweep p50..p95+max: monotone rising to p95, max
+        # rejected via the nBIP audit) — the card now displays the quantity
+        # the metric uses.
+        ('EV95',        'ev95',         'ev95_pctl',         'mph'),
         ('Hard-Hit%',   'hardHitPct',   'hardHitPct_pctl',   'pct1'),
         ('Barrel%',     'barrelPct',    'barrelPct_pctl',    'pct1'),
         ('Air Pull%',   'airPullPct',   'airPullPct_pctl',   'pct1'),
@@ -2986,7 +2992,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
 # ─────────────────────────────────────────────────────────────────────
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team           = "WSH"                   # Team filter (e.g., "NYY"), or None for all teams
+    team           = "ROC"                   # Team filter (e.g., "NYY"), or None for all teams
     start_date     = None                                 # Set to None for full season
     end_date       = None                                 # Set to a date for date range, or None for single day
     filter_hitters = ""       # Semicolon-separated "Last, First" names, or "" for all
