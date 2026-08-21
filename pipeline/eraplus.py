@@ -51,7 +51,16 @@ seasons appearing at both levels in the same season, 2023-2025
 is +0.077 ERA for hpERA and +0.765 for hdERA. hpERA survives because its
 channels cancel and hdERA does not because it is nearly pure xwOBA. Their
 home park is NEUTRAL: Savant publishes no minor-league park factors, so
-the park channel z-scores a flat 1.00 for every ROC row.
+the park channel z-scores a flat 1.00 for every ROC row. Neutral now
+stands by MEASUREMENT, not just data absence (2026-08-21,
+scripts/research/era/aaa_park_channel_validation.py): BA 2025 AAA park
+factors were tested against next-season road xwOBA on 2023-2026 AAA
+pitcher-seasons, and neither the naive forward channel nor the
+retrodictive xrv correction beat the neutral baseline in the IL-only
+decision test (park-partial sign flips across year-pairs). Note the
+direction trap recorded there: for a translated arm the fitted forward
+park weight points the WRONG way, so if factors ever improve, re-test
+the retrodictive form, never just activate the channel.
 """
 import json
 import os
