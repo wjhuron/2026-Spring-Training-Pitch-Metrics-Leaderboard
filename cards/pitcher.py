@@ -2134,13 +2134,12 @@ def render_card(config, pitches, output_file):
         if zone_top is None:
             zone_top, zone_bot = _pooled
         ax.set_facecolor(PLOT_PANEL)
-        if is_season_loc and config.get('is_date_range'):
-            # Uniform 1.2x zoom of the season frame below (2.91 x 3.08 ft),
-            # same x centre (-0.367) and the same centered y window as the
-            # single game.
+        if is_season_loc:
+            # Season AND date-range panels: uniform 1.2x zoom of the classic
+            # season frame (-2.112..1.378 x 0.5..4.2), 2.91 x 3.08 ft, same x
+            # centre (-0.367), y centered on the zone at 2.375 ft. Date range
+            # first, then full season the same day (2026-08-22, per Wally).
             ax.set_xlim(-1.821, 1.087); ax.set_ylim(0.833, 3.917)
-        elif is_season_loc:
-            ax.set_xlim(-2.112, 1.378); ax.set_ylim(0.5, 4.2)
         else:
             # Single-game window: uniform 1.2x zoom of the old 3.8 x 3.7 ft
             # frame (3.17 x 3.08 ft), CENTERED on the zone at 2.375 ft
