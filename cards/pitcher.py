@@ -81,7 +81,28 @@ MILB_TEAMS = {
         'sport_id': 11,         # AAA = sportId 11
         'search_name': 'Rochester',
     },
+    # The AAA tab is the OTHER side of the same Rochester games: the opposing
+    # clubs' pitchers. Same schedule, same sport id; the boxscore filter keeps
+    # every pitcher who is NOT on the opponent_of club (2026-08-21, per Wally).
+    'AAA': {
+        'sheet_key': 'NL',
+        'sport_id': 11,
+        'search_name': 'Rochester',
+        'opponent_of': 'ROC',
+    },
 }
+
+
+def _box_side_matches(pbox_team, team_abbrev):
+    """Does a boxscore pitcher's club belong on this card's team tab?
+
+    MLB tabs and ROC match on the abbreviation. The AAA tab has no club of its
+    own, so it keeps every pitcher whose club is not the one it opposes.
+    """
+    opp = (MILB_TEAMS.get(team_abbrev) or {}).get('opponent_of')
+    if opp is not None:
+        return pbox_team != opp
+    return pbox_team == team_abbrev
 MILB_TEAM_NAME_TO_ABBREV = {
     'Rochester Red Wings': 'ROC',
 }
@@ -945,7 +966,7 @@ def fetch_boxscores_for_team(date_str, team_abbrev, include_live=False, game_pk=
         if not box: continue
         game = {}
         for p in box['pitchers']:
-            if p['team'] == team_abbrev:
+            if _box_side_matches(p['team'], team_abbrev):
                 game[p['name']] = p
         games.append(game)
         pitcher_stats.update(game)
@@ -1056,7 +1077,7 @@ def fetch_boxscores_for_team_dates(dates, team_abbrev, include_live=False):
                 continue
             game = {}
             for p in box['pitchers']:
-                if p['team'] == team_abbrev:
+                if _box_side_matches(p['team'], team_abbrev):
                     game[p['name']] = p
             if game:
                 out.append(game)
@@ -1576,6 +1597,7 @@ def _render_single_game_panel(fig, pitches, config=None):
         # sample supports a baseline. There is deliberately no floor on today's
         # count: an 8-pitch curveball still has a real season average, and
         # suppressing the line just left the reader wondering where it went.
+        _dashed_drawn = False
         for pt, cnt in _n_by_pt.items():
             _sb = _sl.get(pt) or {}
             if (_sb.get('count') or 0) < SEASON_DELTA_MIN:
@@ -1584,6 +1606,7 @@ def _render_single_game_panel(fig, pitches, config=None):
                 continue
             ax_v.axhline(_sb['velocity'], color=PITCH_COLORS.get(pt, '#999'),
                          linewidth=1.1, linestyle='--', alpha=0.6, zorder=1)
+            _dashed_drawn = True
         for pt in PITCH_ORDER:
             _pp2 = [(i2, v) for i2, v, q in _seq if q == pt]
             if not _pp2:
@@ -1606,9 +1629,12 @@ def _render_single_game_panel(fig, pitches, config=None):
                  fontfamily='IBM Plex Sans', va='bottom', ha='left')
         # Notes render BLACK on every layout (2026-08-13, per Wally — the
         # muted gray read too faint at card scale).
-        ax_v.text(0.992, 0.04, 'dashed = his season average',
-                  transform=ax_v.transAxes, fontsize=7.5, color='#000000',
-                  fontfamily='IBM Plex Sans', va='bottom', ha='right', zorder=6)
+        # Only when a line exists. AAA-tab pitchers have no leaderboard row,
+        # so the note described a line that was never drawn (2026-08-21).
+        if _dashed_drawn:
+            ax_v.text(0.992, 0.04, 'dashed = his season average',
+                      transform=ax_v.transAxes, fontsize=7.5, color='#000000',
+                      fontfamily='IBM Plex Sans', va='bottom', ha='right', zorder=6)
     else:
         ax_v.axis('off')
 
