@@ -1712,6 +1712,7 @@ def render_card(config, pitches, output_file):
     # Compute pitch data
     locations = {'L': defaultdict(list), 'R': defaultdict(list)}
     sz_tops, sz_bots = [], []
+    sz_by_hand = {'L': ([], []), 'R': ([], [])}   # per batter hand (top list, bot list)
     groups = defaultdict(list)
 
     for p in pitches:
@@ -1738,18 +1739,29 @@ def render_card(config, pitches, output_file):
                 locations[bh][pt].append((float(px), float(pz), desc, is_b, is_hh))
             except Exception: pass
         if szt is not None and szt != '' and szb is not None and szb != '':
-            try: sz_tops.append(float(szt)); sz_bots.append(float(szb))
+            try:
+                _t, _b = float(szt), float(szb)
+                sz_tops.append(_t); sz_bots.append(_b)
+                if bh in sz_by_hand:
+                    sz_by_hand[bh][0].append(_t); sz_by_hand[bh][1].append(_b)
             except Exception: pass
 
     # Single-game zone box = the OUTER envelope of the outing's strike zones:
     # the highest SzTop and the lowest SzBot the pitcher faced (2026-08-22,
     # per Wally). Season and date-range cards keep the mean; over hundreds of
     # hitters the envelope would be the tallest and shortest zone in the league.
-    if sz_tops and not config.get('mvn_models'):
-        zone_top, zone_bot = max(sz_tops), min(sz_bots)
-    else:
-        zone_top = np.mean(sz_tops) if sz_tops else 3.5
-        zone_bot = np.mean(sz_bots) if sz_bots else 1.5
+    # Split by batter hand (2026-08-22, per Wally): the VS RHH panel uses the
+    # right-handed hitters' zones, VS LHH the left-handers'. A hand with no
+    # zone data falls back to the pooled value, then to 3.5 / 1.5.
+    def _zone_bounds(tops, bots):
+        if not tops:
+            return None
+        if not config.get('mvn_models'):
+            return max(tops), min(bots)
+        return float(np.mean(tops)), float(np.mean(bots))
+    _pooled = _zone_bounds(sz_tops, sz_bots) or (3.5, 1.5)
+    zone_by_hand = {h: (_zone_bounds(*sz_by_hand[h]) or _pooled) for h in ('L', 'R')}
+    zone_top, zone_bot = _pooled
     sorted_types = [pt for pt in PITCH_ORDER if pt in groups]
 
     # Batted ball distribution per pitch type
@@ -2121,6 +2133,9 @@ def render_card(config, pitches, output_file):
     # center stays at the same horizontal fraction as the classic (-2.3, 1.5)
     # window.
     def draw_zone(ax, hand):
+        zone_top, zone_bot = zone_by_hand.get(hand, (None, None))
+        if zone_top is None:
+            zone_top, zone_bot = _pooled
         ax.set_facecolor(PLOT_PANEL)
         if is_season_loc:
             ax.set_xlim(-2.112, 1.378); ax.set_ylim(0.5, 4.2)
