@@ -1746,19 +1746,16 @@ def render_card(config, pitches, output_file):
                     sz_by_hand[bh][0].append(_t); sz_by_hand[bh][1].append(_b)
             except Exception: pass
 
-    # Single-game zone box = the OUTER envelope of the outing's strike zones:
-    # the highest SzTop and the lowest SzBot the pitcher faced (2026-08-22,
-    # per Wally). Season and date-range cards keep the mean; over hundreds of
-    # hitters the envelope would be the tallest and shortest zone in the league.
-    # Split by batter hand (2026-08-22, per Wally): the VS RHH panel uses the
-    # right-handed hitters' zones, VS LHH the left-handers'. A hand with no
-    # zone data falls back to the pooled value, then to 3.5 / 1.5.
+    # Zone box = the OUTER envelope of the strike zones the pitcher faced:
+    # the highest SzTop and the lowest SzBot (2026-08-22, per Wally). Applies
+    # on every layout; single-game first, then season and date-range the same
+    # day. Split by batter hand: the VS RHH panel uses the right-handed
+    # hitters' zones, VS LHH the left-handers'. A hand with no zone data falls
+    # back to the pooled value, then to 3.5 / 1.5.
     def _zone_bounds(tops, bots):
         if not tops:
             return None
-        if not config.get('mvn_models'):
-            return max(tops), min(bots)
-        return float(np.mean(tops)), float(np.mean(bots))
+        return max(tops), min(bots)
     _pooled = _zone_bounds(sz_tops, sz_bots) or (3.5, 1.5)
     zone_by_hand = {h: (_zone_bounds(*sz_by_hand[h]) or _pooled) for h in ('L', 'R')}
     zone_top, zone_bot = _pooled
