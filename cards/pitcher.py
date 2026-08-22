@@ -2135,18 +2135,19 @@ def render_card(config, pitches, output_file):
             zone_top, zone_bot = _pooled
         ax.set_facecolor(PLOT_PANEL)
         if is_season_loc and config.get('is_date_range'):
-            # Uniform 1.3x zoom of the season frame below, same x centre
-            # (-0.367) and the same downward shift as the single-game window.
-            ax.set_xlim(-1.710, 0.975); ax.set_ylim(0.65, 3.50)
+            # Uniform 1.2x zoom of the season frame below (2.91 x 3.08 ft),
+            # same x centre (-0.367) and the same centered y window as the
+            # single game.
+            ax.set_xlim(-1.821, 1.087); ax.set_ylim(0.833, 3.917)
         elif is_season_loc:
             ax.set_xlim(-2.112, 1.378); ax.set_ylim(0.5, 4.2)
         else:
-            # Single-game window: uniform 1.3x zoom of the old 3.8 x 3.7 ft
-            # frame, shifted DOWN so bounced breaking balls stay in view and
-            # high balls leave instead (2026-08-22, per Wally, after a 4-way
-            # prototype). On a 75-pitch outing it hides 22 pitches against the
-            # old frame's 10; the zone itself is unchanged.
-            ax.set_xlim(-1.45, 1.45); ax.set_ylim(0.65, 3.50)
+            # Single-game window: uniform 1.2x zoom of the old 3.8 x 3.7 ft
+            # frame (3.17 x 3.08 ft), CENTERED on the zone at 2.375 ft
+            # (2026-08-22, per Wally, after a 4-way prototype at 1.3x and a
+            # low-window variant he rejected because the zone rode high in the
+            # frame). The zone itself is unchanged.
+            ax.set_xlim(-1.583, 1.583); ax.set_ylim(0.833, 3.917)
         ax.add_patch(Rectangle((-PLATE_HALF, zone_bot), PLATE_HALF*2, zone_top-zone_bot, fill=False, edgecolor=TEXT_SECONDARY, linewidth=1.5, zorder=2))
         tw = PLATE_HALF*2/3; th = (zone_top-zone_bot)/3
         for i in range(1,3):
