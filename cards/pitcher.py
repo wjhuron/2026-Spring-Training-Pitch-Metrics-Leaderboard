@@ -1741,8 +1741,15 @@ def render_card(config, pitches, output_file):
             try: sz_tops.append(float(szt)); sz_bots.append(float(szb))
             except Exception: pass
 
-    avg_top = np.mean(sz_tops) if sz_tops else 3.5
-    avg_bot = np.mean(sz_bots) if sz_bots else 1.5
+    # Single-game zone box = the OUTER envelope of the outing's strike zones:
+    # the highest SzTop and the lowest SzBot the pitcher faced (2026-08-22,
+    # per Wally). Season and date-range cards keep the mean; over hundreds of
+    # hitters the envelope would be the tallest and shortest zone in the league.
+    if sz_tops and not config.get('mvn_models'):
+        zone_top, zone_bot = max(sz_tops), min(sz_bots)
+    else:
+        zone_top = np.mean(sz_tops) if sz_tops else 3.5
+        zone_bot = np.mean(sz_bots) if sz_bots else 1.5
     sorted_types = [pt for pt in PITCH_ORDER if pt in groups]
 
     # Batted ball distribution per pitch type
@@ -2119,12 +2126,12 @@ def render_card(config, pitches, output_file):
             ax.set_xlim(-2.112, 1.378); ax.set_ylim(0.5, 4.2)
         else:
             ax.set_xlim(-1.9, 1.9); ax.set_ylim(0.5, 4.2)
-        ax.add_patch(Rectangle((-PLATE_HALF, avg_bot), PLATE_HALF*2, avg_top-avg_bot, fill=False, edgecolor=TEXT_SECONDARY, linewidth=1.5, zorder=2))
-        tw = PLATE_HALF*2/3; th = (avg_top-avg_bot)/3
+        ax.add_patch(Rectangle((-PLATE_HALF, zone_bot), PLATE_HALF*2, zone_top-zone_bot, fill=False, edgecolor=TEXT_SECONDARY, linewidth=1.5, zorder=2))
+        tw = PLATE_HALF*2/3; th = (zone_top-zone_bot)/3
         for i in range(1,3):
-            ax.plot([-PLATE_HALF+i*tw, -PLATE_HALF+i*tw], [avg_bot, avg_top], color=GRID_COLOR, linewidth=0.6, zorder=2)
-            ax.plot([-PLATE_HALF, PLATE_HALF], [avg_bot+i*th, avg_bot+i*th], color=GRID_COLOR, linewidth=0.6, zorder=2)
-        pt_y = avg_bot - 0.15
+            ax.plot([-PLATE_HALF+i*tw, -PLATE_HALF+i*tw], [zone_bot, zone_top], color=GRID_COLOR, linewidth=0.6, zorder=2)
+            ax.plot([-PLATE_HALF, PLATE_HALF], [zone_bot+i*th, zone_bot+i*th], color=GRID_COLOR, linewidth=0.6, zorder=2)
+        pt_y = zone_bot - 0.15
         ax.plot([-PLATE_HALF,-PLATE_HALF,0,PLATE_HALF,PLATE_HALF,-PLATE_HALF], [pt_y,pt_y-0.10,pt_y-0.20,pt_y-0.10,pt_y,pt_y], color=TEXT_SECONDARY, linewidth=1.2, zorder=2)
         ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
         for spine in ax.spines.values(): spine.set_color(TEXT_FAINT)
@@ -3150,12 +3157,15 @@ def render_card(config, pitches, output_file):
         # Left edge aligned under the Usage column — the first column the note
         # describes — so the note visually claims the block it explains.
         _nx = l
+        # Last league-shaded column. xPitchRV drops when the outing has no RV
+        # data (force_exclude), and then Loc+ is the end of the shaded span.
+        _last_lg = 'xPitchRV' if 'xPitchRV' in col_headers else 'Loc+'
         if 'Usage' in col_headers:
             _nx = (table.get_celld()[(0, col_headers.index('Usage'))]
                    .get_window_extent(renderer).x0 / fig_bbox.width)
         fig.text(_nx, b - _below_off,
                  'Usage and Avg Velo are shaded against HIS OWN season average for that pitch; '
-                 'Zone% through xPitchRV against LEAGUE average. Red = better, blue = worse.\n'
+                 f'Zone% through {_last_lg} against LEAGUE average. Red = better, blue = worse.\n'
                  'Usage simply reads red = higher. '
                  'Full color on Usage/Avg Velo = 2x his normal game-to-game spread, so a faint cell there is a gap inside that noise.',
                  fontsize=8.5, ha='left', va='top', color='#000000',
