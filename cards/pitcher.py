@@ -2140,7 +2140,12 @@ def render_card(config, pitches, output_file):
         if is_season_loc:
             ax.set_xlim(-2.112, 1.378); ax.set_ylim(0.5, 4.2)
         else:
-            ax.set_xlim(-1.9, 1.9); ax.set_ylim(0.5, 4.2)
+            # Single-game window: uniform 1.3x zoom of the old 3.8 x 3.7 ft
+            # frame, shifted DOWN so bounced breaking balls stay in view and
+            # high balls leave instead (2026-08-22, per Wally, after a 4-way
+            # prototype). On a 75-pitch outing it hides 22 pitches against the
+            # old frame's 10; the zone itself is unchanged.
+            ax.set_xlim(-1.45, 1.45); ax.set_ylim(0.65, 3.50)
         ax.add_patch(Rectangle((-PLATE_HALF, zone_bot), PLATE_HALF*2, zone_top-zone_bot, fill=False, edgecolor=TEXT_SECONDARY, linewidth=1.5, zorder=2))
         tw = PLATE_HALF*2/3; th = (zone_top-zone_bot)/3
         for i in range(1,3):
