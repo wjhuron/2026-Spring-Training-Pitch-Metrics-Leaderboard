@@ -2137,7 +2137,11 @@ def render_card(config, pitches, output_file):
         if zone_top is None:
             zone_top, zone_bot = _pooled
         ax.set_facecolor(PLOT_PANEL)
-        if is_season_loc:
+        if is_season_loc and config.get('is_date_range'):
+            # Uniform 1.3x zoom of the season frame below, same x centre
+            # (-0.367) and the same downward shift as the single-game window.
+            ax.set_xlim(-1.710, 0.975); ax.set_ylim(0.65, 3.50)
+        elif is_season_loc:
             ax.set_xlim(-2.112, 1.378); ax.set_ylim(0.5, 4.2)
         else:
             # Single-game window: uniform 1.3x zoom of the old 3.8 x 3.7 ft
@@ -4547,6 +4551,9 @@ def main():
             # (RelZ/RelX kept, no RV pair). Stuff+/Loc+/nVAA/nHAA come
             # from the computed context maps below regardless.
             'mvn_models': mvn_models if is_multi_game else {},
+            # Date-range card: season layout, but the zone panels take the
+            # 1.3x window like a single game (2026-08-22, per Wally).
+            'is_date_range': bool(is_multi_game and date_filter is not None),
             'pctl_row': pctl_row,
             'pitch_locplus': (scratch_locplus if scratch_ctx is not None
                               else locplus_by_pitcher.get((pitcher_name, eff_team), {})),
