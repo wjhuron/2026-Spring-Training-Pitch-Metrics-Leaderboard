@@ -751,7 +751,7 @@ def fetch_milb_game_pks_for_date(date_str, sport_id=11, team_filter=None):
         game_pks = []
         for date_data in data.get('dates', []):
             for game in date_data.get('games', []):
-                if game.get('status', {}).get('abstractGameState') != 'Final':
+                if not _game_is_completed(game):
                     continue
                 if team_filter:
                     away_name = game.get('teams', {}).get('away', {}).get('team', {}).get('name', '')
@@ -765,6 +765,19 @@ def fetch_milb_game_pks_for_date(date_str, sport_id=11, team_filter=None):
         return []
 
 
+def _game_is_completed(game):
+    """True only for a game that was actually played to completion.
+
+    A postponed game is listed on its ORIGINAL date with
+    abstractGameState 'Final' but codedGameState 'D'. Its boxscore is
+    empty, and the makeup game reuses the same gamePk on a later date.
+    Gating on abstractGameState alone cached the empty copy first and
+    the gamePk dedup then discarded the real one (6 games, 150 players,
+    found 2026-08-23).
+    """
+    return game.get('status', {}).get('codedGameState') == 'F'
+
+
 def fetch_game_pks_for_date(date_str):
     """Fetch all MLB game PKs for a given date from the schedule API."""
     url = f"https://statsapi.mlb.com/api/v1/schedule?date={date_str}&sportId=1&gameType=R,F,D,L,W"
@@ -774,7 +787,7 @@ def fetch_game_pks_for_date(date_str):
         game_pks = []
         for date_data in data.get('dates', []):
             for game in date_data.get('games', []):
-                if game.get('status', {}).get('abstractGameState') == 'Final':
+                if _game_is_completed(game):
                     game_pks.append(game['gamePk'])
         return game_pks
     except Exception as e:
@@ -1034,12 +1047,18 @@ def fetch_and_aggregate_boxscores(game_dates):
     pitcher_id_map = {}
     hitter_id_map = {}
     seen_game_pks = set()
+    n_empty_boxes = 0
 
     for d in game_dates:
         if d not in cache:
             continue
         for box in cache[d]:
             gpk = box.get('gamePk')
+            if not box.get('pitchers') and not box.get('hitters'):
+                # Empty boxscore (postponed listing). Never let it claim
+                # the gamePk, or the makeup game is discarded.
+                n_empty_boxes += 1
+                continue
             if gpk and gpk in seen_game_pks:
                 continue
             if gpk:
@@ -1078,4 +1097,6 @@ def fetch_and_aggregate_boxscores(game_dates):
                 if h.get('mlbId'):
                     hitter_id_map[h['mlbId']] = key
 
+    if n_empty_boxes:
+        print(f"  Skipped {n_empty_boxes} empty boxscore(s) (postponed listings)")
     return pitcher_agg, hitter_agg, pitcher_id_map, hitter_id_map
