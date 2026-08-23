@@ -528,10 +528,16 @@ _SNAPSHOT_DATE = '2026-07-06'
 class DecisionLedger:
     """Values Wally has already seen and left out. Blank-fill only."""
 
-    def __init__(self, entries=None):
+    def __init__(self, entries=None, missing=None):
         # (PitchID, column) -> {'rejected': [str, ...], 'asof': str, 'origin': str}
         self.entries = entries or {}
         self.new_rejections = {}
+        # PitchID -> {'asof': str, 'values': {col: str}} for a whole pitch that
+        # a sweep surfaced as absent from the sheet and that was not appended.
+        # The values are the feed's FEED_COLS at the time, so a later sweep can
+        # tell "same pitch, nothing new" from "same pitch, the source changed".
+        self.missing = missing or {}
+        self.new_missing = 0
 
     # -- persistence ----------------------------------------------------------
     @classmethod
@@ -541,9 +547,11 @@ class DecisionLedger:
                 blob = json.load(f)
             entries = {tuple(k.split('|', 1)): v
                        for k, v in blob.get('decisions', {}).items()}
-            print(f"  decision ledger: {len(entries)} entries from "
+            missing = blob.get('missing', {})
+            print(f"  decision ledger: {len(entries)} entries, "
+                  f"{len(missing)} missing pitches from "
                   f"{os.path.relpath(LEDGER_PATH, _ROOT)}")
-            return cls(entries)
+            return cls(entries, missing)
         print("  decision ledger: absent, bootstrapping from the 2026-07-06 "
               "snapshots")
         return cls(cls._bootstrap())
@@ -559,6 +567,12 @@ class DecisionLedger:
             'updated': datetime.now().strftime('%Y-%m-%d'),
             'decisions': {f'{pid}|{col}': v
                           for (pid, col), v in sorted(self.entries.items())},
+            'missing_note': ('Whole pitches a sweep found absent from the sheet '
+                             'and that were not appended. Suppressed while the '
+                             'feed still gives exactly these FEED_COLS values; '
+                             'raised again, with the changed columns named, '
+                             'when any of them moves.'),
+            'missing': dict(sorted(self.missing.items())),
         }
         tmp = LEDGER_PATH + '.tmp'
         with open(tmp, 'w', encoding='utf-8') as f:
@@ -652,6 +666,31 @@ class DecisionLedger:
         """True when `candidate` is a value already rejected for this cell."""
         e = self.entries.get((pid, col))
         return bool(e) and candidate in e['rejected']
+
+    # -- whole missing pitches ------------------------------------------------
+    @staticmethod
+    def fingerprint(exp):
+        return {c: exp[c] for c in FEED_COLS if c in exp}
+
+    def missing_status(self, pid, exp):
+        """('new' | 'changed' | 'seen', [changed columns]) for an absent pitch."""
+        e = self.missing.get(pid)
+        if not e:
+            return 'new', []
+        then, now = e['values'], self.fingerprint(exp)
+        changed = sorted(c for c in set(then) | set(now)
+                         if then.get(c) != now.get(c))
+        return ('changed' if changed else 'seen'), changed
+
+    def record_missing(self, pid, exp):
+        """Note that this absent pitch, with these source values, was surfaced."""
+        fp = self.fingerprint(exp)
+        e = self.missing.get(pid)
+        if e and e['values'] == fp:
+            return
+        self.missing[pid] = {'asof': datetime.now().strftime('%Y-%m-%d'),
+                             'values': fp}
+        self.new_missing += 1
 
     def record(self, pid, col, value):
         """Note that `value` was offered for a blank cell and declined."""
@@ -1844,14 +1883,18 @@ def write_report(changes, missing, ledger, path, unexplained_zones=None):
     if missing:
         ws = sheet('_MISSING PITCHES', ['Team', 'PitchID', 'Game Date',
                                         'Pitcher', 'Batter', 'Pitch Type',
-                                        'Count', 'Description'])
+                                        'Count', 'Description', 'Status',
+                                        'What changed since last seen'])
         rows_ = sorted(missing, key=lambda m: (m[1].get('_PTeam', ''),
                                                m[1].get('Pitcher', ''), m[0]))
-        for pid, exp in rows_:
+        for pid, exp, status, changed in rows_:
+            then = (ledger.missing.get(pid) or {}).get('values', {})
             ws.append([exp.get('_PTeam', ''), pid, exp.get('Game Date', ''),
                        exp.get('Pitcher', ''), exp.get('Batter', ''),
                        exp.get('Pitch Type', ''), exp.get('Count', ''),
-                       exp.get('Description', '')])
+                       exp.get('Description', ''), status,
+                       '; '.join(f'{c}: {then.get(c, "")} -> {exp.get(c, "")}'
+                                 for c in changed)])
         fit(ws)
 
     # ---- Blank fills, one row per PITCH -------------------------------------
@@ -2065,7 +2108,12 @@ def apply_changes(ws, header, changes, chunk=40000):
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
+         seed_missing=False,
          report=True, record=True, decisions_from=None):
+    if seed_missing and (apply or refresh_feed):
+        raise SystemExit('--seed-missing records the CACHED feed as already '
+                         'seen; it cannot be combined with --apply or '
+                         '--refresh-feed.')
     kinds = kinds or {'new', 'drift', 'drift_sub', 'drift_small',
                   'precision', 'zone_fix', 'zone_fix_nodonor'}
     print(f"Mode: {'APPLY' if apply else 'DRY RUN (nothing is written)'}")
@@ -2162,7 +2210,7 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
 
             # --- savant pass ---
             savant_lookup = {}
-            if dates:
+            if dates and not seed_missing:
                 time.sleep(3)
                 savant_lookup = download_statcast(ws.title, min(dates),
                                                   max(dates), session) or {}
@@ -2182,6 +2230,21 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
                   f"{k['precision']} precision | held: {k['suppressed']} "
                   f"suppressed + {k['fill_implausible']} implausible | "
                   f"missing {len(missing)}")
+
+            # A pitch the last sweep already surfaced, with the same source
+            # values, is held back. The same pitch with a moved value comes
+            # back with the moved columns named.
+            kept = []
+            n_seen = 0
+            for pid, exp in missing:
+                status, changed = ledger.missing_status(pid, exp)
+                if status == 'seen':
+                    n_seen += 1
+                    continue
+                kept.append((pid, exp, status, changed))
+            if n_seen:
+                print(f"    missing pitches already seen, unchanged: {n_seen}")
+            missing = kept
 
             all_changes.extend(changes)
             all_missing.extend(missing)
@@ -2246,7 +2309,9 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
     print(f"  suppressed by the ledger {k['suppressed']}")
     print(f"  fills judged implausible {k['fill_implausible']}")
     print(f"  blocked, bad at source   {k['blocked_source']}")
-    print(f"  missing pitches found    {len(all_missing)}")
+    print(f"  missing pitches found    {len(all_missing)} "
+          f"({sum(1 for m in all_missing if m[2] == 'changed')} seen before, "
+          f"source changed)")
     print(f"cells this run would write "
           f"{sum(k[x] for x in AUTO_KINDS) + k['new'] + k['drift']}")
     if feed_failures:
@@ -2295,12 +2360,15 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
             print("\nNo changes anywhere, so no report was written.")
 
     if record:
-        n_new = record_sweep(all_changes, ledger)
+        n_new = 0 if seed_missing else record_sweep(all_changes, ledger)
+        for pid, exp, _status, _changed in all_missing:
+            ledger.record_missing(pid, exp)
         ledger.save()
-        print(f"\nRecorded {n_new} newly surfaced values in "
+        print(f"\nRecorded {n_new} newly surfaced values and "
+              f"{ledger.new_missing} missing pitches in "
               f"{os.path.relpath(LEDGER_PATH, _ROOT)} ({len(ledger.entries)} "
-              f"cells tracked). A later sweep will not raise these again unless "
-              f"the source value changes.")
+              f"cells, {len(ledger.missing)} missing pitches tracked). A later "
+              f"sweep will not raise these again unless the source value changes.")
     else:
         print(f"\n--no-record: nothing written to "
               f"{os.path.relpath(LEDGER_PATH, _ROOT)}; a later sweep will raise "
@@ -2332,11 +2400,18 @@ if __name__ == '__main__':
                          'run that should not stop a later sweep from raising '
                          'the same values again.')
     ap.add_argument('--no-report', action='store_true')
+    ap.add_argument('--seed-missing', action='store_true',
+                    help='record every currently missing pitch, with the feed '
+                         'values in data/_feed_cache, as already seen. Skips the '
+                         'Savant pass, records no cell values, writes nothing. '
+                         'Used once on 2026-08-23 to backfill the 2026-08-17 '
+                         'sweep, whose workbooks were gone.')
     a = ap.parse_args()
     main(filter_teams=[t.strip().upper() for t in a.teams.split(',')] if a.teams else None,
          apply=a.apply,
          refresh_feed=a.refresh_feed,
          kinds={k.strip() for k in a.kinds.split(',') if k.strip()},
-         report=not a.no_report,
+         report=not a.no_report and not a.seed_missing,
          record=not a.no_record,
+         seed_missing=a.seed_missing,
          decisions_from=a.decisions_from)
