@@ -126,6 +126,16 @@ jobs:
           python3 scripts/ci/build_kinematics_2026.py \
             || echo "kinematics refresh failed — using downloaded sidecar as-is"
 
+      - name: Refresh pitcher heights (v14 height feature)
+        # Resolves any pitcher name new to the caches via mlb_id_cache / the
+        # MLB Stats API and appends to data/pitcher_heights.json (atomic
+        # write). A failure leaves the committed artifact in place; the
+        # trainer imputes unresolved arms to the frozen league mean and logs
+        # them, and a retrain aborts below 98% MLB coverage.
+        run: |
+          python3 scripts/ci/build_pitcher_heights.py \
+            || echo "height refresh failed — using committed artifact as-is"
+
       - name: Compute Stuff+ (retrain or cached-model scoring, inject into leaderboards)
         # Retrain path needs the 2025 pickle (retraining without it would
         # silently regress to the weaker 2026-only config). Score-only path

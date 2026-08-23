@@ -174,7 +174,36 @@ def _harmonize_tags(prior, current):
 # +0.007) while gaining +0.05 reliability in all five.
 BASE_FEATS = ['velocity', 'ivb', 'hb', 'velo_diff', 'ivb_diff', 'hb_diff',
               'spin_rate', 'extension', 'arm_angle', 'vaa', 'vaa_diff',
-              'rel_x', 'cross', 'cross_abs', 'kin_eff__ff']
+              'rel_x', 'cross', 'cross_abs', 'kin_eff__ff', 'height']
+
+# v14 (2026-08-23, per Wally): height = pitcher stature in inches (MLB Stats
+# API, data/pitcher_heights.json, refreshed by
+# scripts/ci/build_pitcher_heights.py) + max_depth 7 -> 6. Decided on the v2
+# replicate gate (scripts/research/stuff/stuff_gate_v2.py): NEXT-season
+# objective nxt_r (pitcher grade in year Y vs luck-neutral outcomes in Y+1,
+# model fit on neither season), five pairs 2021-22..2025-26, paired
+# pitcher-bootstrap SE. height alone +0.0153 (z 3.7, 5/5 pairs on nxt_r,
+# unit nxt_r and actual-RV nxt_r, held on a second seed); depth curve
+# 4 -0.001 / 5 +0.006 / 6 +0.005 (5/5) / 7 shipped / 8 -0.004, interior
+# optimum flat across 5-6; height + depth 6 = +0.0170 (z 4.2). The v1 gate
+# (fut_r, within-season halves) could not see either. Rejected in the same
+# battery: arm-plane deviation, acceleration-form movement, release-point
+# SD, release height vs stature. Missing heights impute to the frozen league
+# mean and are logged; a retrain aborts below 98% MLB coverage.
+HEIGHTS_PATH = os.path.join(DATA, 'pitcher_heights.json')
+HEIGHT_LEAGUE_MEAN = 73.72       # measured 2026-08-23 on 2623 pitchers
+_HEIGHTS = None
+
+
+def load_heights(path=HEIGHTS_PATH):
+    """name -> inches, or None if the artifact is absent."""
+    global _HEIGHTS
+    if _HEIGHTS is None:
+        if not os.path.exists(path):
+            return None
+        with open(path) as f:
+            _HEIGHTS = json.load(f).get('by_name', {})
+    return _HEIGHTS
 
 # v13 (2026-08-14, per Wally): kin_eff__ff = measured active-spin fraction
 # (KinEff), TYPE-GATED to four-seamers — real on FF, NaN elsewhere. The
@@ -280,9 +309,10 @@ def _nvaa(pt, vaa, plate_z):
 # (2026-07-14, scripts/stuff_v12_battery.py + depth7_confirm.py: full-prior
 # 8-fold pred 0.2823 -> 0.2942, desc 0.3815 -> 0.3922, reliability
 # 0.8751 -> 0.8717 — well within guard; depth 8 decayed desc and was
-# rejected). Each 3-4x of training data has bought one level of depth.
+# rejected). 7 -> 6 (v14, 2026-08-23): the next-season gate reversed the
+# 2026-OOF call (see the v14 note above BASE_FEATS).
 # Recency weighting of prior rows tested and rejected (uniform 1.0 stays).
-TUNED = dict(max_depth=7, n_estimators=800, learning_rate=0.025, min_child_weight=10,
+TUNED = dict(max_depth=6, n_estimators=800, learning_rate=0.025, min_child_weight=10,
              reg_lambda=1.5, subsample=0.8, colsample_bytree=0.8, n_jobs=-1, tree_method='hist')
 MONO_FEAT = 'velocity'
 
@@ -566,6 +596,25 @@ def build_df(pitches, prefer_true_fastball=True, arm_fallback=None):
         print(f'  arm-angle impute: {_n_miss - _n_left}/{_n_miss} missing filled '
               f'from pitcher averages ({_n_fb} of those from the ROC/AAA '
               f'fallback; {_n_left} left to model-missing)')
+    # height (v14): pitcher stature from the shipped artifact; missing rows
+    # impute to the frozen league mean and are logged (a new arm whose name
+    # the builder could not resolve, or an absent artifact).
+    if len(out):
+        hm = load_heights()
+        if hm is None:
+            print(f'  WARNING: {HEIGHTS_PATH} absent — height imputed to '
+                  f'{HEIGHT_LEAGUE_MEAN} for every pitch')
+            out['height'] = HEIGHT_LEAGUE_MEAN
+        else:
+            out['height'] = out['pitcher'].map(hm).astype('float64')
+            _hm = out['height'].isna()
+            if _hm.any():
+                _who = sorted(out.loc[_hm, 'pitcher'].unique())
+                print(f'  height impute: {int(_hm.sum())} pitches from '
+                      f'{len(_who)} pitchers to league mean '
+                      f'{HEIGHT_LEAGUE_MEAN}: {_who[:8]}'
+                      + (' ...' if len(_who) > 8 else ''))
+                out['height'] = out['height'].fillna(HEIGHT_LEAGUE_MEAN)
     # kin_eff__ff (v13): typed emission + arm-angle-style imputation. Non-FF
     # rows are NaN BY DESIGN (that is the gating the battery validated); only
     # FF rows impute, so the feature never rides the missing branch where the
@@ -660,13 +709,14 @@ def compute_support(df, df_prior):
     """Support score + low_support flag per MLB (pitcher, team, pitch_type).
 
     Features: BASE_FEATS only (platoon_same excluded — averaging a binary
-    usage mix isn't a physical coordinate; kin_eff__ff excluded — it is NaN
+    usage mix isn't a physical coordinate; height excluded — a pitcher
+    constant, not a pitch coordinate; kin_eff__ff excluded — it is NaN
     by design off FF, and a median-filled type-gated column would inject a
     constant fake dimension into every non-FF unit's centroid). z-scored by
     the FULL training pool's mean/std; NaN dims imputed at the training
     median.
     """
-    feats = [f for f in BASE_FEATS if f != 'kin_eff__ff']
+    feats = [f for f in BASE_FEATS if f not in ('kin_eff__ff', 'height')]
     parts = [df[feats].assign(_pitcher=df['pitcher'].values, _prior=0)]
     if df_prior is not None and len(df_prior):
         parts.append(df_prior[feats].assign(_pitcher=df_prior['pitcher'].values, _prior=1))
@@ -841,6 +891,10 @@ def main():
             B = pickle.load(f)
         if 'fold_models' not in B:
             sys.exit('--score-only needs a bundle with fold models — run a full retrain first')
+        if 'height' not in B.get('features', []):
+            sys.exit('--score-only bundle predates the v14 config (height, '
+                     'depth 6) — refresh the bundle from the latest-data '
+                     'release or retrain')
         if 'kin_eff__ff' not in B.get('features', []):
             sys.exit('--score-only bundle predates the v13 config '
                      '(kin_eff__ff) — refresh the bundle from the '
@@ -901,6 +955,16 @@ def main():
                          f'release assets before retraining')
     else:
         print('  (no prior-season pickle found — training on current season only)')
+
+    # v14 guard: height must be resolved for nearly every MLB row before a
+    # retrain, or the imputed constant trains as a real value.
+    if not args.score_only:
+        _hm = load_heights() or {}
+        _hcov = df['pitcher'].map(_hm).notna().mean() if len(df) else 0.0
+        if _hcov < 0.98:
+            sys.exit(f'ABORT: MLB height coverage {_hcov:.1%} (<98%) — run '
+                     'scripts/ci/build_pitcher_heights.py before retraining')
+        print(f'  height coverage (MLB rows): {_hcov:.2%}')
 
     X = design(df); y = df['target_xrv'].values
     if B is not None:
@@ -1304,7 +1368,7 @@ def main():
     if B is None:
         with open(os.path.join(HERE, 'stuff_models.pkl'), 'wb') as f:
             pickle.dump({'model': model, 'features': list(X.columns), 'base_feats': BASE_FEATS,
-                         'league': league, 'params': TUNED, 'version': 'v13',
+                         'league': league, 'params': TUNED, 'version': 'v14',
                          'model_na': model_na, 'noarm_feats': NOARM_FEATS,
                          'features_na': list(Xna.columns),
                          'na_pt_scale': na_pt, 'na_ov_scale': na_ov,
