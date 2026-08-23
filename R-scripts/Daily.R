@@ -251,7 +251,7 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
   total_row <- tibble(
     `Pitch Type` = "Total",
     num_thrown = sprintf("%.0f", total_pitches),
-    percent_thrown = NA_character_,
+    percent_thrown = sprintf("%.1f%%", 100),
     avg_velo = NA_character_,
     max_velo = NA_character_,
     avg_spin = NA_character_,
@@ -259,13 +259,22 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
     avg_tilt = NA_character_,
     avg_ivb = NA_character_,
     avg_hb = NA_character_,
-    avg_height = NA_character_,
-    avg_side = NA_character_,
-    avg_extension = NA_character_,
-    avg_arm_angle = NA_character_,
+    # Release point is one delivery, so the outing mean is meaningful and the
+    # Total row carries it. Shape (velo, spin, tilt, IVB/HB, VAA/HAA) stays
+    # NA above: an average across pitch types is not a pitch anyone threw.
+    # Formats are Daily's own — its arm angle is "%.1f", not the "%.1f°" used
+    # by summarize_total_row in pitcher_report_utils.R.
+    avg_height = fmt_or_blank(pitcher_data$RelPosZ, "%.2f'"),
+    avg_side = fmt_or_blank(pitcher_data$RelPosX, "%.2f'"),
+    avg_extension = fmt_or_blank(pitcher_data$Extension, "%.2f'"),
+    avg_arm_angle = fmt_or_blank(pitcher_data$ArmAngle, "%.1f"),
     avg_vaa = NA_character_,
     avg_haa = NA_character_,
-    avg_stuff_plus = NA_character_,
+    # Stuff+ over every pitch, not the mean of the per-type means: that would
+    # weight a 3-pitch type the same as a 30-pitch one. Same format as the
+    # per-type rows above.
+    avg_stuff_plus = fmt_or_blank(pitcher_data[["Stuff+"]], "%.0f",
+                                  function(x) round(mean(x))),
     iz_percent = sprintf(
       "%.1f%%",
       sum(pitcher_data$InZone == "Yes", na.rm = TRUE) / total_pitches * 100

@@ -218,6 +218,73 @@ keep_populated_cols <- function(cols, data, pitcher_name) {
   }, cols)
 }
 
+# Bottom aggregate row for a report table. Every rate is RECOMPUTED over the
+# whole outing, never averaged from the per-type rows: a mean of per-type rates
+# would weight a 3-pitch type the same as a 30-pitch one.
+#
+# Only metrics that survive mixing pitch types are filled. Release point (Ext,
+# RelZ, RelX, Arm Angle) and the outcome rates describe the pitcher, so they
+# aggregate. Shape (velocity, max velo, spin, tilt, IVB/HB, approach angle)
+# describes a single pitch type, and an average across types is not a pitch
+# anyone threw, so those stay NA and render blank.
+summarize_total_row <- function(data, pitcher_name, gb_zero = "---") {
+  d <- data %>% filter(Pitcher == pitcher_name)
+  n_all <- nrow(d)
+
+  swing_events   <- c("Swinging Strike", "Foul", "In Play")
+  csw_events     <- c("Called Strike", "Swinging Strike")
+  swstr_events   <- c("Swinging Strike")
+  in_play_events <- c("In Play")
+
+  pct <- function(num, den) if (den > 0) sprintf("%.1f%%", num / den * 100) else "---"
+
+  swings  <- sum(d$Description %in% swing_events, na.rm = TRUE)
+  has_iz  <- "InZone" %in% names(d)
+  has_bb  <- "BBType" %in% names(d)
+  ooz     <- if (has_iz) sum(d$InZone == "No", na.rm = TRUE) else 0
+  bip     <- if (has_bb)
+    sum(d$Description %in% in_play_events & !grepl("^bunt", d$BBType), na.rm = TRUE) else 0
+
+  tibble::tibble(
+    `Pitch Type`   = "Total",
+    num_thrown     = sprintf("%.0f", n_all),
+    percent_thrown = sprintf("%.1f%%", 100),
+    # Shape: not comparable across pitch types.
+    avg_velo  = NA_character_, max_velo = NA_character_, avg_spin = NA_character_,
+    avg_rtilt = NA_character_, avg_tilt = NA_character_,
+    avg_ivb   = NA_character_, avg_hb   = NA_character_,
+    avg_vaa   = NA_character_, avg_haa  = NA_character_,
+    # Release point: one delivery, so the outing mean is meaningful.
+    avg_height    = fmt_or_blank(d$RelPosZ, "%.2f'"),
+    avg_side      = fmt_or_blank(d$RelPosX, "%.2f'"),
+    avg_extension = fmt_or_blank(d$Extension, "%.2f'"),
+    avg_arm_angle = fmt_or_blank(d$ArmAngle, "%.1f°"),
+    # Outcomes: recomputed against the whole-outing denominator.
+    iz_percent    = if (has_iz) pct(sum(d$InZone == "Yes", na.rm = TRUE), n_all) else "---",
+    swing_percent = pct(swings, n_all),
+    csw_percent   = pct(sum(d$Description %in% csw_events, na.rm = TRUE), n_all),
+    swstr_percent = pct(sum(d$Description %in% swstr_events, na.rm = TRUE), swings),
+    chase_percent = if (has_iz && ooz > 0)
+      pct(sum(d$Description %in% swing_events & d$InZone == "No", na.rm = TRUE), ooz)
+      else "---",
+    gb_percent    = if (bip > 0)
+      pct(sum(d$Description %in% in_play_events & d$BBType == "ground_ball", na.rm = TRUE), bip)
+      else gb_zero
+  )
+}
+
+# Append the total row to an already mapped-and-sorted table, matched to
+# whatever column set survived keep_populated_cols. Pitch Type drops back to
+# character because map_and_sort_pitch_types leaves it a factor whose levels do
+# not include "Total". NA becomes "" so the shape cells render blank, matching
+# how Daily.R blanks its own Total row.
+append_total_row <- function(stats_df, total_row) {
+  stats_df$`Pitch Type` <- as.character(stats_df$`Pitch Type`)
+  out <- dplyr::bind_rows(stats_df, total_row[names(stats_df)])
+  out[is.na(out)] <- ""
+  out
+}
+
 # ---- Shared Report Pipeline ----
 # Everything below is shared by Daily.R, Season.R, and OnePitcher.R. Report-
 # specific behavior is parameterized (header font size, arm-angle lines, plot

@@ -158,7 +158,10 @@ create_pitcher_tables <- function(pitch_data, selected_pitcher, game_date = NULL
   )
   combined_cols <- combined_cols[keep_populated_cols(names(combined_cols),
                                                      pitch_data, selected_pitcher)]
-  stats_df <- map_and_sort_pitch_types(stats_full %>% select(all_of(names(combined_cols))))
+  stats_df <- append_total_row(
+    map_and_sort_pitch_types(stats_full %>% select(all_of(names(combined_cols)))),
+    summarize_total_row(pitch_data, selected_pitcher, gb_zero = sprintf("%.1f%%", 0))
+  )
   names(stats_df) <- unname(combined_cols)
 
   # SECOND TABLE - Platoon splits

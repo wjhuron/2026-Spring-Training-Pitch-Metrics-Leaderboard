@@ -79,7 +79,11 @@ create_pitcher_tables <- function(pitch_data, selected_pitcher, game_date = NULL
     avg_arm_angle = "Arm Angle", avg_vaa = "VAA", avg_haa = "HAA"
   )
   core_cols <- core_cols[keep_populated_cols(names(core_cols), pitch_data, selected_pitcher)]
-  stats_df_table1 <- map_and_sort_pitch_types(stats_full %>% select(all_of(names(core_cols))))
+  total_row <- summarize_total_row(pitch_data, selected_pitcher, gb_zero = "---")
+  stats_df_table1 <- append_total_row(
+    map_and_sort_pitch_types(stats_full %>% select(all_of(names(core_cols)))),
+    total_row
+  )
   names(stats_df_table1) <- unname(core_cols)
 
   # SECOND TABLE - outcome metrics
@@ -89,7 +93,10 @@ create_pitcher_tables <- function(pitch_data, selected_pitcher, game_date = NULL
     swstr_percent = "Whiff%", chase_percent = "Chase%", gb_percent = "GB%"
   )
   outcome_cols <- outcome_cols[keep_populated_cols(names(outcome_cols), pitch_data, selected_pitcher)]
-  stats_df_table2 <- map_and_sort_pitch_types(stats_full %>% select(all_of(names(outcome_cols))))
+  stats_df_table2 <- append_total_row(
+    map_and_sort_pitch_types(stats_full %>% select(all_of(names(outcome_cols)))),
+    total_row
+  )
   names(stats_df_table2) <- unname(outcome_cols)
 
   # Create base table theme with larger font; tight horizontal padding so each
