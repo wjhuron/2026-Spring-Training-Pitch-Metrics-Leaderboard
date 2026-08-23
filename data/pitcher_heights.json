@@ -2090,6 +2090,7 @@
 "Scrubb, Andre": 76.0,
 "Seabold, Connor": 74.0,
 "Seager, Corey": 76.0,
+"Sears, Andrew": 75.0,
 "Sears, Ben": 77.0,
 "Sears, JP": 71.0,
 "Sedlock, Cody": 76.0,
@@ -8900,6 +8901,9 @@
 "Seager, Corey": [
 608369
 ],
+"Sears, Andrew": [
+808825
+],
 "Sears, Ben": [
 700786
 ],
@@ -10502,5 +10506,5 @@
 ]
 },
 "league_mean": 73.72,
-"n": 2623
+"n": 2624
 }
