@@ -192,6 +192,17 @@ BASE_FEATS = ['velocity', 'ivb', 'hb', 'velo_diff', 'ivb_diff', 'hb_diff',
 # mean and are logged; a retrain aborts below 98% MLB coverage.
 HEIGHTS_PATH = os.path.join(DATA, 'pitcher_heights.json')
 HEIGHT_LEAGUE_MEAN = 73.72       # measured 2026-08-23 on 2623 pitchers
+# v14.1 (2026-08-23, the Schultz sweeper lesson): height is CLIPPED to the
+# range the pool actually populates. Above 80in the 2021-26 training pool is
+# ~3 pitchers (Hjelle/Gervase/Slegers), and the unclipped v14 model cut a
+# leaf between 78 and 82 worth ~50 ST atom points fit on their outcomes
+# alone — Schultz's sweeper graded 66 while missing bats at an
+# above-average clip. Gate v2: clip[70,80] is indistinguishable from
+# unclipped at the pool level (d_nxt -0.0006, z -0.45; unit nxt 5/5) and
+# clip[70,79] LOSES (-0.0046, z -2.5), so 80 is the measured boundary, not
+# a guess. Pool percentiles p1=70, p99=80 (pitch-weighted). Pitchers outside
+# the range also flag low-support (see compute_support's height-tail rule).
+HEIGHT_CLIP = (70.0, 80.0)
 _HEIGHTS = None
 
 
@@ -607,6 +618,7 @@ def build_df(pitches, prefer_true_fastball=True, arm_fallback=None):
             out['height'] = HEIGHT_LEAGUE_MEAN
         else:
             out['height'] = out['pitcher'].map(hm).astype('float64')
+            out['height'] = out['height'].clip(*HEIGHT_CLIP)
             _hm = out['height'].isna()
             if _hm.any():
                 _who = sorted(out.loc[_hm, 'pitcher'].unique())
@@ -763,6 +775,24 @@ def compute_support(df, df_prior):
     cent['support'] = np.round(support, 4)
     thr = float(np.percentile(support, SUPPORT_FLAG_PCT))
     cent['low_support'] = cent['support'] > thr
+    # Height-tail rule (2026-08-23, the Schultz sweeper lesson): the kNN
+    # manifold deliberately excludes height (a pitcher constant), so it can
+    # never see that a 6'10" arm is scored on a leaf three pitchers built.
+    # Flag every unit of a pitcher whose stature sits outside the clip range
+    # the feature trains on (HEIGHT_CLIP below) — the number shown is the
+    # clipped, conservative one, and the hatch says the manifold is thin.
+    hm = load_heights() or {}
+    _h = cent['pitcher'].map(hm)
+    # >1in outside the clip is a CONVENTION: at exactly 1in outside (Ober
+    # 81, Moll 69) the clipped feature misstates stature by an inch against
+    # a deep cohort, which the gate showed is immaterial; at 2in+ (Schultz,
+    # Slegers, Gervase, Hjelle) the score leans on the clip itself.
+    tail = _h.notna() & ((_h < HEIGHT_CLIP[0] - 1) | (_h > HEIGHT_CLIP[1] + 1))
+    cent.loc[tail, 'low_support'] = True
+    if int(tail.sum()):
+        print(f'  height-tail flag: {int(tail.sum())} units from '
+              f'{cent.loc[tail, "pitcher"].nunique()} pitchers outside '
+              f'{HEIGHT_CLIP}')
     n_flag = int(cent['low_support'].sum())
     print(f'  model support: {len(cent)} units, flag threshold {thr:.3f} '
           f'({SUPPORT_FLAG_PCT} pctl), {n_flag} low-support units')
@@ -1368,7 +1398,7 @@ def main():
     if B is None:
         with open(os.path.join(HERE, 'stuff_models.pkl'), 'wb') as f:
             pickle.dump({'model': model, 'features': list(X.columns), 'base_feats': BASE_FEATS,
-                         'league': league, 'params': TUNED, 'version': 'v14',
+                         'league': league, 'params': TUNED, 'version': 'v14.1',
                          'model_na': model_na, 'noarm_feats': NOARM_FEATS,
                          'features_na': list(Xna.columns),
                          'na_pt_scale': na_pt, 'na_ov_scale': na_ov,

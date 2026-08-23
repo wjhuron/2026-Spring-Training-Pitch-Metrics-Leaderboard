@@ -221,6 +221,13 @@ def prepare(d, slopes, anchor='true'):
     d['arm_dev'] = mov - d['arm_angle']
     d['arm_dev_abs'] = d['arm_dev'].abs()
     d['height'] = d['pitcher'].map(height_map())
+    # winsorized height candidates (2026-08-23, the Schultz sweeper lesson):
+    # above 80in the 2021-26 pool is ~3 pitchers, and the model cut a leaf
+    # at ~78-82 worth ~50 ST atom points on their outcomes alone. Clip so
+    # nobody is scored on a leaf that three arms built. Pool percentiles
+    # (pitch-weighted): p1=70, p99=80.
+    d['height_w79'] = d['height'].clip(70, 79)
+    d['height_w80'] = d['height'].clip(70, 80)
     d['rel_z_rel'] = d['rel_z'] * 12.0 - d['height']    # release height vs stature
     # release consistency: SD of release point within (pitcher, type) and
     # (pitcher) over the season frame
