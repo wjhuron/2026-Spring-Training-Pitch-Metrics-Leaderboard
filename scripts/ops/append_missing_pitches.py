@@ -55,10 +55,9 @@ def main(pitch_ids, apply=False):
     by_tab = {}
     for pid in pitch_ids:
         tab = (wanted[pid].get('_PTeam') or '').upper()
-        if tab not in MLB_TEAMS:
-            raise SystemExit(f"{pid}: PTeam '{tab}' is not an MLB tab. This tool is "
-                             f"for MLB tabs only; ROC and AAA split their games "
-                             f"across two tabs and need their own handling.")
+        if tab not in MLB_TEAMS and tab not in ('ROC', 'AAA'):
+            raise SystemExit(f"{pid}: PTeam '{tab}' is not a tracked tab. "
+                             f"Refusing to route it.")
         by_tab.setdefault(tab, []).append(pid)
 
     for label, sid in DIVISION_WORKBOOK_IDS.items():

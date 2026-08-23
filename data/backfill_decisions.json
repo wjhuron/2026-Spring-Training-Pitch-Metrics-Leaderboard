@@ -252,6 +252,20 @@
     "Single"
    ]
   },
+  "815533_084_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.576"
+   ]
+  },
+  "815533_084_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.123"
+   ]
+  },
   "815677_005_01|Description": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -313,6 +327,20 @@
    "origin": "review",
    "rejected": [
     "1564"
+   ]
+  },
+  "815677_013_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.598"
+   ]
+  },
+  "815677_013_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.166"
    ]
   },
   "815677_013_01|xHorzBrk": {
@@ -1040,7 +1068,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2490"
+    "2490",
+    "2491"
    ]
   },
   "815683_008_01|Batter": {
@@ -1195,6 +1224,20 @@
    "origin": "review",
    "rejected": [
     "line_drive"
+   ]
+  },
+  "815797_046_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.693"
+   ]
+  },
+  "815797_046_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.354"
    ]
   },
   "815799_044_02|Spin Rate": {
@@ -1453,7 +1496,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "3400"
+    "3400",
+    "3401"
    ]
   },
   "815834_016_05|RTilt": {
@@ -1481,7 +1525,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "571"
+    "571",
+    "572"
    ]
   },
   "815834_037_05|Event": {
@@ -1503,6 +1548,20 @@
    "origin": "review",
    "rejected": [
     "2253"
+   ]
+  },
+  "815834_043_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.612"
+   ]
+  },
+  "815834_043_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.195"
    ]
   },
   "815835_008_01|RTilt": {
@@ -1530,7 +1589,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2992"
+    "2992",
+    "2993"
    ]
   },
   "815835_020_01|Spin Rate": {
@@ -1565,7 +1625,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2999"
+    "2999",
+    "3000"
    ]
   },
   "815835_037_01|ExitVelo": {
@@ -1656,7 +1717,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2991"
+    "2991",
+    "2992"
    ]
   },
   "815844_067_04|RTilt": {
@@ -1684,14 +1746,30 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2:11"
+    "2:11",
+    "8:18"
    ]
   },
   "815864_029_02|Spin Rate": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
+    "2496",
     "503"
+   ]
+  },
+  "815864_040_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "9:24"
+   ]
+  },
+  "815864_040_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1960"
    ]
   },
   "815864_081_04|RTilt": {
@@ -1733,27 +1811,38 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
+    "2264",
     "919"
+   ]
+  },
+  "815864_084_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "9:54"
    ]
   },
   "815864_084_04|Spin Rate": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1147"
+    "1147",
+    "2300"
    ]
   },
   "815864_084_05|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "12:51"
+    "12:51",
+    "7:28"
    ]
   },
   "815864_084_05|Spin Rate": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
+    "2286",
     "2828"
    ]
   },
@@ -8271,7 +8360,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2285"
+    "2285",
+    "2286"
    ]
   },
   "815875_002_05|HorzBrk": {
@@ -8909,6 +8999,48 @@
    "origin": "review",
    "rejected": [
     "8:15"
+   ]
+  },
+  "815896_068_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.635"
+   ]
+  },
+  "815896_068_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.240"
+   ]
+  },
+  "815896_068_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.635"
+   ]
+  },
+  "815896_068_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.240"
+   ]
+  },
+  "815896_068_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.635"
+   ]
+  },
+  "815896_068_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.240"
    ]
   },
   "815897_010_01|Description": {
@@ -11053,6 +11185,20 @@
     "813"
    ]
   },
+  "815918_071_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.550"
+   ]
+  },
+  "815918_071_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.072"
+   ]
+  },
   "815919_064_04|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -11785,7 +11931,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2694"
+    "2694",
+    "2695"
    ]
   },
   "815920_013_01|SzBot": {
@@ -11813,7 +11960,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2874"
+    "2874",
+    "2875"
    ]
   },
   "815920_013_02|SzBot": {
@@ -12310,7 +12458,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "917"
+    "917",
+    "918"
    ]
   },
   "815920_021_04|SzBot": {
@@ -12471,7 +12620,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2932"
+    "2932",
+    "2933"
    ]
   },
   "815920_022_05|SzBot": {
@@ -12499,7 +12649,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1675"
+    "1675",
+    "1676"
    ]
   },
   "815920_023_01|SzBot": {
@@ -12891,7 +13042,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1530"
+    "1530",
+    "1531"
    ]
   },
   "815920_029_02|SzBot": {
@@ -14487,7 +14639,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1455"
+    "1455",
+    "1456"
    ]
   },
   "815920_068_04|SzBot": {
@@ -14557,7 +14710,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1726"
+    "1726",
+    "1727"
    ]
   },
   "815920_069_05|SzTop": {
@@ -37191,6 +37345,188 @@
     "3.205"
    ]
   },
+  "815938_048_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:41"
+   ]
+  },
+  "815938_063_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:44"
+   ]
+  },
+  "815938_069_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "6:12"
+   ]
+  },
+  "815938_069_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2337"
+   ]
+  },
+  "815938_078_02|Extension": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "6.4961"
+   ]
+  },
+  "815938_078_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "6:31"
+   ]
+  },
+  "815938_078_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2160"
+   ]
+  },
+  "815947_067_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:10"
+   ]
+  },
+  "815947_067_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2222"
+   ]
+  },
+  "815947_069_05|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:21"
+   ]
+  },
+  "815947_069_05|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2283"
+   ]
+  },
+  "815947_074_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:20"
+   ]
+  },
+  "815947_074_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2423"
+   ]
+  },
+  "815947_075_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:03"
+   ]
+  },
+  "815947_075_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2935"
+   ]
+  },
+  "815948_030_01|Extension": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "5.5934"
+   ]
+  },
+  "815948_030_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:24"
+   ]
+  },
+  "815948_030_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2088"
+   ]
+  },
+  "815948_033_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:46"
+   ]
+  },
+  "815948_042_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2191"
+   ]
+  },
+  "815948_043_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:41"
+   ]
+  },
+  "815948_044_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:50"
+   ]
+  },
+  "815948_044_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1690"
+   ]
+  },
+  "815948_047_01|Extension": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "6.4017"
+   ]
+  },
+  "815948_047_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:00"
+   ]
+  },
+  "815948_047_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2336"
+   ]
+  },
   "816339_004_03|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -37301,6 +37637,20 @@
    "origin": "review",
    "rejected": [
     "2030"
+   ]
+  },
+  "816339_031_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.636"
+   ]
+  },
+  "816339_031_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.242"
    ]
   },
   "816339_032_01|RTilt": {
@@ -37986,7 +38336,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2205"
+    "2205",
+    "2206"
    ]
   },
   "816350_086_02|RTilt": {
@@ -54863,7 +55214,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2331"
+    "2331",
+    "2332"
    ]
   },
   "816373_043_01|SzTop": {
@@ -55542,7 +55894,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1861"
+    "1861",
+    "1862"
    ]
   },
   "816373_052_05|SzBot": {
@@ -75782,6 +76135,20 @@
     "1:12"
    ]
   },
+  "816856_016_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.582"
+   ]
+  },
+  "816856_016_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.135"
+   ]
+  },
   "816856_055_04|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -76031,7 +76398,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2311"
+    "2311",
+    "2312"
    ]
   },
   "816858_029_03|RTilt": {
@@ -76543,6 +76911,48 @@
    "origin": "review",
    "rejected": [
     "2455"
+   ]
+  },
+  "816931_030_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.598"
+   ]
+  },
+  "816931_030_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.166"
+   ]
+  },
+  "816931_030_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.598"
+   ]
+  },
+  "816931_030_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.166"
+   ]
+  },
+  "816931_030_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.598"
+   ]
+  },
+  "816931_030_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.166"
    ]
   },
   "822697_026_01|Description": {
@@ -78740,7 +79150,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2058"
+    "2058",
+    "2059"
    ]
   },
   "822753_028_01|RTilt": {
@@ -78755,7 +79166,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2014"
+    "2014",
+    "2015"
    ]
   },
   "822753_057_02|RTilt": {
@@ -79468,7 +79880,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "5:50"
+    "5:50",
+    "8:58"
    ]
   },
   "822782_039_01|RTilt": {
@@ -79497,6 +79910,13 @@
    "origin": "review",
    "rejected": [
     "4.000"
+   ]
+  },
+  "822799_046_01|OTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:09"
    ]
   },
   "822799_046_01|RTilt": {
@@ -80240,7 +80660,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2669"
+    "2669",
+    "2670"
    ]
   },
   "822899_032_01|RunExp": {
@@ -80264,11 +80685,25 @@
     "-0.771"
    ]
   },
+  "822902_027_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.647"
+   ]
+  },
   "822902_027_01|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "3.263"
+   ]
+  },
+  "822902_027_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.647"
    ]
   },
   "822902_027_02|SzTop": {
@@ -80352,7 +80787,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1714"
+    "1714",
+    "1715"
    ]
   },
   "822911_049_01|Velocity": {
@@ -80480,6 +80916,90 @@
    "origin": "review",
    "rejected": [
     "Called Strike"
+   ]
+  },
+  "822934_035_05|xSLG": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4.000"
+   ]
+  },
+  "822934_035_05|xwOBA": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2.000"
+   ]
+  },
+  "822940_027_06|xSLG": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4.000"
+   ]
+  },
+  "822940_027_06|xwOBA": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2.000"
+   ]
+  },
+  "822940_054_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.637"
+   ]
+  },
+  "822940_054_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.244"
+   ]
+  },
+  "822940_054_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.637"
+   ]
+  },
+  "822940_054_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.244"
+   ]
+  },
+  "822940_054_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.637"
+   ]
+  },
+  "822940_054_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.244"
+   ]
+  },
+  "822940_056_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.604"
+   ]
+  },
+  "822940_056_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.178"
    ]
   },
   "822941_035_02|Spin Rate": {
@@ -80709,11 +81229,25 @@
     "-28.217"
    ]
   },
+  "822964_014_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.629"
+   ]
+  },
   "822964_014_01|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "3.228"
+   ]
+  },
+  "822964_014_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.629"
    ]
   },
   "822964_014_02|SzTop": {
@@ -80723,11 +81257,25 @@
     "3.228"
    ]
   },
+  "822964_014_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.629"
+   ]
+  },
   "822964_014_03|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "3.228"
+   ]
+  },
+  "822964_014_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.629"
    ]
   },
   "822964_014_04|SzTop": {
@@ -83365,11 +83913,53 @@
     "1.3"
    ]
   },
+  "823021_049_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.633"
+   ]
+  },
+  "823021_049_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.237"
+   ]
+  },
+  "823021_049_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.633"
+   ]
+  },
+  "823021_049_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.237"
+   ]
+  },
   "823021_073_02|xSLG": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "4.000"
+   ]
+  },
+  "823024_054_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.594"
+   ]
+  },
+  "823024_054_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.159"
    ]
   },
   "823027_056_04|RTilt": {
@@ -83469,6 +84059,7 @@
    "origin": "bootstrap_2026_07_06_snapshot",
    "rejected": [
     "2764",
+    "2765",
     "2773"
    ]
   },
@@ -83628,6 +84219,13 @@
    "origin": "review",
    "rejected": [
     "9:58"
+   ]
+  },
+  "823068_066_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.579"
    ]
   },
   "823068_066_06|SzTop": {
@@ -84042,6 +84640,13 @@
    "rejected": [
     "1:03",
     "1:05"
+   ]
+  },
+  "823101_070_01|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
    ]
   },
   "823108_001_04|RTilt": {
@@ -84871,7 +85476,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1583"
+    "1583",
+    "1584"
    ]
   },
   "823184_062_02|RTilt": {
@@ -84921,6 +85527,20 @@
    "origin": "review",
    "rejected": [
     "1517"
+   ]
+  },
+  "823187_047_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:05"
+   ]
+  },
+  "823187_047_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2332"
    ]
   },
   "823187_065_01|RTilt": {
@@ -85165,7 +85785,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1487"
+    "1487",
+    "1488"
    ]
   },
   "823192_037_03|RTilt": {
@@ -85179,7 +85800,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2280"
+    "2280",
+    "2281"
    ]
   },
   "823192_038_03|RTilt": {
@@ -85214,7 +85836,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2615"
+    "2615",
+    "2616"
    ]
   },
   "823192_041_03|RTilt": {
@@ -85277,7 +85900,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1928"
+    "1928",
+    "1929"
    ]
   },
   "823192_043_02|RTilt": {
@@ -85355,6 +85979,20 @@
    "origin": "review",
    "rejected": [
     "2121"
+   ]
+  },
+  "823192_081_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.607"
+   ]
+  },
+  "823192_081_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.184"
    ]
   },
   "823192_084_02|Distance": {
@@ -85844,7 +86482,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2772"
+    "2772",
+    "2773"
    ]
   },
   "823202_055_06|RTilt": {
@@ -86103,7 +86742,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1143"
+    "1143",
+    "1144"
    ]
   },
   "823202_069_02|RTilt": {
@@ -86145,7 +86785,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1655"
+    "1655",
+    "1656"
    ]
   },
   "823202_069_06|RTilt": {
@@ -86173,7 +86814,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "3085"
+    "3085",
+    "3086"
    ]
   },
   "823202_070_01|RTilt": {
@@ -86229,7 +86871,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2688"
+    "2688",
+    "2689"
    ]
   },
   "823202_070_05|RTilt": {
@@ -86243,7 +86886,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2089"
+    "2089",
+    "2090"
    ]
   },
   "823202_070_06|RTilt": {
@@ -86313,7 +86957,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1027"
+    "1027",
+    "1028"
    ]
   },
   "823204_043_02|RTilt": {
@@ -87056,6 +87701,20 @@
     "3.251"
    ]
   },
+  "823233_006_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.624"
+   ]
+  },
+  "823233_006_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.217"
+   ]
+  },
   "823233_014_01|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -87484,6 +88143,27 @@
     "2588"
    ]
   },
+  "823261_062_01|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Called Strike"
+   ]
+  },
+  "823261_062_02|Count": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "0-1"
+   ]
+  },
+  "823261_062_02|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Ball"
+   ]
+  },
   "823263_003_01|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -87496,6 +88176,20 @@
    "origin": "review",
    "rejected": [
     "2212"
+   ]
+  },
+  "823263_006_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:14"
+   ]
+  },
+  "823263_006_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3135"
    ]
   },
   "823265_051_03|xSLG": {
@@ -88348,6 +89042,69 @@
     "12:51"
    ]
   },
+  "823341_058_01|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
+   ]
+  },
+  "823341_062_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2286"
+   ]
+  },
+  "823342_008_03|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Foul"
+   ]
+  },
+  "823342_046_04|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
+   ]
+  },
+  "823343_077_05|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
+   ]
+  },
+  "823343_078_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "9:52"
+   ]
+  },
+  "823344_001_04|BBType": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "bunt"
+   ]
+  },
+  "823344_001_04|Event": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Bunt Groundout"
+   ]
+  },
+  "823344_001_04|RunExp": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "-0.077"
+   ]
+  },
   "823344_021_01|Description": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -88691,11 +89448,1033 @@
     "Swinging Strike"
    ]
   },
+  "823386_002_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_002_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_002_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_002_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_002_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_002_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_003_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_003_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_003_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_003_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_003_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_003_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_004_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_004_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_004_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_004_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_004_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_004_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_004_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_004_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_004_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_004_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_004_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_004_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_007_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_07|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_07|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_08|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_08|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_09|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_09|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_10|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_10|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_007_11|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_007_11|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_008_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_008_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_008_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_008_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_009_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_009_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_009_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_009_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_010_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_010_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_010_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_010_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_010_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_010_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_010_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_010_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_010_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_010_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_010_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_010_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_010_07|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_010_07|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_014_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.690"
+   ]
+  },
+  "823386_014_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.340"
+   ]
+  },
+  "823386_014_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.690"
+   ]
+  },
+  "823386_014_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.340"
+   ]
+  },
+  "823386_014_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.690"
+   ]
+  },
+  "823386_014_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.340"
+   ]
+  },
+  "823386_016_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_016_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_016_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_016_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_017_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_017_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.230"
+   ]
+  },
+  "823386_018_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_018_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_018_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_018_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_019_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_019_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_019_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_019_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_019_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_019_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_019_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_019_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_019_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_019_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
   "823386_020_03|Description": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "Swinging Strike"
+   ]
+  },
+  "823386_022_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_022_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_022_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_022_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_022_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_022_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_022_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_022_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_022_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_022_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_022_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_022_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_026_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_026_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_026_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_026_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_027_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_027_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_029_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.690"
+   ]
+  },
+  "823386_029_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.340"
+   ]
+  },
+  "823386_031_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_031_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_031_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_031_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_031_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_031_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_031_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_031_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_032_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_032_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_033_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_033_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_033_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_033_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_033_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_033_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_033_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_033_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_033_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_033_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_034_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_034_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_034_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_034_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_035_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_035_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.230"
+   ]
+  },
+  "823386_035_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_035_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.230"
+   ]
+  },
+  "823386_036_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_036_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_036_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_036_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
    ]
   },
   "823386_037_01|BBType": {
@@ -88710,6 +90489,370 @@
    "origin": "review",
    "rejected": [
     "-0.091"
+   ]
+  },
+  "823386_037_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_037_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_039_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_039_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_039_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_039_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_039_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_039_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_039_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_039_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_039_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_039_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_040_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_040_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_040_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_040_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_043_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_043_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_043_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_043_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_043_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_043_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_044_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_044_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_044_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_044_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_044_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_044_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_044_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_044_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_045_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_045_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_045_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_045_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_045_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_045_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_045_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_045_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_046_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_046_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_046_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_046_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_046_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_046_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_046_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_046_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_046_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_046_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_047_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.690"
+   ]
+  },
+  "823386_047_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.690"
+   ]
+  },
+  "823386_047_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.690"
+   ]
+  },
+  "823386_047_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.690"
    ]
   },
   "823386_049_01|BBType": {
@@ -88733,6 +90876,118 @@
     "-0.134"
    ]
   },
+  "823386_052_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_052_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_052_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_052_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_052_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_052_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_052_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_052_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_053_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_053_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_053_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_053_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_053_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_053_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_053_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_053_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
   "823386_053_05|RTilt": {
    "asof": "2026-07-06",
    "origin": "bootstrap_2026_07_06_snapshot",
@@ -88740,11 +90995,697 @@
     "10:19"
    ]
   },
+  "823386_053_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_053_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
   "823386_053_06|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "10:28"
+   ]
+  },
+  "823386_053_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_053_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_054_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.620"
+   ]
+  },
+  "823386_054_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.200"
+   ]
+  },
+  "823386_054_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.620"
+   ]
+  },
+  "823386_054_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.200"
+   ]
+  },
+  "823386_054_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.620"
+   ]
+  },
+  "823386_054_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.200"
+   ]
+  },
+  "823386_056_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_056_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_056_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_056_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_056_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_056_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_056_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_056_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_056_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.770"
+   ]
+  },
+  "823386_056_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.520"
+   ]
+  },
+  "823386_058_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_058_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_058_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_058_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_059_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_060_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_060_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_060_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_060_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_060_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_060_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_060_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_060_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_060_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_060_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_060_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_060_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_060_07|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_060_07|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.420"
+   ]
+  },
+  "823386_061_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_061_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_061_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_061_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_061_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_061_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_061_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.590"
+   ]
+  },
+  "823386_061_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.160"
+   ]
+  },
+  "823386_063_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_063_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_063_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_063_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_063_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_063_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_063_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_063_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_063_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_063_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.260"
+   ]
+  },
+  "823386_065_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_065_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_065_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_065_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_065_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_065_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_065_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_065_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_065_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.730"
+   ]
+  },
+  "823386_065_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.430"
+   ]
+  },
+  "823386_066_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.690"
+   ]
+  },
+  "823386_067_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_067_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_067_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_067_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_067_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_067_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_067_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
+   ]
+  },
+  "823386_067_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.220"
+   ]
+  },
+  "823386_068_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_068_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_068_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_068_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_068_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_068_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_068_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_068_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_068_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_068_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_068_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "823386_068_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "823386_069_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.620"
+   ]
+  },
+  "823386_069_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.200"
+   ]
+  },
+  "823386_069_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.620"
+   ]
+  },
+  "823386_069_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.200"
+   ]
+  },
+  "823386_069_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.620"
+   ]
+  },
+  "823386_069_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.200"
+   ]
+  },
+  "823386_070_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.640"
+   ]
+  },
+  "823386_070_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.250"
+   ]
+  },
+  "823386_071_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
+   ]
+  },
+  "823386_071_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.150"
    ]
   },
   "823387_041_01|Spin Rate": {
@@ -89333,6 +92274,62 @@
     "-0.002"
    ]
   },
+  "823399_052_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.602"
+   ]
+  },
+  "823399_052_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.175"
+   ]
+  },
+  "823399_052_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.602"
+   ]
+  },
+  "823399_052_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.175"
+   ]
+  },
+  "823399_052_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.602"
+   ]
+  },
+  "823399_052_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.175"
+   ]
+  },
+  "823399_052_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.602"
+   ]
+  },
+  "823399_052_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.175"
+   ]
+  },
   "823399_066_01|SzBot": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -89487,6 +92484,20 @@
    "origin": "review",
    "rejected": [
     "3.088"
+   ]
+  },
+  "823422_024_01|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
+   ]
+  },
+  "823424_051_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:33"
    ]
   },
   "823425_044_02|Description": {
@@ -91104,6 +94115,27 @@
     "2.000"
    ]
   },
+  "823509_073_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:12"
+   ]
+  },
+  "823509_074_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "11:28"
+   ]
+  },
+  "823509_074_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "532"
+   ]
+  },
   "823512_067_04|Extension": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -91193,6 +94225,20 @@
    "origin": "review",
    "rejected": [
     "Foul"
+   ]
+  },
+  "823521_034_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.691"
+   ]
+  },
+  "823521_034_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.351"
    ]
   },
   "823522_008_01|Description": {
@@ -92210,7 +95256,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1742"
+    "1742",
+    "1743"
    ]
   },
   "823557_007_03|RunExp": {
@@ -94770,6 +97817,125 @@
     "8:33"
    ]
   },
+  "823586_037_08|Event": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Single"
+   ]
+  },
+  "823586_051_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1501"
+   ]
+  },
+  "823587_004_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:24"
+   ]
+  },
+  "823587_004_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2090"
+   ]
+  },
+  "823587_004_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:11"
+   ]
+  },
+  "823587_007_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:28"
+   ]
+  },
+  "823587_007_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2305"
+   ]
+  },
+  "823587_008_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:30"
+   ]
+  },
+  "823587_008_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2324"
+   ]
+  },
+  "823587_012_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:47"
+   ]
+  },
+  "823587_012_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:20"
+   ]
+  },
+  "823587_012_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2155"
+   ]
+  },
+  "823587_014_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:35"
+   ]
+  },
+  "823587_029_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:28"
+   ]
+  },
+  "823587_038_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:24"
+   ]
+  },
+  "823587_038_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2974"
+   ]
+  },
+  "823587_046_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:24"
+   ]
+  },
   "823588_022_01|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -95036,11 +98202,25 @@
     "3.259"
    ]
   },
+  "823611_010_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.608"
+   ]
+  },
   "823611_010_01|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "3.186"
+   ]
+  },
+  "823611_010_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.608"
    ]
   },
   "823611_010_02|SzTop": {
@@ -95275,6 +98455,13 @@
    "origin": "review",
    "rejected": [
     "9:11"
+   ]
+  },
+  "823619_030_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.583"
    ]
   },
   "823619_030_01|SzTop": {
@@ -96328,6 +99515,13 @@
     "5:54"
    ]
   },
+  "823664_071_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4:58"
+   ]
+  },
   "823670_020_02|HC_X": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -96340,6 +99534,20 @@
    "origin": "review",
    "rejected": [
     "2078"
+   ]
+  },
+  "823677_028_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.683"
+   ]
+  },
+  "823677_028_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.335"
    ]
   },
   "823688_076_02|RunExp": {
@@ -97879,6 +101087,69 @@
     "3.335"
    ]
   },
+  "823746_053_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:37"
+   ]
+  },
+  "823746_053_06|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "11:07"
+   ]
+  },
+  "823746_053_06|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2304"
+   ]
+  },
+  "823746_054_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "11:05"
+   ]
+  },
+  "823746_054_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2270"
+   ]
+  },
+  "823747_012_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1734"
+   ]
+  },
+  "823749_035_01|Event": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Caught Stealing 2B"
+   ]
+  },
+  "823749_082_01|AttackDirection": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "-24.966"
+   ]
+  },
+  "823754_038_05|RunExp": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "-0.626"
+   ]
+  },
   "823755_037_06|HAA": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -98970,6 +102241,20 @@
     "6:46"
    ]
   },
+  "823836_061_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.632"
+   ]
+  },
+  "823836_061_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.234"
+   ]
+  },
   "823837_019_01|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -99031,6 +102316,34 @@
    "origin": "review",
    "rejected": [
     "0.053"
+   ]
+  },
+  "823845_034_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.604"
+   ]
+  },
+  "823845_034_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.179"
+   ]
+  },
+  "823845_034_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.604"
+   ]
+  },
+  "823845_034_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.179"
    ]
   },
   "823851_033_01|SzBot": {
@@ -99225,6 +102538,20 @@
     "-0.736"
    ]
   },
+  "823881_008_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.663"
+   ]
+  },
+  "823881_008_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.295"
+   ]
+  },
   "823882_036_01|RunExp": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -99308,6 +102635,27 @@
    "rejected": [
     "11:24",
     "11:26"
+   ]
+  },
+  "823911_074_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:35"
+   ]
+  },
+  "823912_073_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.707"
+   ]
+  },
+  "823912_073_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.382"
    ]
   },
   "823915_009_04|Velocity": {
@@ -99486,6 +102834,7 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
+    "2:24",
     "2:50"
    ]
   },
@@ -99493,7 +102842,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1960"
+    "1960",
+    "2103"
    ]
   },
   "823991_058_05|RTilt": {
@@ -99822,6 +103172,48 @@
    "origin": "review",
    "rejected": [
     "4.000"
+   ]
+  },
+  "824023_025_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.660"
+   ]
+  },
+  "824023_025_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.290"
+   ]
+  },
+  "824023_025_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.660"
+   ]
+  },
+  "824023_025_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.290"
+   ]
+  },
+  "824023_026_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.660"
+   ]
+  },
+  "824023_026_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.290"
    ]
   },
   "824026_034_01|RunExp": {
@@ -102912,6 +106304,419 @@
     "1405"
    ]
   },
+  "824072_059_05|xSLG": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4.000"
+   ]
+  },
+  "824073_059_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "9:58"
+   ]
+  },
+  "824074_005_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "6:28"
+   ]
+  },
+  "824074_007_05|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:47"
+   ]
+  },
+  "824074_009_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:22"
+   ]
+  },
+  "824074_017_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:31"
+   ]
+  },
+  "824074_017_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2357"
+   ]
+  },
+  "824074_025_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:56"
+   ]
+  },
+  "824074_025_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1539"
+   ]
+  },
+  "824074_025_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "5:18"
+   ]
+  },
+  "824074_032_05|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:24"
+   ]
+  },
+  "824074_034_06|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "6:49"
+   ]
+  },
+  "824074_034_06|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2298"
+   ]
+  },
+  "824074_035_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:07"
+   ]
+  },
+  "824074_035_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1974"
+   ]
+  },
+  "824074_037_06|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "11:10"
+   ]
+  },
+  "824074_040_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "11:54"
+   ]
+  },
+  "824074_040_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2142"
+   ]
+  },
+  "824074_046_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "9:44"
+   ]
+  },
+  "824074_046_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2582"
+   ]
+  },
+  "824074_059_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "9:24"
+   ]
+  },
+  "824074_059_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4:31"
+   ]
+  },
+  "824074_059_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:26"
+   ]
+  },
+  "824074_062_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:08"
+   ]
+  },
+  "824074_062_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2245"
+   ]
+  },
+  "824074_063_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "5:56"
+   ]
+  },
+  "824074_072_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:10"
+   ]
+  },
+  "824074_074_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:11"
+   ]
+  },
+  "824074_074_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2117"
+   ]
+  },
+  "824074_074_07|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:05"
+   ]
+  },
+  "824074_074_07|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2155"
+   ]
+  },
+  "824074_076_05|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:56"
+   ]
+  },
+  "824074_076_05|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2269"
+   ]
+  },
+  "824074_078_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:03"
+   ]
+  },
+  "824074_078_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2027"
+   ]
+  },
+  "824077_032_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2338"
+   ]
+  },
+  "824077_043_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "7:49"
+   ]
+  },
+  "824077_043_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2650"
+   ]
+  },
+  "824077_048_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3047"
+   ]
+  },
+  "824077_048_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:37"
+   ]
+  },
+  "824077_048_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1922"
+   ]
+  },
+  "824077_048_05|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2803"
+   ]
+  },
+  "824077_048_06|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:48"
+   ]
+  },
+  "824077_048_06|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2960"
+   ]
+  },
+  "824077_049_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:31"
+   ]
+  },
+  "824077_049_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:08"
+   ]
+  },
+  "824077_049_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2694"
+   ]
+  },
+  "824077_049_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "9:58"
+   ]
+  },
+  "824077_049_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1312"
+   ]
+  },
+  "824077_049_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2710"
+   ]
+  },
+  "824077_050_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:14"
+   ]
+  },
+  "824077_050_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2382"
+   ]
+  },
+  "824077_063_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "11:10"
+   ]
+  },
+  "824077_065_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:12"
+   ]
+  },
+  "824077_065_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2545"
+   ]
+  },
+  "824077_066_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "7:03"
+   ]
+  },
+  "824077_066_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2619"
+   ]
+  },
+  "824077_067_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:10"
+   ]
+  },
+  "824077_071_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:40"
+   ]
+  },
   "824080_024_03|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -102924,6 +106729,62 @@
    "origin": "review",
    "rejected": [
     "1:12"
+   ]
+  },
+  "824081_036_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.604"
+   ]
+  },
+  "824081_036_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.178"
+   ]
+  },
+  "824081_036_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.604"
+   ]
+  },
+  "824081_036_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.178"
+   ]
+  },
+  "824081_036_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.604"
+   ]
+  },
+  "824081_036_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.178"
+   ]
+  },
+  "824081_036_07|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.604"
+   ]
+  },
+  "824081_036_07|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.178"
    ]
   },
   "824085_055_08|RTilt": {
@@ -103042,7 +106903,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1537"
+    "1537",
+    "1538"
    ]
   },
   "824087_030_02|xSLG": {
@@ -103454,6 +107316,20 @@
     "1:01"
    ]
   },
+  "824096_071_04|xSLG": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4.000"
+   ]
+  },
+  "824096_071_04|xwOBA": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2.000"
+   ]
+  },
   "824096_073_06|Spin Rate": {
    "asof": "2026-07-06",
    "origin": "bootstrap_2026_07_06_snapshot",
@@ -103666,6 +107542,20 @@
    "origin": "review",
    "rejected": [
     "10:03"
+   ]
+  },
+  "824102_086_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2148"
+   ]
+  },
+  "824102_086_05|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "9:01"
    ]
   },
   "824105_050_01|xSLG": {
@@ -107144,6 +111034,20 @@
     "2172"
    ]
   },
+  "824153_010_01|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
+   ]
+  },
+  "824155_011_02|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
+   ]
+  },
   "824156_074_03|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -107158,6 +111062,34 @@
     "Called Strike"
    ]
   },
+  "824162_076_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.576"
+   ]
+  },
+  "824162_076_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.123"
+   ]
+  },
+  "824162_077_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.576"
+   ]
+  },
+  "824162_077_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.123"
+   ]
+  },
   "824167_059_01|AttackAngle": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -107165,11 +111097,179 @@
     "10.252"
    ]
   },
+  "824168_002_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.680"
+   ]
+  },
+  "824168_002_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.329"
+   ]
+  },
+  "824168_002_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.680"
+   ]
+  },
+  "824168_002_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.329"
+   ]
+  },
+  "824168_003_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.680"
+   ]
+  },
+  "824168_003_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.329"
+   ]
+  },
+  "824168_003_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.680"
+   ]
+  },
+  "824168_003_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.329"
+   ]
+  },
+  "824168_003_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.680"
+   ]
+  },
+  "824168_003_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.329"
+   ]
+  },
+  "824168_003_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.680"
+   ]
+  },
+  "824168_003_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.329"
+   ]
+  },
   "824169_088_05|Description": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "Called Strike"
+   ]
+  },
+  "824170_065_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.595"
+   ]
+  },
+  "824170_065_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.161"
+   ]
+  },
+  "824170_065_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.595"
+   ]
+  },
+  "824170_065_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.161"
+   ]
+  },
+  "824170_065_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.595"
+   ]
+  },
+  "824170_065_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.161"
+   ]
+  },
+  "824170_069_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.659"
+   ]
+  },
+  "824170_069_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.287"
+   ]
+  },
+  "824170_070_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.680"
+   ]
+  },
+  "824170_070_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.329"
+   ]
+  },
+  "824170_070_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.680"
+   ]
+  },
+  "824170_070_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.329"
    ]
   },
   "824172_030_02|Description": {
@@ -107227,6 +111327,48 @@
    "origin": "review",
    "rejected": [
     "-21.777"
+   ]
+  },
+  "824183_028_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.688"
+   ]
+  },
+  "824183_028_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.344"
+   ]
+  },
+  "824183_028_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.688"
+   ]
+  },
+  "824183_028_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.344"
+   ]
+  },
+  "824183_028_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.688"
+   ]
+  },
+  "824183_028_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.344"
    ]
   },
   "824188_077_02|Spin Rate": {
@@ -107468,6 +111610,20 @@
    "origin": "review",
    "rejected": [
     "8:45"
+   ]
+  },
+  "824205_067_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.571"
+   ]
+  },
+  "824205_067_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.113"
    ]
   },
   "824206_006_03|RTilt": {
@@ -107780,6 +111936,13 @@
     "6.9576"
    ]
   },
+  "824218_002_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1403"
+   ]
+  },
   "824236_073_02|Description": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -108059,7 +112222,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1196"
+    "1196",
+    "1197"
    ]
   },
   "824283_063_04|RTilt": {
@@ -108090,6 +112254,13 @@
     "Swinging Strike"
    ]
   },
+  "824286_035_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.581"
+   ]
+  },
   "824286_035_01|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -108097,11 +112268,25 @@
     "3.133"
    ]
   },
+  "824286_043_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.581"
+   ]
+  },
   "824286_043_01|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "3.133"
+   ]
+  },
+  "824286_043_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.581"
    ]
   },
   "824286_043_02|SzTop": {
@@ -108146,6 +112331,13 @@
     "Called Strike"
    ]
   },
+  "824290_076_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.558"
+   ]
+  },
   "824290_076_01|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -108153,11 +112345,25 @@
     "3.087"
    ]
   },
+  "824290_076_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.558"
+   ]
+  },
   "824290_076_02|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "3.087"
+   ]
+  },
+  "824290_076_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.558"
    ]
   },
   "824290_076_03|SzTop": {
@@ -108181,6 +112387,27 @@
     "-35.014"
    ]
   },
+  "824290_077_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.583"
+   ]
+  },
+  "824290_077_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.137"
+   ]
+  },
+  "824290_078_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.546"
+   ]
+  },
   "824290_078_01|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -108188,11 +112415,25 @@
     "3.063"
    ]
   },
+  "824290_078_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.546"
+   ]
+  },
   "824290_078_02|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "3.063"
+   ]
+  },
+  "824290_078_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.546"
    ]
   },
   "824290_078_03|SzTop": {
@@ -108354,6 +112595,13 @@
     "12:33"
    ]
   },
+  "824320_048_04|xSLG": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4.000"
+   ]
+  },
   "824321_065_02|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -108400,7 +112648,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2337"
+    "2337",
+    "2338"
    ]
   },
   "824323_042_01|Spin Rate": {
@@ -108491,7 +112740,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1724"
+    "1724",
+    "1725"
    ]
   },
   "824325_020_05|RTilt": {
@@ -109937,6 +114187,90 @@
     "10:24"
    ]
   },
+  "824408_027_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.685"
+   ]
+  },
+  "824408_027_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.339"
+   ]
+  },
+  "824408_027_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.685"
+   ]
+  },
+  "824408_027_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.339"
+   ]
+  },
+  "824408_027_03|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.685"
+   ]
+  },
+  "824408_027_03|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.339"
+   ]
+  },
+  "824408_027_04|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.685"
+   ]
+  },
+  "824408_027_04|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.339"
+   ]
+  },
+  "824408_027_05|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.685"
+   ]
+  },
+  "824408_027_05|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.339"
+   ]
+  },
+  "824408_027_06|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.685"
+   ]
+  },
+  "824408_027_06|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.339"
+   ]
+  },
   "824411_072_05|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -110524,6 +114858,55 @@
     "9:31"
    ]
   },
+  "824474_049_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "6:47"
+   ]
+  },
+  "824474_055_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:35"
+   ]
+  },
+  "824476_066_01|BBType": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "bunt"
+   ]
+  },
+  "824476_066_01|RunExp": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "-0.037"
+   ]
+  },
+  "824476_068_01|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Called Strike"
+   ]
+  },
+  "824476_068_02|Count": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "0-1"
+   ]
+  },
+  "824476_068_02|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Ball"
+   ]
+  },
   "824480_023_03|BBType": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -110543,6 +114926,13 @@
    "origin": "review",
    "rejected": [
     "2888"
+   ]
+  },
+  "824480_062_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2189"
    ]
   },
   "824480_070_02|Description": {
@@ -110634,6 +115024,20 @@
    "origin": "review",
    "rejected": [
     "2564"
+   ]
+  },
+  "824496_075_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.608"
+   ]
+  },
+  "824496_075_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.187"
    ]
   },
   "824497_052_02|RTilt": {
@@ -110879,6 +115283,13 @@
    "origin": "review",
    "rejected": [
     "3.328"
+   ]
+  },
+  "824505_070_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.559"
    ]
   },
   "824505_070_01|SzTop": {
@@ -112238,6 +116649,20 @@
     "6:33"
    ]
   },
+  "824514_046_06|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:03"
+   ]
+  },
+  "824514_054_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4:46"
+   ]
+  },
   "824515_063_03|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -112523,6 +116948,55 @@
     "9:30"
    ]
   },
+  "824520_028_03|HorzBrk": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.8"
+   ]
+  },
+  "824520_028_03|IndVertBrk": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "18.6"
+   ]
+  },
+  "824520_028_03|OTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:11"
+   ]
+  },
+  "824520_028_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:31"
+   ]
+  },
+  "824520_028_03|xHorzBrk": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.8"
+   ]
+  },
+  "824520_028_03|xIndVrtBrk": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "18.8"
+   ]
+  },
+  "824520_056_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:28"
+   ]
+  },
   "824520_056_02|Spin Rate": {
    "asof": "2026-07-06",
    "origin": "bootstrap_2026_07_06_snapshot",
@@ -112601,11 +117075,25 @@
     "8:07"
    ]
   },
+  "824525_031_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.642"
+   ]
+  },
   "824525_031_01|SzTop": {
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
     "3.254"
+   ]
+  },
+  "824525_031_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.642"
    ]
   },
   "824525_031_02|SzTop": {
@@ -113511,7 +117999,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1162"
+    "1162",
+    "1163"
    ]
   },
   "824575_055_01|Extension": {
@@ -113575,6 +118064,90 @@
    "origin": "review",
    "rejected": [
     "2:43"
+   ]
+  },
+  "824589_010_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:17"
+   ]
+  },
+  "824589_022_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:52"
+   ]
+  },
+  "824589_022_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2609"
+   ]
+  },
+  "824589_028_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:14"
+   ]
+  },
+  "824589_030_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2472"
+   ]
+  },
+  "824589_036_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:48"
+   ]
+  },
+  "824589_036_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2415"
+   ]
+  },
+  "824589_044_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:41"
+   ]
+  },
+  "824589_044_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2512"
+   ]
+  },
+  "824589_050_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:05"
+   ]
+  },
+  "824589_052_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:15"
+   ]
+  },
+  "824589_066_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:19"
    ]
   },
   "824591_028_04|RTilt": {
@@ -113953,7 +118526,8 @@
    "origin": "bootstrap_2026_07_06_snapshot",
    "rejected": [
     "2206",
-    "2618"
+    "2618",
+    "2619"
    ]
   },
   "824605_012_05|RTilt": {
@@ -114088,7 +118662,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1947"
+    "1947",
+    "1948"
    ]
   },
   "824605_019_03|RTilt": {
@@ -114275,7 +118850,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1657"
+    "1657",
+    "1658"
    ]
   },
   "824605_044_01|RTilt": {
@@ -114338,7 +118914,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2469"
+    "2469",
+    "2470"
    ]
   },
   "824605_048_05|RTilt": {
@@ -114374,6 +118951,7 @@
    "origin": "bootstrap_2026_07_06_snapshot",
    "rejected": [
     "1725",
+    "1726",
     "3478"
    ]
   },
@@ -114389,7 +118967,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2398"
+    "2398",
+    "2399"
    ]
   },
   "824605_053_01|RTilt": {
@@ -114470,7 +119049,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1860"
+    "1860",
+    "1861"
    ]
   },
   "824605_057_05|RTilt": {
@@ -114537,6 +119117,7 @@
    "origin": "bootstrap_2026_07_06_snapshot",
    "rejected": [
     "1830",
+    "1831",
     "880"
    ]
   },
@@ -114560,7 +119141,8 @@
    "origin": "bootstrap_2026_07_06_snapshot",
    "rejected": [
     "103",
-    "1687"
+    "1687",
+    "1688"
    ]
   },
   "824605_066_04|RTilt": {
@@ -114816,6 +119398,34 @@
     "-0.118"
    ]
   },
+  "824615_055_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "824615_055_01|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
+  "824615_055_02|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.600"
+   ]
+  },
+  "824615_055_02|SzTop": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3.170"
+   ]
+  },
   "824615_071_01|SzBot": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -114955,7 +119565,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1482"
+    "1482",
+    "1483"
    ]
   },
   "824619_038_01|RTilt": {
@@ -115027,6 +119638,55 @@
    "origin": "review",
    "rejected": [
     "3.296"
+   ]
+  },
+  "824639_022_06|xSLG": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4.000"
+   ]
+  },
+  "824639_022_06|xwOBA": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2.000"
+   ]
+  },
+  "824640_003_05|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:51"
+   ]
+  },
+  "824640_003_05|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2176"
+   ]
+  },
+  "824640_011_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "7:15"
+   ]
+  },
+  "824640_012_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:05"
+   ]
+  },
+  "824640_026_05|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:58"
    ]
   },
   "824645_011_03|RTilt": {
@@ -116886,6 +121546,34 @@
     "Swinging Strike"
    ]
   },
+  "824722_026_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "11:22"
+   ]
+  },
+  "824722_026_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2259"
+   ]
+  },
+  "824722_027_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:21"
+   ]
+  },
+  "824722_032_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:18"
+   ]
+  },
   "824724_006_03|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -116968,6 +121656,13 @@
    "origin": "review",
    "rejected": [
     "2124"
+   ]
+  },
+  "824725_075_04|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
    ]
   },
   "824726_072_01|xSLG": {
@@ -117121,7 +121816,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2889"
+    "2889",
+    "2890"
    ]
   },
   "824734_015_01|RTilt": {
@@ -117454,6 +122150,7 @@
    "origin": "bootstrap_2026_07_06_snapshot",
    "rejected": [
     "2370",
+    "2371",
     "56"
    ]
   },
@@ -117660,6 +122357,13 @@
    "origin": "review",
    "rejected": [
     "-0.787"
+   ]
+  },
+  "824770_018_01|SzBot": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1.630"
    ]
   },
   "824770_018_01|SzTop": {
@@ -118184,7 +122888,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "1326"
+    "1326",
+    "1327"
    ]
   },
   "824786_020_03|RTilt": {
@@ -118219,7 +122924,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "2899"
+    "2899",
+    "2900"
    ]
   },
   "824786_024_05|Spin Rate": {
@@ -118351,6 +123057,202 @@
    "origin": "bootstrap_2026_07_06_snapshot",
    "rejected": [
     "11:44"
+   ]
+  },
+  "824801_040_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:30"
+   ]
+  },
+  "824801_040_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2032"
+   ]
+  },
+  "824801_040_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "7:56"
+   ]
+  },
+  "824801_040_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1918"
+   ]
+  },
+  "824801_041_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "10:44"
+   ]
+  },
+  "824801_041_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2088"
+   ]
+  },
+  "824801_041_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "9:54"
+   ]
+  },
+  "824801_041_03|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1991"
+   ]
+  },
+  "824801_041_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2299"
+   ]
+  },
+  "824801_041_05|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2051"
+   ]
+  },
+  "824801_042_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:41"
+   ]
+  },
+  "824801_042_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2151"
+   ]
+  },
+  "824801_047_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:15"
+   ]
+  },
+  "824801_047_02|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2014"
+   ]
+  },
+  "824801_048_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:30"
+   ]
+  },
+  "824801_048_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "571"
+   ]
+  },
+  "824801_048_06|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:50"
+   ]
+  },
+  "824801_048_06|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "675"
+   ]
+  },
+  "824801_049_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "8:20"
+   ]
+  },
+  "824801_051_03|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2:16"
+   ]
+  },
+  "824801_057_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:35"
+   ]
+  },
+  "824801_075_02|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
+   ]
+  },
+  "824802_027_02|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "12:03"
+   ]
+  },
+  "824803_034_01|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "6:58"
+   ]
+  },
+  "824803_034_01|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2588"
+   ]
+  },
+  "824803_034_07|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "1:19"
+   ]
+  },
+  "824803_035_04|Spin Rate": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "2637"
+   ]
+  },
+  "824803_039_02|Description": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "Swinging Strike"
    ]
   },
   "824805_058_05|RunExp": {
@@ -119515,6 +124417,13 @@
     "76.8"
    ]
   },
+  "824916_060_07|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "5:01"
+   ]
+  },
   "824920_010_05|RunExp": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -119614,6 +124523,13 @@
     "1:26"
    ]
   },
+  "824928_035_04|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "3:07"
+   ]
+  },
   "824929_042_01|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -119670,6 +124586,13 @@
    "origin": "review",
    "rejected": [
     "3:39"
+   ]
+  },
+  "824936_053_07|RTilt": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4:13"
    ]
   },
   "824936_074_03|AttackAngle": {
@@ -119876,6 +124799,20 @@
     "6.1990"
    ]
   },
+  "824965_068_01|SwingLength": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4.5"
+   ]
+  },
+  "824965_073_06|SwingLength": {
+   "asof": "2026-08-23",
+   "origin": "review",
+   "rejected": [
+    "4.7"
+   ]
+  },
   "824972_005_01|RTilt": {
    "asof": "2026-08-17",
    "origin": "review",
@@ -119985,7 +124922,8 @@
    "asof": "2026-08-17",
    "origin": "review",
    "rejected": [
-    "960"
+    "960",
+    "961"
    ]
   },
   "824972_057_03|Velocity": {
@@ -120936,7 +125874,8 @@
    "rejected": [
     "2049",
     "2058",
-    "2062"
+    "2062",
+    "2063"
    ]
   },
   "825071_039_01|Spin Rate": {
@@ -125596,3392 +130535,7 @@
    ]
   }
  },
- "missing": {
-  "815884_072_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Berroa, Steward",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.5695",
-    "HAA": "-1.035",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "10.7",
-    "IndVertBrk": "14.5",
-    "LaunchAngle": "",
-    "OTilt": "1:12",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.8368",
-    "PlateZ": "2.9293",
-    "RTilt": "1:19",
-    "RelPosX": "-1.7961",
-    "RelPosZ": "6.2891",
-    "Spin Rate": "1720",
-    "SzBot": "1.558",
-    "SzTop": "3.087",
-    "Throws": "R",
-    "VAA": "-7.406",
-    "Velocity": "72.1",
-    "xHorzBrk": "11.4",
-    "xIndVrtBrk": "15.4"
-   }
-  },
-  "815884_072_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Berroa, Steward",
-    "Count": "1-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.5875",
-    "HAA": "0.980",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "2.6",
-    "IndVertBrk": "15.1",
-    "LaunchAngle": "",
-    "OTilt": "12:19",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.3820",
-    "PlateZ": "3.8373",
-    "RTilt": "1:00",
-    "RelPosX": "-1.4169",
-    "RelPosZ": "7.2284",
-    "Spin Rate": "1190",
-    "SzBot": "1.558",
-    "SzTop": "3.087",
-    "Throws": "R",
-    "VAA": "-12.832",
-    "Velocity": "49.4",
-    "xHorzBrk": "2.8",
-    "xIndVrtBrk": "16.0"
-   }
-  },
-  "815884_072_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Berroa, Steward",
-    "Count": "1-1",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.4883",
-    "HAA": "0.356",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "13.9",
-    "IndVertBrk": "13.7",
-    "LaunchAngle": "",
-    "OTilt": "1:30",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.8174",
-    "PlateZ": "0.6711",
-    "RTilt": "1:19",
-    "RelPosX": "-3.2004",
-    "RelPosZ": "6.0917",
-    "Spin Rate": "1586",
-    "SzBot": "1.558",
-    "SzTop": "3.087",
-    "Throws": "R",
-    "VAA": "-10.847",
-    "Velocity": "65.4",
-    "xHorzBrk": "14.8",
-    "xIndVrtBrk": "14.5"
-   }
-  },
-  "815884_072_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "fly_ball",
-    "Bats": "L",
-    "Batter": "Berroa, Steward",
-    "Count": "2-1",
-    "Description": "In Play",
-    "Distance": "350",
-    "Event": "Double",
-    "ExitVelo": "92.8",
-    "Extension": "4.4098",
-    "HAA": "2.644",
-    "HC_X": "183.40",
-    "HC_Y": "103.25",
-    "HorzBrk": "0.6",
-    "IndVertBrk": "17.3",
-    "LaunchAngle": "28",
-    "OTilt": "12:03",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "1.0034",
-    "PlateZ": "3.9447",
-    "RTilt": "12:49",
-    "RelPosX": "-1.2863",
-    "RelPosZ": "7.4764",
-    "Spin Rate": "1188",
-    "SzBot": "1.558",
-    "SzTop": "3.087",
-    "Throws": "R",
-    "VAA": "-13.294",
-    "Velocity": "48.1",
-    "xHorzBrk": "0.6",
-    "xIndVrtBrk": "18.4"
-   }
-  },
-  "815884_073_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Carlson, Dylan",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.4740",
-    "HAA": "0.005",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "1.1",
-    "IndVertBrk": "20.2",
-    "LaunchAngle": "",
-    "OTilt": "12:06",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.6329",
-    "PlateZ": "4.3143",
-    "RTilt": "12:49",
-    "RelPosX": "-1.7253",
-    "RelPosZ": "7.2525",
-    "Spin Rate": "1262",
-    "SzBot": "1.651",
-    "SzTop": "3.272",
-    "Throws": "R",
-    "VAA": "-11.851",
-    "Velocity": "50.0",
-    "xHorzBrk": "1.2",
-    "xIndVrtBrk": "21.4"
-   }
-  },
-  "815884_073_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Carlson, Dylan",
-    "Count": "1-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.5946",
-    "HAA": "-0.957",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "5.4",
-    "IndVertBrk": "17.0",
-    "LaunchAngle": "",
-    "OTilt": "12:35",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-2.1708",
-    "PlateZ": "3.3437",
-    "RTilt": "1:00",
-    "RelPosX": "-1.7824",
-    "RelPosZ": "7.2589",
-    "Spin Rate": "1150",
-    "SzBot": "1.651",
-    "SzTop": "3.272",
-    "Throws": "R",
-    "VAA": "-14.378",
-    "Velocity": "47.1",
-    "xHorzBrk": "5.7",
-    "xIndVrtBrk": "18.0"
-   }
-  },
-  "815884_073_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Carlson, Dylan",
-    "Count": "2-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7264",
-    "HAA": "0.612",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "8.4",
-    "IndVertBrk": "18.1",
-    "LaunchAngle": "",
-    "OTilt": "12:49",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.4205",
-    "PlateZ": "3.2949",
-    "RTilt": "1:05",
-    "RelPosX": "-1.6011",
-    "RelPosZ": "6.2708",
-    "Spin Rate": "1754",
-    "SzBot": "1.651",
-    "SzTop": "3.272",
-    "Throws": "R",
-    "VAA": "-6.821",
-    "Velocity": "71.3",
-    "xHorzBrk": "8.9",
-    "xIndVrtBrk": "19.2"
-   }
-  },
-  "815884_073_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Carlson, Dylan",
-    "Count": "2-1",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.6051",
-    "HAA": "-1.713",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "11.9",
-    "IndVertBrk": "20.5",
-    "LaunchAngle": "",
-    "OTilt": "1:00",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-2.3409",
-    "PlateZ": "3.9659",
-    "RTilt": "1:10",
-    "RelPosX": "-1.8342",
-    "RelPosZ": "6.3568",
-    "Spin Rate": "1793",
-    "SzBot": "1.651",
-    "SzTop": "3.272",
-    "Throws": "R",
-    "VAA": "-6.111",
-    "Velocity": "70.3",
-    "xHorzBrk": "12.6",
-    "xIndVrtBrk": "21.8"
-   }
-  },
-  "815884_073_05": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "line_drive",
-    "Bats": "L",
-    "Batter": "Carlson, Dylan",
-    "Count": "3-1",
-    "Description": "In Play",
-    "Distance": "307",
-    "Event": "Double",
-    "ExitVelo": "92.7",
-    "Extension": "4.6472",
-    "HAA": "2.362",
-    "HC_X": "211.02",
-    "HC_Y": "108.61",
-    "HorzBrk": "0.7",
-    "IndVertBrk": "20.3",
-    "LaunchAngle": "24",
-    "OTilt": "12:03",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.8674",
-    "PlateZ": "1.8451",
-    "RTilt": "12:44",
-    "RelPosX": "-1.1926",
-    "RelPosZ": "7.1101",
-    "Spin Rate": "1190",
-    "SzBot": "1.651",
-    "SzTop": "3.272",
-    "Throws": "R",
-    "VAA": "-14.944",
-    "Velocity": "48.5",
-    "xHorzBrk": "0.7",
-    "xIndVrtBrk": "21.6"
-   }
-  },
-  "815884_074_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Pinto, Ren\u00e9",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.5062",
-    "HAA": "-0.650",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "7.8",
-    "IndVertBrk": "19.9",
-    "LaunchAngle": "",
-    "OTilt": "12:42",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-2.0774",
-    "PlateZ": "3.8437",
-    "RTilt": "1:00",
-    "RelPosX": "-2.1397",
-    "RelPosZ": "7.0185",
-    "Spin Rate": "1343",
-    "SzBot": "1.570",
-    "SzTop": "3.110",
-    "Throws": "R",
-    "VAA": "-10.808",
-    "Velocity": "53.5",
-    "xHorzBrk": "8.3",
-    "xIndVrtBrk": "21.1"
-   }
-  },
-  "815884_074_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "line_drive",
-    "Bats": "R",
-    "Batter": "Pinto, Ren\u00e9",
-    "Count": "1-0",
-    "Description": "In Play",
-    "Distance": "154",
-    "Event": "Double",
-    "ExitVelo": "100.0",
-    "Extension": "4.5152",
-    "HAA": "2.050",
-    "HC_X": "141.98",
-    "HC_Y": "116.55",
-    "HorzBrk": "6.5",
-    "IndVertBrk": "16.4",
-    "LaunchAngle": "10",
-    "OTilt": "12:43",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "1.2250",
-    "PlateZ": "2.4010",
-    "RTilt": "12:44",
-    "RelPosX": "-1.0222",
-    "RelPosZ": "7.0566",
-    "Spin Rate": "1346",
-    "SzBot": "1.570",
-    "SzTop": "3.110",
-    "Throws": "R",
-    "VAA": "-13.043",
-    "Velocity": "52.6",
-    "xHorzBrk": "6.9",
-    "xIndVrtBrk": "17.4"
-   }
-  },
-  "815884_075_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Moore, Dylan",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7586",
-    "HAA": "0.547",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "7.6",
-    "IndVertBrk": "16.1",
-    "LaunchAngle": "",
-    "OTilt": "12:50",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.2737",
-    "PlateZ": "0.9812",
-    "RTilt": "12:51",
-    "RelPosX": "-1.3402",
-    "RelPosZ": "6.7063",
-    "Spin Rate": "1309",
-    "SzBot": "1.634",
-    "SzTop": "3.238",
-    "Throws": "R",
-    "VAA": "-14.285",
-    "Velocity": "52.9",
-    "xHorzBrk": "8.1",
-    "xIndVrtBrk": "17.1"
-   }
-  },
-  "815884_075_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "fly_ball",
-    "Bats": "R",
-    "Batter": "Moore, Dylan",
-    "Count": "1-0",
-    "Description": "In Play",
-    "Distance": "370",
-    "Event": "Flyout",
-    "ExitVelo": "100.4",
-    "Extension": "4.2979",
-    "HAA": "1.401",
-    "HC_X": "96.70",
-    "HC_Y": "52.66",
-    "HorzBrk": "-0.5",
-    "IndVertBrk": "19.3",
-    "LaunchAngle": "26",
-    "OTilt": "11:57",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.0985",
-    "PlateZ": "3.2960",
-    "RTilt": "12:40",
-    "RelPosX": "-1.2506",
-    "RelPosZ": "7.4261",
-    "Spin Rate": "1199",
-    "SzBot": "1.634",
-    "SzTop": "3.238",
-    "Throws": "R",
-    "VAA": "-14.647",
-    "Velocity": "47.4",
-    "xHorzBrk": "-0.5",
-    "xIndVrtBrk": "20.5"
-   }
-  },
-  "815884_081_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "popup",
-    "Bats": "R",
-    "Batter": "Anthony, Keaton",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "107",
-    "Event": "Pop Out",
-    "ExitVelo": "71.8",
-    "Extension": "4.9952",
-    "HAA": "-0.106",
-    "HC_X": "146.47",
-    "HC_Y": "164.66",
-    "HorzBrk": "9.2",
-    "IndVertBrk": "17.6",
-    "LaunchAngle": "73",
-    "OTilt": "12:55",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.8329",
-    "PlateZ": "2.4249",
-    "RTilt": "12:49",
-    "RelPosX": "-1.4546",
-    "RelPosZ": "6.4505",
-    "Spin Rate": "1402",
-    "SzBot": "1.654",
-    "SzTop": "3.277",
-    "Throws": "R",
-    "VAA": "-10.461",
-    "Velocity": "57.6",
-    "xHorzBrk": "9.8",
-    "xIndVrtBrk": "18.7"
-   }
-  },
-  "815884_082_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Kemp, Otto",
-    "Count": "0-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.3439",
-    "HAA": "4.263",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "-10.7",
-    "IndVertBrk": "19.9",
-    "LaunchAngle": "",
-    "OTilt": "11:03",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.8720",
-    "PlateZ": "2.3938",
-    "RTilt": "12:40",
-    "RelPosX": "-1.9056",
-    "RelPosZ": "7.1946",
-    "Spin Rate": "1198",
-    "SzBot": "1.594",
-    "SzTop": "3.158",
-    "Throws": "R",
-    "VAA": "-13.947",
-    "Velocity": "49.7",
-    "xHorzBrk": "-11.4",
-    "xIndVrtBrk": "21.1"
-   }
-  },
-  "815884_082_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "fly_ball",
-    "Bats": "R",
-    "Batter": "Kemp, Otto",
-    "Count": "0-1",
-    "Description": "In Play",
-    "Distance": "356",
-    "Event": "Flyout",
-    "ExitVelo": "90.4",
-    "Extension": "4.5832",
-    "HAA": "3.908",
-    "HC_X": "143.79",
-    "HC_Y": "57.04",
-    "HorzBrk": "-5.9",
-    "IndVertBrk": "20.9",
-    "LaunchAngle": "28",
-    "OTilt": "11:28",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.9862",
-    "PlateZ": "2.8379",
-    "RTilt": "12:28",
-    "RelPosX": "-1.8646",
-    "RelPosZ": "6.8791",
-    "Spin Rate": "1269",
-    "SzBot": "1.594",
-    "SzTop": "3.158",
-    "Throws": "R",
-    "VAA": "-11.578",
-    "Velocity": "54.3",
-    "xHorzBrk": "-6.3",
-    "xIndVrtBrk": "22.2"
-   }
-  },
-  "815884_083_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Reyes, Felix",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.6382",
-    "HAA": "3.071",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "-8.6",
-    "IndVertBrk": "19.3",
-    "LaunchAngle": "",
-    "OTilt": "11:11",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.2489",
-    "PlateZ": "4.5890",
-    "RTilt": "12:26",
-    "RelPosX": "-1.6594",
-    "RelPosZ": "6.9362",
-    "Spin Rate": "1299",
-    "SzBot": "1.692",
-    "SzTop": "3.353",
-    "Throws": "R",
-    "VAA": "-9.631",
-    "Velocity": "55.0",
-    "xHorzBrk": "-9.1",
-    "xIndVrtBrk": "20.5"
-   }
-  },
-  "815884_083_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Reyes, Felix",
-    "Count": "1-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7457",
-    "HAA": "-0.209",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "6.8",
-    "IndVertBrk": "17.2",
-    "LaunchAngle": "",
-    "OTilt": "12:43",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.4060",
-    "PlateZ": "2.9622",
-    "RTilt": "12:58",
-    "RelPosX": "-1.7624",
-    "RelPosZ": "6.3113",
-    "Spin Rate": "1739",
-    "SzBot": "1.692",
-    "SzTop": "3.353",
-    "Throws": "R",
-    "VAA": "-7.672",
-    "Velocity": "68.4",
-    "xHorzBrk": "7.2",
-    "xIndVrtBrk": "18.3"
-   }
-  },
-  "815884_083_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Reyes, Felix",
-    "Count": "2-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.0962",
-    "HAA": "1.813",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "-4.0",
-    "IndVertBrk": "21.0",
-    "LaunchAngle": "",
-    "OTilt": "11:38",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.1506",
-    "PlateZ": "3.1173",
-    "RTilt": "12:21",
-    "RelPosX": "-1.3801",
-    "RelPosZ": "7.6838",
-    "Spin Rate": "1151",
-    "SzBot": "1.692",
-    "SzTop": "3.353",
-    "Throws": "R",
-    "VAA": "-15.501",
-    "Velocity": "45.4",
-    "xHorzBrk": "-4.2",
-    "xIndVrtBrk": "22.3"
-   }
-  },
-  "815884_083_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Reyes, Felix",
-    "Count": "2-1",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.4317",
-    "HAA": "2.474",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "-7.8",
-    "IndVertBrk": "20.9",
-    "LaunchAngle": "",
-    "OTilt": "11:19",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.8155",
-    "PlateZ": "4.4819",
-    "RTilt": "12:15",
-    "RelPosX": "-2.2872",
-    "RelPosZ": "7.2375",
-    "Spin Rate": "1302",
-    "SzBot": "1.692",
-    "SzTop": "3.353",
-    "Throws": "R",
-    "VAA": "-10.643",
-    "Velocity": "52.7",
-    "xHorzBrk": "-8.3",
-    "xIndVrtBrk": "22.2"
-   }
-  },
-  "815884_083_05": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Reyes, Felix",
-    "Count": "3-1",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.8656",
-    "HAA": "0.250",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "10.1",
-    "IndVertBrk": "19.6",
-    "LaunchAngle": "",
-    "OTilt": "12:54",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.5670",
-    "PlateZ": "3.6821",
-    "RTilt": "1:03",
-    "RelPosX": "-1.5541",
-    "RelPosZ": "6.3383",
-    "Spin Rate": "1755",
-    "SzBot": "1.692",
-    "SzTop": "3.353",
-    "Throws": "R",
-    "VAA": "-6.504",
-    "Velocity": "69.0",
-    "xHorzBrk": "10.7",
-    "xIndVrtBrk": "20.8"
-   }
-  },
-  "815884_083_06": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Reyes, Felix",
-    "Count": "3-2",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.8374",
-    "HAA": "0.126",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "8.5",
-    "IndVertBrk": "17.8",
-    "LaunchAngle": "",
-    "OTilt": "12:51",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.8096",
-    "PlateZ": "3.9525",
-    "RTilt": "1:01",
-    "RelPosX": "-1.5857",
-    "RelPosZ": "6.3063",
-    "Spin Rate": "1913",
-    "SzBot": "1.692",
-    "SzTop": "3.353",
-    "Throws": "R",
-    "VAA": "-5.428",
-    "Velocity": "76.7",
-    "xHorzBrk": "9.0",
-    "xIndVrtBrk": "18.9"
-   }
-  },
-  "815884_083_07": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Reyes, Felix",
-    "Count": "3-2",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "Walk",
-    "ExitVelo": "",
-    "Extension": "4.5803",
-    "HAA": "1.644",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "-1.3",
-    "IndVertBrk": "18.0",
-    "LaunchAngle": "",
-    "OTilt": "11:51",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.6596",
-    "PlateZ": "1.7029",
-    "RTilt": "12:19",
-    "RelPosX": "-1.9472",
-    "RelPosZ": "7.0051",
-    "Spin Rate": "1216",
-    "SzBot": "1.692",
-    "SzTop": "3.353",
-    "Throws": "R",
-    "VAA": "-13.697",
-    "Velocity": "51.8",
-    "xHorzBrk": "-1.4",
-    "xIndVrtBrk": "19.1"
-   }
-  },
-  "815884_084_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "popup",
-    "Bats": "R",
-    "Batter": "McIntosh, Paul",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "118",
-    "Event": "Pop Out",
-    "ExitVelo": "70.5",
-    "Extension": "4.7065",
-    "HAA": "1.264",
-    "HC_X": "112.46",
-    "HC_Y": "165.07",
-    "HorzBrk": "3.4",
-    "IndVertBrk": "17.9",
-    "LaunchAngle": "70",
-    "OTilt": "12:21",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.1937",
-    "PlateZ": "2.9572",
-    "RTilt": "12:33",
-    "RelPosX": "-1.5282",
-    "RelPosZ": "7.0739",
-    "Spin Rate": "1169",
-    "SzBot": "1.582",
-    "SzTop": "3.134",
-    "Throws": "R",
-    "VAA": "-12.310",
-    "Velocity": "52.0",
-    "xHorzBrk": "3.6",
-    "xIndVrtBrk": "19.0"
-   }
-  },
-  "815908_078_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "De La Cruz, Bryan",
-    "Count": "0-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "5.0459",
-    "HAA": "0.880",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "4.4",
-    "IndVertBrk": "21.0",
-    "LaunchAngle": "",
-    "OTilt": "12:23",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.4676",
-    "PlateZ": "2.2317",
-    "RTilt": "12:54",
-    "RelPosX": "-1.5585",
-    "RelPosZ": "6.3932",
-    "Spin Rate": "1484",
-    "SzBot": "1.629",
-    "SzTop": "3.228",
-    "Throws": "R",
-    "VAA": "-10.023",
-    "Velocity": "59.1",
-    "xHorzBrk": "4.3",
-    "xIndVrtBrk": "20.3"
-   }
-  },
-  "815908_078_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "De La Cruz, Bryan",
-    "Count": "0-1",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.5423",
-    "HAA": "3.366",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "2.2",
-    "IndVertBrk": "20.2",
-    "LaunchAngle": "",
-    "OTilt": "12:12",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.6719",
-    "PlateZ": "3.5876",
-    "RTilt": "12:42",
-    "RelPosX": "-2.3548",
-    "RelPosZ": "7.2069",
-    "Spin Rate": "1119",
-    "SzBot": "1.629",
-    "SzTop": "3.228",
-    "Throws": "R",
-    "VAA": "-14.183",
-    "Velocity": "46.0",
-    "xHorzBrk": "2.1",
-    "xIndVrtBrk": "19.5"
-   }
-  },
-  "815908_078_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "De La Cruz, Bryan",
-    "Count": "0-2",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7098",
-    "HAA": "0.819",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "9.1",
-    "IndVertBrk": "19.7",
-    "LaunchAngle": "",
-    "OTilt": "12:49",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.2425",
-    "PlateZ": "2.8013",
-    "RTilt": "1:08",
-    "RelPosX": "-1.1551",
-    "RelPosZ": "6.1741",
-    "Spin Rate": "1689",
-    "SzBot": "1.629",
-    "SzTop": "3.228",
-    "Throws": "R",
-    "VAA": "-6.601",
-    "Velocity": "74.7",
-    "xHorzBrk": "8.8",
-    "xIndVrtBrk": "19.1"
-   }
-  },
-  "815908_078_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "De La Cruz, Bryan",
-    "Count": "0-2",
-    "Description": "Swinging Strike",
-    "Distance": "",
-    "Event": "Strikeout",
-    "ExitVelo": "",
-    "Extension": "4.7783",
-    "HAA": "3.836",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "-9.7",
-    "IndVertBrk": "18.4",
-    "LaunchAngle": "",
-    "OTilt": "11:04",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.8184",
-    "PlateZ": "1.7484",
-    "RTilt": "12:30",
-    "RelPosX": "-1.6777",
-    "RelPosZ": "6.9722",
-    "Spin Rate": "1146",
-    "SzBot": "1.629",
-    "SzTop": "3.228",
-    "Throws": "R",
-    "VAA": "-15.345",
-    "Velocity": "47.8",
-    "xHorzBrk": "-9.4",
-    "xIndVrtBrk": "17.8"
-   }
-  },
-  "815908_079_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Carlson, Dylan",
-    "Count": "0-0",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "5.1247",
-    "HAA": "0.545",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "10.3",
-    "IndVertBrk": "20.2",
-    "LaunchAngle": "",
-    "OTilt": "12:54",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.0222",
-    "PlateZ": "3.1665",
-    "RTilt": "1:19",
-    "RelPosX": "-2.2973",
-    "RelPosZ": "6.1194",
-    "Spin Rate": "1787",
-    "SzBot": "1.651",
-    "SzTop": "3.272",
-    "Throws": "R",
-    "VAA": "-6.542",
-    "Velocity": "71.8",
-    "xHorzBrk": "10.0",
-    "xIndVrtBrk": "19.5"
-   }
-  },
-  "815908_079_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Carlson, Dylan",
-    "Count": "0-1",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "5.1677",
-    "HAA": "-1.600",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "13.2",
-    "IndVertBrk": "13.2",
-    "LaunchAngle": "",
-    "OTilt": "1:30",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-2.9363",
-    "PlateZ": "2.5104",
-    "RTilt": "1:24",
-    "RelPosX": "-2.6228",
-    "RelPosZ": "6.0221",
-    "Spin Rate": "1482",
-    "SzBot": "1.651",
-    "SzTop": "3.272",
-    "Throws": "R",
-    "VAA": "-9.670",
-    "Velocity": "61.5",
-    "xHorzBrk": "12.8",
-    "xIndVrtBrk": "12.8"
-   }
-  },
-  "815908_079_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "ground_ball",
-    "Bats": "L",
-    "Batter": "Carlson, Dylan",
-    "Count": "1-1",
-    "Description": "In Play",
-    "Distance": "10",
-    "Event": "Groundout",
-    "ExitVelo": "83.4",
-    "Extension": "4.0239",
-    "HAA": "0.719",
-    "HC_X": "144.41",
-    "HC_Y": "162.23",
-    "HorzBrk": "5.3",
-    "IndVertBrk": "21.4",
-    "LaunchAngle": "-19",
-    "OTilt": "12:27",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.2334",
-    "PlateZ": "2.7182",
-    "RTilt": "12:42",
-    "RelPosX": "-1.2652",
-    "RelPosZ": "7.3199",
-    "Spin Rate": "1220",
-    "SzBot": "1.651",
-    "SzTop": "3.272",
-    "Throws": "R",
-    "VAA": "-13.994",
-    "Velocity": "49.1",
-    "xHorzBrk": "5.1",
-    "xIndVrtBrk": "20.7"
-   }
-  },
-  "815908_080_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "ground_ball",
-    "Bats": "R",
-    "Batter": "Moore, Dylan",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "15",
-    "Event": "Groundout",
-    "ExitVelo": "92.5",
-    "Extension": "4.9379",
-    "HAA": "1.065",
-    "HC_X": "105.38",
-    "HC_Y": "169.32",
-    "HorzBrk": "3.2",
-    "IndVertBrk": "10.7",
-    "LaunchAngle": "-11",
-    "OTilt": "12:33",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.4396",
-    "PlateZ": "2.2415",
-    "RTilt": "2:09",
-    "RelPosX": "-1.6051",
-    "RelPosZ": "6.2414",
-    "Spin Rate": "196",
-    "SzBot": "1.634",
-    "SzTop": "3.238",
-    "Throws": "R",
-    "VAA": "-11.767",
-    "Velocity": "56.6",
-    "xHorzBrk": "3.1",
-    "xIndVrtBrk": "10.3"
-   }
-  },
-  "815916_076_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "popup",
-    "Bats": "L",
-    "Batter": "Thaiss, Matt",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "150",
-    "Event": "Pop Out",
-    "ExitVelo": "62.6",
-    "Extension": "4.5966",
-    "HAA": "2.379",
-    "HC_X": "86.62",
-    "HC_Y": "182.50",
-    "HorzBrk": "4.4",
-    "IndVertBrk": "20.8",
-    "LaunchAngle": "56",
-    "OTilt": "12:23",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.1225",
-    "PlateZ": "2.1558",
-    "RTilt": "12:49",
-    "RelPosX": "-2.2413",
-    "RelPosZ": "6.9184",
-    "Spin Rate": "1228",
-    "SzBot": "1.594",
-    "SzTop": "3.159",
-    "Throws": "R",
-    "VAA": "-13.370",
-    "Velocity": "50.6",
-    "xHorzBrk": "4.2",
-    "xIndVrtBrk": "20.1"
-   }
-  },
-  "815920_054_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Henry, Payton",
-    "Count": "0-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "3.9041",
-    "HAA": "1.205",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "8.0",
-    "IndVertBrk": "18.2",
-    "LaunchAngle": "",
-    "OTilt": "12:47",
-    "Outs": "1",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.5022",
-    "PlateZ": "1.9591",
-    "RTilt": "1:12",
-    "RelPosX": "-1.1403",
-    "RelPosZ": "6.9348",
-    "Spin Rate": "1324",
-    "SzBot": "1.646",
-    "SzTop": "3.261",
-    "Throws": "R",
-    "VAA": "-12.725",
-    "Velocity": "53.4",
-    "xHorzBrk": "8.2",
-    "xIndVrtBrk": "18.7"
-   }
-  },
-  "815920_054_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Henry, Payton",
-    "Count": "0-1",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "3.9842",
-    "HAA": "2.206",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "6.0",
-    "IndVertBrk": "19.0",
-    "LaunchAngle": "",
-    "OTilt": "12:35",
-    "Outs": "1",
-    "Pitcher": "Short, Zack",
-    "PlateX": "1.2829",
-    "PlateZ": "2.7026",
-    "RTilt": "12:51",
-    "RelPosX": "-1.0516",
-    "RelPosZ": "6.7754",
-    "Spin Rate": "1451",
-    "SzBot": "1.646",
-    "SzTop": "3.261",
-    "Throws": "R",
-    "VAA": "-9.750",
-    "Velocity": "60.4",
-    "xHorzBrk": "6.2",
-    "xIndVrtBrk": "19.5"
-   }
-  },
-  "815920_054_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Henry, Payton",
-    "Count": "1-1",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.0992",
-    "HAA": "-0.091",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "11.4",
-    "IndVertBrk": "18.4",
-    "LaunchAngle": "",
-    "OTilt": "1:03",
-    "Outs": "1",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.5986",
-    "PlateZ": "4.3336",
-    "RTilt": "1:24",
-    "RelPosX": "-1.4244",
-    "RelPosZ": "6.7799",
-    "Spin Rate": "1459",
-    "SzBot": "1.646",
-    "SzTop": "3.261",
-    "Throws": "R",
-    "VAA": "-8.766",
-    "Velocity": "58.4",
-    "xHorzBrk": "11.7",
-    "xIndVrtBrk": "18.9"
-   }
-  },
-  "815920_054_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Henry, Payton",
-    "Count": "2-1",
-    "Description": "Swinging Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "3.9360",
-    "HAA": "0.334",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "11.4",
-    "IndVertBrk": "20.9",
-    "LaunchAngle": "",
-    "OTilt": "12:57",
-    "Outs": "1",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.0233",
-    "PlateZ": "3.5843",
-    "RTilt": "1:01",
-    "RelPosX": "-1.2140",
-    "RelPosZ": "7.0815",
-    "Spin Rate": "1411",
-    "SzBot": "1.646",
-    "SzTop": "3.261",
-    "Throws": "R",
-    "VAA": "-10.547",
-    "Velocity": "55.4",
-    "xHorzBrk": "11.7",
-    "xIndVrtBrk": "21.4"
-   }
-  },
-  "815920_054_05": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Henry, Payton",
-    "Count": "2-2",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.3308",
-    "HAA": "2.120",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "7.9",
-    "IndVertBrk": "18.1",
-    "LaunchAngle": "",
-    "OTilt": "12:47",
-    "Outs": "1",
-    "Pitcher": "Short, Zack",
-    "PlateX": "1.5109",
-    "PlateZ": "1.7946",
-    "RTilt": "1:00",
-    "RelPosX": "-0.8977",
-    "RelPosZ": "6.4637",
-    "Spin Rate": "1660",
-    "SzBot": "1.646",
-    "SzTop": "3.261",
-    "Throws": "R",
-    "VAA": "-9.321",
-    "Velocity": "66.8",
-    "xHorzBrk": "8.1",
-    "xIndVrtBrk": "18.6"
-   }
-  },
-  "815920_054_06": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "ground_ball",
-    "Bats": "R",
-    "Batter": "Henry, Payton",
-    "Count": "3-2",
-    "Description": "In Play",
-    "Distance": "57",
-    "Event": "Grounded Into DP",
-    "ExitVelo": "90.3",
-    "Extension": "4.1487",
-    "HAA": "0.917",
-    "HC_X": "111.07",
-    "HC_Y": "157.60",
-    "HorzBrk": "8.4",
-    "IndVertBrk": "19.7",
-    "LaunchAngle": "2",
-    "OTilt": "12:46",
-    "Outs": "1",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.4103",
-    "PlateZ": "2.5834",
-    "RTilt": "12:08",
-    "RelPosX": "-1.0296",
-    "RelPosZ": "6.8249",
-    "Spin Rate": "2980",
-    "SzBot": "1.646",
-    "SzTop": "3.261",
-    "Throws": "R",
-    "VAA": "-10.350",
-    "Velocity": "59.5",
-    "xHorzBrk": "8.6",
-    "xIndVrtBrk": "20.2"
-   }
-  },
-  "815920_058_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Shewmake, Braden",
-    "Count": "0-0",
-    "Description": "Swinging Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.0478",
-    "HAA": "-0.492",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "21.5",
-    "IndVertBrk": "9.4",
-    "LaunchAngle": "",
-    "OTilt": "2:12",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.0633",
-    "PlateZ": "1.7854",
-    "RTilt": "1:08",
-    "RelPosX": "-1.2311",
-    "RelPosZ": "6.3946",
-    "Spin Rate": "1567",
-    "SzBot": "1.693",
-    "SzTop": "3.355",
-    "Throws": "R",
-    "VAA": "-10.856",
-    "Velocity": "63.7",
-    "xHorzBrk": "22.0",
-    "xIndVrtBrk": "9.6"
-   }
-  },
-  "815920_058_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Shewmake, Braden",
-    "Count": "0-1",
-    "Description": "Hit By Pitch",
-    "Distance": "",
-    "Event": "Hit By Pitch",
-    "ExitVelo": "",
-    "Extension": "4.0806",
-    "HAA": "2.539",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "11.2",
-    "IndVertBrk": "15.5",
-    "LaunchAngle": "",
-    "OTilt": "1:11",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "1.9994",
-    "PlateZ": "3.8442",
-    "RTilt": "1:03",
-    "RelPosX": "-1.0291",
-    "RelPosZ": "6.5305",
-    "Spin Rate": "1739",
-    "SzBot": "1.693",
-    "SzTop": "3.355",
-    "Throws": "R",
-    "VAA": "-7.275",
-    "Velocity": "67.6",
-    "xHorzBrk": "11.5",
-    "xIndVrtBrk": "15.9"
-   }
-  },
-  "815920_059_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "fly_ball",
-    "Bats": "R",
-    "Batter": "Ornelas, Jonathan",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "415",
-    "Event": "Home Run",
-    "ExitVelo": "98.3",
-    "Extension": "3.6556",
-    "HAA": "0.401",
-    "HC_X": "58.42",
-    "HC_Y": "44.93",
-    "HorzBrk": "4.3",
-    "IndVertBrk": "18.6",
-    "LaunchAngle": "28",
-    "OTilt": "12:26",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.4802",
-    "PlateZ": "2.5647",
-    "RTilt": "12:54",
-    "RelPosX": "-1.1664",
-    "RelPosZ": "7.0376",
-    "Spin Rate": "1446",
-    "SzBot": "1.632",
-    "SzTop": "3.233",
-    "Throws": "R",
-    "VAA": "-11.398",
-    "Velocity": "56.7",
-    "xHorzBrk": "4.4",
-    "xIndVrtBrk": "19.1"
-   }
-  },
-  "815920_060_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Dom\u00ednguez, Jasson",
-    "Count": "0-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "3.6738",
-    "HAA": "0.392",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "3.6",
-    "IndVertBrk": "29.9",
-    "LaunchAngle": "",
-    "OTilt": "12:13",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.4465",
-    "PlateZ": "2.9125",
-    "RTilt": "1:00",
-    "RelPosX": "-1.0761",
-    "RelPosZ": "7.2745",
-    "Spin Rate": "1287",
-    "SzBot": "1.556",
-    "SzTop": "3.083",
-    "Throws": "R",
-    "VAA": "-12.664",
-    "Velocity": "51.1",
-    "xHorzBrk": "3.7",
-    "xIndVrtBrk": "30.7"
-   }
-  },
-  "815920_060_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Dom\u00ednguez, Jasson",
-    "Count": "0-1",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.0941",
-    "HAA": "0.121",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "17.2",
-    "IndVertBrk": "19.8",
-    "LaunchAngle": "",
-    "OTilt": "1:21",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.4694",
-    "PlateZ": "3.6151",
-    "RTilt": "12:51",
-    "RelPosX": "-1.0101",
-    "RelPosZ": "6.8463",
-    "Spin Rate": "1420",
-    "SzBot": "1.556",
-    "SzTop": "3.083",
-    "Throws": "R",
-    "VAA": "-9.073",
-    "Velocity": "60.6",
-    "xHorzBrk": "17.6",
-    "xIndVrtBrk": "20.3"
-   }
-  },
-  "815920_060_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Dom\u00ednguez, Jasson",
-    "Count": "0-2",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.1955",
-    "HAA": "-0.815",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "21.1",
-    "IndVertBrk": "10.9",
-    "LaunchAngle": "",
-    "OTilt": "2:05",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.1086",
-    "PlateZ": "2.2994",
-    "RTilt": "12:54",
-    "RelPosX": "-1.0890",
-    "RelPosZ": "6.6742",
-    "Spin Rate": "1507",
-    "SzBot": "1.556",
-    "SzTop": "3.083",
-    "Throws": "R",
-    "VAA": "-10.900",
-    "Velocity": "61.1",
-    "xHorzBrk": "21.6",
-    "xIndVrtBrk": "11.2"
-   }
-  },
-  "815920_060_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Dom\u00ednguez, Jasson",
-    "Count": "0-2",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.2534",
-    "HAA": "-0.679",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "20.8",
-    "IndVertBrk": "21.1",
-    "LaunchAngle": "",
-    "OTilt": "1:29",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.0668",
-    "PlateZ": "3.0909",
-    "RTilt": "12:58",
-    "RelPosX": "-1.0117",
-    "RelPosZ": "6.5918",
-    "Spin Rate": "1574",
-    "SzBot": "1.556",
-    "SzTop": "3.083",
-    "Throws": "R",
-    "VAA": "-8.437",
-    "Velocity": "64.3",
-    "xHorzBrk": "21.3",
-    "xIndVrtBrk": "21.6"
-   }
-  },
-  "815920_060_05": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Dom\u00ednguez, Jasson",
-    "Count": "0-2",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.2231",
-    "HAA": "-0.177",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "13.0",
-    "IndVertBrk": "15.7",
-    "LaunchAngle": "",
-    "OTilt": "1:19",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.2664",
-    "PlateZ": "0.8522",
-    "RTilt": "1:35",
-    "RelPosX": "-1.1191",
-    "RelPosZ": "6.4081",
-    "Spin Rate": "1215",
-    "SzBot": "1.556",
-    "SzTop": "3.083",
-    "Throws": "R",
-    "VAA": "-11.438",
-    "Velocity": "61.8",
-    "xHorzBrk": "13.3",
-    "xIndVrtBrk": "16.1"
-   }
-  },
-  "815920_060_06": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Dom\u00ednguez, Jasson",
-    "Count": "1-2",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.2032",
-    "HAA": "-0.183",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "20.9",
-    "IndVertBrk": "12.6",
-    "LaunchAngle": "",
-    "OTilt": "1:57",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.5086",
-    "PlateZ": "3.8937",
-    "RTilt": "12:46",
-    "RelPosX": "-0.9930",
-    "RelPosZ": "6.8130",
-    "Spin Rate": "1566",
-    "SzBot": "1.556",
-    "SzTop": "3.083",
-    "Throws": "R",
-    "VAA": "-8.509",
-    "Velocity": "64.2",
-    "xHorzBrk": "21.4",
-    "xIndVrtBrk": "12.9"
-   }
-  },
-  "815920_060_07": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "line_drive",
-    "Bats": "R",
-    "Batter": "Dom\u00ednguez, Jasson",
-    "Count": "2-2",
-    "Description": "In Play",
-    "Distance": "255",
-    "Event": "Double",
-    "ExitVelo": "85.4",
-    "Extension": "4.3035",
-    "HAA": "0.093",
-    "HC_X": "207.46",
-    "HC_Y": "119.86",
-    "HorzBrk": "19.3",
-    "IndVertBrk": "12.4",
-    "LaunchAngle": "23",
-    "OTilt": "1:54",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.6606",
-    "PlateZ": "2.4874",
-    "RTilt": "1:01",
-    "RelPosX": "-0.9495",
-    "RelPosZ": "6.5772",
-    "Spin Rate": "1614",
-    "SzBot": "1.556",
-    "SzTop": "3.083",
-    "Throws": "R",
-    "VAA": "-9.662",
-    "Velocity": "65.2",
-    "xHorzBrk": "19.8",
-    "xIndVrtBrk": "12.7"
-   }
-  },
-  "815920_061_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Schuemann, Max",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.0043",
-    "HAA": "-2.413",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "28.4",
-    "IndVertBrk": "23.2",
-    "LaunchAngle": "",
-    "OTilt": "1:41",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.5289",
-    "PlateZ": "4.2604",
-    "RTilt": "12:46",
-    "RelPosX": "-0.8186",
-    "RelPosZ": "6.8838",
-    "Spin Rate": "1507",
-    "SzBot": "1.612",
-    "SzTop": "3.195",
-    "Throws": "R",
-    "VAA": "-8.569",
-    "Velocity": "59.8",
-    "xHorzBrk": "29.1",
-    "xIndVrtBrk": "23.8"
-   }
-  },
-  "815920_061_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Schuemann, Max",
-    "Count": "1-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.2453",
-    "HAA": "1.416",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "17.9",
-    "IndVertBrk": "19.7",
-    "LaunchAngle": "",
-    "OTilt": "1:24",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "1.7597",
-    "PlateZ": "1.1664",
-    "RTilt": "12:51",
-    "RelPosX": "-0.8703",
-    "RelPosZ": "6.5047",
-    "Spin Rate": "1558",
-    "SzBot": "1.612",
-    "SzTop": "3.195",
-    "Throws": "R",
-    "VAA": "-11.367",
-    "Velocity": "61.1",
-    "xHorzBrk": "18.4",
-    "xIndVrtBrk": "20.2"
-   }
-  },
-  "815920_061_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Schuemann, Max",
-    "Count": "2-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.1191",
-    "HAA": "0.191",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "6.1",
-    "IndVertBrk": "16.8",
-    "LaunchAngle": "",
-    "OTilt": "12:39",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.4987",
-    "PlateZ": "4.2416",
-    "RTilt": "12:58",
-    "RelPosX": "-1.1394",
-    "RelPosZ": "7.0610",
-    "Spin Rate": "1421",
-    "SzBot": "1.612",
-    "SzTop": "3.195",
-    "Throws": "R",
-    "VAA": "-8.905",
-    "Velocity": "58.8",
-    "xHorzBrk": "6.3",
-    "xIndVrtBrk": "17.2"
-   }
-  },
-  "815920_061_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Schuemann, Max",
-    "Count": "3-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "3.9881",
-    "HAA": "0.432",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "11.6",
-    "IndVertBrk": "20.8",
-    "LaunchAngle": "",
-    "OTilt": "12:58",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.3720",
-    "PlateZ": "2.9040",
-    "RTilt": "12:49",
-    "RelPosX": "-0.9083",
-    "RelPosZ": "6.8123",
-    "Spin Rate": "1524",
-    "SzBot": "1.612",
-    "SzTop": "3.195",
-    "Throws": "R",
-    "VAA": "-9.296",
-    "Velocity": "61.4",
-    "xHorzBrk": "11.9",
-    "xIndVrtBrk": "21.3"
-   }
-  },
-  "815920_061_05": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Schuemann, Max",
-    "Count": "3-1",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.0452",
-    "HAA": "-0.910",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "20.4",
-    "IndVertBrk": "28.9",
-    "LaunchAngle": "",
-    "OTilt": "1:10",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.0521",
-    "PlateZ": "2.5312",
-    "RTilt": "12:56",
-    "RelPosX": "-0.8616",
-    "RelPosZ": "6.6513",
-    "Spin Rate": "1533",
-    "SzBot": "1.612",
-    "SzTop": "3.195",
-    "Throws": "R",
-    "VAA": "-9.106",
-    "Velocity": "62.7",
-    "xHorzBrk": "20.9",
-    "xIndVrtBrk": "29.6"
-   }
-  },
-  "815920_061_06": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Schuemann, Max",
-    "Count": "3-2",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.2377",
-    "HAA": "-0.660",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "13.1",
-    "IndVertBrk": "20.2",
-    "LaunchAngle": "",
-    "OTilt": "1:05",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.4976",
-    "PlateZ": "3.7522",
-    "RTilt": "12:44",
-    "RelPosX": "-0.9828",
-    "RelPosZ": "6.8336",
-    "Spin Rate": "1540",
-    "SzBot": "1.612",
-    "SzTop": "3.195",
-    "Throws": "R",
-    "VAA": "-8.104",
-    "Velocity": "63.9",
-    "xHorzBrk": "13.4",
-    "xIndVrtBrk": "20.7"
-   }
-  },
-  "815920_061_07": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Schuemann, Max",
-    "Count": "3-2",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "Walk",
-    "ExitVelo": "",
-    "Extension": "4.1008",
-    "HAA": "1.097",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "3.5",
-    "IndVertBrk": "20.0",
-    "LaunchAngle": "",
-    "OTilt": "12:19",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.2116",
-    "PlateZ": "4.5993",
-    "RTilt": "12:54",
-    "RelPosX": "-0.9881",
-    "RelPosZ": "6.9065",
-    "Spin Rate": "1504",
-    "SzBot": "1.612",
-    "SzTop": "3.195",
-    "Throws": "R",
-    "VAA": "-7.156",
-    "Velocity": "63.5",
-    "xHorzBrk": "3.6",
-    "xIndVrtBrk": "20.5"
-   }
-  },
-  "815920_062_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "line_drive",
-    "Bats": "L",
-    "Batter": "Jones, Spencer",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "381",
-    "Event": "Double",
-    "ExitVelo": "108.2",
-    "Extension": "4.0402",
-    "HAA": "0.183",
-    "HC_X": "92.98",
-    "HC_Y": "48.88",
-    "HorzBrk": "11.3",
-    "IndVertBrk": "15.8",
-    "LaunchAngle": "19",
-    "OTilt": "1:11",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.2067",
-    "PlateZ": "1.9890",
-    "RTilt": "1:03",
-    "RelPosX": "-1.2246",
-    "RelPosZ": "6.6260",
-    "Spin Rate": "1428",
-    "SzBot": "1.766",
-    "SzTop": "3.500",
-    "Throws": "R",
-    "VAA": "-10.772",
-    "Velocity": "59.2",
-    "xHorzBrk": "11.6",
-    "xIndVrtBrk": "16.2"
-   }
-  },
-  "815920_063_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Fern\u00e1ndez, Yanquiel",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.0740",
-    "HAA": "0.140",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "8.2",
-    "IndVertBrk": "13.1",
-    "LaunchAngle": "",
-    "OTilt": "1:04",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.8090",
-    "PlateZ": "4.4005",
-    "RTilt": "1:00",
-    "RelPosX": "-1.5584",
-    "RelPosZ": "6.7554",
-    "Spin Rate": "1616",
-    "SzBot": "1.668",
-    "SzTop": "3.305",
-    "Throws": "R",
-    "VAA": "-7.553",
-    "Velocity": "64.1",
-    "xHorzBrk": "8.4",
-    "xIndVrtBrk": "13.4"
-   }
-  },
-  "815920_063_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Fern\u00e1ndez, Yanquiel",
-    "Count": "1-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.1348",
-    "HAA": "0.495",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "10.2",
-    "IndVertBrk": "17.8",
-    "LaunchAngle": "",
-    "OTilt": "12:59",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.2003",
-    "PlateZ": "1.5653",
-    "RTilt": "1:10",
-    "RelPosX": "-1.4284",
-    "RelPosZ": "6.4269",
-    "Spin Rate": "1625",
-    "SzBot": "1.668",
-    "SzTop": "3.305",
-    "Throws": "R",
-    "VAA": "-10.320",
-    "Velocity": "63.7",
-    "xHorzBrk": "10.5",
-    "xIndVrtBrk": "18.3"
-   }
-  },
-  "815920_063_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Fern\u00e1ndez, Yanquiel",
-    "Count": "2-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.1056",
-    "HAA": "1.004",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "10.9",
-    "IndVertBrk": "17.5",
-    "LaunchAngle": "",
-    "OTilt": "1:03",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.4772",
-    "PlateZ": "2.1102",
-    "RTilt": "1:14",
-    "RelPosX": "-1.2244",
-    "RelPosZ": "6.4997",
-    "Spin Rate": "1619",
-    "SzBot": "1.668",
-    "SzTop": "3.305",
-    "Throws": "R",
-    "VAA": "-9.616",
-    "Velocity": "63.8",
-    "xHorzBrk": "11.2",
-    "xIndVrtBrk": "17.9"
-   }
-  },
-  "815920_063_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "line_drive",
-    "Bats": "L",
-    "Batter": "Fern\u00e1ndez, Yanquiel",
-    "Count": "2-1",
-    "Description": "In Play",
-    "Distance": "406",
-    "Event": "Home Run",
-    "ExitVelo": "109.5",
-    "Extension": "3.9794",
-    "HAA": "1.407",
-    "HC_X": "223.39",
-    "HC_Y": "65.88",
-    "HorzBrk": "6.4",
-    "IndVertBrk": "21.1",
-    "LaunchAngle": "21",
-    "OTilt": "12:33",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "0.3060",
-    "PlateZ": "2.5554",
-    "RTilt": "1:03",
-    "RelPosX": "-1.3875",
-    "RelPosZ": "6.5519",
-    "Spin Rate": "1551",
-    "SzBot": "1.668",
-    "SzTop": "3.305",
-    "Throws": "R",
-    "VAA": "-8.934",
-    "Velocity": "63.6",
-    "xHorzBrk": "6.6",
-    "xIndVrtBrk": "21.6"
-   }
-  },
-  "815920_064_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Brown, Seth",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "3.7887",
-    "HAA": "-0.768",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "12.7",
-    "IndVertBrk": "17.6",
-    "LaunchAngle": "",
-    "OTilt": "1:11",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-1.1550",
-    "PlateZ": "4.0280",
-    "RTilt": "1:19",
-    "RelPosX": "-1.4965",
-    "RelPosZ": "7.2971",
-    "Spin Rate": "1198",
-    "SzBot": "1.650",
-    "SzTop": "3.269",
-    "Throws": "R",
-    "VAA": "-12.042",
-    "Velocity": "50.4",
-    "xHorzBrk": "13.0",
-    "xIndVrtBrk": "18.0"
-   }
-  },
-  "815920_064_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "fly_ball",
-    "Bats": "L",
-    "Batter": "Brown, Seth",
-    "Count": "1-0",
-    "Description": "In Play",
-    "Distance": "318",
-    "Event": "Flyout",
-    "ExitVelo": "87.5",
-    "Extension": "3.7892",
-    "HAA": "-0.033",
-    "HC_X": "108.09",
-    "HC_Y": "72.87",
-    "HorzBrk": "8.9",
-    "IndVertBrk": "23.6",
-    "LaunchAngle": "44",
-    "OTilt": "12:41",
-    "Outs": "0",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.8239",
-    "PlateZ": "3.2688",
-    "RTilt": "1:17",
-    "RelPosX": "-1.4983",
-    "RelPosZ": "7.1787",
-    "Spin Rate": "1263",
-    "SzBot": "1.650",
-    "SzTop": "3.269",
-    "Throws": "R",
-    "VAA": "-12.189",
-    "Velocity": "50.7",
-    "xHorzBrk": "9.1",
-    "xIndVrtBrk": "24.2"
-   }
-  },
-  "815920_065_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "ground_ball",
-    "Bats": "L",
-    "Batter": "Martinez Jr., Ernesto",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "18",
-    "Event": "Groundout",
-    "ExitVelo": "95.5",
-    "Extension": "3.9032",
-    "HAA": "-1.530",
-    "HC_X": "144.37",
-    "HC_Y": "158.81",
-    "HorzBrk": "19.2",
-    "IndVertBrk": "26.9",
-    "LaunchAngle": "-10",
-    "OTilt": "1:11",
-    "Outs": "1",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-1.0430",
-    "PlateZ": "3.0573",
-    "RTilt": "1:14",
-    "RelPosX": "-1.3009",
-    "RelPosZ": "7.2479",
-    "Spin Rate": "1236",
-    "SzBot": "1.754",
-    "SzTop": "3.476",
-    "Throws": "R",
-    "VAA": "-13.015",
-    "Velocity": "49.9",
-    "xHorzBrk": "19.7",
-    "xIndVrtBrk": "27.6"
-   }
-  },
-  "815920_066_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "fly_ball",
-    "Bats": "R",
-    "Batter": "Henry, Payton",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "334",
-    "Event": "Flyout",
-    "ExitVelo": "88.9",
-    "Extension": "3.7001",
-    "HAA": "0.754",
-    "HC_X": "151.55",
-    "HC_Y": "67.17",
-    "HorzBrk": "2.6",
-    "IndVertBrk": "21.0",
-    "LaunchAngle": "37",
-    "OTilt": "12:14",
-    "Outs": "2",
-    "Pitcher": "Short, Zack",
-    "PlateX": "-0.1162",
-    "PlateZ": "2.6983",
-    "RTilt": "12:58",
-    "RelPosX": "-0.9654",
-    "RelPosZ": "7.8388",
-    "Spin Rate": "1115",
-    "SzBot": "1.646",
-    "SzTop": "3.261",
-    "Throws": "R",
-    "VAA": "-17.325",
-    "Velocity": "43.3",
-    "xHorzBrk": "2.7",
-    "xIndVrtBrk": "21.5"
-   }
-  },
-  "815926_071_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Martinez Jr., Ernesto",
-    "Count": "0-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7511",
-    "HAA": "0.517",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "9.2",
-    "IndVertBrk": "22.0",
-    "LaunchAngle": "",
-    "OTilt": "12:45",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.5172",
-    "PlateZ": "3.2566",
-    "RTilt": "1:01",
-    "RelPosX": "-1.6943",
-    "RelPosZ": "6.5350",
-    "Spin Rate": "1513",
-    "SzBot": "1.754",
-    "SzTop": "3.476",
-    "Throws": "R",
-    "VAA": "-8.689",
-    "Velocity": "61.3",
-    "xHorzBrk": "8.9",
-    "xIndVrtBrk": "21.2"
-   }
-  },
-  "815926_071_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "line_drive",
-    "Bats": "L",
-    "Batter": "Martinez Jr., Ernesto",
-    "Count": "0-1",
-    "Description": "In Play",
-    "Distance": "188",
-    "Event": "Single",
-    "ExitVelo": "108.9",
-    "Extension": "5.0067",
-    "HAA": "0.633",
-    "HC_X": "166.53",
-    "HC_Y": "96.49",
-    "HorzBrk": "12.6",
-    "IndVertBrk": "20.8",
-    "LaunchAngle": "11",
-    "OTilt": "1:02",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.0876",
-    "PlateZ": "3.8369",
-    "RTilt": "1:03",
-    "RelPosX": "-1.6224",
-    "RelPosZ": "6.4235",
-    "Spin Rate": "1546",
-    "SzBot": "1.754",
-    "SzTop": "3.476",
-    "Throws": "R",
-    "VAA": "-7.711",
-    "Velocity": "62.5",
-    "xHorzBrk": "12.2",
-    "xIndVrtBrk": "20.1"
-   }
-  },
-  "815926_072_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "fly_ball",
-    "Bats": "R",
-    "Batter": "S\u00e1nchez, Ali",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "362",
-    "Event": "Home Run",
-    "ExitVelo": "103.2",
-    "Extension": "4.7058",
-    "HAA": "0.403",
-    "HC_X": "25.01",
-    "HC_Y": "91.88",
-    "HorzBrk": "9.6",
-    "IndVertBrk": "26.2",
-    "LaunchAngle": "31",
-    "OTilt": "12:40",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.3787",
-    "PlateZ": "3.4763",
-    "RTilt": "12:51",
-    "RelPosX": "-1.4889",
-    "RelPosZ": "6.7450",
-    "Spin Rate": "1458",
-    "SzBot": "1.612",
-    "SzTop": "3.195",
-    "Throws": "R",
-    "VAA": "-9.717",
-    "Velocity": "56.1",
-    "xHorzBrk": "9.3",
-    "xIndVrtBrk": "25.3"
-   }
-  },
-  "815926_073_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Shewmake, Braden",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.4036",
-    "HAA": "0.352",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "3.6",
-    "IndVertBrk": "22.3",
-    "LaunchAngle": "",
-    "OTilt": "12:18",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.1089",
-    "PlateZ": "2.6876",
-    "RTilt": "12:42",
-    "RelPosX": "-1.6877",
-    "RelPosZ": "7.3760",
-    "Spin Rate": "1132",
-    "SzBot": "1.693",
-    "SzTop": "3.355",
-    "Throws": "R",
-    "VAA": "-14.892",
-    "Velocity": "46.2",
-    "xHorzBrk": "3.5",
-    "xIndVrtBrk": "21.5"
-   }
-  },
-  "815926_073_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "ground_ball",
-    "Bats": "L",
-    "Batter": "Shewmake, Braden",
-    "Count": "1-0",
-    "Description": "In Play",
-    "Distance": "136",
-    "Event": "Single",
-    "ExitVelo": "87.4",
-    "Extension": "4.7118",
-    "HAA": "0.023",
-    "HC_X": "63.35",
-    "HC_Y": "122.47",
-    "HorzBrk": "5.5",
-    "IndVertBrk": "22.3",
-    "LaunchAngle": "9",
-    "OTilt": "12:27",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.3933",
-    "PlateZ": "3.4269",
-    "RTilt": "12:56",
-    "RelPosX": "-1.8467",
-    "RelPosZ": "7.0980",
-    "Spin Rate": "1211",
-    "SzBot": "1.693",
-    "SzTop": "3.355",
-    "Throws": "R",
-    "VAA": "-12.279",
-    "Velocity": "49.8",
-    "xHorzBrk": "5.3",
-    "xIndVrtBrk": "21.5"
-   }
-  },
-  "815926_074_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Ornelas, Jonathan",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7205",
-    "HAA": "4.852",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "0.7",
-    "IndVertBrk": "5.2",
-    "LaunchAngle": "",
-    "OTilt": "12:15",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "3.0209",
-    "PlateZ": "1.1681",
-    "RTilt": "9:01",
-    "RelPosX": "-1.1635",
-    "RelPosZ": "6.7244",
-    "Spin Rate": "104",
-    "SzBot": "1.632",
-    "SzTop": "3.233",
-    "Throws": "R",
-    "VAA": "-16.940",
-    "Velocity": "49.2",
-    "xHorzBrk": "0.7",
-    "xIndVrtBrk": "5.0"
-   }
-  },
-  "815926_074_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Ornelas, Jonathan",
-    "Count": "1-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7543",
-    "HAA": "-0.446",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "6.6",
-    "IndVertBrk": "23.0",
-    "LaunchAngle": "",
-    "OTilt": "12:32",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.6320",
-    "PlateZ": "2.5918",
-    "RTilt": "1:01",
-    "RelPosX": "-1.7830",
-    "RelPosZ": "6.6581",
-    "Spin Rate": "1364",
-    "SzBot": "1.632",
-    "SzTop": "3.233",
-    "Throws": "R",
-    "VAA": "-11.167",
-    "Velocity": "54.8",
-    "xHorzBrk": "6.4",
-    "xIndVrtBrk": "22.2"
-   }
-  },
-  "815926_074_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Ornelas, Jonathan",
-    "Count": "2-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "5.0390",
-    "HAA": "1.027",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "9.8",
-    "IndVertBrk": "20.9",
-    "LaunchAngle": "",
-    "OTilt": "12:50",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.1727",
-    "PlateZ": "2.3937",
-    "RTilt": "12:46",
-    "RelPosX": "-1.4710",
-    "RelPosZ": "6.5002",
-    "Spin Rate": "1464",
-    "SzBot": "1.632",
-    "SzTop": "3.233",
-    "Throws": "R",
-    "VAA": "-10.121",
-    "Velocity": "58.9",
-    "xHorzBrk": "9.5",
-    "xIndVrtBrk": "20.2"
-   }
-  },
-  "815926_074_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Ornelas, Jonathan",
-    "Count": "2-1",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "5.0882",
-    "HAA": "0.121",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "10.1",
-    "IndVertBrk": "20.8",
-    "LaunchAngle": "",
-    "OTilt": "12:51",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.5161",
-    "PlateZ": "0.9333",
-    "RTilt": "12:40",
-    "RelPosX": "-1.4113",
-    "RelPosZ": "6.4172",
-    "Spin Rate": "1398",
-    "SzBot": "1.632",
-    "SzTop": "3.233",
-    "Throws": "R",
-    "VAA": "-12.271",
-    "Velocity": "56.7",
-    "xHorzBrk": "9.7",
-    "xIndVrtBrk": "20.1"
-   }
-  },
-  "815926_074_05": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Ornelas, Jonathan",
-    "Count": "3-1",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "5.0235",
-    "HAA": "0.312",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "9.5",
-    "IndVertBrk": "23.9",
-    "LaunchAngle": "",
-    "OTilt": "12:43",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.5247",
-    "PlateZ": "2.8788",
-    "RTilt": "12:47",
-    "RelPosX": "-1.5429",
-    "RelPosZ": "6.4099",
-    "Spin Rate": "1687",
-    "SzBot": "1.632",
-    "SzTop": "3.233",
-    "Throws": "R",
-    "VAA": "-7.881",
-    "Velocity": "65.7",
-    "xHorzBrk": "9.2",
-    "xIndVrtBrk": "23.1"
-   }
-  },
-  "815926_074_06": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Ornelas, Jonathan",
-    "Count": "3-2",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7967",
-    "HAA": "-0.319",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "8.6",
-    "IndVertBrk": "18.5",
-    "LaunchAngle": "",
-    "OTilt": "12:49",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.2163",
-    "PlateZ": "3.9574",
-    "RTilt": "12:47",
-    "RelPosX": "-1.6211",
-    "RelPosZ": "6.4242",
-    "Spin Rate": "1766",
-    "SzBot": "1.632",
-    "SzTop": "3.233",
-    "Throws": "R",
-    "VAA": "-6.248",
-    "Velocity": "70.6",
-    "xHorzBrk": "8.3",
-    "xIndVrtBrk": "17.9"
-   }
-  },
-  "815926_074_07": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Ornelas, Jonathan",
-    "Count": "3-2",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "Walk",
-    "ExitVelo": "",
-    "Extension": "4.7186",
-    "HAA": "1.532",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "3.0",
-    "IndVertBrk": "20.5",
-    "LaunchAngle": "",
-    "OTilt": "12:16",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.0411",
-    "PlateZ": "4.9060",
-    "RTilt": "12:46",
-    "RelPosX": "-1.5752",
-    "RelPosZ": "7.0019",
-    "Spin Rate": "1247",
-    "SzBot": "1.632",
-    "SzTop": "3.233",
-    "Throws": "R",
-    "VAA": "-9.611",
-    "Velocity": "53.2",
-    "xHorzBrk": "2.9",
-    "xIndVrtBrk": "19.8"
-   }
-  },
-  "815926_075_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Dom\u00ednguez, Jasson",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7858",
-    "HAA": "-1.046",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "7.6",
-    "IndVertBrk": "21.1",
-    "LaunchAngle": "",
-    "OTilt": "12:39",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-2.1211",
-    "PlateZ": "3.8669",
-    "RTilt": "12:47",
-    "RelPosX": "-1.8296",
-    "RelPosZ": "6.7783",
-    "Spin Rate": "1395",
-    "SzBot": "1.556",
-    "SzTop": "3.083",
-    "Throws": "R",
-    "VAA": "-8.925",
-    "Velocity": "58.1",
-    "xHorzBrk": "7.3",
-    "xIndVrtBrk": "20.4"
-   }
-  },
-  "815926_075_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "line_drive",
-    "Bats": "R",
-    "Batter": "Dom\u00ednguez, Jasson",
-    "Count": "1-0",
-    "Description": "In Play",
-    "Distance": "323",
-    "Event": "Single",
-    "ExitVelo": "104.9",
-    "Extension": "4.8478",
-    "HAA": "1.863",
-    "HC_X": "149.69",
-    "HC_Y": "71.80",
-    "HorzBrk": "6.8",
-    "IndVertBrk": "19.3",
-    "LaunchAngle": "16",
-    "OTilt": "12:38",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.8756",
-    "PlateZ": "3.0938",
-    "RTilt": "12:38",
-    "RelPosX": "-1.2353",
-    "RelPosZ": "6.6723",
-    "Spin Rate": "1502",
-    "SzBot": "1.556",
-    "SzTop": "3.083",
-    "Throws": "R",
-    "VAA": "-9.091",
-    "Velocity": "61.0",
-    "xHorzBrk": "6.6",
-    "xIndVrtBrk": "18.6"
-   }
-  },
-  "815926_076_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "R",
-    "Batter": "Cabrera, Oswaldo",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7811",
-    "HAA": "-1.029",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "8.6",
-    "IndVertBrk": "21.6",
-    "LaunchAngle": "",
-    "OTilt": "12:43",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.8397",
-    "PlateZ": "3.0897",
-    "RTilt": "12:58",
-    "RelPosX": "-1.6473",
-    "RelPosZ": "6.4651",
-    "Spin Rate": "1557",
-    "SzBot": "1.618",
-    "SzTop": "3.206",
-    "Throws": "R",
-    "VAA": "-8.409",
-    "Velocity": "62.8",
-    "xHorzBrk": "8.3",
-    "xIndVrtBrk": "20.8"
-   }
-  },
-  "815926_076_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "fly_ball",
-    "Bats": "R",
-    "Batter": "Cabrera, Oswaldo",
-    "Count": "1-0",
-    "Description": "In Play",
-    "Distance": "318",
-    "Event": "Flyout",
-    "ExitVelo": "88.1",
-    "Extension": "4.7191",
-    "HAA": "1.367",
-    "HC_X": "54.29",
-    "HC_Y": "92.69",
-    "HorzBrk": "-0.4",
-    "IndVertBrk": "22.6",
-    "LaunchAngle": "41",
-    "OTilt": "11:57",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.4693",
-    "PlateZ": "3.5885",
-    "RTilt": "12:35",
-    "RelPosX": "-1.5990",
-    "RelPosZ": "7.1677",
-    "Spin Rate": "1258",
-    "SzBot": "1.618",
-    "SzTop": "3.206",
-    "Throws": "R",
-    "VAA": "-11.606",
-    "Velocity": "51.4",
-    "xHorzBrk": "-0.4",
-    "xIndVrtBrk": "21.8"
-   }
-  },
-  "815926_082_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Jones, Spencer",
-    "Count": "0-0",
-    "Description": "Hit By Pitch",
-    "Distance": "",
-    "Event": "Hit By Pitch",
-    "ExitVelo": "",
-    "Extension": "4.3491",
-    "HAA": "4.587",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "3.4",
-    "IndVertBrk": "11.2",
-    "LaunchAngle": "",
-    "OTilt": "12:33",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "3.0050",
-    "PlateZ": "1.3234",
-    "RTilt": "8:07",
-    "RelPosX": "-1.1628",
-    "RelPosZ": "6.9630",
-    "Spin Rate": "167",
-    "SzBot": "1.766",
-    "SzTop": "3.500",
-    "Throws": "R",
-    "VAA": "-17.456",
-    "Velocity": "46.7",
-    "xHorzBrk": "3.3",
-    "xIndVrtBrk": "10.8"
-   }
-  },
-  "815926_083_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Fern\u00e1ndez, Yanquiel",
-    "Count": "0-0",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.2618",
-    "HAA": "1.884",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "2.9",
-    "IndVertBrk": "25.0",
-    "LaunchAngle": "",
-    "OTilt": "12:13",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.4770",
-    "PlateZ": "2.7502",
-    "RTilt": "12:26",
-    "RelPosX": "-1.3448",
-    "RelPosZ": "7.6891",
-    "Spin Rate": "1069",
-    "SzBot": "1.668",
-    "SzTop": "3.305",
-    "Throws": "R",
-    "VAA": "-16.530",
-    "Velocity": "44.0",
-    "xHorzBrk": "2.8",
-    "xIndVrtBrk": "24.1"
-   }
-  },
-  "815926_083_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Fern\u00e1ndez, Yanquiel",
-    "Count": "0-1",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.5816",
-    "HAA": "-1.887",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "14.3",
-    "IndVertBrk": "23.4",
-    "LaunchAngle": "",
-    "OTilt": "1:02",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-2.2926",
-    "PlateZ": "3.4483",
-    "RTilt": "12:56",
-    "RelPosX": "-1.8219",
-    "RelPosZ": "6.6143",
-    "Spin Rate": "1608",
-    "SzBot": "1.668",
-    "SzTop": "3.305",
-    "Throws": "R",
-    "VAA": "-8.236",
-    "Velocity": "61.8",
-    "xHorzBrk": "13.8",
-    "xIndVrtBrk": "22.6"
-   }
-  },
-  "815926_083_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Fern\u00e1ndez, Yanquiel",
-    "Count": "1-1",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.2293",
-    "HAA": "-0.387",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "4.4",
-    "IndVertBrk": "25.6",
-    "LaunchAngle": "",
-    "OTilt": "12:19",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.4860",
-    "PlateZ": "4.1335",
-    "RTilt": "12:42",
-    "RelPosX": "-1.5076",
-    "RelPosZ": "7.9065",
-    "Spin Rate": "1030",
-    "SzBot": "1.668",
-    "SzTop": "3.305",
-    "Throws": "R",
-    "VAA": "-15.853",
-    "Velocity": "42.8",
-    "xHorzBrk": "4.2",
-    "xIndVrtBrk": "24.7"
-   }
-  },
-  "815926_083_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Fern\u00e1ndez, Yanquiel",
-    "Count": "2-1",
-    "Description": "Swinging Strike",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.4256",
-    "HAA": "-1.590",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "10.3",
-    "IndVertBrk": "28.9",
-    "LaunchAngle": "",
-    "OTilt": "12:39",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.9791",
-    "PlateZ": "2.5771",
-    "RTilt": "12:35",
-    "RelPosX": "-1.4609",
-    "RelPosZ": "7.6686",
-    "Spin Rate": "1045",
-    "SzBot": "1.668",
-    "SzTop": "3.305",
-    "Throws": "R",
-    "VAA": "-16.887",
-    "Velocity": "43.4",
-    "xHorzBrk": "9.9",
-    "xIndVrtBrk": "27.9"
-   }
-  },
-  "815926_083_05": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Fern\u00e1ndez, Yanquiel",
-    "Count": "2-2",
-    "Description": "Called Strike",
-    "Distance": "",
-    "Event": "Strikeout",
-    "ExitVelo": "",
-    "Extension": "4.8039",
-    "HAA": "0.276",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "12.4",
-    "IndVertBrk": "23.4",
-    "LaunchAngle": "",
-    "OTilt": "12:55",
-    "Outs": "0",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.2650",
-    "PlateZ": "2.5549",
-    "RTilt": "12:54",
-    "RelPosX": "-1.4821",
-    "RelPosZ": "6.4500",
-    "Spin Rate": "1531",
-    "SzBot": "1.668",
-    "SzTop": "3.305",
-    "Throws": "R",
-    "VAA": "-9.332",
-    "Velocity": "60.9",
-    "xHorzBrk": "12.0",
-    "xIndVrtBrk": "22.6"
-   }
-  },
-  "815926_084_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "line_drive",
-    "Bats": "L",
-    "Batter": "Brown, Seth",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "269",
-    "Event": "Single",
-    "ExitVelo": "98.3",
-    "Extension": "4.5858",
-    "HAA": "-0.076",
-    "HC_X": "66.54",
-    "HC_Y": "109.00",
-    "HorzBrk": "5.6",
-    "IndVertBrk": "22.1",
-    "LaunchAngle": "15",
-    "OTilt": "12:28",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.1158",
-    "PlateZ": "2.8004",
-    "RTilt": "12:40",
-    "RelPosX": "-1.4880",
-    "RelPosZ": "7.3386",
-    "Spin Rate": "1124",
-    "SzBot": "1.650",
-    "SzTop": "3.269",
-    "Throws": "R",
-    "VAA": "-14.847",
-    "Velocity": "46.1",
-    "xHorzBrk": "5.4",
-    "xIndVrtBrk": "21.3"
-   }
-  },
-  "815926_085_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Martinez Jr., Ernesto",
-    "Count": "0-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.1172",
-    "HAA": "-1.299",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "8.0",
-    "IndVertBrk": "27.0",
-    "LaunchAngle": "",
-    "OTilt": "12:33",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-1.9734",
-    "PlateZ": "3.7071",
-    "RTilt": "12:31",
-    "RelPosX": "-1.5180",
-    "RelPosZ": "8.2272",
-    "Spin Rate": "962",
-    "SzBot": "1.754",
-    "SzTop": "3.476",
-    "Throws": "R",
-    "VAA": "-19.610",
-    "Velocity": "39.6",
-    "xHorzBrk": "7.7",
-    "xIndVrtBrk": "26.1"
-   }
-  },
-  "815926_085_02": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Martinez Jr., Ernesto",
-    "Count": "1-0",
-    "Description": "Ball",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.2290",
-    "HAA": "-1.279",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "1.9",
-    "IndVertBrk": "25.0",
-    "LaunchAngle": "",
-    "OTilt": "12:08",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-2.5249",
-    "PlateZ": "3.9611",
-    "RTilt": "12:31",
-    "RelPosX": "-1.5898",
-    "RelPosZ": "8.0632",
-    "Spin Rate": "962",
-    "SzBot": "1.754",
-    "SzTop": "3.476",
-    "Throws": "R",
-    "VAA": "-18.750",
-    "Velocity": "39.8",
-    "xHorzBrk": "1.8",
-    "xIndVrtBrk": "24.1"
-   }
-  },
-  "815926_085_03": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "",
-    "Bats": "L",
-    "Batter": "Martinez Jr., Ernesto",
-    "Count": "2-0",
-    "Description": "Foul",
-    "Distance": "",
-    "Event": "",
-    "ExitVelo": "",
-    "Extension": "4.7277",
-    "HAA": "1.940",
-    "HC_X": "",
-    "HC_Y": "",
-    "HorzBrk": "2.9",
-    "IndVertBrk": "20.3",
-    "LaunchAngle": "",
-    "OTilt": "12:16",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "0.4455",
-    "PlateZ": "3.4594",
-    "RTilt": "12:42",
-    "RelPosX": "-1.4260",
-    "RelPosZ": "6.9946",
-    "Spin Rate": "1387",
-    "SzBot": "1.754",
-    "SzTop": "3.476",
-    "Throws": "R",
-    "VAA": "-10.579",
-    "Velocity": "54.6",
-    "xHorzBrk": "2.8",
-    "xIndVrtBrk": "19.6"
-   }
-  },
-  "815926_085_04": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "fly_ball",
-    "Bats": "L",
-    "Batter": "Martinez Jr., Ernesto",
-    "Count": "2-1",
-    "Description": "In Play",
-    "Distance": "",
-    "Event": "Flyout",
-    "ExitVelo": "92.0",
-    "Extension": "4.3961",
-    "HAA": "2.332",
-    "HC_X": "213.87",
-    "HC_Y": "101.39",
-    "HorzBrk": "3.1",
-    "IndVertBrk": "22.7",
-    "LaunchAngle": "44",
-    "OTilt": "12:15",
-    "Outs": "1",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "1.0457",
-    "PlateZ": "2.6410",
-    "RTilt": "12:15",
-    "RelPosX": "-1.1778",
-    "RelPosZ": "7.7773",
-    "Spin Rate": "1012",
-    "SzBot": "1.754",
-    "SzTop": "3.476",
-    "Throws": "R",
-    "VAA": "-18.025",
-    "Velocity": "42.3",
-    "xHorzBrk": "3.0",
-    "xIndVrtBrk": "21.9"
-   }
-  },
-  "815926_086_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "line_drive",
-    "Bats": "R",
-    "Batter": "S\u00e1nchez, Ali",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "285",
-    "Event": "Single",
-    "ExitVelo": "98.0",
-    "Extension": "4.4274",
-    "HAA": "1.749",
-    "HC_X": "145.33",
-    "HC_Y": "87.16",
-    "HorzBrk": "6.0",
-    "IndVertBrk": "25.1",
-    "LaunchAngle": "21",
-    "OTilt": "12:26",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "1.0413",
-    "PlateZ": "3.0180",
-    "RTilt": "12:31",
-    "RelPosX": "-0.9143",
-    "RelPosZ": "7.6571",
-    "Spin Rate": "1088",
-    "SzBot": "1.612",
-    "SzTop": "3.195",
-    "Throws": "R",
-    "VAA": "-15.917",
-    "Velocity": "44.3",
-    "xHorzBrk": "5.8",
-    "xIndVrtBrk": "24.2"
-   }
-  },
-  "815926_087_01": {
-   "asof": "2026-08-23",
-   "values": {
-    "BBType": "ground_ball",
-    "Bats": "L",
-    "Batter": "Shewmake, Braden",
-    "Count": "0-0",
-    "Description": "In Play",
-    "Distance": "80",
-    "Event": "Forceout",
-    "ExitVelo": "100.7",
-    "Extension": "4.5612",
-    "HAA": "0.428",
-    "HC_X": "140.86",
-    "HC_Y": "157.66",
-    "HorzBrk": "9.1",
-    "IndVertBrk": "24.5",
-    "LaunchAngle": "4",
-    "OTilt": "12:40",
-    "Outs": "2",
-    "Pitcher": "Glasser, Phillip",
-    "PlateX": "-0.2441",
-    "PlateZ": "2.0274",
-    "RTilt": "12:42",
-    "RelPosX": "-1.3433",
-    "RelPosZ": "7.1848",
-    "Spin Rate": "1170",
-    "SzBot": "1.693",
-    "SzTop": "3.355",
-    "Throws": "R",
-    "VAA": "-15.663",
-    "Velocity": "46.5",
-    "xHorzBrk": "8.8",
-    "xIndVrtBrk": "23.6"
-   }
-  }
- },
+ "missing": {},
  "missing_note": "Whole pitches a sweep found absent from the sheet and that were not appended. Suppressed while the feed still gives exactly these FEED_COLS values; raised again, with the changed columns named, when any of them moves.",
  "note": "Values deliberately left out of the sheet. A blank-fill candidate matching one of these exactly is suppressed. Bootstrapped from data/_tracking_pitches.pkl and data/_statcast2026_full.pkl (both 2026-07-06); every run since appends what the review rejected.",
  "updated": "2026-08-23",
