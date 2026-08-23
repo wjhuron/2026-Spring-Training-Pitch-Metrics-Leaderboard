@@ -3245,7 +3245,7 @@ _SCRATCH_POOL_STATS = ['xRunValue', 'xRv100', 'xwOBA', 'kPct', 'bbPct', 'kbbPct'
 
 def _pitching_blend(stuff, loc):
     """Stuff+/Loc+ blend in z units — the trainer's _blend. The weight's
-    single source of truth is pipeline.utils.PITCHING_W_STUFF (0.80); the
+    single source of truth is pipeline.utils.PITCHING_W_STUFF (0.72 as of 2026-08-23); the
     fallback reads it from there rather than hardcoding, so a weight change
     can never silently fork the card blend again."""
     _sv_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root, for stuff_plus package

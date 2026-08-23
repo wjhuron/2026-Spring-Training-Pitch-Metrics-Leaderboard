@@ -28,8 +28,14 @@ DATA_DIR = os.path.join(_SCRIPT_DIR, 'data')
 #
 # Derivation and the flat-region argument: train_stuff.PITCHING_W_STUFF.
 # Re-audited 2026-08-12 under Stuff+ v12 (scripts/research/stuff/pitchingplus_command_loso.py):
-# kept at 0.80.
-PITCHING_W_STUFF = 0.80
+# kept at 0.80. Re-swept 2026-08-23 on the NEXT-SEASON objective under v14
+# (scripts/research/stuff/pitchingplus_nxt_sweep.py, data/_pplus_nxt_sweep.json):
+# luck-neutral argmax 0.70, flat [0.65, 0.76]; actual-RV argmax 0.73, flat
+# [0.67, 0.79]; 0.80 sat outside the flat region (0.70-vs-0.80 won 4/5
+# pairs, mean +0.009, z ~2.2). 0.72 is a CONVENTION inside both flat
+# regions, chosen to match the 2021-25 within-season argmin; any value in
+# [0.67, 0.76] is defensible, 0.80 is not.
+PITCHING_W_STUFF = 0.72
 
 BALL_RADIUS_FT = 1.45 / 12   # 1.45 inches = ~0.121 ft
 ZONE_HALF_WIDTH = 0.83        # half plate (8.5") + ball radius (1.45") in feet,
