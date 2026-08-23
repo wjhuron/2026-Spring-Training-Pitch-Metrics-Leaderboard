@@ -68,28 +68,29 @@ create_pitcher_tables <- function(pitch_data, selected_pitcher, game_date = NULL
     return(grid.text("No pitch data available", gp = gpar(fontsize = 16, fontface = "bold")))
   }
 
-  # FIRST TABLE - pitch metrics
+  # FIRST TABLE - pitch metrics. keep_populated_cols drops any column whose
+  # source is empty for the whole outing (Arm Angle included, so has_arm_angle
+  # no longer needs its own branch here).
   core_cols <- c(
-    "Pitch Type", "num_thrown", "percent_thrown", "avg_velo", "max_velo", "avg_spin",
-    "avg_rtilt", "avg_tilt", "avg_ivb", "avg_hb", "avg_height", "avg_side",
-    "avg_extension", if (has_arm_angle) "avg_arm_angle", "avg_vaa", "avg_haa"
+    `Pitch Type` = "Pitch Type", num_thrown = "Count", percent_thrown = "% Thrown",
+    avg_velo = "Velocity", max_velo = "Max Velo", avg_spin = "Spin Rate",
+    avg_rtilt = "RTilt", avg_tilt = "OTilt", avg_ivb = "IVB", avg_hb = "HB",
+    avg_height = "RelZ", avg_side = "RelX", avg_extension = "Ext",
+    avg_arm_angle = "Arm Angle", avg_vaa = "VAA", avg_haa = "HAA"
   )
-  stats_df_table1 <- map_and_sort_pitch_types(stats_full %>% select(all_of(core_cols)))
-  names(stats_df_table1) <- c(
-    "Pitch Type", "Count", "% Thrown", "Velocity", "Max Velo", "Spin Rate", "RTilt", "OTilt",
-    "IVB", "HB", "RelZ", "RelX", "Ext", if (has_arm_angle) "Arm Angle", "VAA", "HAA"
-  )
+  core_cols <- core_cols[keep_populated_cols(names(core_cols), pitch_data, selected_pitcher)]
+  stats_df_table1 <- map_and_sort_pitch_types(stats_full %>% select(all_of(names(core_cols))))
+  names(stats_df_table1) <- unname(core_cols)
 
   # SECOND TABLE - outcome metrics
-  stats_df_table2 <- map_and_sort_pitch_types(
-    stats_full %>%
-      select(`Pitch Type`, num_thrown, percent_thrown, iz_percent, swing_percent,
-             csw_percent, swstr_percent, chase_percent, gb_percent)
+  outcome_cols <- c(
+    `Pitch Type` = "Pitch Type", num_thrown = "Count", percent_thrown = "% Thrown",
+    iz_percent = "Zone%", swing_percent = "Swing%", csw_percent = "CSW%",
+    swstr_percent = "Whiff%", chase_percent = "Chase%", gb_percent = "GB%"
   )
-  names(stats_df_table2) <- c(
-    "Pitch Type", "Count", "% Thrown", "Zone%", "Swing%",
-    "CSW%", "Whiff%", "Chase%", "GB%"
-  )
+  outcome_cols <- outcome_cols[keep_populated_cols(names(outcome_cols), pitch_data, selected_pitcher)]
+  stats_df_table2 <- map_and_sort_pitch_types(stats_full %>% select(all_of(names(outcome_cols))))
+  names(stats_df_table2) <- unname(outcome_cols)
 
   # Create base table theme with larger font; tight horizontal padding so each
   # column is only as wide as its widest content

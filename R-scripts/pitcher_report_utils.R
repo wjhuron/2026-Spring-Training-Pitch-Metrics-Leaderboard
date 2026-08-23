@@ -174,6 +174,50 @@ col_has_data <- function(data, pitcher_name, col_name) {
   any(!is.na(pitcher_data[[col_name]]))
 }
 
+# Internal stat column -> the source column it is derived from. A stat column
+# whose source is empty for the WHOLE outing carries no information and is
+# dropped from the table. Per-pitch gaps are NOT this case: those still render
+# through each metric's own blank/"---" handling, because one populated pitch
+# anywhere in the outing keeps the column.
+#
+# Zone%, Chase% and GB% are here because an empty source does not render blank.
+# InZone is derived from PlateX/PlateZ/SzTop/SzBot and is all-NA when those are
+# missing, so Zone% prints a false "0.0%"; GB% likewise divides real balls in
+# play by zero tagged ground balls and prints "0.0%". Both read as measured
+# zeros rather than as absent data.
+#
+# Columns absent from this map are always kept. They derive from Description,
+# Pitch Type or the pitch count, none of which can be missing.
+STAT_COL_SOURCE <- c(
+  avg_velo      = "Velocity",
+  max_velo      = "Velocity",
+  avg_spin      = "Spin Rate",
+  avg_rtilt     = "RTilt",
+  avg_tilt      = "OTilt",
+  avg_ivb       = "xIndVrtBrk",
+  avg_hb        = "xHorzBrk",
+  avg_height    = "RelPosZ",
+  avg_side      = "RelPosX",
+  avg_extension = "Extension",
+  avg_arm_angle = "ArmAngle",
+  avg_vaa       = "VAA",
+  avg_haa       = "HAA",
+  iz_percent    = "InZone",
+  chase_percent = "InZone",
+  gb_percent    = "BBType"
+)
+
+# Keep the members of `cols` that still carry data for this pitcher: anything
+# with no mapped source, plus every mapped column whose source has at least one
+# value somewhere in the outing. Order is preserved.
+keep_populated_cols <- function(cols, data, pitcher_name) {
+  Filter(function(col) {
+    src <- unname(STAT_COL_SOURCE[col])
+    if (is.na(src)) return(TRUE)
+    col_has_data(data, pitcher_name, src)
+  }, cols)
+}
+
 # ---- Shared Report Pipeline ----
 # Everything below is shared by Daily.R, Season.R, and OnePitcher.R. Report-
 # specific behavior is parameterized (header font size, arm-angle lines, plot
@@ -406,16 +450,21 @@ format_table <- function(tbl, stats_df, pitch_names, header_fontsize = 10,
     }
   }
 
-  # For the platoon table, also color the second pitch type column
-  if (color_platoon_cols && ncol(stats_df) >= 16) {  # This is the platoon table
+  # For the platoon table, also color the second pitch type column. The two
+  # halves shrink whenever keep_populated_cols drops an empty stat column, so
+  # locate that column by name instead of assuming the fixed 8+8 layout.
+  pitch_type_cols <- which(names(stats_df) == "Pitch Type")
+  if (color_platoon_cols && length(pitch_type_cols) >= 2) {
+    second_pt <- pitch_type_cols[2]
     for (i in seq_len(nrow(stats_df))) {
-      pitch_full <- stats_df[[9]][i]  # 9th column (second Pitch Type)
+      pitch_full <- stats_df[[second_pt]][i]
       pitch_code <- names(which(pitch_names == pitch_full))[1]
 
       if (!is.na(pitch_code) && pitch_code %in% names(pitch_colors)) {
         color_info <- pitch_colors[[pitch_code]]
-        # Color the 9th column background and text
-        col_offset <- 8 * nrow(stats_df)
+        # tableGrob fills core cells column-major, so a column's block starts
+        # (column index - 1) * nrow cells in.
+        col_offset <- (second_pt - 1) * nrow(stats_df)
         if (length(bg_indices) > (i + col_offset - 1)) {
           tbl$grobs[[bg_indices[i + col_offset]]]$gp$fill <- color_info$fill
           tbl$grobs[[fg_indices[i + col_offset]]]$gp$col <- color_info$text

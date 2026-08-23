@@ -145,19 +145,21 @@ create_pitcher_tables <- function(pitch_data, selected_pitcher, game_date = NULL
     return(grid.text("No pitch data available", gp = gpar(fontsize = 16, fontface = "bold")))
   }
 
+  # keep_populated_cols drops any column whose source is empty for the whole
+  # outing (Arm Angle included, so has_arm_angle no longer needs a branch here).
   combined_cols <- c(
-    "Pitch Type", "num_thrown", "percent_thrown", "avg_velo", "max_velo", "avg_spin",
-    "avg_rtilt", "avg_tilt", "avg_ivb", "avg_hb", "avg_height", "avg_side",
-    "avg_extension", if (has_arm_angle) "avg_arm_angle", "avg_vaa", "avg_haa",
-    "iz_percent", "csw_percent", "swstr_percent", "chase_percent", "gb_percent"
+    `Pitch Type` = "Pitch Type", num_thrown = "Count", percent_thrown = "% Thrown",
+    avg_velo = "Velocity", max_velo = "Max Velo", avg_spin = "Spin Rate",
+    avg_rtilt = "RTilt", avg_tilt = "OTilt", avg_ivb = "IVB", avg_hb = "HB",
+    avg_height = "RelZ", avg_side = "RelX", avg_extension = "Ext",
+    avg_arm_angle = "Arm Angle", avg_vaa = "VAA", avg_haa = "HAA",
+    iz_percent = "Zone%", csw_percent = "CSW%", swstr_percent = "Whiff%",
+    chase_percent = "Chase%", gb_percent = "GB%"
   )
-  stats_df <- map_and_sort_pitch_types(stats_full %>% select(all_of(combined_cols)))
-  names(stats_df) <- c(
-    "Pitch Type", "Count", "% Thrown", "Velocity", "Max Velo", "Spin Rate", "RTilt", "OTilt",
-    "IVB", "HB", "RelZ", "RelX", "Ext", if (has_arm_angle) "Arm Angle",
-    "VAA", "HAA",
-    "Zone%", "CSW%", "Whiff%", "Chase%", "GB%"
-  )
+  combined_cols <- combined_cols[keep_populated_cols(names(combined_cols),
+                                                     pitch_data, selected_pitcher)]
+  stats_df <- map_and_sort_pitch_types(stats_full %>% select(all_of(names(combined_cols))))
+  names(stats_df) <- unname(combined_cols)
 
   # SECOND TABLE - Platoon splits
   platoon_df <- calculate_platoon_stats(pitch_data, selected_pitcher)
@@ -179,21 +181,25 @@ create_pitcher_tables <- function(pitch_data, selected_pitcher, game_date = NULL
     # Add duplicate pitch type column for LHH section
     platoon_df$pitch_type_lhh <- platoon_df$`Pitch Type`
 
-    # Define headers for the platoon table with duplicate pitch type column
-    platoon_colnames <- c(
-      "Pitch Type", "Count", "% Thrown", "Zone%", "CSW%", "Whiff%", "Chase%", "GB%",
-      "Pitch Type", "Count", "% Thrown", "Zone%", "CSW%", "Whiff%", "Chase%", "GB%"
-    )
+    # Same drop rule as the combined table, applied symmetrically to both
+    # halves so the RHH and LHH blocks stay column-aligned.
+    platoon_stats <- c(iz_percent = "Zone%", csw_percent = "CSW%",
+                       swstr_percent = "Whiff%", chase_percent = "Chase%",
+                       gb_percent = "GB%")
+    platoon_stats <- platoon_stats[keep_populated_cols(names(platoon_stats),
+                                                       pitch_data, selected_pitcher)]
+    half_cols <- function(side, pitch_type_col)
+      c(pitch_type_col, paste0("num_thrown_fmt_", side), paste0("percent_thrown_", side),
+        paste0(names(platoon_stats), "_", side))
 
     # Reorder columns to include duplicate pitch type
     platoon_df <- platoon_df %>%
-      select(`Pitch Type`, num_thrown_fmt_rhh, percent_thrown_rhh, iz_percent_rhh,
-             csw_percent_rhh, swstr_percent_rhh, chase_percent_rhh, gb_percent_rhh,
-             pitch_type_lhh, num_thrown_fmt_lhh, percent_thrown_lhh, iz_percent_lhh,
-             csw_percent_lhh, swstr_percent_lhh, chase_percent_lhh, gb_percent_lhh)
+      select(all_of(c(half_cols("rhh", "Pitch Type"),
+                      half_cols("lhh", "pitch_type_lhh"))))
 
     # Set column names
-    names(platoon_df) <- platoon_colnames
+    names(platoon_df) <- rep(c("Pitch Type", "Count", "% Thrown",
+                               unname(platoon_stats)), 2)
   }
 
   # Create base table theme (tight horizontal padding so each column is only

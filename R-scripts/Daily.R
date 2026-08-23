@@ -348,14 +348,16 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
   if (has_col["HAA"])
     cols_to_keep <- c(cols_to_keep, "avg_haa")
 
-  # Always-present outcome columns
+  # Outcome columns. CSW% and Whiff% derive from Description and always show.
+  # Zone%, Chase% and GB% drop when InZone / BBType are empty for the whole
+  # outing, where they would otherwise print a false "0.0%" rather than blank.
   cols_to_keep <- c(
     cols_to_keep,
-    "iz_percent",
-    "csw_percent",
-    "swstr_percent",
-    "chase_percent",
-    "gb_percent"
+    keep_populated_cols(
+      c("iz_percent", "csw_percent", "swstr_percent", "chase_percent", "gb_percent"),
+      data,
+      pitcher_name
+    )
   )
 
   result <- result %>% select(all_of(cols_to_keep))
