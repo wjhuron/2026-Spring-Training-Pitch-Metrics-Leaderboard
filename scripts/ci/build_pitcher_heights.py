@@ -8,9 +8,8 @@ carry. Sources, in order: the existing artifact, data/mlb_id_cache.json
 unresolved. Heights come from /api/v1/people. Ambiguous names (several ids)
 take the mean.
 
-Names are collected from data/all_pitches_rs_cache.pkl (MLB + ROC/AAA),
-data/scoring_only_rs_cache.pkl (the NEW tab) and, when present, the prior
-training pickles. The artifact is written to a temp path and moved, never
+Names are collected from data/all_pitches_rs_cache.pkl (MLB + ROC/AAA).
+The NEW tab is deliberately excluded — see collect_names. The artifact is written to a temp path and moved, never
 partially. A network failure leaves the previous artifact in place and
 prints how many names stay unresolved; the trainer imputes those to the
 frozen league mean and says so.
@@ -67,14 +66,19 @@ def search_name(name):
 
 
 def collect_names():
+    """MLB + ROC/AAA arms only. The NEW tab (scoring_only_rs_cache.pkl) is
+    deliberately excluded (per Wally 2026-08-23): its arms are often college
+    or indie pitchers the MLB API cannot resolve, they only ever receive a
+    NEW-tab grade, and they impute to the league mean in the trainer with a
+    log line. When one of them reaches a real MLB/ROC cache, this builder
+    resolves them then."""
     names = set()
-    for fn in ('all_pitches_rs_cache.pkl', 'scoring_only_rs_cache.pkl'):
-        p = os.path.join(DATA, fn)
-        if os.path.exists(p):
-            with open(p, 'rb') as f:
-                for x in pickle.load(f):
-                    if x.get('Pitch Type') != 'EP' and x.get('Pitcher'):
-                        names.add(x['Pitcher'])
+    p = os.path.join(DATA, 'all_pitches_rs_cache.pkl')
+    if os.path.exists(p):
+        with open(p, 'rb') as f:
+            for x in pickle.load(f):
+                if x.get('Pitch Type') != 'EP' and x.get('Pitcher'):
+                    names.add(x['Pitcher'])
     return names
 
 
