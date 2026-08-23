@@ -67,3 +67,4 @@ scripts/_feed_meta_cache.pkl
 artifacts/
 # AAA calibration corpus (2023-2026 Triple-A pitch pull, ~600 gz files)
 data/_aaa_raw/
+data/_feed_rows_cache/

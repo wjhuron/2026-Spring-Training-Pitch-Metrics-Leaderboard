@@ -210,6 +210,26 @@ def fetch_game_json(game_pk, session, refresh=False):
     raise RuntimeError(f'feed {game_pk}: {last}')
 
 
+_SHEET_CACHE_ROWS = None
+
+
+def sheet_cache_rows():
+    """data/all_pitches_rs_cache.pkl, loaded once per process, or None.
+
+    Three builders (baselines, _sheet_zone_index, _pitchids_elsewhere) each
+    loaded it themselves: 23 s a load, 68 s a run, for the same list.
+    """
+    global _SHEET_CACHE_ROWS
+    if _SHEET_CACHE_ROWS is None:
+        import pickle
+        path = os.path.join(DATA, 'all_pitches_rs_cache.pkl')
+        if not os.path.exists(path):
+            return None
+        with open(path, 'rb') as f:
+            _SHEET_CACHE_ROWS = pickle.load(f)
+    return _SHEET_CACHE_ROWS
+
+
 _SCRAPER = None
 
 
@@ -224,16 +244,79 @@ def _scraper():
 
 _FEED_ROWS_CACHE = {}
 
+# ── Parsed-feed cache ────────────────────────────────────────────────────────
+# Parsing one game through Pitcher2026 at raw precision costs about a second of
+# pure Python, and a season sweep parses every game on every run: 1,987 games,
+# 33 minutes, for payloads that have not changed since the last run. The parsed
+# rows are therefore kept on disk, one file per game, keyed on
+#
+#   * the SHA-256 of the decompressed payload, so a --refresh-feed that brings
+#     back a moved payload re-parses, and an identical payload does not;
+#   * the SHA-256 of scrapers/pitcher2026.py, so any edit to the parser
+#     invalidates every entry rather than serving rows from the old math.
+#
+# A mismatch on either is a miss, never an error. The cache holds the exact
+# dict feed_rows() used to build in memory, so a hit and a parse are
+# indistinguishable downstream.
+PARSED_FEED_CACHE = os.path.join(DATA, '_feed_rows_cache')
+_PARSER_HASH = None
 
-def feed_rows(game_pk, session, refresh=False):
-    """PitchID -> {column: formatted string} for one game, at full precision.
 
-    Parsed by Pitcher2026.download_game_data so this module cannot drift from
-    the scraper. Memoised because a game is walked once per team tab.
-    """
-    if game_pk in _FEED_ROWS_CACHE:
-        return _FEED_ROWS_CACHE[game_pk]
-    payload = fetch_game_json(game_pk, session, refresh=refresh)
+def _parser_hash():
+    global _PARSER_HASH
+    if _PARSER_HASH is None:
+        import hashlib
+        src = os.path.join(_ROOT, 'scrapers', 'pitcher2026.py')
+        with open(src, 'rb') as f:
+            _PARSER_HASH = hashlib.sha256(f.read()).hexdigest()
+    return _PARSER_HASH
+
+
+def _payload_hash(game_pk):
+    """SHA-256 of the cached payload's decompressed bytes, or None if absent."""
+    import hashlib
+    path = feed_path(game_pk)
+    if not os.path.exists(path):
+        return None
+    try:
+        with gzip.open(path, 'rb') as f:
+            return hashlib.sha256(f.read()).hexdigest()
+    except (OSError, EOFError, gzip.BadGzipFile):
+        return None
+
+
+def parsed_feed_path(game_pk):
+    return os.path.join(PARSED_FEED_CACHE, f'{game_pk}.json.gz')
+
+
+def _read_parsed(game_pk, payload_hash):
+    """The cached parse for this exact payload and parser, or None."""
+    path = parsed_feed_path(game_pk)
+    if payload_hash is None or not os.path.exists(path):
+        return None
+    try:
+        with gzip.open(path, 'rt', encoding='utf-8') as f:
+            blob = json.load(f)
+    except (OSError, EOFError, json.JSONDecodeError, gzip.BadGzipFile):
+        return None
+    if (blob.get('payload') != payload_hash
+            or blob.get('parser') != _parser_hash()):
+        return None
+    return blob['rows']
+
+
+def _write_parsed(game_pk, payload_hash, rows):
+    os.makedirs(PARSED_FEED_CACHE, exist_ok=True)
+    path = parsed_feed_path(game_pk)
+    tmp = f'{path}.{os.getpid()}.tmp'
+    with gzip.open(tmp, 'wt', encoding='utf-8') as f:
+        json.dump({'payload': payload_hash, 'parser': _parser_hash(),
+                   'rows': rows}, f)
+    os.replace(tmp, path)
+
+
+def _parse_payload(game_pk, payload):
+    """PitchID -> {column: formatted string}, the one parse in this module."""
     df = _scraper().download_game_data(game_pk, game_json=payload,
                                        raw_precision=True)
     out = {}
@@ -250,6 +333,69 @@ def feed_rows(game_pk, session, refresh=False):
             # carry. scripts/ops/append_missing_pitches.py reads them from here.
             out[pid]['_BTeam'] = str(rec.get('BTeam') or '')
             out[pid]['_PitchType'] = str(rec.get('Pitch Type') or '')
+    return out
+
+
+def _parse_from_disk(game_pk):
+    """Parse one game whose payload is already on disk, and cache the parse."""
+    path = feed_path(game_pk)
+    with gzip.open(path, 'rt', encoding='utf-8') as f:
+        payload = json.load(f)
+    rows = _parse_payload(game_pk, payload)
+    _write_parsed(game_pk, _payload_hash(game_pk), rows)
+    return game_pk, rows
+
+
+def prime_feed_rows(game_pks, session, refresh=False):
+    """Fill the memo for every game: fetch, then cache hits, then parses.
+
+    Fetch errors are returned per game exactly as feed_rows() raised them, so
+    the caller's per-game fail-closed handling is unchanged.
+
+    Returns {game_pk: RuntimeError} for games that could not be fetched.
+    """
+    todo = [g for g in game_pks if g not in _FEED_ROWS_CACHE]
+    failures = {}
+    misses = []
+    for g in todo:
+        try:
+            fetch_game_json(g, session, refresh=refresh)
+        except RuntimeError as e:
+            failures[g] = e
+            continue
+        rows = _read_parsed(g, _payload_hash(g))
+        if rows is None:
+            misses.append(g)
+        else:
+            _FEED_ROWS_CACHE[g] = rows
+    # Serial on purpose. A process pool was measured 2026-08-23 at 8.3 s
+    # against 3.0 s serial for 40 games: at 0.075 s per parse, spawning
+    # workers and importing pandas in each costs more than the parsing.
+    for g in misses:
+        _FEED_ROWS_CACHE[g] = _parse_from_disk(g)[1]
+    hits = len(todo) - len(misses) - len(failures)
+    if todo:
+        print(f"    feed: {hits} games from the parsed cache, {len(misses)} "
+              f"parsed, {len(failures)} unreadable")
+    return failures
+
+
+def feed_rows(game_pk, session, refresh=False):
+    """PitchID -> {column: formatted string} for one game, at full precision.
+
+    Parsed by Pitcher2026.download_game_data so this module cannot drift from
+    the scraper. Memoised because a game is walked once per team tab, and
+    served from the parsed-feed cache on disk when the payload and the parser
+    are both unchanged.
+    """
+    if game_pk in _FEED_ROWS_CACHE:
+        return _FEED_ROWS_CACHE[game_pk]
+    payload = fetch_game_json(game_pk, session, refresh=refresh)
+    h = _payload_hash(game_pk)
+    out = _read_parsed(game_pk, h)
+    if out is None:
+        out = _parse_payload(game_pk, payload)
+        _write_parsed(game_pk, h, out)
     _FEED_ROWS_CACHE[game_pk] = out
     return out
 
@@ -331,7 +477,7 @@ def baselines():
         return _BASELINES
 
     print("  measuring the per-column noise scale from the sheet cache...")
-    rows = pickle.load(open(path, 'rb'))
+    rows = sheet_cache_rows()
     cols = [c for c in IN_SCOPE if c in PRECISION]
     grp = collections.defaultdict(lambda: collections.defaultdict(list))
     for x in rows:
@@ -1226,7 +1372,7 @@ def _sheet_zone_index():
                   f"this run. Run every tab together, or no zone will be "
                   f"repaired.")
         else:
-            for x in pickle.load(open(path, 'rb')):
+            for x in sheet_cache_rows():
                 b, pid = x.get('Batter'), x.get('PitchID')
                 t, bo = as_float(x.get('SzTop')), as_float(x.get('SzBot'))
                 if not b or not pid or t is None or bo is None:
@@ -1397,7 +1543,7 @@ def _pitchids_elsewhere(tab, gc=None):
         by_tab = collections.defaultdict(set)
         path = os.path.join(DATA, 'all_pitches_rs_cache.pkl')
         if os.path.exists(path):
-            for x in pickle.load(open(path, 'rb')):
+            for x in sheet_cache_rows():
                 if x.get('PitchID'):
                     by_tab[x['_sheet_tab'].upper()].add(x['PitchID'])
         else:
@@ -2164,12 +2310,19 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
             # will not let this account repin those formats. Comparing against the
             # display made the sweep propose the same cells forever: on HOU, run 2
             # re-proposed 162,179 cells that run 1 had already written correctly.
-            rows = read_sheet_with_retry(ws)
-            if rows:
-                unformatted = _retry_sheets_call(
+            # The two reads are independent GETs of about 25 s each, so they
+            # run side by side. Same calls, same retry wrapper, same merge.
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=2) as ex:
+                f_rows = ex.submit(read_sheet_with_retry, ws)
+                f_unf = ex.submit(
+                    _retry_sheets_call,
                     lambda: ws.get_all_values(
                         value_render_option='UNFORMATTED_VALUE'),
                     'unformatted sheet read')
+                rows = f_rows.result()
+                unformatted = f_unf.result()
+            if rows:
                 rows = merge_rendered(rows[0], rows, unformatted)
             if not rows or len(rows) < 2:
                 print("  empty tab")
@@ -2194,18 +2347,19 @@ def main(filter_teams=None, apply=False, refresh_feed=False, kinds=None,
             print(f"  {len(rows) - 1} rows, {len(game_pks)} games")
 
             # --- feed pass ---
+            # Parsed-cache hits are file reads; misses parse in a process pool.
+            # A game that cannot be fetched is failed closed per game, not per
+            # tab: it must not be reported as missing pitches.
             feed_by_pid = {}
-            for n, gpk in enumerate(sorted(game_pks), 1):
-                try:
-                    feed_by_pid.update(feed_rows(gpk, session,
-                                                 refresh=refresh_feed))
-                except RuntimeError as e:
-                    # Fail closed per game, not per tab: a game we could not
-                    # read must not be reported as missing pitches.
-                    print(f"    FEED FAILED {gpk}: {e}")
-                    feed_failures.append((tab, gpk, str(e)))
-                if n % 25 == 0:
-                    print(f"    feed {n}/{len(game_pks)} games", flush=True)
+            failed = prime_feed_rows(sorted(game_pks), session,
+                                     refresh=refresh_feed)
+            for gpk in sorted(game_pks):
+                if gpk in failed:
+                    print(f"    FEED FAILED {gpk}: {failed[gpk]}")
+                    feed_failures.append((tab, gpk, str(failed[gpk])))
+                    continue
+                feed_by_pid.update(feed_rows(gpk, session,
+                                             refresh=refresh_feed))
             print(f"    feed gave {len(feed_by_pid)} pitches")
 
             # --- savant pass ---
