@@ -32,7 +32,9 @@ from datetime import datetime, timedelta
 start_date = None
 end_date   = None
 
-# Set specific teams, or None for all teams.  e.g. ["BOS", "NYY"]
+# Set specific teams, or None for all teams.  e.g. ["BOS", "NYY"].
+# Tab names are accepted in any case, and "ROC" / "AAA" work here the same as
+# an MLB club (they live on NLE2026). e.g. ["ROC", "AAA"] runs just those tabs.
 filter_teams = None
 
 # Produce an Excel report of all changes? "yes" or "no"
@@ -739,9 +741,21 @@ def write_report(report_data, output_dir=os.path.join(os.path.expanduser('~'), '
 
 
 def main():
+    global filter_teams
     print(f"Date range: {start_date or '(all)'} to {end_date or '(all)'}")
     if filter_teams:
+        # Normalize here, not only on the CLI path: a bare string ("ROC") or a
+        # lowercase entry (["roc"]) used to match no tab and the run walked all
+        # six books in silence.
+        if isinstance(filter_teams, str):
+            filter_teams = [filter_teams]
+        filter_teams = {t.strip().upper() for t in filter_teams if t and t.strip()}
+        unknown = sorted(filter_teams - ALL_TRACKED_TEAMS)
+        if unknown:
+            raise SystemExit(f"filter_teams has no tab for: {', '.join(unknown)}. "
+                             f"Valid: {', '.join(sorted(ALL_TRACKED_TEAMS))}")
         print(f"Teams: {', '.join(sorted(filter_teams))}")
+    remaining = set(filter_teams) if filter_teams else None
 
     # Default gspread service account (~/.config/gspread/service_account.json =
     # huronalytics), the writer on all six division books and the same account
@@ -761,6 +775,8 @@ def main():
     report_data = {}  # team -> list of {header, row_values, changes}
 
     for sheet_label, sheet_id in SPREADSHEET_IDS.items():
+        if remaining is not None and not remaining:
+            break   # every requested tab has been processed
         # Metadata calls 503 sporadically too (open_by_key killed a CI
         # leaderboard run on 2026-07-13) — same retry as reads/writes.
         sh = _retry_sheets_call(lambda: gc.open_by_key(sheet_id), 'workbook open')
@@ -776,6 +792,8 @@ def main():
                 continue
             if filter_teams and tab_name not in filter_teams:
                 continue
+            if remaining is not None:
+                remaining.discard(tab_name)
 
             print(f"\n[{ws.title}]")
             if i > 0:
@@ -1012,7 +1030,7 @@ if __name__ == '__main__':
     if args.end is not None:
         end_date = None if args.end.lower() == 'none' else args.end
     if args.teams is not None:
-        filter_teams = [t.strip().upper() for t in args.teams.split(',') if t.strip()]
+        filter_teams = [t for t in args.teams.split(',') if t.strip()]   # main() normalizes
     if args.report is not None:
         produce_report = args.report.lower()
     if args.resync_platez is not None:
