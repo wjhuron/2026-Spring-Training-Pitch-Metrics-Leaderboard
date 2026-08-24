@@ -227,48 +227,46 @@ def compute_xrv_map(pitches, aaa_teams, roc_pitches=None):
 
 
 def combined_park_map(rows, park, aaa_teams, is_combined_fn):
-    """{id(row) -> home park factor} for every combined 2TM/3TM/... row,
-    IP-weighted over the pitcher's own MLB stint rows.
+    """{id(row) -> home park factor} for every combined 2TM/3TM/... row:
+    the park of the club the pitcher MOST RECENTLY pitched for
+    (current_team_by_player, the same lastGameDate resolution the
+    qualification denominator uses).
 
-    A combined row carries a LABEL, not a franchise, so park.get('2TM') has
-    always fallen through to a neutral 100 -- and a traded pitcher did not
-    pitch in a neutral park. Measured on the 2026 board: 55 of 93 combined
-    rows move at least 0.05 ERA once this is applied, up to 0.523.
+    A combined row carries a LABEL, not a franchise, so park.get('2TM')
+    has always fallen through to a neutral 100 -- and a traded pitcher
+    did not pitch in a neutral park.
 
-    WEIGHTED BY INNINGS, which is a deliberate divergence from the research
-    harness. era_estimator_screen.park_exposure takes an UNWEIGHTED mean
-    over the pitcher's clubs, and the two disagree by a mean of 0.051 ERA
-    and up to 0.278 on the 2026 board. Senzatela threw 52.3 innings at Coors
-    and 4.7 at Milwaukee: unweighted calls that a 111 park, innings-weighted
-    calls it 125. The weighted figure is the one that describes where he
-    actually pitched. The fitted weight W_PH['park'] = 0.168 was estimated
-    against the unweighted exposure, so it is if anything attenuated by the
-    noisier measure -- the same direction as the abbreviation fix, and a
-    refit belongs in the next replicate-validated battery.
+    MOST-RECENT CLUB, not IP-weighted history, by measurement (2026-08-24,
+    scripts/research/era/era_park_weight_refit.py + _era_team_outs.json).
+    Two facts came out of that battery:
+      1. The shipped W_PH['park'] = 0.168 was fit on FINAL-CLUB exposure
+         all along: the bulk stats endpoint returns one season-combined
+         row per pitcher with only the last club attached, so the
+         harness's "mean over clubs" never saw a second club. (An earlier
+         version of this docstring believed otherwise.)
+      2. Re-fit on true per-stint exposure (person-hydrate pull),
+         IP-weighted history LOSES to final-club in every LOSO test
+         (ROS g60 1/6 folds, -.0023 mean r; NEXT g60 1/5, -.0028).
+         hpERA forecasts future runs, and the future innings come at the
+         CURRENT club's park, so where he pitched BEFORE the trade is the
+         worse proxy.
+    So production now matches both the fit convention and the measured
+    best: a combined row scores the park of its most recent club. The
+    previous IP-weighted convention shipped 2026-08-19..2026-08-24.
 
-    ROC/AAA stints are excluded: they have no MLB park factor and would
-    otherwise pull a traded pitcher's exposure toward neutral.
+    ROC/AAA stints are excluded by current_team_by_player: a pitcher sent
+    down still resolves to his last MLB club.
     """
-    from collections import defaultdict
-    stints = defaultdict(list)
-    for r in rows:
-        t = r.get('team')
-        if t in aaa_teams or is_combined_fn(t) or t not in park:
-            continue
-        key = r.get('mlbId') or r.get('pitcher')
-        if key is None:
-            continue
-        o = _ip_outs(r.get('ip'))
-        if o > 0:
-            stints[key].append((park[t], o))
+    from pipeline.utils import current_team_by_player, player_key
+    cur = current_team_by_player(rows, 'pitcher', set(aaa_teams))
     out, unresolved = {}, []
     for r in rows:
         if not is_combined_fn(r.get('team')):
             continue
-        sr = stints.get(r.get('mlbId') or r.get('pitcher')) or []
-        tot = sum(o for _, o in sr)
-        if tot > 0:
-            out[id(r)] = sum(pf * o for pf, o in sr) / tot
+        team = cur.get(player_key(r, 'pitcher'))
+        pf = park.get(team) if team is not None else None
+        if pf is not None:
+            out[id(r)] = pf
         else:
             unresolved.append(r.get('pitcher'))
     if unresolved:
