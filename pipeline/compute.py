@@ -75,11 +75,18 @@ PITCHER_BB_INVERT = {'avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAga
 
 # ── Stat computation functions ───────────────────────────────────────────
 
-def compute_expected_stats(pitches, woba_weights=None):
+def compute_expected_stats(pitches, woba_weights=None, xwoba_key='xwOBA'):
     """Compute wOBA, xBA, xSLG, xwOBA, xwOBAcon from pitch-level data.
 
     wOBA uses FanGraphs Guts linear weights applied to actual outcomes.
     xBA/xSLG/xwOBA use Statcast per-pitch expected values from the spreadsheet.
+
+    xwoba_key selects the per-pitch field the PA-level xwOBA averages.
+    HITTER rows pass 'xwOBA_hb' (the pulled-air-adjusted hitter basis, see
+    process_data xwOBA_hb block); pitcher rows keep the raw default —
+    hdERA's DH_B slope was calibrated on raw xwOBA against, and opponent
+    spray is not pitcher skill. xwOBAcon always reads raw (BB+ n0
+    calibration). Pitches without the field fall back to raw.
     """
     weights = woba_weights
 
@@ -116,7 +123,7 @@ def compute_expected_stats(pitches, woba_weights=None):
         # xwOBA denominator is AB+BB+HBP+SF (standard); exclude SH (sac bunt),
         # CI, and bunt ABs.
         if event not in SH_EVENTS and event not in CI_EVENTS and not _is_bunt:
-            xwoba_val = safe_float(p.get('xwOBA'))
+            xwoba_val = safe_float(p.get(xwoba_key, p.get('xwOBA')))
             if xwoba_val is not None:
                 xwoba_sum += xwoba_val
                 xwoba_denom += 1

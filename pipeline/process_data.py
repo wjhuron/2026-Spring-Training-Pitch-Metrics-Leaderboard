@@ -25,6 +25,7 @@ from pipeline.utils import (
     SF_EVENTS, SH_EVENTS, CI_EVENTS, NON_PA_EVENTS, BUNT_BB_TYPES,
     MLB_TEAMS, AAA_TEAMS, ALL_TEAMS, TEAM_ABBREV_TO_ID,
     BALL_RADIUS_FT, ZONE_HALF_WIDTH, box_key, PITCHING_W_STUFF,
+    XWOBA_PULLAIR_C, XWOBA_PULLAIR_LA, XWOBA_PULLAIR_LGSHARE,
 )
 from pipeline.fetch import (
     fetch_guts_constants, fetch_sprint_speed, fetch_park_factors,
@@ -644,9 +645,11 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
 
         # xwOBA: assigned to all PA events (K, BB, HBP, BIP) EXCEPT SH (sac bunt)
         # and CI, matching the standard AB+BB+HBP+SF denominator and pipeline_compute.
+        # HITTER atoms read xwOBA_hb (pulled-air adjusted) so filtered
+        # client views re-aggregate to the same basis as the row value.
         if (event and event not in NON_PA_EVENTS and event != 'Intent Walk'
                 and event not in SH_EVENTS and event not in CI_EVENTS):
-            xwoba_val = safe_float(p.get('xwOBA'))
+            xwoba_val = safe_float(p.get('xwOBA_hb', p.get('xwOBA')))
             if xwoba_val is not None:
                 c[43] += xwoba_val; c[44] += 1
 
@@ -861,9 +864,10 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
 
         # xwOBA: assigned to all PA events (K, BB, HBP, BIP) EXCEPT SH (sac bunt)
         # and CI, matching the standard AB+BB+HBP+SF denominator and pipeline_compute.
+        # Hitter atoms read xwOBA_hb, same as the block above.
         if (event and event not in NON_PA_EVENTS and event != 'Intent Walk'
                 and event not in SH_EVENTS and event not in CI_EVENTS):
-            xwoba_val = safe_float(p.get('xwOBA'))
+            xwoba_val = safe_float(p.get('xwOBA_hb', p.get('xwOBA')))
             if xwoba_val is not None:
                 c[43] += xwoba_val; c[44] += 1
 
@@ -1514,6 +1518,77 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
               f"{_n_bip} BIP, {_n_bb} BB, {_n_hbp} HBP, {_n_k} K")
     else:
         _xw3d_smoothed_table = None
+
+    # --- Hitter-basis pulled-air xwOBA (xwOBA_hb) ------------------------
+    # Savant's per-pitch xwOBA is EV/LA-only, and it underrates pulled air
+    # balls (a pulled fly at a given EV/LA clears a shorter fence). The
+    # HITTER-side xwOBA (the displayed column and the xwRC+ input) applies
+    # a centered pulled-air term per air BIP:
+    #
+    #     xwOBA_hb = xwOBA + C * (is_pull - lgPullShare)     [air BIP only]
+    #
+    # C = XWOBA_PULLAIR_C (0.20): replicate-validated 2021-2025 (DESC LOSO
+    # 4/5, interior optima c* .12-.25, scripts/research/hitter/
+    # xwrc_pullair_adjust.py) and confirmed on the live 2026 board
+    # (+.014 r vs wOBA, plateau .20-.30, xwrc_pullair_2026_check.py). The
+    # gain GROWS toward recent seasons. Predictive test failed (0/4), so
+    # this is a DESCRIPTIVE correction, which is what xwOBA/xwRC+ are.
+    #
+    # SCOPE FENCE (deliberate): xwOBA_hb feeds ONLY hitter-side xwOBA —
+    # the hitter row (compute_expected_stats xwoba_key), both hitter micro
+    # accumulators, and therefore xwRC+ and every filtered client view.
+    # It must NEVER feed: pitcher xwOBA against (hdERA's DH_B was
+    # calibrated on raw, and opponent spray is not pitcher skill),
+    # xwOBAcon (BB+ n0 calibration), xwOBAsp/SACQ (separate spray model —
+    # feeding an already-spray-adjusted input would double count), or the
+    # RV/xRV anchors. Those all keep reading p['xwOBA'].
+    # Centered on the LIVE league pull share so the league mean is
+    # unmoved; ROC hitters adjust against the MLB share (translation
+    # framing, like every other ROC scoring).
+    _pull_lg_n = _pull_lg_p = 0
+    for p in all_pitches:
+        if (p.get('_source', 'MLB') == 'MLB'
+                and p.get('Description') == 'In Play'
+                and (p.get('BBType') or '') not in BUNT_BB_TYPES):
+            _la = safe_float(p.get('LaunchAngle'))
+            if _la is None or _la < XWOBA_PULLAIR_LA:
+                continue
+            _sd = spray_direction(
+                spray_angle(safe_float(p.get('HC_X')),
+                            safe_float(p.get('HC_Y'))), p.get('Bats'))
+            if _sd is None:
+                continue
+            _pull_lg_n += 1
+            if _sd in ('pull', 'pull_side'):
+                _pull_lg_p += 1
+    if _pull_lg_n >= 5000:
+        _pull_share = _pull_lg_p / _pull_lg_n
+    else:
+        _pull_share = XWOBA_PULLAIR_LGSHARE
+        print(f"  xwOBA_hb WARNING: only {_pull_lg_n} MLB air BIPs — "
+              f"frozen league pull share {XWOBA_PULLAIR_LGSHARE} used")
+    _n_hb_adj = 0
+    for p in all_pitches:
+        _xw = safe_float(p.get('xwOBA'))
+        if _xw is None:
+            continue
+        p['xwOBA_hb'] = _xw
+        if (p.get('Description') == 'In Play'
+                and (p.get('BBType') or '') not in BUNT_BB_TYPES):
+            _la = safe_float(p.get('LaunchAngle'))
+            if _la is None or _la < XWOBA_PULLAIR_LA:
+                continue
+            _sd = spray_direction(
+                spray_angle(safe_float(p.get('HC_X')),
+                            safe_float(p.get('HC_Y'))), p.get('Bats'))
+            if _sd is None:
+                continue
+            _is_pull = 1.0 if _sd in ('pull', 'pull_side') else 0.0
+            p['xwOBA_hb'] = _xw + XWOBA_PULLAIR_C * (_is_pull - _pull_share)
+            _n_hb_adj += 1
+    print(f"  xwOBA_hb pulled-air term: C={XWOBA_PULLAIR_C}, league pull "
+          f"share {_pull_share:.3f} ({_pull_lg_n} MLB air BIPs), "
+          f"{_n_hb_adj} air-BIP atoms adjusted")
 
     # --- Reclassify CF (Cut-Fastball) → FF or FC ---
     # CF is not a real Statcast classification. Remap to FF by default,
@@ -2900,7 +2975,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             'lastGameDate': last_game_date,
         }
         row.update(compute_hitter_stats(pitches))
-        row.update(compute_expected_stats(pitches, woba_weights=WOBA_WEIGHTS))
+        # xwoba_key='xwOBA_hb': the hitter row xwOBA (and therefore xwRC+)
+        # is on the pulled-air-adjusted basis, matching the micro atoms.
+        row.update(compute_expected_stats(pitches, woba_weights=WOBA_WEIGHTS,
+                                          xwoba_key='xwOBA_hb'))
         row.update(compute_xrv(pitches,
                                 lg_woba=_xrv_lg, woba_scale=_xrv_scale,
                                 count_offsets=XRV_COUNT_OFFSETS,
@@ -3044,6 +3122,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 evt = 3  # BIP
             else:
                 evt = 1  # other swing (foul, foul tip)
+            # Deliberately RAW xwOBA, not xwOBA_hb: the damage heat map
+            # shows the contact quality of THAT pitch; the pulled-air term
+            # is a hitter-level spray correction and would misstate a
+            # single ball's value here.
             xw = safe_float(p.get('xwOBA')) if evt == 3 else None
             records.append([round(px, 3), round(pz, 3), evt, xw, ph])
         if not records:

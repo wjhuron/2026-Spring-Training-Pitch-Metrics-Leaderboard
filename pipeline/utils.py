@@ -37,6 +37,26 @@ DATA_DIR = os.path.join(_SCRIPT_DIR, 'data')
 # [0.67, 0.76] is defensible, 0.80 is not.
 PITCHING_W_STUFF = 0.72
 
+# ── Hitter-basis pulled-air xwOBA term (xwOBA_hb) ────────────────────────
+# Savant per-pitch xwOBA is EV/LA-only and underrates pulled air balls.
+# The hitter-side xwOBA applies, per non-bunt air BIP (LA >= 20):
+#     xwOBA_hb = xwOBA + C * (is_pull - live league pull share)
+# C measured 2026-08-24 (scripts/research/hitter/xwrc_pullair_adjust.py):
+# 2021-2025 replicates, DESC LOSO 4/5, interior optima c* .12-.25;
+# confirmed on the live 2026 board (xwrc_pullair_2026_check.py, +.014 r
+# vs wOBA, plateau .20-.30). 0.20 is the interior consensus of the
+# replicate argmaxes and sits inside the live plateau. Descriptive only —
+# the predictive test failed 0/4, which is fine for a descriptive stat.
+# Scope: hitter row xwOBA + hitter micro atoms + xwRC+ ONLY. Never
+# pitcher xwOBA against, xwOBAcon, xwOBAsp/SACQ, or RV/xRV (see the
+# xwOBA_hb block in process_data.process_game_type).
+XWOBA_PULLAIR_C = 0.20
+XWOBA_PULLAIR_LA = 20.0       # air-ball floor, deg (the battery's la20 set,
+                              # which beat the bb_type=fly definition)
+XWOBA_PULLAIR_LGSHARE = 0.28  # frozen fallback league pull share of air
+                              # BIPs; measured .261-.283 (2021-2026), used
+                              # only when the live pool is under 5000
+
 BALL_RADIUS_FT = 1.45 / 12   # 1.45 inches = ~0.121 ft
 ZONE_HALF_WIDTH = 0.83        # half plate (8.5") + ball radius (1.45") in feet,
                               # ROUNDED (exact is 9.95/12 = 0.82917). Kept as
