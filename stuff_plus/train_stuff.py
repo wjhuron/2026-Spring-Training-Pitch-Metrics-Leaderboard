@@ -1439,14 +1439,49 @@ def main():
     rel = float(corrcoef(np.array(a0), np.array(a1))[0, 1]) if len(a0) >= 5 else float('nan')
     print(f'  OOF split-half reliability (>=40/half): r = {rel:+.3f} (n={len(a0)})')
 
+    # Goodhart-drift telemetry (2026-08-23, after Andrews, FanGraphs
+    # 2026-01-20: FG Stuff+ pitcher SD narrowed 9.7 -> 8.8 and its
+    # grade-to-outcome r fell as pitchers trained to the model). Three
+    # per-run columns make that decay visible here the day it starts:
+    #   pitcher_sd_raw100   between-pitcher SD of mean OOF stuff_raw,
+    #                       runs/100, pitchers >= 300 pitches (compression)
+    #   pitcher_r_target    pitcher-level r(mean stuff_raw, mean -target)
+    #                       same floor (is the grade still telling truth)
+    #   fb_pitcher_sd_raw100  the same SD on FF/SI only (the family drift
+    #                       showed up in first at FanGraphs)
+    gp = df.groupby('pitcher').agg(s=('stuff_raw', 'mean'),
+                                   t=('target_xrv', 'mean'),
+                                   n=('stuff_raw', 'size'))
+    gp = gp[gp['n'] >= 300]
+    drift_sd = float(gp['s'].std()) * 100.0
+    drift_r = float(corrcoef(gp['s'], -gp['t'])[0, 1]) if len(gp) >= 5 else float('nan')
+    fb = df[df['pitch_type'].isin(('FF', 'SI'))].groupby('pitcher').agg(
+        s=('stuff_raw', 'mean'), n=('stuff_raw', 'size'))
+    drift_fb = float(fb.loc[fb['n'] >= 150, 's'].std()) * 100.0
+    print(f'  drift telemetry: pitcher SD {drift_sd:.3f} runs/100 '
+          f'(FB {drift_fb:.3f}), pitcher r_target {drift_r:+.3f} (n={len(gp)})')
+
     hist = os.path.join(DATA, 'stuff_metrics_history.csv')
     latest_date = max((d for d in df['date'].dropna()), default='')
-    new_file = not os.path.exists(hist)
-    with open(hist, 'a') as f:
-        if new_file:
-            f.write('through_date,n_pitches,n_pitchers,oof_descriptive_r,oof_splithalf_r,n_rel_units\n')
-        f.write(f'{latest_date},{len(df)},{df.pitcher.nunique()},'
-                f'{oof_desc_r:.4f},{rel:.4f},{len(a0)}\n')
+    HIST_HEADER = ('through_date,n_pitches,n_pitchers,oof_descriptive_r,'
+                   'oof_splithalf_r,n_rel_units,pitcher_sd_raw100,'
+                   'pitcher_r_target,fb_pitcher_sd_raw100')
+    lines = []
+    if os.path.exists(hist):
+        with open(hist) as f:
+            lines = f.read().splitlines()
+    if not lines or lines[0] != HIST_HEADER:
+        # migrate: new header, pad pre-2026-08-23 rows with blanks (atomic)
+        old = [ln for ln in lines[1:] if ln.strip()]
+        pad = HIST_HEADER.count(',') + 1
+        lines = [HIST_HEADER] + [ln + ',' * (pad - 1 - ln.count(',')) for ln in old]
+    lines.append(f'{latest_date},{len(df)},{df.pitcher.nunique()},'
+                 f'{oof_desc_r:.4f},{rel:.4f},{len(a0)},'
+                 f'{drift_sd:.4f},{drift_r:.4f},{drift_fb:.4f}')
+    tmp = hist + '.tmp'
+    with open(tmp, 'w') as f:
+        f.write('\n'.join(lines) + '\n')
+    os.replace(tmp, hist)
     print('\n  top arsenals by mean Stuff+ (n>=200):')
     top = agg[agg.n >= 200].sort_values('stuff_mean', ascending=False).head(10)
     for _, r in top.iterrows():
