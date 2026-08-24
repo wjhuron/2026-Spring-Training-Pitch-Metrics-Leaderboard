@@ -2662,7 +2662,6 @@ def render_card(config, pitches, output_file):
             f'{_c_ivb:.1f}"' if ivbs else '—',
             f'{_c_hb:.1f}"' if hbs else '—',
             f"{_nvaa:.2f}" if _nvaa is not None else '—',
-            f"{_nhaa:.2f}" if _nhaa is not None else '—',
             fmt_fi(sum(relzs)/len(relzs)) if relzs else '—',fmt_fi(sum(relxs)/len(relxs)) if relxs else '—',
             fmt_fi(sum(exts)/len(exts)) if exts else '—',
             f"{sum(armangles)/len(armangles):.1f}°" if armangles else '—',
@@ -2761,7 +2760,7 @@ def render_card(config, pitches, output_file):
                'PitchRV/100': total_prv_100, 'xPitchRV/100': total_xrv_100,
                'xRVOE/100': ((round(_pr['xrvoe100'], 1) + 0.0)
                              if _pr.get('xrvoe100') is not None else None)}
-    total_row=['Total',str(tc),'100.0%','—','—','—','—','—','—','—',
+    total_row=['Total',str(tc),'100.0%','—','—','—','—','—','—',
         fmt_fi(sum(t_relzs)/len(t_relzs)) if t_relzs else '—',
         fmt_fi(sum(t_relxs)/len(t_relxs)) if t_relxs else '—',
         fmt_fi(sum(t_exts)/len(t_exts)) if t_exts else '—',
@@ -2782,7 +2781,9 @@ def render_card(config, pitches, output_file):
     # Source-data presence check — RV needs RunExp on at least one pitch.
     has_pitchrv_data = any(p.get('RunExp') is not None and str(p.get('RunExp','')).strip() != '' for p in pitches)
 
-    all_col_headers=['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate','IVB','HB','nVAA','nHAA','RelZ','RelX','Ext','Arm Angle','Stuff+','Loc+','Pitching+','Zone%','CSW%','Whiff%','Chase%','xwOBAcon','GB%'] + rv_cols
+    # nHAA column removed entirely; RelZ/RelX sit directly after nVAA
+    # (2026-08-24, per Wally).
+    all_col_headers=['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate','IVB','HB','nVAA','RelZ','RelX','Ext','Arm Angle','Stuff+','Loc+','Pitching+','Zone%','CSW%','Whiff%','Chase%','xwOBAcon','GB%'] + rv_cols
     all_cell_data=[r[1] for r in pitch_stats]+[total_row]
 
     # Daily cards use a different column ORDER than season (Wally's layout):
@@ -2793,7 +2794,7 @@ def render_card(config, pitches, output_file):
     # name-indexed so it follows. Season layout is unchanged.
     if not is_season:
         _daily_order = ['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate',
-                        'IVB','HB','RelZ','RelX','Ext','Arm Angle','nVAA','nHAA',
+                        'IVB','HB','RelZ','RelX','Ext','Arm Angle','nVAA',
                         'Zone%','CSW%','Whiff%','Chase%','xwOBAcon','Stuff+','Loc+','Pitching+'] + rv_cols
         _perm = [all_col_headers.index(h) for h in _daily_order]
         all_col_headers = _daily_order
@@ -2816,20 +2817,11 @@ def render_card(config, pitches, output_file):
     has_xwoba_bip = (any(sf(p.get('xwOBA')) is not None and p.get('Description') == 'In Play' and not str(p.get('BBType', '')).startswith('bunt') for p in pitches)
                      or any(v is not None for v in xwc_by_pt.values()))
     if not has_xwoba_bip: force_exclude.add('xwOBAcon')
-    # Conditional RelZ/RelX: always exclude on season cards. On single-game cards,
-    # exclude only when Arm Angle data exists (Arm Angle conveys the same release
-    # info more compactly); keep RelZ/RelX as a fallback when Arm Angle is missing.
     has_arm_angle = any(sf(p.get('ArmAngle')) is not None for p in pitches)
-    # Drop RelZ/RelX once Arm Angle is present — it conveys the same release
-    # information more compactly. ROC/AAA used to be special-cased here because
-    # AAA had no arm angle at all; the minor-league Statcast backfill
-    # (2026-07-25) ended that, so the rule is now purely data-driven. The
-    # is_season shortcut stays MLB-only: a MiLB card for a pitcher whose games
-    # Savant hasn't processed yet keeps RelZ/RelX rather than losing release
-    # info entirely (the all-'—' Arm Angle column gets dropped below).
-    if has_arm_angle or (is_season and not is_milb):
-        force_exclude.add('RelZ')
-        force_exclude.add('RelX')
+    # RelZ/RelX always render (2026-08-24, per Wally — they used to drop
+    # whenever Arm Angle was present, on the theory that Arm Angle conveys
+    # the same release info more compactly). The all-'—' keep-check below
+    # still drops them when no release data exists at all.
 
     # Drop columns where ALL pitch-type rows have '—' OR source data is missing.
     # Derive from all_cell_data (NOT pitch_stats) so the keep-check stays aligned
@@ -4508,13 +4500,12 @@ def main():
             pctl_row = pctl_by_name.get((pitcher_name, eff_team)) \
                        or (pctl_by_id.get(str(int(mlb_id))) if mlb_id is not None else None)
 
-        # Season cards: the headline strip shows hdERA/hpERA off the
-        # leaderboard row (they are season-scope metrics: shrunk inputs,
-        # 30+ IP z-pools — not reconstructable from a pitch window).
-        # Explicit date-range cards keep the box-derived ERA/FIP/SIERA
-        # trio, which honours the range.
-        if (start_date is None and end_date is None
-                and pctl_row is not None and is_multi_game):
+        # Multi-game cards: the headline strip shows hdERA/hpERA in place of
+        # FIP/SIERA. Season cards read them off the leaderboard row; date-range
+        # cards use the window-scored pair from score_scratch_row above
+        # (2026-08-24, per Wally — range cards previously kept the box-derived
+        # FIP/SIERA trio).
+        if pctl_row is not None and is_multi_game:
             _dh = pctl_row.get('hdERA')
             _ph = pctl_row.get('hpERA')
             if _dh is not None or _ph is not None:
