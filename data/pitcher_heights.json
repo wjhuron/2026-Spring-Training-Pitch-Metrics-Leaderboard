@@ -17,6 +17,7 @@
 "Adam, Jason": 75.0,
 "Adames, Willy": 72.0,
 "Adams, Austin": 75.0,
+"Adams, Blake": 74.0,
 "Adams, Mason": 73.0,
 "Adams, Riley": 76.0,
 "Adams, Travis": 73.0,
@@ -2676,6 +2677,9 @@
 ],
 "Adams, Austin": [
 613534
+],
+"Adams, Blake": [
+687060
 ],
 "Adams, Mason": [
 690279
@@ -10506,5 +10510,5 @@
 ]
 },
 "league_mean": 73.72,
-"n": 2624
+"n": 2625
 }
