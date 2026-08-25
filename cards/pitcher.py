@@ -2213,17 +2213,15 @@ def render_card(config, pitches, output_file):
                     angle = np.degrees(np.arctan2(vecs[1, 1], vecs[0, 1]))
                     mx, my = np.mean(xs), np.mean(ys)
                     _pc = PITCH_COLORS[pt]
-                    # Outline-only ellipse + center dot at the per-type mean.
-                    # Daily cards layer per-pitch dots + W/B/H marks back on
-                    # top (removed 2026-08-13, restored 2026-08-20, per
-                    # Wally), so their strokes THIN + DIM to sit behind the
-                    # full-alpha dots, and the mean dot GROWS to stay findable
-                    # among same-size pitch dots. Bracketed by eye 2026-08-20:
-                    # 1.2/0.50 too faint, 1.7/0.80 too busy, mean dot 32 lost
-                    # in the field. Season panels carry no per-pitch marks and
-                    # keep the heavier strokes.
-                    _ell_a, _ell_lw, _ctr_s = ((0.95, 2.2, 32) if is_season
-                                               else (0.65, 1.4, 48))
+                    # Outline-only ellipse; season panels add a center dot at
+                    # the per-type mean. Daily cards layer per-pitch dots +
+                    # W/B/H marks back on top (removed 2026-08-13, restored
+                    # 2026-08-20, per Wally), so their strokes THIN + DIM to
+                    # sit behind the full-alpha dots. Bracketed by eye
+                    # 2026-08-20: 1.2/0.50 too faint, 1.7/0.80 too busy.
+                    # Daily mean dot removed 2026-08-25, per Wally: among
+                    # same-size per-pitch dots it read as a pitch location.
+                    _ell_a, _ell_lw = (0.95, 2.2) if is_season else (0.65, 1.4)
                     ax.add_patch(Ellipse(
                         (mx, my),
                         2 * 1.0 * np.sqrt(vals[1]), 2 * 1.0 * np.sqrt(vals[0]),
@@ -2231,8 +2229,10 @@ def render_card(config, pitches, output_file):
                         edgecolor=_rgba(_pc, _ell_a),
                         linewidth=_ell_lw, zorder=1
                     ))
-                    ax.scatter([mx], [my], c=_pc, s=_ctr_s, alpha=1.0,
-                               edgecolors=TEXT_PRIMARY, linewidths=0.6, zorder=4)
+                    if is_season:
+                        ax.scatter([mx], [my], c=_pc, s=32, alpha=1.0,
+                                   edgecolors=TEXT_PRIMARY, linewidths=0.6,
+                                   zorder=4)
         # Per-pitch marks — single-game cards only. Every pitch draws a dot
         # (s=30, down from the pre-declutter 55); a whiff draws a W instead,
         # a barrel a B, a non-barrel hard-hit ball (In Play, EV >= 95) an H.
