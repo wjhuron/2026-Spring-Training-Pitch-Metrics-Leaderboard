@@ -15,7 +15,8 @@ two:
 
 CLASS 1, the source is genuinely quantized. The depth here IS the source depth
 and there is nothing to decide.
-    Velocity, IndVertBrk, HorzBrk, ExitVelo, ArmAngle, BatSpeed, SwingLength  1
+    Velocity, IndVertBrk, HorzBrk, ExitVelo, ArmAngle, BatSpeed               1
+    SwingLength                                                               2
     LaunchAngle, Distance                                                     1
     HC_X, HC_Y                                                                2
     xBA, xSLG, xwOBA, RunExp                                                  3
@@ -62,7 +63,12 @@ PRECISION = {
     'Velocity': 1, 'IndVertBrk': 1, 'HorzBrk': 1,
     'xIndVrtBrk': 1, 'xHorzBrk': 1,
     'ExitVelo': 1,
-    'ArmAngle': 1, 'BatSpeed': 1, 'SwingLength': 1,
+    'ArmAngle': 1, 'BatSpeed': 1,
+    # SwingLength is 2, not 1. The Savant minors export reports it to a
+    # hundredth of a foot (10.88, 11.43), so a 1-decimal depth would throw a
+    # digit the source actually measured. Wally's call 2026-08-25, applied
+    # with the ROC swing-length backfill.
+    'SwingLength': 2,
     'HC_X': 2, 'HC_Y': 2,
     'xBA': 3, 'xSLG': 3, 'xwOBA': 3, 'RunExp': 3,
     # LaunchAngle and Distance are INTEGERS, and stay integers. An earlier pass
