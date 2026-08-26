@@ -870,6 +870,7 @@
 "Gosselin, Phil": 73.0,
 "Gott, Trevor": 71.0,
 "Goudeau, Ashton": 78.0,
+"Grable, Ben": 76.0,
 "Graceffo, Gordon": 76.0,
 "Granillo, Andre": 76.0,
 "Graterol, Brusdar": 73.0,
@@ -896,6 +897,7 @@
 "Gsellman, Robert": 76.0,
 "Guduan, Reymin": 76.0,
 "Guenther, Sean": 71.0,
+"Guerra, Daniel": 78.0,
 "Guerra, Deolis": 77.0,
 "Guerra, Javy": 72.5,
 "Guerra, Junior": 72.0,
@@ -2214,6 +2216,7 @@
 "Steele, Justin": 74.0,
 "Steer, Spencer": 69.0,
 "Stefanic, Michael": 69.0,
+"Stephan, Josh": 75.0,
 "Stephan, Trevor": 77.0,
 "Stephens, Jackson": 74.0,
 "Stephenson, Robert": 75.0,
@@ -5240,6 +5243,9 @@
 "Goudeau, Ashton": [
 623485
 ],
+"Grable, Ben": [
+695066
+],
 "Graceffo, Gordon": [
 700669
 ],
@@ -5317,6 +5323,9 @@
 ],
 "Guenther, Sean": [
 674944
+],
+"Guerra, Daniel": [
+806413
 ],
 "Guerra, Deolis": [
 500610
@@ -9276,6 +9285,9 @@
 "Stefanic, Michael": [
 683021
 ],
+"Stephan, Josh": [
+695776
+],
 "Stephan, Trevor": [
 663986
 ],
@@ -10513,6 +10525,6 @@
 594798
 ]
 },
-"league_mean": 73.72,
-"n": 2626
+"league_mean": 73.73,
+"n": 2629
 }
