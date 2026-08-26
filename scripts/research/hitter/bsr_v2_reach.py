@@ -55,21 +55,22 @@ MIN_SIDE = 40
 MIN_REACH = 20
 
 
-def three_regime(sl, bs, cap):
+def three_regime(sl, bs, cap, min_sw=MIN_SW, min_side=MIN_SIDE,
+                 min_reach=MIN_REACH):
     """Returns dict with dn / near / reach slopes (+SEs) or None."""
     ok = np.isfinite(sl) & np.isfinite(bs)
     sl, bs = sl[ok], bs[ok]
-    if len(sl) < MIN_SW:
+    if len(sl) < min_sw:
         return None
     m = float(sl.mean())
     d = sl - m
     n_dn = int((d < 0).sum())
     n_near = int(((d > 0) & (d <= cap)).sum())
     n_reach = int((d > cap).sum())
-    if n_dn < MIN_SIDE or n_near < MIN_SIDE:
+    if n_dn < min_side or n_near < min_side:
         return None
     cols = [np.ones(len(d)), np.minimum(d, 0.0), np.clip(d, 0.0, cap)]
-    with_reach = n_reach >= MIN_REACH
+    with_reach = n_reach >= min_reach
     if with_reach:
         cols.append(np.maximum(d - cap, 0.0))
     else:
