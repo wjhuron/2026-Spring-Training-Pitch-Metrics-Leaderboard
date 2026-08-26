@@ -869,6 +869,23 @@ const Aggregator = {
           if (pre.locPlusN !== undefined) rows[mi].locPlusN = pre.locPlusN;
         }
         if (rows[mi].pitchingScore == null && pre.pitchingScore !== undefined) rows[mi].pitchingScore = pre.pitchingScore;
+        // K%/BB%/K-BB% over official TBF, but ONLY when this aggregation
+        // covered the whole season. The micro denominator cannot see a
+        // no-pitch intentional walk (no pitch thrown since 2017 = no pitch
+        // row), so it runs short by that many batters faced and reads K%
+        // high, BB% low. The server applies the same override in
+        // process_data.py's pitcher boxscore merge; without this the site
+        // would keep recomputing the short version and disagree with the
+        // shipped JSON, because needsReaggregation() is unconditional.
+        // Gate on pa equality rather than on a list of filter fields: any
+        // filter that dropped a PA makes the official TBF the wrong
+        // denominator, and a filter that dropped none leaves the season
+        // value correct. A new filter therefore cannot silently break this.
+        if (pre.pa && rows[mi].pa === pre.pa) {
+          if (pre.kPct !== undefined) rows[mi].kPct = pre.kPct;
+          if (pre.bbPct !== undefined) rows[mi].bbPct = pre.bbPct;
+          if (pre.kbbPct !== undefined) rows[mi].kbbPct = pre.kbbPct;
+        }
       }
     }
 

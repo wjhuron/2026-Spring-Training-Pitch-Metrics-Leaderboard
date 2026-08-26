@@ -4179,6 +4179,8 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         # Merge pitcher boxscore stats. Primary key is mlbId|team (immune
         # to name-spelling variation); name|team + the id_map are
         # fallbacks for records with no resolved MLB ID.
+        n_pitcher_rate_official = 0
+        n_pitcher_rate_pitch_derived = 0
         for row in pitcher_leaderboard:
             box = pitcher_box.get(box_key(row['pitcher'], row['team'], row.get('mlbId')))
             if not box:
@@ -4200,6 +4202,25 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 row['era'] = round(box['er'] * 9 / ip_float, 2) if ip_float > 0 else None
                 row['hr9'] = round(box['hr'] * 9 / ip_float, 2) if ip_float > 0 else None
                 row['_box_er'] = box['er']  # raw ER for league avg calc (includes 0-IP pitchers)
+                # K%, BB%, K-BB% from official boxscore counts, mirroring the
+                # hitter merge below. The pitch-derived denominator CANNOT see
+                # a no-pitch intentional walk (automatic since 2017, no pitch
+                # thrown, so no pitch row exists), which left every pitcher who
+                # issued one short by that many batters faced: Jaden Hill read
+                # 31/134 = 23.1% K% against an official 31/136 = 22.8%.
+                # Measured 2026-08-26: 346 batters faced missing across 676
+                # single-club pitchers, moving 254 K% and 175 BB% cells.
+                # box['tbf'] is in sync with the sheets (it counts only the
+                # games the pitch data covers), so this is not a recency swap.
+                # Pitcher BB% keeps the uBB numerator; hitter BB% keeps IBB.
+                box_tbf = box['tbf']
+                if box_tbf > 0:
+                    row['kPct'] = round(box['so'] / box_tbf, 4)
+                    row['bbPct'] = round((box['bb'] - box['ibb']) / box_tbf, 4)
+                    row['kbbPct'] = round(row['kPct'] - row['bbPct'], 4)
+                    n_pitcher_rate_official += 1
+                else:
+                    n_pitcher_rate_pitch_derived += 1
                 # Store raw boxscore counts for FIP/xFIP/SIERA (computed below)
                 row['_box'] = box
             else:
@@ -4212,6 +4233,16 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 row['hld'] = None
                 row['era'] = None
                 row['hr9'] = None
+                n_pitcher_rate_pitch_derived += 1
+        # A row with no boxscore match keeps the pitch-derived K%/BB%, which
+        # cannot see a no-pitch intentional walk. That is a degrade, so it
+        # announces itself rather than passing as an official rate.
+        print(f"  Pitcher K%/BB% from official boxscore counts: {n_pitcher_rate_official}"
+              f"/{n_pitcher_rate_official + n_pitcher_rate_pitch_derived}")
+        if n_pitcher_rate_pitch_derived:
+            print(f"  WARNING: {n_pitcher_rate_pitch_derived} pitcher row(s) fell back to "
+                  f"pitch-derived K%/BB% (no boxscore match); those denominators omit "
+                  f"no-pitch intentional walks")
 
         # Merge hitter boxscore stats. Primary key is mlbId|team (immune
         # to name-spelling variation); name|team + the id_map are
