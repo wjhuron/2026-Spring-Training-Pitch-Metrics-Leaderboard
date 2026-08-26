@@ -3988,6 +3988,11 @@ def main():
                              'only — does not change which tab/team the '
                              'pitches are read from). Useful for scratch-tab '
                              'pulls, e.g. --team NEW --display-team WSH.')
+    parser.add_argument('--bats', default=None, choices=['L', 'R'],
+                        help='Only pitches to this batter hand. The card renders '
+                             'from the filtered pitches (window context, bubbles, '
+                             'tables); the boxscore strip (G/GS/IP/ERA) stays '
+                             'whole-outing because runs cannot be split by hand.')
     parser.add_argument('--tab', default=None,
                         help='Read pitches from this scratch tab in the NLE2026 '
                              'workbook (e.g. Sheet2) instead of a team tab. '
@@ -4012,6 +4017,7 @@ def main():
     if args.game_pk is not None: game_pk = args.game_pk
     if args.display_team is not None: display_team = args.display_team
     if args.output_dir is not None: output_dir = args.output_dir
+    bats_filter = args.bats
     rv_mode = args.rv_mode
     pitch_qual = args.pitch_qual
 
@@ -4108,6 +4114,10 @@ def main():
         date_label = f"{start_date} to {end_date}"
         date_slug = f"{start_obj.strftime('%m%d')}-{end_obj.strftime('%m%d%Y')}"
 
+    if bats_filter:
+        _hand_lbl = 'vs LHH' if bats_filter == 'L' else 'vs RHH'
+        date_label = f"{date_label} {_hand_lbl}"
+        display_date = f"{display_date}  ·  {_hand_lbl}"
     if filter_pitchers:
         print(f"═══ Generating cards for {', '.join(filter_pitchers)} ({team}) — {date_label} ({league}) ═══\n")
     else:
@@ -4225,6 +4235,8 @@ def main():
         pitcher_name = row.get('Pitcher', '')
         if pitcher_name:
             if filter_pitchers and pitcher_name not in filter_pitchers:
+                continue
+            if bats_filter and row.get('Bats') != bats_filter:
                 continue
             pitches_by_pitcher[pitcher_name].append(row)
             if row_date:
@@ -4563,7 +4575,8 @@ def main():
             name_slug = f"{parts[0]}{parts[1]}".replace(' ', '')
         else:
             name_slug = pitcher_name.replace(' ', '').replace(',', '')
-        output_file = os.path.join(output_dir, f"{date_slug}-{name_slug}.png")
+        _hs = f"-vs{bats_filter}" if bats_filter else ""
+        output_file = os.path.join(output_dir, f"{date_slug}-{name_slug}{_hs}.png")
 
         # Render
         success = render_card(config, pitches, output_file)
