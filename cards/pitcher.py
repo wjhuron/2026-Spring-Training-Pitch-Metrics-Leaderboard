@@ -3153,7 +3153,7 @@ def render_card(config, pitches, output_file):
     if is_season and 'Stuff+' in col_headers:
         _sp_cell = table.get_celld()[(0, col_headers.index('Stuff+'))]
         _sp_x = _sp_cell.get_window_extent(renderer).x0 / fig_bbox.width
-        _sp_note = ('PitchRV/100 actual · xPitchRV/100 expected (luck-neutral on contact) runs saved per 100 pitches: the gap is batted-ball fortune\n'
+        _sp_note = ('PitchRV/100 actual, xPitchRV/100 expected runs saved per 100 pitches. xPitchRV is luck-neutral on contact, so the gap is batted-ball fortune\n'
                     'Per-pitch Stuff+ graded vs the same pitch type, Loc+ vs its pitch family (100 = average for that type or family)\n'
                     'Overall Stuff+ = pitch-weighted average of per-pitch grades\n'
                     'Faded values: sample too small to grade; they color in as pitches accumulate')

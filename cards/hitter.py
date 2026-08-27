@@ -2464,8 +2464,8 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 '    average and each point is 1% better or worse, the way wRC+ reads.\n'
                 '•  GB% is colored so that lower = better.\n'
                 '•  Values are for this date window. Percentiles rank them against '
-                'the full-season MLB pool\n    (ROC and multi-team stint rows excluded), '
-                'with no minimum sample.'
+                'the full-season MLB pool\n    (ROC rows excluded; a traded player counts once, '
+                'through his combined row), with no minimum sample.'
             )
         elif date_filter is not None:
             # Window card with no pool. Say plainly which numbers are missing
@@ -2493,7 +2493,7 @@ def render_hitter_card(hitter_name, team_abbrev=None, year_label='2026 Season',
                 _notes += (
                     '\n•  Bat Speed at AAA comes from balls in play and strikeouts '
                     'only, not every swing.\n    The percentile ranks it against '
-                    'MLB all-swing values.'
+                    'MLB values built from all tracked swings (50+ mph).'
                 )
         fig.text(0.020, 0.068, _notes, fontsize=13, color=TEXT_MUTED, va='top',
                  ha='left', fontfamily='IBM Plex Sans', fontweight='600',
