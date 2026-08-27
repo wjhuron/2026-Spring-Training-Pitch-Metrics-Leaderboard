@@ -4210,6 +4210,10 @@ def main():
     filter_pitchers = "Marinaccio, Ron"                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
+    social          = False              # True = consolidated social card (daily/season by date mode) instead of the full card
+    bats            = None               # Batter-handedness filter: "L", "R", or None for both
+    rv_mode         = "per100"           # Season-card RV columns: "per100", "totals", or "both"
+    pitch_qual      = None               # Min pitches for a pitch type's RV coloring (None = default 50)
     output_dir      = OUTPUT_DIR
 
     # ── CLI overrides (optional — values above are used if no args passed) ──
@@ -4225,7 +4229,7 @@ def main():
     parser.add_argument('--pitchers', default=None, help='Semicolon-separated "Last, First" names')
     parser.add_argument('--game-pk', default=None, help='Game PK for live/in-progress games')
     parser.add_argument('--output-dir', default=None, help=f'Output directory (default: {OUTPUT_DIR})')
-    parser.add_argument('--rv-mode', default='per100', choices=['per100', 'totals', 'both'],
+    parser.add_argument('--rv-mode', default=None, choices=['per100', 'totals', 'both'],
                         help='Season-card RV columns: per-100 rates (default), cumulative '
                              'totals (PitchRV/xPitchRV), or both pairs. Single-game cards '
                              'always show cumulative xPitchRV.')
@@ -4266,9 +4270,11 @@ def main():
     if args.game_pk is not None: game_pk = args.game_pk
     if args.display_team is not None: display_team = args.display_team
     if args.output_dir is not None: output_dir = args.output_dir
-    bats_filter = args.bats
-    rv_mode = args.rv_mode
-    pitch_qual = args.pitch_qual
+    if args.social: social = True
+    if args.bats is not None: bats = args.bats
+    bats_filter = bats
+    if args.rv_mode is not None: rv_mode = args.rv_mode
+    if args.pitch_qual is not None: pitch_qual = args.pitch_qual
 
     # Parse filter_pitchers string into list
     if filter_pitchers:
@@ -4845,7 +4851,7 @@ def main():
         output_file = os.path.join(output_dir, f"{date_slug}-{name_slug}{_hs}.png")
 
         # Render
-        if args.social:
+        if social:
             output_file = os.path.join(output_dir,
                                        f"Social-{date_slug}-{name_slug}{_hs}.png")
             success = render_social_card(config, pitches, output_file)

@@ -275,7 +275,7 @@ Keep this file under 500 lines. It loads into every session, and long context ma
 - `0 Stuff+ grades` in the CI log means the grade dump is missing. The run is bad even though it succeeded.
 - Do not move anything in `scripts/ci/` without editing `.github/workflows/update-leaderboard.yml` in the same commit.
 - Do not move `scripts/abs_daily.py` or `scripts/auto-pull.sh`. launchd pins their paths.
-- The settings blocks at the top of `scrapers/pitcher2026.py`, `cards/pitcher.py`, `cards/hitter.py` and the ford_comps scripts are per-run scratch. Stage files explicitly when committing logic changes so team, dates, and player_id edits do not ride along. Reset the dates to `None` in the committed version: a shipped `start_date` makes a bare run render a window instead of the season.
+- The settings blocks at the top of `scrapers/pitcher2026.py`, `cards/pitcher.py`, `cards/hitter.py` and the ford_comps scripts are per-run scratch. Every option-type card control (social, bats, rv_mode, layout, la_view, ...) ALWAYS gets a variable in that block with the CLI flag as override — never a CLI-only option (per Wally 2026-08-27). Stage files explicitly when committing logic changes so team, dates, and player_id edits do not ride along. Reset the dates to `None` in the committed version: a shipped `start_date` makes a bare run render a window instead of the season.
 - Read the README in `archive/` and `scripts/archive/` before re-running anything there. Some of it is destructive.
 - Concurrent sessions can swallow each other's staged files. Check `git status` before committing if another session is open.
 - `.venv/` is load-bearing for the IDE. Never delete it.

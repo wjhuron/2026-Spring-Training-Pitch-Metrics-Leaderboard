@@ -3018,6 +3018,8 @@ def main():
     end_date       = None                                 # Set to a date for date range, or None for single day
     filter_hitters = ""       # Semicolon-separated "Last, First" names, or "" for all
     year_label     = "2026 Season"        # Display label on the card
+    layout         = "bubbles"            # Card layout: "bubbles" or "classic"
+    la_view        = "damage"             # LA x spray coloring: "damage" or "outcome"
     output_dir     = OUTPUT_DIR
 
     # ── CLI overrides (optional — values above are used if no args passed) ──
@@ -3034,12 +3036,12 @@ def main():
                          help=f'Display label on the card (default: "{year_label}")')
     parser.add_argument('--output-dir', default=None,
                          help=f'Output directory (default: {OUTPUT_DIR})')
-    parser.add_argument('--layout', default='bubbles',
+    parser.add_argument('--layout', default=None,
                          choices=['classic', 'bubbles'],
                          help="'bubbles' (default) = single-column percentile grid "
                               "(Result / QoC / Plate Discipline / Bat Tracking). "
                               "'classic' = legacy heat maps + contact profile + pitch group table.")
-    parser.add_argument('--la-view', default='damage', choices=['damage', 'outcome'],
+    parser.add_argument('--la-view', default=None, choices=['damage', 'outcome'],
                          help="LA x Spray mode: 'damage' (default) = softened damage-zone "
                               "gradient + barrel/hard-hit/other dots + quality-contact "
                               "concentration ellipse; 'outcome' = full wOBAcon zones + "
@@ -3052,8 +3054,8 @@ def main():
     if args.hitters is not None: filter_hitters = args.hitters
     if args.year_label is not None: year_label = args.year_label
     if args.output_dir is not None: output_dir = args.output_dir
-    layout = args.layout
-    la_view = args.la_view
+    if args.layout is not None: layout = args.layout
+    if args.la_view is not None: la_view = args.la_view
 
     # Parse filter_hitters string into a list (empty string → render all)
     if filter_hitters:
