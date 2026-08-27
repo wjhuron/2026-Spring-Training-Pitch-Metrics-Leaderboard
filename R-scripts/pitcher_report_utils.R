@@ -227,6 +227,19 @@ keep_populated_cols <- function(cols, data, pitcher_name) {
 # aggregate. Shape (velocity, max velo, spin, tilt, IVB/HB, approach angle)
 # describes a single pitch type, and an average across types is not a pitch
 # anyone threw, so those stay NA and render blank.
+# Bunts are not swings (mirrors pipeline.utils.is_swing; 2026-08-27 audit):
+# an In Play pitch whose BBType is a bunt leaves every swing denominator.
+# Foul Bunt / Missed Bunt never enter the set (distinct Descriptions).
+swing_mask <- function(df) {
+  s <- df$Description %in% c("Swinging Strike", "Foul", "In Play")
+  if ("BBType" %in% names(df)) {
+    bunt <- !is.na(df$BBType) & grepl("^bunt", df$BBType)
+    s & !(df$Description == "In Play" & bunt)
+  } else {
+    s
+  }
+}
+
 summarize_total_row <- function(data, pitcher_name, gb_zero = "---") {
   d <- data %>% filter(Pitcher == pitcher_name)
   n_all <- nrow(d)
@@ -238,7 +251,7 @@ summarize_total_row <- function(data, pitcher_name, gb_zero = "---") {
 
   pct <- function(num, den) if (den > 0) sprintf("%.1f%%", num / den * 100) else "---"
 
-  swings  <- sum(d$Description %in% swing_events, na.rm = TRUE)
+  swings  <- sum(swing_mask(d), na.rm = TRUE)
   has_iz  <- "InZone" %in% names(d)
   has_bb  <- "BBType" %in% names(d)
   ooz     <- if (has_iz) sum(d$InZone == "No", na.rm = TRUE) else 0
@@ -265,7 +278,7 @@ summarize_total_row <- function(data, pitcher_name, gb_zero = "---") {
     csw_percent   = pct(sum(d$Description %in% csw_events, na.rm = TRUE), n_all),
     swstr_percent = pct(sum(d$Description %in% swstr_events, na.rm = TRUE), swings),
     chase_percent = if (has_iz && ooz > 0)
-      pct(sum(d$Description %in% swing_events & d$InZone == "No", na.rm = TRUE), ooz)
+      pct(sum(swing_mask(d) & d$InZone == "No", na.rm = TRUE), ooz)
       else "---",
     gb_percent    = if (bip > 0)
       pct(sum(d$Description %in% in_play_events & d$BBType == "ground_ball", na.rm = TRUE), bip)
@@ -379,6 +392,7 @@ summarize_pitch_type_stats <- function(data, pitcher_name, has_arm_angle = FALSE
   swstr_events <- c("Swinging Strike")
   in_play_events <- c("In Play")
 
+  pitcher_data$IsSwing <- swing_mask(pitcher_data)
   pitcher_data %>%
     group_by(`Pitch Type`) %>%
     summarize(
@@ -399,10 +413,10 @@ summarize_pitch_type_stats <- function(data, pitcher_name, has_arm_angle = FALSE
       avg_haa = fmt_or_blank(HAA, "%.2f°"),
       # Outcome metrics
       iz_percent = sprintf("%.1f%%", sum(InZone == "Yes", na.rm = TRUE) / n() * 100),
-      swing_percent = sprintf("%.1f%%", sum(Description %in% swing_events, na.rm = TRUE) / n() * 100),
+      swing_percent = sprintf("%.1f%%", sum(IsSwing, na.rm = TRUE) / n() * 100),
       csw_percent = sprintf("%.1f%%", sum(Description %in% csw_events, na.rm = TRUE) / n() * 100),
       swstr_percent = {
-        total_swings <- sum(Description %in% swing_events, na.rm = TRUE)
+        total_swings <- sum(IsSwing, na.rm = TRUE)
         if (total_swings > 0) {
           sprintf("%.1f%%", sum(Description %in% swstr_events, na.rm = TRUE) / total_swings * 100)
         } else {
@@ -413,7 +427,7 @@ summarize_pitch_type_stats <- function(data, pitcher_name, has_arm_angle = FALSE
       chase_percent = {
         ooz_pitches <- sum(InZone == "No", na.rm = TRUE)
         if (ooz_pitches > 0) {
-          sprintf("%.1f%%", sum(Description %in% swing_events & (InZone == "No"), na.rm = TRUE) / ooz_pitches * 100)
+          sprintf("%.1f%%", sum(IsSwing & (InZone == "No"), na.rm = TRUE) / ooz_pitches * 100)
         } else {
           "---"
         }

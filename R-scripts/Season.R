@@ -52,6 +52,8 @@ calculate_platoon_stats <- function(data, pitcher_name) {
   csw_events <- c("Called Strike", "Swinging Strike")
   swstr_events <- c("Swinging Strike")
   in_play_events <- c("In Play")
+  # Bunts are not swings: precomputed mask from pitcher_report_utils.R.
+  pitcher_data$IsSwing <- swing_mask(pitcher_data)
 
   # Calculate total pitches by handedness first
   total_pitches_by_handedness <- pitcher_data %>%
@@ -65,12 +67,12 @@ calculate_platoon_stats <- function(data, pitcher_name) {
       num_thrown = n(),
       # IZ% count
       iz_count = sum(InZone == "Yes", na.rm = TRUE),
-      swing_count = sum(Description %in% swing_events, na.rm = TRUE),
+      swing_count = sum(IsSwing, na.rm = TRUE),
       csw_count = sum(Description %in% csw_events, na.rm = TRUE),
       swstr_count = sum(Description %in% swstr_events, na.rm = TRUE),
       # Chase count (swings outside zone) and out-of-zone pitch count
       ooz_count = sum(InZone == "No", na.rm = TRUE),
-      chase_count = sum(Description %in% swing_events & (InZone == "No"), na.rm = TRUE),
+      chase_count = sum(IsSwing & (InZone == "No"), na.rm = TRUE),
       # Ground Ball calculations
       balls_in_play = sum(Description %in% in_play_events & !grepl("^bunt", BBType), na.rm = TRUE),
       ground_balls = sum(Description %in% in_play_events & BBType == "ground_ball", na.rm = TRUE),

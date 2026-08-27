@@ -4,8 +4,8 @@ output_directory <- path.expand("~/Downloads/")
 # ---- Optional Filtering Parameters ----
 # Set these to NULL to disable filtering
 selected_pitcher_filter <- NULL          # Example format: "Bieber, Shane" - Set to NULL for all pitchers
-start_date_filter <- "2026-08-17"        # Example format: "2025-05-18" - Set to NULL for no date filter
-end_date_filter <- "2026-08-17"          # Example format: "2025-05-18" - Set to NULL for no date filter
+start_date_filter <- "2026-08-27"        # Example format: "2025-05-18" - Set to NULL for no date filter
+end_date_filter <- "2026-08-27"          # Example format: "2025-05-18" - Set to NULL for no date filter
 # ---- Required Libraries ----
 library(tidyverse)
 library(patchwork)
@@ -94,6 +94,8 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
   swing_events <- c("Swinging Strike", "Foul", "In Play")
   csw_events <- c("Called Strike", "Swinging Strike")
   swstr_events <- c("Swinging Strike")
+  # Bunts are not swings: precomputed mask from pitcher_report_utils.R.
+  pitcher_data$IsSwing <- swing_mask(pitcher_data)
   in_play_events <- c("In Play")
 
   # --- Determine which conditional pitch metric columns have data ---
@@ -198,7 +200,7 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
         sum(Description %in% csw_events, na.rm = TRUE) / n() * 100
       ),
       swstr_percent = {
-        total_swings <- sum(Description %in% swing_events, na.rm = TRUE)
+        total_swings <- sum(IsSwing, na.rm = TRUE)
         if (total_swings > 0) {
           sprintf("%.1f%%",
                   sum(Description %in% swstr_events, na.rm = TRUE) / total_swings * 100)
@@ -209,7 +211,7 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
       chase_percent = {
         ooz_pitches <- sum(InZone == "No", na.rm = TRUE)
         if (ooz_pitches > 0) {
-          ooz_swings <- sum(Description %in% swing_events &
+          ooz_swings <- sum(IsSwing &
                               (InZone == "No"), na.rm = TRUE)
           sprintf("%.1f%%", ooz_swings / ooz_pitches * 100)
         } else {
@@ -241,7 +243,7 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
     )
 
   # --- Compute and append Total row ---
-  total_swings_all <- sum(pitcher_data$Description %in% swing_events, na.rm = TRUE)
+  total_swings_all <- sum(pitcher_data$IsSwing, na.rm = TRUE)
   total_bip_all <- sum(
     pitcher_data$Description %in% in_play_events &
       !grepl("^bunt", pitcher_data$BBType),
@@ -296,7 +298,7 @@ calculate_pitcher_stats <- function(data, pitcher_name) {
         sprintf(
           "%.1f%%",
           sum(
-            pitcher_data$Description %in% swing_events &
+            pitcher_data$IsSwing &
               (pitcher_data$InZone == "No"),
             na.rm = TRUE
           ) / ooz_all * 100
