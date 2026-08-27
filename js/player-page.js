@@ -1462,16 +1462,27 @@ var PlayerPage = {
       }
     }
     var groups = {};
+    var expSums = {};
     for (var fi = 0; fi < filteredPitches.length; fi++) {
       var fp = filteredPitches[fi];
       if (fp.ivb == null || fp.hb == null) continue;
       if (!groups[fp.pt]) groups[fp.pt] = [];
       groups[fp.pt].push({ x: fp.hb, y: fp.ivb });
+      // Expected-movement sums for the overlay (2026-08-27, per Wally).
+      // Independent per-axis means over the pitches that carry the model
+      // value, the same accounting behind the shipped ivbOE/hbOE columns.
+      var es = expSums[fp.pt];
+      if (!es) es = expSums[fp.pt] = { aV: 0, nAV: 0, aH: 0, nAH: 0, eV: 0, nEV: 0, eH: 0, nEH: 0 };
+      es.aV += fp.ivb; es.nAV++;
+      es.aH += fp.hb; es.nAH++;
+      if (fp.xivb != null) { es.eV += fp.xivb; es.nEV++; }
+      if (fp.xhb != null) { es.eH += fp.xhb; es.nEH++; }
     }
     if (Object.keys(groups).length === 0) return;
 
     var datasets = [];
     var ellipseMeta = [];
+    var oeMeta = [];
     var pitchTypes = Utils.sortPitchTypes(Object.keys(groups));
     // Hairline edge matching the panel bg — de-blobs dense clusters without a contrasting ring
     var dotEdge = 'rgba(240,232,216,0.9)';
@@ -1496,6 +1507,19 @@ var PlayerPage = {
       var ellipse = ScatterChart.computeEllipse(pts);
       if (ellipse) {
         ellipseMeta.push({ color: color.bg, ellipse: ellipse });
+      }
+
+      // Expected-movement marker (2026-08-27, per Wally): ghost at the MVN
+      // model expectation, disc at the actual mean, dashed connector between
+      // them — ivbOE/hbOE drawn instead of printed. Needs 10+ modeled pitches;
+      // types without model values (draw nothing) degrade silently by design.
+      var es2 = expSums[pt];
+      if (es2 && es2.nEV >= 10 && es2.nEH >= 10) {
+        oeMeta.push({
+          color: color.bg,
+          aX: es2.aH / es2.nAH, aY: es2.aV / es2.nAV,
+          eX: es2.eH / es2.nEH, eY: es2.eV / es2.nEV,
+        });
       }
     }
 
@@ -1581,6 +1605,50 @@ var PlayerPage = {
           ctx.stroke();
           ctx.setLineDash([]);
           ctx.restore();
+        },
+        // Expected-movement overlay ON TOP of the dot cloud (per the approved
+        // prototype): cream-filled ghost with a dashed pitch-colored ring at
+        // the model expectation, ink-ringed disc at the actual mean, dashed
+        // ink connector between them.
+        afterDatasetsDraw: function (chart) {
+          var ctx = chart.ctx;
+          var xAxis = chart.scales.x;
+          var yAxis = chart.scales.y;
+          for (var oi = 0; oi < oeMeta.length; oi++) {
+            var om = oeMeta[oi];
+            var ax = xAxis.getPixelForValue(om.aX);
+            var ay = yAxis.getPixelForValue(om.aY);
+            var ex = xAxis.getPixelForValue(om.eX);
+            var ey = yAxis.getPixelForValue(om.eY);
+            ctx.save();
+            // connector
+            ctx.strokeStyle = 'rgba(26,22,18,0.75)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 3]);
+            ctx.beginPath();
+            ctx.moveTo(ex, ey);
+            ctx.lineTo(ax, ay);
+            ctx.stroke();
+            // ghost at expectation
+            ctx.setLineDash([3, 2.5]);
+            ctx.fillStyle = '#f0e8d8';
+            ctx.strokeStyle = om.color;
+            ctx.lineWidth = 2.6;
+            ctx.beginPath();
+            ctx.arc(ex, ey, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            // actual mean disc
+            ctx.setLineDash([]);
+            ctx.fillStyle = om.color;
+            ctx.strokeStyle = '#1a1612';
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            ctx.arc(ax, ay, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+          }
         },
       }],
     });
