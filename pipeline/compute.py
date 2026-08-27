@@ -71,7 +71,11 @@ HITTER_STAT_KEYS = [
 HITTER_INVERT_PCTL = {'chasePct', 'whiffPct', 'gbPct', 'kPct', 'puPct', 'twoStrikeWhiffPct', 'firstPitchSwingPct', 'oppoPct'}
 
 PITCHER_BB_KEYS = ['avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'ldPct', 'fbPct', 'puPct', 'hrFbPct', 'xwOBAsp']
-PITCHER_BB_INVERT = {'avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'hrFbPct', 'xwOBAsp'}
+# ldPct/fbPct joined 2026-08-27 (audit): the pitcher-level ranks shipped
+# hitter-favorable while the pitch-type level inverted the same stats. No
+# surface displayed them, but any future consumer would have colored
+# backwards without an error.
+PITCHER_BB_INVERT = {'avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'hrFbPct', 'xwOBAsp', 'ldPct', 'fbPct'}
 
 # ── Stat computation functions ───────────────────────────────────────────
 

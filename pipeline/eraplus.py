@@ -17,7 +17,9 @@ replicates.
 
     hpERA = poolERA + sum_c W_PH[c] * z(channel_c)
 
-Channels (ERA direction, i.e. higher value = more expected runs):
+Channels (ERA direction, i.e. higher value = more expected runs).
+NOTE (corrected 2026-08-27): xw feeds hdERA only — W_PH carries no xw
+term; the eight hpERA channels are the rest of this table.
     xw     shrunk xwOBA against          stuff  -stuffScore (as published;
     k      -(shrunk K%)                          its own reliability
     izwh   -izWhiff%                             regression stands in for
@@ -465,7 +467,9 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
         for r in rows:
             p = _pctl(r.get(key), pool)
             if p is not None and invert:
-                p = round(100.0 - p, 1)
+                # int like every other shipped percentile (2026-08-27 audit:
+                # round(...,1) here was the one float-typed rank in the JSON).
+                p = int(round(100.0 - p))
             r[key + '_pctl'] = p
 
     n_dh = sum(1 for r in rows if r.get('hdERA') is not None)
@@ -491,6 +495,15 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
             'lgGb': round(_channels.lg_gb, 5),
             'lgXrv': round(_channels.lg_xrv, 5),
             'locScaleK': LOC_SCALE_K}
+
+
+# Display floor for scratch/window hpERA, a labeled CONVENTION rather than a
+# swept constant: the docstring promised a pa >= 100 proxy for the season
+# path's 30 IP domain floor, and until 2026-08-27 no gate existed at all, so
+# tiny windows printed an hpERA. 100 PA ~ 25 IP of batters faced, the closest
+# available proxy in window context (no g/outs there). If a measured gate is
+# ever wanted, sweep window-vs-season hpERA agreement by PA per the repo rule.
+SCRATCH_HP_MIN_PA = 100
 
 
 def score_scratch_row(row, pitches, g, gs, team, const, season=None):
@@ -566,7 +579,11 @@ def score_scratch_row(row, pitches, g, gs, team, const, season=None):
     zs['park'] = z('park', _load_park(season).get(team, 100.0) / 100.0)
 
     ph = None
-    if all(zs.get(c) is not None for c in W_PH):
+    # The gate the docstring always promised (implemented 2026-08-27): below
+    # SCRATCH_HP_MIN_PA the window is too small for a projection to mean
+    # anything, so hpERA stays blank. hdERA already shrinks by pa and keeps
+    # rendering.
+    if pa >= SCRATCH_HP_MIN_PA and all(zs.get(c) is not None for c in W_PH):
         ph = anchor + sum(W_PH[c] * zs[c] for c in W_PH)
     return (round(dh, 2) if dh is not None else None,
             round(ph, 2) if ph is not None else None)

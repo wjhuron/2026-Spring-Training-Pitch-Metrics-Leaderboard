@@ -96,6 +96,53 @@ from pipeline.utils import (compute_runexp_scale, runexp_factor,
                             runexp_scale_to_json)
 
 
+def _hitter_pitch_row_finish(row, plist, ep_pitchers, woba_weights,
+                             xrv_lg, xrv_scale, count_offsets, bip_count_means):
+    """Shared finish for hitter-pitch leaderboard rows (2026-08-27 audit).
+
+    Three season-row conventions the per-pitch rows lacked:
+    - xwOBA on the pulled-air hitter basis (xwoba_key='xwOBA_hb'), so the
+      tab's All row matches the hitter's headline xwOBA.
+    - xwOBAcon excludes position-pitcher (EP) pitches, mirroring the
+      skill-metric exclusion on the season row.
+    - Pitch-derived AVG/SLG/ISO: the columns shipped with every avg_pctl None
+      and no values. A per-type slash has no official line to merge, so the
+      pitch-derived version is the only honest basis (PA-ending events only;
+      IBB markers never reach this path).
+    """
+    row.update(compute_expected_stats(plist, woba_weights=woba_weights,
+                                      xwoba_key='xwOBA_hb'))
+    row.update(compute_xrv(plist,
+                           lg_woba=xrv_lg, woba_scale=xrv_scale,
+                           count_offsets=count_offsets,
+                           bip_count_means=bip_count_means,
+                           negate=True))
+    if ep_pitchers:
+        _skill = [q for q in plist
+                  if (q.get('Pitcher'), q.get('PTeam')) not in ep_pitchers]
+        if len(_skill) != len(plist):
+            row['xwOBAcon'] = compute_expected_stats(
+                _skill, woba_weights=woba_weights).get('xwOBAcon')
+    n_ab = n_h = n_tb = 0
+    _tb = {'Single': 1, 'Double': 2, 'Triple': 3, 'Home Run': 4}
+    for q in plist:
+        ev = q.get('Event')
+        if not ev or ev in NON_PA_EVENTS:
+            continue
+        if (ev in BB_EVENTS or ev in HBP_EVENTS or ev in SF_EVENTS
+                or ev in SH_EVENTS or ev in CI_EVENTS):
+            continue
+        n_ab += 1
+        if ev in HIT_EVENTS:
+            n_h += 1
+            n_tb += _tb[ev]
+    row['avg'] = round(n_h / n_ab, 3) if n_ab else None
+    row['slg'] = round(n_tb / n_ab, 3) if n_ab else None
+    row['iso'] = (round(row['slg'] - row['avg'], 3)
+                  if n_ab else None)
+    return row
+
+
 def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
                         stuff_grades=None, loc_grades=None):
     """Generate micro-aggregate data for client-side date and opponent-hand filtering.
@@ -3200,12 +3247,9 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 '_isROC': is_roc,
             }
             row.update(compute_hitter_stats(pt_pitches))
-            row.update(compute_expected_stats(pt_pitches, woba_weights=WOBA_WEIGHTS))
-            row.update(compute_xrv(pt_pitches,
-                                    lg_woba=_xrv_lg, woba_scale=_xrv_scale,
-                                    count_offsets=XRV_COUNT_OFFSETS,
-                                    bip_count_means=XRV_BIP_COUNT_MEANS,
-                                    negate=True))
+            _hitter_pitch_row_finish(row, pt_pitches, ep_pitchers, WOBA_WEIGHTS,
+                                     _xrv_lg, _xrv_scale, XRV_COUNT_OFFSETS,
+                                     XRV_BIP_COUNT_MEANS)
             hitter_pitch_leaderboard.append(row)
 
         row_all = {
@@ -3219,12 +3263,9 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             '_isROC': is_roc,
         }
         row_all.update(compute_hitter_stats(pitches))
-        row_all.update(compute_expected_stats(pitches, woba_weights=WOBA_WEIGHTS))
-        row_all.update(compute_xrv(pitches,
-                                    lg_woba=_xrv_lg, woba_scale=_xrv_scale,
-                                    count_offsets=XRV_COUNT_OFFSETS,
-                                    bip_count_means=XRV_BIP_COUNT_MEANS,
-                                    negate=True))
+        _hitter_pitch_row_finish(row_all, pitches, ep_pitchers, WOBA_WEIGHTS,
+                                 _xrv_lg, _xrv_scale, XRV_COUNT_OFFSETS,
+                                 XRV_BIP_COUNT_MEANS)
         hitter_pitch_leaderboard.append(row_all)
 
         for cat_name, cat_types in PITCH_CATEGORIES.items():
@@ -3246,12 +3287,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                     '_isROC': is_roc,
                 }
                 row_cat.update(compute_hitter_stats(cat_pitches))
-                row_cat.update(compute_expected_stats(cat_pitches, woba_weights=WOBA_WEIGHTS))
-                row_cat.update(compute_xrv(cat_pitches,
-                                            lg_woba=_xrv_lg, woba_scale=_xrv_scale,
-                                            count_offsets=XRV_COUNT_OFFSETS,
-                                            bip_count_means=XRV_BIP_COUNT_MEANS,
-                                            negate=True))
+                _hitter_pitch_row_finish(row_cat, cat_pitches, ep_pitchers,
+                                         WOBA_WEIGHTS, _xrv_lg, _xrv_scale,
+                                         XRV_COUNT_OFFSETS,
+                                         XRV_BIP_COUNT_MEANS)
                 hitter_pitch_leaderboard.append(row_cat)
 
     # Compute rv100 and xRv100 for hitter pitch leaderboard rows
@@ -3327,56 +3366,19 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         _compute_hitter_lg_avg(stat)
     hitter_league_avgs['count'] = len(hitter_lb_mlb)
 
-    # BB+ — batted-ball contact-quality index indexed to 100 = league avg.
-    #
-    # TWO INGREDIENTS since 2026-08-19: mean xwOBAcon and the 95th-percentile
-    # exit velocity. BB+ was pure xwOBAcon+, and a mean of a heavy-tailed
-    # per-BIP quantity is a weak estimator of the underlying skill. EV95
-    # measures the same skill far more stably, so the two are blended.
-    #
-    #     raw = W_CON·shrink(conPlus, nBip, N0_CON)
-    #         + W_EV ·shrink(evPlus,  nBip, N0_EV)
-    #
-    # Each ingredient is shrunk at its OWN n0 BEFORE blending, which is NOT
-    # the same as blending then shrinking once — but only because the two n0
-    # differ. Shrinkage is linear, so with one shared n0 and one denominator
-    # the two forms are algebraically identical. The whole gain here comes
-    # from xwOBAcon needing heavy shrinkage (200) while EV95 needs none (0).
-    #
-    # Derivation: scripts/research/hitter/bbplus_ev_derivation.py, results in
-    # data/_bbplus_ev_derivation.json. Leave-one-SEASON-out (the folds inside
-    # a season share games, so seasons are the independent unit), 3 seeds,
-    # 2021-2026, config and composite weights fitted on training seasons only.
-    # Held-out gain over pure-xwOBAcon BB+: +.0311 descriptive on actual wOBA
-    # (6/6 seasons) and +.0270 predictive on next-season wOBA (5/5 pairs).
-    #
-    # W_EV 0.70 reads alarming and is not: the ingredients have very different
-    # spreads, SD(conPlus) ≈ 15 against SD(evPlus) ≈ 2.6, so 0.70 in plus
-    # units buys EV about 28% of the standardised variance.
-    #
-    # Constants, labelled honestly. Percentile 95: p90 and p95 are
-    # indistinguishable (.5601 vs .5610) — a FLAT region, not a bracketed
-    # peak; p95 is the consistent argmax (6/6 nested picks) and carries no
-    # sample-size penalty (see below). W_EV 0.70: a genuine interior optimum
-    # with curvature both sides. N0_CON 200: interior optimum but flat to
-    # .0003 across 130-280, so anything in that band works. N0_EV 0: the
-    # argmax and a real endpoint, meaning EV95 is not shrunk at all.
-    #
-    # DO NOT substitute max EV. It won the raw percentile sweep and is an
-    # artifact: a maximum grows mechanically with the number of batted balls,
-    # BIP count tracks playing time, and playing time tracks quality. maxEV
-    # correlates .389 with nBip against .225 for p95; with log(nBip)
-    # controlled it LOSES. Within sample-size bands p90 and p95 are identical
-    # (.141/.141, .088/.089) and only maxEV stays contaminated (.158, .186).
-    #
-    # sprayVal was retired as an ingredient on 2026-07-13 (ridge beta
-    # negative; the pure-con BB+ beat the 85/15 mix in every fold). The
-    # weight is kept in the metadata contract at 0.0 so the JS mirror stays
-    # general.
-    #
-    # Mirrored in js/aggregator.js via metadata bbPlusWeights /
-    # bbPlusShrinkN0Con / bbPlusShrinkN0Ev / bbPlusEvPct — BB+ is the ONLY
-    # "+" recomputed client-side, so both sides move in the same commit.
+    # (A 2026-08-19 first-cut header lived here — W_EV 0.70 / N0_CON 200,
+    # no unit conversion — describing a retired spec; removed 2026-08-27.
+    # The shipped spec is the block below. Three notes from it that remain
+    # load-bearing:
+    #  - DO NOT substitute max EV for EV95: a maximum grows mechanically with
+    #    BIP count, which tracks playing time and quality. maxEV correlates
+    #    .389 with nBip vs .225 for p95, and LOSES with log(nBip) controlled.
+    #  - sprayVal was retired as an ingredient 2026-07-13 (ridge beta
+    #    negative); W_SP stays 0.0 only so the JS metadata contract stays
+    #    general.
+    #  - BB+ is the ONLY "+" recomputed client-side: the constants mirror to
+    #    js/aggregator.js via metadata (bbPlusWeights / bbPlusShrinkN0Con /
+    #    bbPlusShrinkN0Ev / bbPlusEvPct), so both sides move in one commit.)
     # BB+ — batted-ball contact-quality index, 100 = league average.
     #
     # TWO INGREDIENTS: mean xwOBAcon and the 95th-percentile exit velocity.
@@ -4538,24 +4540,23 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     else:
         print("  Hitter+ wRC+ scale match skipped (wRC+ pool too small) — SD-40 scale stands.")
 
-    # ── BB+/SD+/CT+ display scales (2026-08-15, supersedes uniform wRC+
-    # matching) ──
-    # Measured run slopes (scripts/research/hitter/hitter_spread_atlas.py, 2021-2026
-    # replicates, wRC+ points per 1 SD of metric):
-    #   BB+  15.9 desc / 10.7 pred  (r ~ .66 -> a production sub-estimate:
-    #        keep the wRC+ currency, at its measured 0.66x share)
+    # ── BB+/SD+/CT+ display scales ──
+    # CURRENT POLICY (2026-08-18, the "+" contract; this header rewritten
+    # 2026-08-27 — the 2026-08-15 version described a superseded SD-pinning
+    # scheme): every component stays on its natural percent-of-league scale
+    # (100 = league average, one point = one percent), the factor below is
+    # hard-pinned to 1.0 (NO spread matching for components), and the only
+    # adjustment applied here is the ADDITIVE PA-weighted re-anchor to 100.
+    # wRC+ scaling exists in exactly two places, neither of them here:
+    # Hitter+ (live-r deflation, below) and xWRC+ (the run-truth cap).
+    # Measured run slopes, kept for context
+    # (scripts/research/hitter/hitter_spread_atlas.py, 2021-2026 replicates,
+    # wRC+ points per 1 SD of metric):
+    #   BB+  15.9 desc / 10.7 pred
     #   SD+   5.8 desc /  6.1 pred  (real, stable skill; tiny run payoff)
     #   CT+  ~0 both horizons       (quantity trades against quality)
-    # Printing SD+/CT+ at wRC+ width overstated their run meaning 4x-to-
-    # infinite, and printing them at run-truth width would produce dead
-    # columns — so they move to the explicit skill z-ruler the pitcher side
-    # already uses (Command+/Pitcher+ convention): pool SD pinned at 10,
-    # "+10 = 1 SD better at the skill", no run claim in the scale at all.
-    # BB+ keeps the live wRC+ anchor (factor x current pool SD) for the same
-    # reason Hitter+ does: the factor is the measured season-invariant
-    # quantity, wRC+'s deflating spread is intentionally current.
     # The value differences between components are carried explicitly by
-    # the Hitter+ weights, as before.
+    # the Hitter+ weights.
     #
     # Ordering matters and is load-bearing:
     #   - AFTER Hitter+ is built from these three, so Hitter+ is invariant by
@@ -4970,62 +4971,13 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # ==========================================================
     print("\n--- Computing percentiles (single pass) ---")
 
-    # ── Qualified-pool helpers ──
-    # Rate-stat percentile distributions are defined ONLY by qualified players
-    # (3.1 PA × team_games for hitters; IP × team_games role-adjusted for
-    # pitchers). All rows still get a percentile rank stored — non-qualified
-    # rows have ranks for tooltip display but are not colored at render time.
-    # Counting stats (hr, sb) keep the unfiltered pool.
-    # Canonical qualification — ROC-aware via the shared pipeline_utils
-    # helpers (MLB hitter 3.1 PA×TG, ROC 2.7; MLB SP 1.0 IP×TG / RP 0.5,
-    # ROC SP 0.8 / RP 0.4). NOTE: compute_percentile_ranks_with_aaa routes
-    # ROC rows to interpolation BEFORE qualifier_fn is ever called, so the
-    # MLB pool is unaffected by the ROC branch here — the ROC-aware code
-    # is kept for correctness/consistency with the frontend.
-    from pipeline.utils import (
-        hitter_pa_per_game, pitcher_ip_per_game, SP_GS_RATIO,
-        is_combined_team, player_key, current_team_by_player,
-    )
-
-    # Which club supplies the denominator. A combined 2TM/3TM row resolves to
-    # the team the player is on now; everything else uses its own team. This
-    # mirrors Utils.buildQualContext in js/utils.js — the two must agree or the
-    # shipped percentiles and the site's render gate disagree.
-    _pitcher_current_team = current_team_by_player(pitcher_leaderboard, 'pitcher', AAA_TEAMS)
-    _hitter_current_team = current_team_by_player(hitter_leaderboard, 'hitter', AAA_TEAMS)
-
-    def _qual_team_games(row, name_key, current_team):
-        team = row.get('team')
-        if is_combined_team(team):
-            # The label is a player, not a franchise, so it has no schedule.
-            # This used to fall through to max(team_games_played.values()),
-            # which made every traded player clear the league's longest
-            # schedule (127) instead of his own club's.
-            team = current_team.get(player_key(row, name_key))
-        # No entry means no rate, and "unknown" is not "qualified".
-        return team_games_played.get(team) or 0
-
-    def _hitter_qualified_for_pctl(row):
-        tg = _qual_team_games(row, 'hitter', _hitter_current_team)
-        if not tg:
-            return False
-        pa = row.get('pa', 0) or 0
-        return pa >= hitter_pa_per_game(bool(row.get('_isROC'))) * tg
-
-    def _pitcher_qualified_for_pctl(row):
-        tg = _qual_team_games(row, 'pitcher', _pitcher_current_team)
-        if not tg:
-            return False
-        ip_str = row.get('ip')
-        ip_f = ip_str_to_float(ip_str) if ip_str is not None else 0
-        g = row.get('g') or 0
-        gs = row.get('gs') or 0
-        is_starter = g > 0 and (gs / g) > SP_GS_RATIO
-        per_game = pitcher_ip_per_game(is_starter, bool(row.get('_isROC')))
-        return ip_f >= tg * per_game
-
-    # Hitter counting stats — keep unfiltered pool, do not apply qualifier_fn.
-    HITTER_COUNTING_PCTL = {'hr', 'sb'}
+    # Pool doctrine (comment corrected 2026-08-27): the percentile pool is
+    # ALL MLB players — qualification is a render-time coloring gate applied
+    # in the site layer, never a pool filter (root CLAUDE.md). A stale header
+    # here claimed qualified-only pools, above ~50 lines of qualifier
+    # plumbing that no percentile call ever received; both are gone. The
+    # qualifier_fn parameter on compute_percentile_ranks remains for any
+    # future caller that genuinely wants a restricted pool.
 
     # Pitch-type outcome stats — non-shape per-pitch stats use min_count=25
     # so pitches thrown rarely (e.g., 5 sliders) don't pollute the per-pitch

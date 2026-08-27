@@ -304,7 +304,12 @@ def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None,
             r['_projRaw'] = PROJ_CUR_W * v + PROJ_PRIOR_W * float(pv)
             n_prior += 1
         else:
-            r['_projRaw'] = v          # no prior -> current-only (Marcel)
+            r['_projRaw'] = v          # no prior -> current value seeds the
+                                       # blend (Marcel); NOTE the pool-wide
+                                       # re-standardization below still
+                                       # stretches these rows ~6%, so the
+                                       # emitted Proj is not literally the
+                                       # current Pitcher+ (2026-08-27 audit).
         if _is_baseline(r, aaa):
             blended.append(r['_projRaw'])
     # Re-standardize: blending two imperfectly-correlated 100+/-10 values

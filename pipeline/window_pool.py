@@ -62,8 +62,12 @@ def build_window_hitter_row(pitches, metadata, identity=None):
     row['count'] = len(pitches)
     row['lastGameDate'] = max(_d) if _d else None
     row.update(compute_hitter_stats(pitches))
+    # xwoba_key='xwOBA_hb' (2026-08-27 audit): the window xwOBA was the one
+    # hitter surface still on the raw basis, so it ranked a raw value inside
+    # the hb-basis season pool and skewed window xWRC+ with it.
     row.update(compute_expected_stats(
-        pitches, woba_weights=metadata.get('wobaWeights')))
+        pitches, woba_weights=metadata.get('wobaWeights'),
+        xwoba_key='xwOBA_hb'))
 
     pa_p = [p for p in pitches
             if p.get('Event') and p['Event'] not in NON_PA_EVENTS]
@@ -273,13 +277,23 @@ def score_window_against_season(hitter_key, window_pitches, all_pitches,
     from pipeline.sdplus import compute_sd_plus
     from pipeline.contact import compute_ct_plus
     by = defaultdict(list)
+    # Position-player pitches leave every skill-metric input (2026-08-27
+    # audit), mirroring the season path: the league cell tables, every
+    # hitter's decision/contact pitches, and the window hitter's own.
+    _ep = {(p.get('Pitcher'), p.get('PTeam'))
+           for p in all_pitches if p.get('Pitch Type') == 'EP'}
+    def _no_ep(plist):
+        return ([q for q in plist
+                 if (q.get('Pitcher'), q.get('PTeam')) not in _ep]
+                if _ep else plist)
+    all_pitches = _no_ep(all_pitches)
     for p in all_pitches:
         if p.get('_roc_pitcher_pitch'):
             continue
         b, bt = p.get('Batter'), p.get('BTeam')
         if b and bt and bt in ALL_TEAMS:
             by[(b, bt)].append(p)
-    by[hitter_key] = window_pitches          # this hitter only, window-scoped
+    by[hitter_key] = _no_ep(window_pitches)  # this hitter only, window-scoped
     if verbose:
         print(f"    scoring SD+/CT+ against season tables "
               f"({len(all_pitches)} league pitches)...")
@@ -313,6 +327,20 @@ def score_window_against_season(hitter_key, window_pitches, all_pitches,
     row['ctPlus'] = c['ctPlus'] if c else None
     row['ctPlusRaw'] = round(c['raw_ct_adj'], 5) if c else None
     row['ctPlusN'] = c['n_swings'] if c else 0
+    # Post-chain scaling (2026-08-27 audit): the season path multiplies by
+    # plusReanchor and applies the plusWrcScale factor/shift AFTER the raw
+    # computation; the window skipped both, so window SD+/CT+ read ~1.2
+    # points high and fed pre-chain values into the post-chain Hitter+
+    # anchors below. Same two stages the bbPlus block above applies.
+    for _pk in ('sdPlus', 'ctPlus'):
+        if row.get(_pk) is None:
+            continue
+        _v = row[_pk] * ((metadata.get('plusReanchor') or {}).get(_pk) or 1.0)
+        _wrc = (metadata.get('plusWrcScale') or {}).get(_pk) or {}
+        if _wrc.get('factor'):
+            _v = (100.0 + (_v - 100.0) * _wrc['factor']
+                  + (_wrc.get('shift') or 0.0))
+        row[_pk] = round(_v, 6)
 
     # ── Hitter+ : composite on the SEASON standardization, so a window number
     # sits on the same ruler as the season card and as every other window.
@@ -344,6 +372,14 @@ def score_window_against_season(hitter_key, window_pitches, all_pitches,
         xw = row.get('xwOBA')
         row['xWRCplus'] = (round((((xw - lgw) / sc) + rpa) / rpa * 100)
                            if xw is not None else None)
+        # Run-truth cap (2026-08-27 audit): the season path prints xWRC+ at
+        # the published factor/shift (plusWrcScale.xWRCplus); the window
+        # skipped it, printing ~27% too wide and then ranking that uncapped
+        # value inside the capped season pool.
+        _xf = (metadata.get('plusWrcScale') or {}).get('xWRCplus') or {}
+        if row.get('xWRCplus') is not None and _xf.get('factor'):
+            row['xWRCplus'] = round(100.0 + (row['xWRCplus'] - 100.0)
+                                    * _xf['factor'] + (_xf.get('shift') or 0.0))
     else:
         row['wRCplus'] = row['xWRCplus'] = None
 

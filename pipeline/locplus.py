@@ -784,9 +784,11 @@ def compute_loc_plus(all_pitches, pitches_by_pitcher, pitches_by_pitch_type,
 
     # ── COHERENT CANON (2026-07-18, per Wally): every displayed Loc+ —
     # overall AND per-type — is the plain mean of the per-pitch INTEGER
-    # atoms (the same integers in the Sheets Loc+ column), so a sheet
-    # AVERAGEIF, a window card, a filtered site view, and these leaderboard
-    # values agree to the digit. The _normalize machinery above still
+    # atoms, so a window card, a filtered site view, and these leaderboard
+    # values agree to the digit. (Precision caveat, 2026-08-27 audit: the
+    # sheet write-back dumps round(g, 2), not the integer atom, so a sheet
+    # AVERAGEIF reconciles to within ~0.005/pitch rather than exactly;
+    # int(round()) is also half-to-even where Sheets ROUND is half-up.) The _normalize machinery above still
     # supplies the anchors and the raw_loc_adj / locRuns100 / heatmap
     # fields; only the displayed locPlus is overridden here. Overall uses
     # the per-GROUP anchors per pitch (not the old pitcher-population

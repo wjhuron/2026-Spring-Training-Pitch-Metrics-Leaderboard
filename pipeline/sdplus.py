@@ -372,8 +372,11 @@ def zone_level_means(pitches, rv_fn):
 
 def shrink_table(raw_table, zone_means, k=CELL_SHRINK_K):
     """Cascade Bayesian shrinkage: cell → (zone × cat) → zone, k pseudo-obs
-    per level. Returns dict keyed by (zone, count, cat, decision) with ALL
-    360 combinations populated."""
+    per level. Returns dict keyed by (zone, count, cat, decision) with every
+    combination populated (120 with the shipped SD_CATS=('ALL',); the 360
+    figure belonged to the retired cat3 scheme). With cats collapsed the
+    middle level is an algebraic no-op, so this is effectively single-level
+    shrinkage at k."""
     zc_means, z_means = zone_means
     smoothed = {}
     for zone in ZONES:

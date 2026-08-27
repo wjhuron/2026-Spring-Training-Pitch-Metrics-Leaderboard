@@ -1478,13 +1478,18 @@ const Aggregator = {
     const NO_PCTL_METRICS = { relPosZ: true, relPosX: true, armAngle: true };
     const METRIC_PCTL_KEYS = METRIC_KEYS_LIST.filter(function (k) { return !NO_PCTL_METRICS[k]; });
     const PITCH_STAT_KEYS = ['izPct', 'swStrPct', 'cswPct', 'izWhiffPct', 'chasePct', 'gbPct', 'fpsPct'];
-    const PITCH_BB_KEYS = ['avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'hrFbPct', 'ldPct', 'fbPct', 'puPct'];
-    // ldPct/fbPct inverted to match the server (pipeline_compute.PITCH_BB_INVERT):
-    // higher line-drive / fly-ball rate against = worse for the pitcher (red).
-    const PITCH_BB_INVERT = { avgEVAgainst: true, maxEVAgainst: true, hardHitPct: true, barrelPctAgainst: true, hrFbPct: true, ldPct: true, fbPct: true };
+    // Mirrors pipeline_compute.PITCH_BB_PCTL_KEYS / PITCH_BB_INVERT exactly
+    // (2026-08-27 audit): babip joined (inverted — lower BABIP against = red)
+    // and maxEVAgainst left, because the server never ranked it and no surface
+    // displays a per-pitch Max EV percentile; the two lists had drifted apart.
+    const PITCH_BB_KEYS = ['avgEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'hrFbPct', 'ldPct', 'fbPct', 'puPct', 'babip'];
+    const PITCH_BB_INVERT = { avgEVAgainst: true, hardHitPct: true, barrelPctAgainst: true, hrFbPct: true, ldPct: true, fbPct: true, babip: true };
     const PITCH_EXPECTED_KEYS = ['wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'xwOBAsp'];
     const PITCH_EXPECTED_INVERT = { wOBA: true, xBA: true, xSLG: true, xwOBA: true, xwOBAcon: true, xwOBAsp: true };
-    let PITCH_PCTL_KEYS = METRIC_PCTL_KEYS.concat(['nVAA', 'nHAA', 'ivbOE', 'hbOE', 'stuffScore', 'pitchingScore', 'locPlus']).concat(PITCH_STAT_KEYS).concat(PITCH_BB_KEYS).concat(PITCH_EXPECTED_KEYS);
+    // swStrRate rides along (server ranks it; the filtered rows carry the
+    // value). strikePct/twoStrikeWhiffPct stay out in player mode: the micro
+    // counters cannot rebuild them, so their season pctls merge via ppre.
+    let PITCH_PCTL_KEYS = METRIC_PCTL_KEYS.concat(['nVAA', 'nHAA', 'ivbOE', 'hbOE', 'stuffScore', 'pitchingScore', 'locPlus', 'swStrRate']).concat(PITCH_STAT_KEYS).concat(PITCH_BB_KEYS).concat(PITCH_EXPECTED_KEYS);
     if (teamMode) {
       // Stats merged from pre-agg data carry no team-level _pctl — rank them here
       PITCH_PCTL_KEYS = PITCH_PCTL_KEYS.concat(['runValue', 'rv100', 'xRunValue', 'xRv100', 'strikePct', 'twoStrikeWhiffPct']);
