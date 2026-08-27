@@ -2242,7 +2242,7 @@ const Aggregator = {
     const HITTER_STAT_KEYS = [
       'avg', 'obp', 'slg', 'ops', 'iso', 'wOBA', 'babip', 'kPct', 'bbPct', 'bbToK',
       'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'xwOBAsp', 'sprayVal', 'bbPlus',
-      'avgEVAll', 'ev50', 'ev95', 'maxEV', 'hardHitPct', 'barrelPct',
+      'avgEVAll', 'ev50', 'medEV', 'ev95', 'maxEV', 'hardHitPct', 'barrelPct',
       'gbPct', 'ldPct', 'fbPct', 'puPct', 'hrFbPct',
       'pullPct', 'airPullPct',
       'swingPct', 'izSwingPct', 'chasePct', 'izSwChase', 'contactPct', 'izContactPct', 'whiffPct', 'sdPlus', 'ctPlus',
@@ -2358,6 +2358,12 @@ const Aggregator = {
         ev50 = Math.round(topHalf.reduce(function (s, v) { return s + v; }, 0) / topHalf.length * 10) / 10;
       }
 
+      // Median EV — same linear-interpolated percentile as the server
+      // (pipeline/utils.percentile), rounded to 1 decimal so the filtered
+      // recompute matches the shipped value exactly.
+      const medEV = evsAll.length > 0
+        ? Math.round(percentileLinear(evsAll, 50) * 10) / 10 : null;
+
       // EV95 — the BB+ exit-velocity ingredient. Rounded to 1 decimal, the
       // same as the server stores it, so the filtered recompute below lands
       // on the identical value.
@@ -2433,6 +2439,7 @@ const Aggregator = {
         babip: babip_val,
         avgEVAll: avgEVAll,
         ev50: ev50,
+        medEV: medEV,
         ev95: ev95,
         maxEV: maxEV,
         medLA: medLA,

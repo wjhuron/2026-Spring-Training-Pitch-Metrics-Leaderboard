@@ -96,6 +96,7 @@ var PlayerPage = {
     { key: 'iso', label: 'ISO', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'babip', label: 'BABIP', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'wOBA', label: 'wOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    { key: 'xwOBA', label: 'xwOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'wRCplus', label: 'wRC+', format: function(v) { return v != null ? v : '—'; } },
     { key: 'xWRCplus', label: 'xWRC+', format: function(v) { return v != null ? v : '—'; } },
     { key: 'hitterPlus', label: 'Hitter+', format: function(v) { return v != null ? Math.round(v) : '—'; } },
@@ -141,12 +142,12 @@ var PlayerPage = {
     { key: 'pitchType', label: 'Pitch', noPctl: true },
     { key: 'count', label: 'Pitches', format: function(v) { return v != null ? v : '—'; }, noPctl: true },
     { key: 'nBip', label: 'BIP', format: function(v) { return v != null ? v : '—'; }, noPctl: true },
-    // Outcome
-    { key: 'babip', label: 'BABIP', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    // Outcome — expected before realized, the fortune-pair order.
     { key: 'xwOBAcon', label: 'xwOBAcon', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    { key: 'babip', label: 'BABIP', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     // Quality
     { key: 'avgEVAll', label: 'Avg EV', format: function(v) { return v != null ? v.toFixed(1) : '—'; } },
-    { key: 'ev50', label: 'EV50', format: function(v) { return v != null ? v.toFixed(1) : '—'; } },
+    { key: 'medEV', label: 'MedEV', format: function(v) { return v != null ? v.toFixed(1) : '—'; } },
     { key: 'maxEV', label: 'Max EV', format: function(v) { return v != null ? v.toFixed(1) : '—'; } },
     { key: 'hardHitPct', label: 'Hard-Hit%', format: function(v) { return Utils.formatPct(v); } },
     { key: 'barrelPct', label: 'Barrel%', format: function(v) { return Utils.formatPct(v); } },
@@ -245,6 +246,10 @@ var PlayerPage = {
     { key: 'fip', label: 'FIP', format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
     { key: 'xFIP', label: 'xFIP', format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
     { key: 'siera', label: 'SIERA', format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
+    // The flagship pair joined 2026-08-27 (per Wally): the season line now
+    // carries the two house ERAs the leaderboard leads with.
+    { key: 'hdERA', label: 'hdERA', format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
+    { key: 'hpERA', label: 'hpERA', format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
   ],
 
   // Shown in place of STATS_COLS whenever a handedness is selected. The
@@ -274,8 +279,9 @@ var PlayerPage = {
     { key: 'pitchType', label: 'Pitch' },
     { key: 'count', label: 'Count', format: function(v) { return v != null ? v : '—'; } },
     { key: 'nBip', label: 'BIP', format: function(v) { return v != null ? v : '—'; } },
-    { key: 'babip', label: 'BABIP', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    // Expected before realized — the fortune-pair order every other surface uses.
     { key: 'xwOBAcon', label: 'xwOBAcon', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    { key: 'babip', label: 'BABIP', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'avgEVAgainst', label: 'Avg EV', format: function(v) { return v != null ? v.toFixed(1) : '—'; } },
     { key: 'hardHitPct', label: 'Hard-Hit%', format: function(v) { return Utils.formatPct(v); } },
     { key: 'barrelPctAgainst', label: 'Barrel%', format: function(v) { return Utils.formatPct(v); } },
@@ -1349,63 +1355,75 @@ var PlayerPage = {
     // same gate the generic _renderPercentiles uses for hitter rate stats.
     var isQualified = Utils.isQualified(data, this._qualContext(false), false);
 
-    var xRv100 = data.xRv100;
-    var pctl = data.xRv100_pctl;
+    function buildRow(label, xRv100, pctl, colored) {
+      var row = document.createElement('div');
+      row.className = 'pctl-row';
 
-    var row = document.createElement('div');
-    row.className = 'pctl-row';
+      var labelEl = document.createElement('span');
+      labelEl.className = 'pctl-label';
+      labelEl.textContent = label;
 
-    var labelEl = document.createElement('span');
-    labelEl.className = 'pctl-label';
-    labelEl.textContent = 'Overall';
+      var valEl = document.createElement('span');
+      valEl.className = 'pctl-value';
+      valEl.textContent = xRv100 != null ? xRv100.toFixed(1) : '—';
 
-    var valEl = document.createElement('span');
-    valEl.className = 'pctl-value';
-    valEl.textContent = xRv100 != null ? xRv100.toFixed(1) : '—';
-
-    var circleWrap = document.createElement('div');
-    circleWrap.className = 'pctl-circle-wrap';
-    if (pctl != null) {
-      var circle = document.createElement('div');
-      circle.className = 'pctl-circle';
-      if (isQualified) {
-        var bgColor = Utils.percentileBubbleColor(pctl);
-        var textColor = Utils.percentileTextColor(pctl);
-        circle.style.backgroundColor = bgColor;
-        circle.style.color = textColor;
-        circle.title = Utils.ordinal(Math.round(pctl)) + ' percentile among qualified hitters';
-      } else {
-        circle.style.backgroundColor = 'transparent';
-        circle.style.border = '2px solid #b3a68c';
-        circle.style.color = '#8a7f75';
-        circle.title = 'Below minimum qualification threshold';
+      var circleWrap = document.createElement('div');
+      circleWrap.className = 'pctl-circle-wrap';
+      if (pctl != null) {
+        var circle = document.createElement('div');
+        circle.className = 'pctl-circle';
+        if (colored) {
+          var bgColor = Utils.percentileBubbleColor(pctl);
+          var textColor = Utils.percentileTextColor(pctl);
+          circle.style.backgroundColor = bgColor;
+          circle.style.color = textColor;
+          circle.title = Utils.ordinal(Math.round(pctl)) + ' percentile among qualified hitters';
+        } else {
+          circle.style.backgroundColor = 'transparent';
+          circle.style.border = '2px solid #b3a68c';
+          circle.style.color = '#8a7f75';
+          circle.title = 'Below minimum qualification threshold';
+        }
+        circle.textContent = Math.round(pctl);
+        circleWrap.appendChild(circle);
       }
-      circle.textContent = Math.round(pctl);
-      circleWrap.appendChild(circle);
+
+      var barTrack = document.createElement('div');
+      barTrack.className = 'pctl-bar-track';
+      var barFill = document.createElement('div');
+      barFill.className = 'pctl-bar-fill';
+      if (pctl != null) {
+        barFill.style.width = Math.round(pctl) + '%';
+        if (colored) {
+          var barColor = Utils.percentileBubbleColor(pctl);
+          barFill.style.background = barColor;
+        } else {
+          var barBg = '#d8ccb4';
+          var stripColor = 'rgba(240,232,216,0.85)';
+          barFill.style.background = barBg + ' repeating-linear-gradient(135deg, ' + stripColor + ', ' + stripColor + ' 2px, transparent 2px, transparent 6px)';
+        }
+      }
+      barTrack.appendChild(barFill);
+
+      row.appendChild(labelEl);
+      row.appendChild(barTrack);
+      row.appendChild(circleWrap);
+      row.appendChild(valEl);
+      container.appendChild(row);
     }
 
-    var barTrack = document.createElement('div');
-    barTrack.className = 'pctl-bar-track';
-    var barFill = document.createElement('div');
-    barFill.className = 'pctl-bar-fill';
-    if (pctl != null) {
-      barFill.style.width = Math.round(pctl) + '%';
-      if (isQualified) {
-        var barColor = Utils.percentileBubbleColor(pctl);
-        barFill.style.background = barColor;
-      } else {
-        var barBg = '#d8ccb4';
-        var stripColor = 'rgba(240,232,216,0.85)';
-        barFill.style.background = barBg + ' repeating-linear-gradient(135deg, ' + stripColor + ', ' + stripColor + ' 2px, transparent 2px, transparent 6px)';
-      }
-    }
-    barTrack.appendChild(barFill);
+    buildRow('Overall', data.xRv100, data.xRv100_pctl, isQualified);
 
-    row.appendChild(labelEl);
-    row.appendChild(barTrack);
-    row.appendChild(circleWrap);
-    row.appendChild(valEl);
-    container.appendChild(row);
+    // Category rows (2026-08-27, per Wally): the hitter panel now mirrors the
+    // pitcher panel's per-pitch rows at the grouped grain — Hard, Breaking,
+    // Offspeed. A category row colors when its pitch count clears the same
+    // minimum the grouped tables use.
+    var catRows = this._getHitterCategoryRows(data.hitter, data.team);
+    for (var ci = 0; ci < catRows.length; ci++) {
+      var cr = catRows[ci];
+      buildRow(cr.pitchType, cr.xRv100, cr.xRv100_pctl,
+               (cr.count || 0) >= QUAL.MIN_HITTER_PT);
+    }
 
     var divider = document.createElement('div');
     divider.style.cssText = 'border-top: 1px solid var(--border, #ddd); margin: 12px 0 8px 0;';
@@ -2805,14 +2823,16 @@ var PlayerPage = {
     section.style.display = '';
     var hand = this._countHand || 'R';
 
+    // "Pitcher Ahead"/"Pitcher Behind" (2026-08-27, per Wally): the bare
+    // Ahead/Behind labels never said whose advantage the count was.
     var COUNT_GROUPS = {
       'First Pitch': ['0-0'],
-      'Ahead': ['0-1', '0-2', '1-2'],
-      'Behind': ['1-0', '2-0', '3-0', '2-1', '3-1'],
+      'Pitcher Ahead': ['0-1', '0-2', '1-2'],
+      'Pitcher Behind': ['1-0', '2-0', '3-0', '2-1', '3-1'],
       'Even': ['1-1', '2-2'],
       'Two-Strike': ['0-2', '1-2', '2-2', '3-2']
     };
-    var groupNames = ['First Pitch', 'Ahead', 'Behind', 'Even', 'Two-Strike'];
+    var groupNames = ['First Pitch', 'Pitcher Ahead', 'Pitcher Behind', 'Even', 'Two-Strike'];
 
     // Build lookup: count string -> array of group names it belongs to
     var countToGroups = {};
@@ -3142,11 +3162,18 @@ var PlayerPage = {
       this._renderStatsTable(found);
       this._renderPlatoonSplit('pitcher', data); // moves the active-row highlight
 
-      // Re-aggregate pitch-type rows with hand filter
+      // Re-aggregate pitch-type rows with hand filter. Category rows
+      // (Hard/Breaking/Offspeed) are dropped on the pitcher side (2026-08-27,
+      // per Wally): the pitch is the pitcher's unit of analysis, and a
+      // category row averages shape across pitch types into a pitch nobody
+      // threw — same principle as the R-report Total-row rule. The shared
+      // aggregation request still carries them for the hitter tables.
       var pitchRows = this._platoonAggregate('pitch', hand);
+      var PITCH_CATEGORY_ROWS = { Hard: true, Breaking: true, Offspeed: true };
       var myPitchRows = [];
       for (var i = 0; i < pitchRows.length; i++) {
-        if (pitchRows[i].pitcher === data.pitcher && pitchRows[i].team === data.team) {
+        if (pitchRows[i].pitcher === data.pitcher && pitchRows[i].team === data.team &&
+            !PITCH_CATEGORY_ROWS[pitchRows[i].pitchType]) {
           myPitchRows.push(pitchRows[i]);
         }
       }
@@ -4694,33 +4721,74 @@ var PlayerPage = {
     var table = document.createElement('table');
     table.className = 'player-pitch-stats-table expanded-pitch-table';
 
+    var cols = this.HITTER_BAT_TRACKING_COLS;
+
     var thead = document.createElement('thead');
     var headerRow = document.createElement('tr');
-    for (var i = 0; i < this.HITTER_BAT_TRACKING_COLS.length; i++) {
+    var thPitch = document.createElement('th');
+    thPitch.textContent = 'Pitch';
+    headerRow.appendChild(thPitch);
+    for (var i = 0; i < cols.length; i++) {
       var th = document.createElement('th');
-      th.textContent = this.HITTER_BAT_TRACKING_COLS[i].label;
+      th.textContent = cols[i].label;
       headerRow.appendChild(th);
     }
     thead.appendChild(headerRow);
     table.appendChild(thead);
 
     var tbody = document.createElement('tbody');
-    var tr = document.createElement('tr');
-    for (var c = 0; c < this.HITTER_BAT_TRACKING_COLS.length; c++) {
-      var col = this.HITTER_BAT_TRACKING_COLS[c];
-      var td = document.createElement('td');
-      var val = data[col.key];
-      td.textContent = col.format ? col.format(val) : (val != null ? val : '—');
-      if (!col.noPctl) {
-        var pctl = data[col.key + '_pctl'];
-        if (pctl != null) {
-          var bg2 = Utils.percentileColor(pctl);
-          if (bg2) { td.style.backgroundColor = bg2; td.style.color = Utils.percentileTextColor(pctl); }
-        }
+
+    // One row per source: the season line, then the pitch-category splits
+    // (2026-08-27, per Wally) — bat speed vs Breaking is the adjustability
+    // read. Category rows come from the shipped HITTER_PITCH_LB; percentiles
+    // rank within the same category across MLB. A category row colors only
+    // with 10+ competitive swings, the same bar the bat-speed bubble uses.
+    // Platoon mode keeps the season Overall row only: the client aggregator
+    // does not rebuild bat tracking under a handedness filter.
+    var sources = [{ label: 'Overall', row: data, colored: true }];
+    if (!this._platoonHand || this._platoonHand === 'all') {
+      var catRows = this._getHitterCategoryRows(data.hitter, data.team);
+      for (var s = 0; s < catRows.length; s++) {
+        sources.push({
+          label: catRows[s].pitchType,
+          row: catRows[s],
+          colored: (catRows[s].nCompSwings || 0) >= 10
+        });
       }
-      tr.appendChild(td);
     }
-    tbody.appendChild(tr);
+
+    for (var r = 0; r < sources.length; r++) {
+      var src = sources[r];
+      var tr = document.createElement('tr');
+      var tdLabel = document.createElement('td');
+      tdLabel.style.textAlign = 'left';
+      tdLabel.style.paddingLeft = '8px';
+      if (src.label === 'Overall') {
+        tdLabel.textContent = 'Overall';
+        tdLabel.style.fontWeight = '700';
+      } else {
+        tdLabel.appendChild(Utils.createCategoryBadge(src.label, true));
+      }
+      tr.appendChild(tdLabel);
+      for (var c = 0; c < cols.length; c++) {
+        var col = cols[c];
+        var td = document.createElement('td');
+        var val = src.row[col.key];
+        td.textContent = col.format ? col.format(val) : (val != null ? val : '—');
+        if (!col.noPctl) {
+          var pctl = src.row[col.key + '_pctl'];
+          if (pctl != null) {
+            td.title = Math.round(pctl) + 'th percentile';
+            if (src.colored) {
+              var bg2 = Utils.percentileColor(pctl);
+              if (bg2) { td.style.backgroundColor = bg2; td.style.color = Utils.percentileTextColor(pctl); }
+            }
+          }
+        }
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
     table.appendChild(tbody);
     container.appendChild(table);
   },

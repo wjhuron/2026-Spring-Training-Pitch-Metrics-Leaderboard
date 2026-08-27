@@ -175,8 +175,8 @@ const COLUMNS = {
     { key: 'xwOBA',       label: 'xwOBA',    format: Utils.formatDecimal(3), sortType: 'numeric', desc: 'Expected wOBA (Statcast, EV + LA)', group: 'expected' },
     { key: 'xBA',         label: 'xBA',      format: Utils.formatDecimal(3), sortType: 'numeric', desc: 'Expected BA (Statcast, EV + LA)', group: 'expected' },
     { key: 'xSLG',        label: 'xSLG',     format: Utils.formatDecimal(3), sortType: 'numeric', desc: 'Expected SLG (Statcast, EV + LA)', group: 'expected' },
-    { key: 'ev95',        label: 'EV95',     format: Utils.formatDecimal(1), sortType: 'numeric', sectionStart: true, desc: '95th-percentile exit velocity (mph) — the hard-hit ceiling, and the exact EV ingredient inside BB+. A steadier read of contact skill than Max EV, which grows mechanically with sample size', group: 'ev' },
-    { key: 'ev50',        label: 'EV50',     format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Avg EV of top 50% hardest-hit BIP (mph)', group: 'ev' },
+    { key: 'medEV',       label: 'MedEV',    format: Utils.formatDecimal(1), sortType: 'numeric', sectionStart: true, desc: 'Median exit velocity (mph) — the 50th-percentile BIP. A robust central read of contact quality: it ignores the tails Avg EV chases, and unlike EV50 (mean of the top half) it charges weak contact', group: 'ev' },
+    { key: 'ev95',        label: 'EV95',     format: Utils.formatDecimal(1), sortType: 'numeric', desc: '95th-percentile exit velocity (mph) — the hard-hit ceiling, and the exact EV ingredient inside BB+. A steadier read of contact skill than Max EV, which grows mechanically with sample size', group: 'ev' },
     { key: 'maxEV',       label: 'Max EV',   format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Maximum exit velocity (mph)', group: 'ev' },
     { key: 'avgEVAll',    label: 'Avg EV',       format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Average exit velocity on all BIP (mph)', group: 'ev' },
     { key: 'hardHitPct',  label: 'Hard-Hit%', format: Utils.formatPct, sortType: 'numeric', desc: 'Pct of trackable BIP with EV ≥ 95 mph (denominator = BIP with valid EV)', group: 'quality' },
@@ -258,7 +258,7 @@ const COLUMNS = {
     { key: 'xSLG',        label: 'xSLG',     format: Utils.formatDecimal(3), sortType: 'numeric', desc: 'Expected SLG vs this pitch type (Statcast, EV + LA)', group: 'stats' },
     { key: 'xwOBAcon',    label: 'xwOBAcon', format: Utils.formatDecimal(3), sortType: 'numeric', desc: 'Expected wOBA on contact vs this pitch type — avg xwOBA on BIP only', group: 'stats' },
     { key: 'xwOBAsp',     label: 'xwOBAsp',  format: Utils.formatDecimal(3), sortType: 'numeric', desc: 'Expected wOBA vs this pitch type from spray direction + launch angle — judges where the ball was hit rather than how hard', group: 'stats' },
-    { key: 'ev50',        label: 'EV50',     format: Utils.formatDecimal(1), sortType: 'numeric', sectionStart: true, desc: 'Avg EV of top 50% hardest-hit BIP (mph)', group: 'ev' },
+    { key: 'medEV',       label: 'MedEV',    format: Utils.formatDecimal(1), sortType: 'numeric', sectionStart: true, desc: 'Median exit velocity vs this pitch type (mph, 50th-percentile BIP)', group: 'ev' },
     { key: 'maxEV',       label: 'Max EV',   format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Maximum exit velocity (mph)', group: 'ev' },
     { key: 'medLA',       label: 'Med LA',   format: Utils.formatDecimal(1), sortType: 'numeric', noPercentile: true, sectionStart: true, desc: 'Median launch angle (degrees)', group: 'batted_ball' },
     { key: 'ldPct',       label: 'LD%',      format: Utils.formatPct, sortType: 'numeric', noPercentile: true, desc: 'Line drive rate', group: 'batted_ball' },
@@ -288,12 +288,17 @@ const Leaderboard = {
     pitchMetrics:          ['maxVelo', 'vaa', 'haa', 'cswPct', 'barrelPctAgainst', 'xwOBA', 'xBA', 'xSLG', 'rv100', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100', 'xrvoe100'],
     pitcherStats:          ['w', 'l', 'sv', 'hld', 'tbf', 'siera', 'fip', 'xFIP', 'pitchingScore', 'hdERAPlus', 'hpERAPlus', 'rv100', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100'],
     pitcherSwingDecisions: ['twoStrikeWhiffPct', 'fpsPct', 'oneOneWinPct', 'earlyActionPct'],
-    pitcherBattedBall:     ['hrFbPct', 'xwOBAsp', 'xBA', 'xSLG', 'maxEVAgainst'],
+    // hrFbPct unhidden 2026-08-27 (per Wally): it completes the visible
+    // Barrel% -> HR/FB fortune pair, mirroring the card's Contact Mgmt read.
+    pitcherBattedBall:     ['xwOBAsp', 'xBA', 'xSLG', 'maxEVAgainst'],
     hitterStats:           ['g', 'ab', 'ops', 'iso', 'babip', 'bbToK', 'xwOBAcon', 'xBA', 'xSLG', 'doubles', 'triples', 'cs', 'sbPct'],
-    hitterBattedBall:      ['nSwings', 'maxEV', 'avgEVAll', 'medLA', 'ldPct', 'puPct', 'sprayVal', 'xwOBA', 'xBA', 'xSLG', 'middlePct', 'oppoPct', 'avgFbDist', 'avgHrDist'],
+    // sprayVal unhidden 2026-08-27 (per Wally): a novel house metric — the
+    // placement-skill trait behind consistent xwOBA-beaters — now reads
+    // beside xwOBAsp instead of hiding in the picker.
+    hitterBattedBall:      ['nSwings', 'maxEV', 'avgEVAll', 'medLA', 'ldPct', 'puPct', 'xwOBA', 'xBA', 'xSLG', 'middlePct', 'oppoPct', 'avgFbDist', 'avgHrDist'],
     hitterSwingDecisions:  ['firstPitchSwingPct', 'whiffPct', 'twoStrikeWhiffPct'],
     hitterBatTracking:     ['attackDirection', 'swingPathTilt'],
-    hitterPitch:           ['runValue', 'xRunValue', 'avg', 'slg', 'iso', 'xBA', 'xSLG', 'xwOBAcon', 'xwOBAsp', 'ev50', 'maxEV', 'medLA', 'ldPct', 'fbPct', 'hrFbPct', 'pullPct', 'oppoPct', 'swingPct', 'izSwingPct', 'contactPct', 'izContactPct'],
+    hitterPitch:           ['runValue', 'xRunValue', 'avg', 'slg', 'iso', 'xBA', 'xSLG', 'xwOBAcon', 'xwOBAsp', 'medEV', 'maxEV', 'medLA', 'ldPct', 'fbPct', 'hrFbPct', 'pullPct', 'oppoPct', 'swingPct', 'izSwingPct', 'contactPct', 'izContactPct'],
   },
 
   initHiddenColumns: function (tab) {
@@ -479,7 +484,7 @@ const Leaderboard = {
     var IP_WEIGHTED = { era:1, fip:1, xFIP:1, siera:1, hdERA:1, hpERA:1 };
     var BIP_WEIGHTED = { avgEVAgainst:1, maxEVAgainst:1, hardHitPct:1, barrelPctAgainst:1,
                           gbPct:1, ldPct:1, fbPct:1, hrFbPct:1, xwOBAsp:1, bbPlus:1,
-                          avgEV:1, avgEVAll:1, ev50:1, maxEV:1, barrelPct:1, pullPct:1, airPullPct:1 };
+                          avgEV:1, avgEVAll:1, ev50:1, medEV:1, ev95:1, maxEV:1, barrelPct:1, pullPct:1, airPullPct:1 };
     var PA_WEIGHTED = { wOBA:1, xBA:1, xSLG:1, xwOBA:1, xwOBAcon:1,
                          kPct:1, bbPct:1, kbbPct:1, babip:1,
                          avg:1, obp:1, slg:1, ops:1, iso:1 };
@@ -949,7 +954,7 @@ const Leaderboard = {
           const HITTER_PA_STATS = {
             babip: true, hrFbPct: true,
             xBA: true, xSLG: true, xwOBA: true, xwOBAcon: true,
-            avgEVAll: true, ev50: true, medLA: true,
+            avgEVAll: true, medEV: true, ev95: true, medLA: true,
             hardHitPct: true, barrelPct: true,
             xwOBAsp: true, sprayVal: true, airPullPct: true, bbPlus: true, hitterPlus: true,
             gbPct: true, ldPct: true, fbPct: true,

@@ -3147,7 +3147,12 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     HITTER_PITCH_PCTL_KEYS = [
         'avg', 'slg', 'iso',
         'wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'xwOBAsp',
-        'ev50', 'maxEV', 'hardHitPct', 'barrelPct', 'babip',
+        'ev50', 'medEV', 'maxEV', 'hardHitPct', 'barrelPct', 'babip',
+        # Bat tracking per pitch category (2026-08-27, per Wally): the player
+        # page's bat-tracking table grew Hard/Breaking/Offspeed rows, so the
+        # colored columns need within-category ranks. Angles stay unranked
+        # (direction-ambiguous, noPctl on the site).
+        'batSpeed', 'swingLength', 'squaredUpPct', 'blastPct', 'idealAAPct',
         'gbPct', 'ldPct', 'fbPct', 'puPct', 'hrFbPct',
         'pullPct', 'oppoPct',
         'swingPct', 'izSwingPct', 'chasePct', 'izSwChase', 'firstPitchSwingPct',
@@ -3292,7 +3297,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 'wOBA', 'xBA', 'xSLG', 'xwOBA', 'rv100', 'xRv100',
                 'swingPct', 'izSwingPct', 'chasePct', 'izSwChase', 'contactPct', 'izContactPct', 'whiffPct'}
     # Batted ball stats weighted by nBip
-    bip_stats = {'avgEVAll', 'ev50', 'ev95', 'maxEV', 'medLA', 'hardHitPct', 'barrelPct',
+    bip_stats = {'avgEVAll', 'ev50', 'medEV', 'ev95', 'maxEV', 'medLA', 'hardHitPct', 'barrelPct',
                  'xwOBAcon', 'xwOBAsp', 'sprayVal',
                  'gbPct', 'ldPct', 'fbPct', 'puPct',
                  'pullPct', 'middlePct', 'oppoPct', 'airPullPct'}

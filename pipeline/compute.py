@@ -47,7 +47,7 @@ PITCHER_INVERT_PCTL = {'bbPct', 'babip', 'era', 'fip', 'xFIP', 'siera'}
 HITTER_STAT_KEYS = [
     'avg', 'obp', 'slg', 'ops', 'iso', 'babip', 'kPct', 'bbPct', 'bbToK',
     'wOBA', 'xBA', 'xSLG', 'xwOBA', 'xwOBAcon', 'xwOBAsp', 'sprayVal', 'bbPlus',
-    'avgEVAll', 'ev50', 'ev95', 'maxEV', 'hardHitPct', 'barrelPct',
+    'avgEVAll', 'ev50', 'medEV', 'ev95', 'maxEV', 'hardHitPct', 'barrelPct',
     'gbPct', 'ldPct', 'fbPct', 'puPct', 'hrFbPct',
     'pullPct', 'middlePct', 'oppoPct', 'airPullPct',
     'swingPct', 'izSwingPct', 'chasePct', 'izSwChase', 'contactPct', 'izContactPct', 'whiffPct', 'sdPlus', 'ctPlus',
@@ -503,11 +503,17 @@ def compute_hitter_stats(pitches):
     all_evs = [safe_float(p.get('ExitVelo')) for p in bip]
     all_evs = [v for v in all_evs if v is not None]
     ev50 = None
+    med_ev = None
     ev95 = None
     if all_evs:
         sorted_evs = sorted(all_evs, reverse=True)
         top_half = sorted_evs[:max(1, len(sorted_evs) // 2)]
         ev50 = round(sum(top_half) / len(top_half), 1)
+        # Median EV (2026-08-27, per Wally): replaces EV50 on the displayed
+        # surfaces. Same linear-interpolated percentile helper as ev95, so the
+        # client's filtered recompute (percentileLinear in js/aggregator.js)
+        # lands on the identical value. ev50 stays in the row for continuity.
+        med_ev = round(percentile(all_evs, 50), 1)
         # BB+ ingredient. A mean of a heavy-tailed per-BIP quantity is a weak
         # estimator of contact-quality skill; a high EV percentile is far more
         # stable. Stored rounded so the server value and the client's filtered
@@ -634,6 +640,7 @@ def compute_hitter_stats(pitches):
         'xbh': xbh,
         'avgEVAll': round(sum(ev_valid) / len(ev_valid), 1) if ev_valid else None,
         'ev50': ev50,
+        'medEV': med_ev,
         'ev95': ev95,
         'maxEV': round(max(ev_valid), 1) if ev_valid else None,
         'medLA': round(median(all_la), 1) if all_la else None,
