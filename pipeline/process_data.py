@@ -17,7 +17,7 @@ from collections import defaultdict
 # ── Pipeline modules ─────────────────────────────────────────────────────
 from pipeline.utils import (
     safe_float, normalize_date, _today_et, avg, median, round_metric,
-    is_barrel, spray_angle, spray_direction,
+    is_barrel, spray_angle, spray_direction, duplicate_pa_events,
     break_tilt_to_minutes, circular_mean_minutes, minutes_to_tilt_display,
     compute_in_zone, outs_to_ip_str, outs_to_ip_float, ip_str_to_float,
     DATA_DIR,
@@ -5645,6 +5645,21 @@ def main():
     print("\n=== Reading Regular Season data (Sheets) ===")
     rs_pitches = read_all_pitches_from_sheets()
     print(f"  Read {len(rs_pitches)} RS pitches from the 6 division workbooks")
+
+    # Shape guard: exactly one pitch ends a plate appearance, so exactly one
+    # row per at-bat may carry a PA Event. A second one double-counts the PA
+    # AND the outcome, because the stale row carries BBType and the
+    # batted-ball columns too. This warns rather than aborts: it is a handful
+    # of rows out of 600k, and a hard stop would block the daily build over a
+    # defect the named tool repairs in a minute.
+    _dupe_pa = duplicate_pa_events(rs_pitches)
+    if _dupe_pa:
+        print(f"  WARNING: {len(_dupe_pa)} plate appearance(s) carry a PA Event "
+              f"on more than one row. One ball in play is counted twice in "
+              f"each. Repair: python3 scripts/ops/fix_duplicate_pa_events.py --apply")
+        for _k, _v in sorted(_dupe_pa.items())[:10]:
+            print(f"    {_v[0].get('_sheet_tab')} {_v[0].get('Pitcher')}: "
+                  + ', '.join(sorted(p['PitchID'] for p in _v)))
 
     # Normalize player names: strip surrounding whitespace so a stray trailing/
     # leading space (e.g. "Lee, Hao-Yu ") doesn't fork one player into duplicate

@@ -107,6 +107,44 @@ def is_no_pitch(row):
     return bool(pid) and str(pid).endswith('_00')
 
 
+def duplicate_pa_events(rows):
+    """At-bats where MORE THAN ONE row carries a plate-appearance Event.
+
+    Exactly one pitch ends a plate appearance, so exactly one row in an
+    at-bat may carry a PA Event. A second one double-counts the PA and, worse,
+    the outcome: the stale row also carries BBType and the batted-ball
+    columns, so one ball in play becomes two.
+
+    The cause is a live scrape. A game pulled mid-at-bat stamps the outcome on
+    what was then the last pitch; the re-pull appends the real final pitch,
+    and the PitchID dedupe cannot see that the earlier row is now wrong.
+
+    Returns {(gamePk, atBatIndex): [rows]}, groups of two or more, keyed as
+    strings exactly as PitchID spells them. Repair with
+    scripts/ops/fix_duplicate_pa_events.py.
+    """
+    by_ab = defaultdict(list)
+    for r in rows:
+        ev = r.get('Event')
+        if not ev or ev in NON_PA_EVENTS:
+            continue
+        parts = str(r.get('PitchID') or '').split('_')
+        if len(parts) != 3:
+            continue
+        by_ab[(parts[0], parts[1])].append(r)
+    return {k: v for k, v in by_ab.items() if len(v) > 1}
+
+
+# The plate-appearance OUTCOME columns. These describe how the PA ended, so
+# they belong on the terminal pitch and nowhere else. Deliberately excluded:
+# Description, Count, Runners, Outs and RunExp are per-PITCH facts and stay
+# correct on a stale row, as does every pitch measurement.
+PA_OUTCOME_COLUMNS = (
+    'Event', 'BBType', 'ExitVelo', 'LaunchAngle', 'Distance',
+    'HC_X', 'HC_Y', 'Barrel', 'xBA', 'xSLG', 'xwOBA',
+)
+
+
 def real_pitches(rows):
     """Only rows where a pitch was actually thrown.
 
