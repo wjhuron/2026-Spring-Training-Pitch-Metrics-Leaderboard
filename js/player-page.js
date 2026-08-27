@@ -1484,8 +1484,15 @@ var PlayerPage = {
     var ellipseMeta = [];
     var oeMeta = [];
     var pitchTypes = Utils.sortPitchTypes(Object.keys(groups));
-    // Hairline edge matching the panel bg — de-blobs dense clusters without a contrasting ring
-    var dotEdge = 'rgba(240,232,216,0.9)';
+    // 2026-08-27 (per Wally, prototype-approved): the per-pitch cloud fades
+    // back so the expected-movement overlay carries the chart — labeled
+    // cream-ringed discs at the actual means, hollow dashed ghosts at the
+    // model expectation. Faded fill via hex -> rgba at low alpha.
+    function fadedColor(hex, alpha) {
+      if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return hex;
+      var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+    }
 
     for (var j = 0; j < pitchTypes.length; j++) {
       var pt = pitchTypes[j];
@@ -1496,11 +1503,11 @@ var PlayerPage = {
       datasets.push({
         label: label,
         data: pts,
-        backgroundColor: color.bg,
-        borderColor: dotEdge,
-        borderWidth: 1,
-        pointRadius: 5,
+        backgroundColor: fadedColor(color.bg, 0.25),
+        borderWidth: 0,
+        pointRadius: 4,
         pointHoverRadius: 7,
+        _solidColor: color.bg,
       });
 
       // Actual-spread ellipse (covariance, dashed/unfilled, pitch-colored) — matches the cards
@@ -1516,6 +1523,7 @@ var PlayerPage = {
       var es2 = expSums[pt];
       if (es2 && es2.nEV >= 10 && es2.nEH >= 10) {
         oeMeta.push({
+          pt: pt,
           color: color.bg,
           aX: es2.aH / es2.nAH, aY: es2.aV / es2.nAV,
           eX: es2.eH / es2.nEH, eY: es2.eV / es2.nEV,
@@ -1552,7 +1560,19 @@ var PlayerPage = {
           },
         },
         plugins: {
-          legend: { display: true, position: 'bottom', labels: { color: tickColor, usePointStyle: true, padding: 10, font: { size: 11 } } },
+          legend: { display: true, position: 'bottom', labels: { color: tickColor, usePointStyle: true, padding: 10, font: { size: 11 },
+            // Legend chips stay SOLID pitch colors even though the cloud
+            // datasets render faded (the overlay restyle, 2026-08-27).
+            generateLabels: function (chart) {
+              var items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+              for (var li = 0; li < items.length; li++) {
+                var ds = chart.data.datasets[items[li].datasetIndex];
+                var solid = ds._solidColor || items[li].fillStyle;
+                items[li].fillStyle = solid;
+                items[li].strokeStyle = solid;
+              }
+              return items;
+            } } },
           tooltip: {
             callbacks: {
               label: function (ctx) {
@@ -1621,38 +1641,58 @@ var PlayerPage = {
             var ex = xAxis.getPixelForValue(om.eX);
             var ey = yAxis.getPixelForValue(om.eY);
             ctx.save();
-            // connector
-            ctx.strokeStyle = 'rgba(26,22,18,0.75)';
-            ctx.lineWidth = 2;
-            ctx.setLineDash([5, 3]);
+            // connector — pitch-colored, thin, dashed
+            ctx.strokeStyle = om.color;
+            ctx.globalAlpha = 0.9;
+            ctx.lineWidth = 1.8;
+            ctx.setLineDash([4, 3]);
             ctx.beginPath();
             ctx.moveTo(ex, ey);
             ctx.lineTo(ax, ay);
             ctx.stroke();
-            // ghost at expectation
+            // ghost at expectation — hollow dashed ring
             ctx.setLineDash([3, 2.5]);
-            ctx.fillStyle = '#f0e8d8';
-            ctx.strokeStyle = om.color;
-            ctx.lineWidth = 2.6;
+            ctx.lineWidth = 2.4;
             ctx.beginPath();
-            ctx.arc(ex, ey, 8, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.arc(ex, ey, 9, 0, Math.PI * 2);
             ctx.stroke();
-            // actual mean disc
+            // actual mean disc — cream-ringed, with the pitch-type label
+            ctx.globalAlpha = 1;
             ctx.setLineDash([]);
             ctx.fillStyle = om.color;
-            ctx.strokeStyle = '#1a1612';
-            ctx.lineWidth = 2.2;
+            ctx.strokeStyle = '#f0e8d8';
+            ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.arc(ax, ay, 7, 0, Math.PI * 2);
+            ctx.arc(ax, ay, 10, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
+            // Label with a cream halo so it stays legible over its own cloud.
+            ctx.font = '800 13px "IBM Plex Sans", sans-serif';
+            ctx.strokeStyle = '#f0e8d8';
+            ctx.lineWidth = 3;
+            ctx.strokeText(om.pt, ax + 14, ay + 5);
+            ctx.fillStyle = om.color;
+            ctx.fillText(om.pt, ax + 14, ay + 5);
             ctx.restore();
           }
         },
       }],
     });
 
+    // Overlay key under the chart (prototype-approved wording). Shares the
+    // canvas with the hitter spray chart, so _renderSprayChart hides it.
+    // Inserted AFTER the chart container, not inside it: Chart.js sizes the
+    // container, so content inside it overlaps whatever follows.
+    var chartBox = canvas.parentNode;
+    var oeCap = document.getElementById('movement-oe-caption');
+    if (!oeCap) {
+      oeCap = document.createElement('div');
+      oeCap.id = 'movement-oe-caption';
+      oeCap.style.cssText = 'font-size:11.5px;color:var(--text-muted,#6a5f55);text-align:center;margin:2px 0 10px;line-height:1.4;';
+      chartBox.parentNode.insertBefore(oeCap, chartBox.nextSibling);
+    }
+    oeCap.textContent = '● actual average   ◌ model expectation   dashed = movement beyond expectation';
+    oeCap.style.display = oeMeta.length > 0 ? '' : 'none';
   },
 
 
@@ -3328,6 +3368,9 @@ var PlayerPage = {
   _renderSprayChart: function (data) {
     var canvas = document.getElementById('player-pitch-chart');
     if (!canvas) return;
+    // The movement chart's overlay key shares this canvas slot — hide it here.
+    var oeCap = document.getElementById('movement-oe-caption');
+    if (oeCap) oeCap.style.display = 'none';
     // Set canvas size for spray chart — wider than tall to fit foul lines
     canvas.width = 500;
     canvas.height = 420;
