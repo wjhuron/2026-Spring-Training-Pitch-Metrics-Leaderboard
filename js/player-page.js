@@ -4,70 +4,84 @@ var PlayerPage = {
   isOpen: false,
   _playerType: null, // 'pitcher' or 'hitter'
 
+  // 2026-08-27 (per Wally): page-card parity. This list mirrors the pitcher
+  // card's BUBBLE_COLUMNS (cards/pitcher.py) — same rows, same order, same
+  // section titles. Every prior page-only row the card had pruned (Pitching+,
+  // SIERA, xwOBA) is gone for the card's documented reasons; every card row
+  // the page lacked (xRV, xRV/100, Z-Whiff%, xwOBAcon, BABIP, HR/FB%, PU%,
+  // Extension) is here. Change the card list and this list in the same commit.
   PITCHING_STATS: [
-    // Stuff foundation: velocity (dynamic — expands to FF and/or SI velo when present).
-    { key: '_veloPlaceholder',  label: '',                  format: function() { return ''; }, _dynamic: true },
-    // The grades trio (2026-07-20: bubbles for the flagship composites —
-    // Loc+ had one since v2; Stuff+/Pitching+ were missing since launch).
-    { key: 'stuffScore',        label: 'Stuff+',           format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    { key: 'locPlus',           label: 'Loc+',             format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    { key: 'pitchingScore',     label: 'Pitching+',        format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    // Pitcher+ (2026-07-24): the all-encompassing composite. Sits with the
-    // grades but is pitcher-level, not a per-pitch atom mean — see
-    // pipeline_pitcherplus.py.
+    { _section: 'Result' },
+    // xRV (cumulative) above xRV/100 (rate): volume then efficiency, so a
+    // reliever's strong rate and a starter's larger total both read.
+    { key: 'xRunValue',         label: 'xRV',              format: function(v) { return v != null ? v.toFixed(1) : '—'; } },
+    { key: 'xRv100',            label: 'xRV/100',          format: function(v) { return v != null ? v.toFixed(1) : '—'; } },
     { key: 'pitcherPlus',       label: 'Pitcher+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    // Pitcher+ Proj removed 2026-07-30 (already hidden on leaderboards).
-    // Rate stats and their composite estimator.
     { key: 'kPct',              label: 'K%',               format: function(v) { return Utils.formatPct(v); } },
     { key: 'bbPct',             label: 'BB%',              format: function(v) { return Utils.formatPct(v); } },
     { key: 'kbbPct',            label: 'K-BB%',            format: function(v) { return Utils.formatPct(v, true); } },
-    { key: 'siera',             label: 'SIERA',            format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
-    // Bat-missing process. (Zone% and Z-Whiff% live in the tables below —
-    // battery 2026-07-20: Zone% pred ~0, Z-Whiff% r=.83 with Whiff%.)
+    { _section: 'Swing & Miss' },
     { key: 'swStrPct',          label: 'Whiff%',           format: function(v) { return Utils.formatPct(v); } },
+    { key: 'izWhiffPct',        label: 'Z-Whiff%',         format: function(v) { return Utils.formatPct(v); } },
     { key: 'chasePct',          label: 'Chase%',           format: function(v) { return Utils.formatPct(v); } },
-    // Contact allowed. (xwOBAcon stays in the batted-ball table — pitcher-side
-    // split-half reliability .26; a percentile bubble overstates it.)
-    { key: 'xwOBA',             label: 'xwOBA',            format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    { _section: 'Contact Mgmt' },
+    // xwOBAcon then BABIP: realized-vs-expected on contact — mismatched tints
+    // flag batted-ball fortune. Barrel% then HR/FB%: damage quality vs damage
+    // realized, the same fortune read on the HR channel.
+    { key: 'xwOBAcon',          label: 'xwOBAcon',         format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    { key: 'babip',             label: 'BABIP',            format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'hardHitPct',        label: 'Hard-Hit%',        format: function(v) { return Utils.formatPct(v); } },
     { key: 'barrelPctAgainst',  label: 'Barrel%',          format: function(v) { return Utils.formatPct(v); } },
+    { key: 'hrFbPct',           label: 'HR/FB%',           format: function(v) { return Utils.formatPct(v); } },
     { key: 'gbPct',             label: 'GB%',              format: function(v) { return Utils.formatPct(v); } },
+    { key: 'puPct',             label: 'PU%',              format: function(v) { return Utils.formatPct(v); } },
+    { _section: 'Command & Shape' },
+    // Velocity (dynamic — expands to FF and/or SI velo when present).
+    { key: '_veloPlaceholder',  label: '',                  format: function() { return ''; }, _dynamic: true },
+    { key: 'extension',         label: 'Extension',        format: function(v) { return Utils.formatFeetInches(v); } },
+    { key: 'stuffScore',        label: 'Stuff+',           format: function(v) { return v != null ? Math.round(v) : '—'; } },
+    { key: 'locPlus',           label: 'Loc+',             format: function(v) { return v != null ? Math.round(v) : '—'; } },
   ],
 
+  // 2026-08-27 (per Wally): page-card parity. This list mirrors the hitter
+  // card's BUBBLE_COLUMNS (cards/hitter.py) — same rows, same order, same
+  // section titles (labels stay in the site's short vocabulary: BB+/CT+/SD+).
+  // The four page-only rows the card never had (xwOBAsp, Squared-Up%, Blast%,
+  // Sprint Speed) are dropped per Wally 2026-08-27; they live in the tables.
+  // EV50/Max EV replaced by EV95 — the exact BB+ ingredient (card, 2026-08-21).
+  // Change the card list and this list in the same commit.
   HITTING_STATS: [
-    // Quality summary — headlines first
+    { _section: 'Result' },
     { key: 'hitterPlus',   label: 'Hitter+',     format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    { key: 'xWRCplus',     label: 'xWRC+',       format: function(v) { return v != null ? Math.round(v) : '—'; } },
     // Hitter+ components (weights: BB+ 65%, CT+ 28%, SD+ 7%)
     { key: 'bbPlus',       label: 'BB+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'ctPlus',       label: 'CT+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'sdPlus',       label: 'SD+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    // Expected outcomes (wOBA family)
+    { key: 'batSpeed',     label: 'Bat Speed',   format: function(v) { return v != null ? v.toFixed(1) + ' mph' : '—'; }, rocHide: true, batSpeedQual: true },
+    // xWRC+ directly under xwOBA: the same quantity in the readable run
+    // currency — its percentile matches xwOBA's by construction.
     { key: 'xwOBA',        label: 'xwOBA',       format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    { key: 'xWRCplus',     label: 'xWRC+',       format: function(v) { return v != null ? Math.round(v) : '—'; } },
+    { _section: 'Quality of Contact' },
+    // xwOBAcon then BABIP: realized-vs-expected on contact — mismatched tints
+    // flag batted-ball fortune (hitter side uninverted: high BABIP = red).
     { key: 'xwOBAcon',     label: 'xwOBAcon',    format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
-    { key: 'xwOBAsp',      label: 'xwOBAsp',     format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
-    // Contact quality (EV). EV50 over Avg EV (battery 2026-07-20: rel .93
-    // vs .87, same predictive power — mirrors the leaderboard call).
-    { key: 'ev50',         label: 'EV50',        format: function(v) { return v != null ? v.toFixed(1) + ' mph' : '—'; } },
-    { key: 'maxEV',        label: 'Max EV',      format: function(v) { return v != null ? v.toFixed(1) + ' mph' : '—'; } },
-    // Contact quality (rate)
+    { key: 'babip',        label: 'BABIP',       format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
+    { key: 'ev95',         label: 'EV95',        format: function(v) { return v != null ? v.toFixed(1) + ' mph' : '—'; } },
     { key: 'hardHitPct',   label: 'Hard-Hit%',   format: function(v) { return Utils.formatPct(v); } },
     { key: 'barrelPct',    label: 'Barrel%',     format: function(v) { return Utils.formatPct(v); } },
-    // Discipline — PA-level rates
+    { key: 'airPullPct',   label: 'Air Pull%',   format: function(v) { return Utils.formatPct(v); } },
+    { key: 'gbPct',        label: 'GB%',         format: function(v) { return Utils.formatPct(v); } },
+    { _section: 'Plate Discipline' },
+    // Outcomes first, then the swing in the order it happens: DECIDE (Z-Swing%,
+    // Chase%, their differential) then EXECUTE (Whiff%, Z-Contact%).
     { key: 'bbPct',        label: 'BB%',         format: function(v) { return Utils.formatPct(v); } },
     { key: 'kPct',         label: 'K%',          format: function(v) { return Utils.formatPct(v); } },
-    // Discipline — per-pitch process. (Whiff% bubble dropped 2026-07-20:
-    // contact axis covered by Z-Contact% + K%; it stays in the tables.)
+    { key: 'izSwingPct',   label: 'Z-Swing%',    format: function(v) { return Utils.formatPct(v); } },
     { key: 'chasePct',     label: 'Chase%',      format: function(v) { return Utils.formatPct(v); } },
+    { key: 'izSwChase',    label: 'Z-Sw% - Chase%', format: function(v) { return Utils.formatPct(v, true); } },
+    { key: 'whiffPct',     label: 'Whiff%',      format: function(v) { return Utils.formatPct(v); } },
     { key: 'izContactPct', label: 'Z-Contact%', format: function(v) { return Utils.formatPct(v); } },
-    // Bat tracking
-    { key: 'batSpeed',     label: 'Bat Speed',   format: function(v) { return v != null ? v.toFixed(1) + ' mph' : '—'; }, rocHide: true, batSpeedQual: true },
-    { key: 'squaredUpPct', label: 'Squared-Up%', format: function(v) { return Utils.formatPct(v); }, rocHide: true, batSpeedQual: true },
-    { key: 'blastPct',     label: 'Blast%',      format: function(v) { return Utils.formatPct(v); }, rocHide: true, batSpeedQual: true },
-    // Spray
-    { key: 'airPullPct',   label: 'Air Pull%',   format: function(v) { return Utils.formatPct(v); } },
-    // Speed
-    { key: 'sprintSpeed',  label: 'Sprint Speed', format: function(v) { return v != null ? v.toFixed(1) + ' ft/s' : '—'; }, rocHide: true, sprintQual: true },
   ],
 
   HITTER_STATS_COLS: [
@@ -1065,7 +1079,9 @@ var PlayerPage = {
     // Determine if player qualifies based on team games played
     // Micro data is already game-type-specific, so no date range needed
     var isQualified = Utils.isQualified(data, this._qualContext(isPitcher), isPitcher);
-    var alwaysColorKeys = isPitcher ? { ffVelo: true, siVelo: true } : { maxEV: true };
+    // (maxEV left the hitter always-color set 2026-08-27 with the Max EV
+    // bubble itself — EV95 replaced it and is BIP-gated like the other rates.)
+    var alwaysColorKeys = isPitcher ? { ffVelo: true, siVelo: true } : {};
 
     var dynamicVeloStats = [];
     if (isPitcher) {
@@ -1087,13 +1103,14 @@ var PlayerPage = {
 
     // BIP-dependent stats that show gray when bipQual is false
     var HITTER_BIP_STATS = {
-      avgEVAll: true, ev50: true, maxEV: true,
-      hardHitPct: true, barrelPct: true,
+      avgEVAll: true, ev50: true, ev95: true, maxEV: true,
+      hardHitPct: true, barrelPct: true, gbPct: true,
       xBA: true, xSLG: true, xwOBA: true, xwOBAcon: true, xwOBAsp: true,
       babip: true, hrFbPct: true, airPullPct: true
     };
     var PITCHER_BIP_STATS = {
-      barrelPctAgainst: true, gbPct: true, avgEVAgainst: true, hardHitPct: true,
+      barrelPctAgainst: true, gbPct: true, puPct: true, avgEVAgainst: true,
+      hardHitPct: true, babip: true, hrFbPct: true,
       xBA: true, xSLG: true, xwOBA: true, xwOBAcon: true, xwOBAsp: true
     };
 

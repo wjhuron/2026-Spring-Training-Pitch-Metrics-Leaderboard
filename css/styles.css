@@ -1439,7 +1439,9 @@ body.compact #table-pinned-body td { padding: 4px 8px; font-size: 12px; }
 
 .pctl-row {
   display: grid;
-  grid-template-columns: 110px 1fr 44px 80px;
+  /* 118px label gutter: sized to the widest bubble label
+     ("Z-Sw% - Chase%"), which clipped at 110px. */
+  grid-template-columns: 118px 1fr 44px 80px;
   align-items: center;
   gap: 8px;
   height: 32px;
@@ -1846,7 +1848,8 @@ body.compact #table-pinned-body td { padding: 4px 8px; font-size: 12px; }
     white-space: normal;
   }
   .pctl-row {
-    grid-template-columns: 90px 1fr 36px 70px;
+    /* 106px fits the widest bubble label ("Z-Sw% - Chase%", 104px). */
+    grid-template-columns: 106px 1fr 36px 70px;
   }
   .heatmap-grid {
     grid-template-columns: repeat(2, 1fr);

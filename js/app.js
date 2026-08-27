@@ -49,11 +49,14 @@
   // Per-tab default sort. Falls back to alphabetical by player name.
   const TAB_DEFAULT_SORT = {
     pitcherStats:          { key: 'hpERA',      dir: 'asc' },
-    pitchMetrics:          { key: 'xRv100',     dir: 'desc' },
-    pitcherSwingDecisions: { key: 'swStrPct',   dir: 'desc' },
+    // 2026-08-27 (per Wally): pitch tab leads with the stabilized grade, not
+    // the noisy per-pitch xRV/100; swing tabs lead with CSW% (whole decision
+    // space) and SD+ (the tab's namesake grade).
+    pitchMetrics:          { key: 'pitchingScore', dir: 'desc' },
+    pitcherSwingDecisions: { key: 'cswPct',     dir: 'desc' },
     pitcherBattedBall:     { key: 'xwOBAcon',   dir: 'asc'  },
     hitterStats:           { key: 'hitterPlus', dir: 'desc' },
-    hitterSwingDecisions:  { key: 'ctPlus',     dir: 'desc' },
+    hitterSwingDecisions:  { key: 'sdPlus',     dir: 'desc' },
     hitterBattedBall:      { key: 'bbPlus',     dir: 'desc' },
     hitterBatTracking:     { key: 'batSpeed',   dir: 'desc' },
     hitterPitch:           { key: 'xRv100',     dir: 'desc' }
