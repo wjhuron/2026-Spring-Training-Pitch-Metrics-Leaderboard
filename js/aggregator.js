@@ -3342,8 +3342,9 @@ const Aggregator = {
       if (row[ci.pitcherIdx] !== pIdx || row[ci.teamIdx] !== tIdx) continue;
       const di = row[ci.dateIdx];
       let a = byDate[di];
-      if (!a) a = byDate[di] = { n: 0, sS: 0, nS: 0, sL: 0, nL: 0, sP: 0, nP: 0 };
+      if (!a) a = byDate[di] = { n: 0, csw: 0, sS: 0, nS: 0, sL: 0, nL: 0, sP: 0, nP: 0 };
       a.n += row[ci.n];
+      a.csw += row[ci.csw] || 0;
       a.sS += row[ci.sumStuff] || 0; a.nS += row[ci.nStuff] || 0;
       a.sL += row[ci.sumLoc] || 0;  a.nL += row[ci.nLoc] || 0;
       a.sP += row[ci.sumPitching] || 0; a.nP += row[ci.nPitching] || 0;
@@ -3354,6 +3355,9 @@ const Aggregator = {
       out.push({
         date: lookups.dates[di2],
         n: a2.n,
+        // Per-game CSW% (2026-08-27, per Wally): one outcome column so each
+        // start's grades sit next to their process result.
+        cswPct: a2.n > 0 ? a2.csw / a2.n : null,
         stuffScore: a2.nS > 0 ? Number((a2.sS / a2.nS).toFixed(1)) : null,
         locPlus: a2.nL > 0 ? Number((a2.sL / a2.nL).toFixed(1)) : null,
         pitchingScore: a2.nP > 0 ? Number((a2.sP / a2.nP).toFixed(1)) : null,

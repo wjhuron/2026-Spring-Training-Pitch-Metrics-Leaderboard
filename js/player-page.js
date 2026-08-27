@@ -505,7 +505,7 @@ var PlayerPage = {
     table.className = 'count-table';
     var thead = document.createElement('thead');
     var headRow = document.createElement('tr');
-    var headers = ['Date', 'Pitches', 'Stuff+', 'Loc+', 'Pitching+'];
+    var headers = ['Date', 'Pitches', 'CSW%', 'Stuff+', 'Loc+', 'Pitching+'];
     for (var hi = 0; hi < headers.length; hi++) {
       var th = document.createElement('th');
       th.textContent = headers[hi];
@@ -522,6 +522,7 @@ var PlayerPage = {
       var cells = [
         parseInt(parts[1]) + '/' + parseInt(parts[2]) + '/' + parts[0],
         g.n,
+        g.cswPct != null ? Utils.formatPct(g.cswPct) : '—',
         g.stuffScore != null ? Math.round(g.stuffScore) : '—',
         g.locPlus != null ? Math.round(g.locPlus) : '—',
         g.pitchingScore != null ? Math.round(g.pitchingScore) : '—',
