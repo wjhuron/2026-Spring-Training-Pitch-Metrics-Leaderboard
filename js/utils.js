@@ -494,14 +494,13 @@ const Utils = {
     'nVAA': 'VAA with the location effect removed (high pitches are naturally flatter). Positive = flatter than its height predicts — the sneaky-ride trait that plays at the top of the zone',
     'HAA': 'Horizontal Approach Angle (degrees)',
     'Z-%': 'In-Zone Rate',
-    'Whiff%': 'Whiff Rate (swinging strikes / swings)',
     'CSW%': 'Called Strike + Whiff Rate',
     'Chase%': 'Out-of-Zone Swing Rate',
     'GB%': 'Ground Ball Rate',
     // Hitter tooltips
     'Hitter': 'Hitter name',
     'Bats': 'Batting side (R/L/S)',
-    'Pitches': 'Total pitches seen',
+    'Pitches': 'Total pitches',
     'Swings': 'Total swings',
     'K%': 'Strikeout Rate (strikeouts / plate appearances)',
     'BB%': 'Walk Rate (walks / plate appearances)',
@@ -517,9 +516,9 @@ const Utils = {
     'PU%': 'Popup Rate',
     'Med LA': 'Median Launch Angle (degrees)',
     'Pull%': 'Pull Rate (batted balls to pull side)',
-    'Cent%': 'Center Rate (batted balls to center)',
+    'Middle%': 'Center rate (BIP up the middle)',
     'Oppo%': 'Oppo Rate (batted balls to opposite field)',
-    'AirPull%': 'Air Pull Rate (LD + FB + PU to pull side / total BIP)',
+    'AirPull%': 'Air Pull Rate (pulled LD + FB / total BIP; popups excluded from the numerator)',
   },
 
   readHash: function () {

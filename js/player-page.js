@@ -53,7 +53,7 @@ var PlayerPage = {
   HITTING_STATS: [
     { _section: 'Result' },
     { key: 'hitterPlus',   label: 'Hitter+',     format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    // Hitter+ components (weights: BB+ 65%, CT+ 28%, SD+ 7%)
+    // Hitter+ components (weights: BB+ 52%, SD+ 17%, CT+ 31%)
     { key: 'bbPlus',       label: 'BB+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'ctPlus',       label: 'CT+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'sdPlus',       label: 'SD+',         format: function(v) { return v != null ? Math.round(v) : '—'; } },
