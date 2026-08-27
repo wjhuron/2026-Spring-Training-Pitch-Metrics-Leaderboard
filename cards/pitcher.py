@@ -706,9 +706,13 @@ def fmt_fi(v):
     s = f"{ft}'{inc}\""; return f"-{s}" if neg else s
 
 def compute_iz(p):
-    px, pz, st, sb = sf(p.get('PlateX')), sf(p.get('PlateZ')), sf(p.get('SzTop')), sf(p.get('SzBot'))
-    if any(v is None for v in [px, pz, st, sb]): return None
-    return abs(px) <= 0.83 and pz >= sb-0.121 and pz <= st+0.121
+    # Exact Savant geometry via the pipeline's single home (2026-08-27 audit):
+    # the old rectangle (|px| <= 0.83, independent vertical margins) over-
+    # included ~0.2% of pitches and made the card tables disagree with the
+    # card's own bubbles, which already went through compute_in_zone.
+    from pipeline.utils import compute_in_zone as _ciz
+    iz = _ciz(p)
+    return None if iz is None else iz == 'Yes'
 
 def luminance(hc):
     r, g, b = int(hc[1:3],16)/255, int(hc[3:5],16)/255, int(hc[5:7],16)/255
@@ -1380,7 +1384,7 @@ def _bubble_columns_for(config, p_row):
     # keeps the bubble on the same pool as the site. Falls back to the plain
     # per-type value when counts are missing (older leaderboard JSONs).
     _fbs = []
-    for _t in ('FF', 'FA', 'SI'):
+    for _t in ('FF', 'SI'):
         _d = pitch_lb.get(_t) or {}
         if _d.get('velocity') is not None:
             _fbs.append((_d['velocity'], _d.get('count') or 0, _d.get('velocity_pctl')))
@@ -1874,7 +1878,7 @@ def render_card(config, pitches, output_file):
     # first/mid/last date labels below. Skips gracefully under 3 games. Lives
     # in the 0.7in of extra card height, so nothing below has to yield.
     if config.get('mvn_models'):
-        _FB_POOL = ('FF', 'FA', 'SI')
+        _FB_POOL = ('FF', 'SI')
         _velo_by_start = defaultdict(list)
         for p in pitches:
             _pt_ = p.get('Pitch Type')
@@ -1993,44 +1997,8 @@ def render_card(config, pitches, output_file):
     ax_plot.grid(True, alpha=0.5, color=GRID_COLOR); ax_plot.set_facecolor(PLOT_PANEL)
     for spine in ax_plot.spines.values(): spine.set_color(TEXT_FAINT)
 
-    # Compute expected movement per pitch type from MVN model
-    mvn_models = config.get('mvn_models', {})
-    throws = config['hand']
-    exp_movement = {}  # pt -> {'sum_ivb': ..., 'sum_hb': ..., 'n': ...}
-    for p in pitches:
-        pt = p.get('Pitch Type', '')
-        if not pt:
-            continue
-        aa = sf(p.get('ArmAngle'))
-        ext = sf(p.get('Extension'))
-        velo = sf(p.get('Velocity'))
-        rz = sf(p.get('RelPosZ'))
-        rx = sf(p.get('RelPosX'))
-        xivb, xhb = compute_expected_movement(mvn_models, pt, throws, aa, ext, velo, rz, rx)
-        if xivb is not None and xhb is not None:
-            if pt not in exp_movement:
-                exp_movement[pt] = {'sum_ivb': 0, 'sum_hb': 0, 'n': 0}
-            exp_movement[pt]['sum_ivb'] += xivb
-            exp_movement[pt]['sum_hb'] += xhb
-            exp_movement[pt]['n'] += 1
-
-    # Drop the shaded expected-movement ellipses + caption on all cards.
-    exp_movement = {}
-
-    # Draw expected movement ellipses first (behind scatter points, mv_ellipse_min)
-    for pt in PITCH_ORDER:
-        if pt not in exp_movement or pt not in groups:
-            continue
-        if len(groups[pt]) < mv_ellipse_min:
-            continue
-        em = exp_movement[pt]
-        cx = em['sum_hb'] / em['n']
-        cy = em['sum_ivb'] / em['n']
-        color = PITCH_COLORS.get(pt, '#999')
-        ax_plot.add_patch(Ellipse((cx, cy), 7.0, 7.0,
-            fill=True, facecolor=color, edgecolor=color,
-            linewidth=1.2, alpha=0.24, zorder=1,
-            hatch='///'))
+    # (The shaded expected-movement ellipses were dropped from all cards; the
+    # dead computation, ellipse loop, and caption were removed 2026-08-27.)
 
     for pt in PITCH_ORDER:
         if pt not in groups: continue
@@ -2075,9 +2043,6 @@ def render_card(config, pitches, output_file):
         leg = ax_plot.legend(handles=legend_handles, loc='upper center', bbox_to_anchor=(0.5,-0.09), ncol=min(len(sorted_types),5), fontsize=7.5, frameon=False, handlelength=1.2, columnspacing=1.2)
     for t in leg.get_texts(): t.set_color(TEXT_SECONDARY)
     # Add movement plot annotations
-    if exp_movement:
-        ax_plot.text(0.02, 0.035, 'Shaded = expected movement', transform=ax_plot.transAxes,
-                     fontsize=7, color='#000000', fontfamily='IBM Plex Sans', va='bottom')
     # Notes render BLACK on every layout (2026-08-13, per Wally — the muted
     # gray read too faint at card scale).
     ax_plot.text(0.02, 0.005, f'Min. {mv_ellipse_min} pitches for ellipse', transform=ax_plot.transAxes,
@@ -2363,20 +2328,24 @@ def render_card(config, pitches, output_file):
             if _ext_vals:
                 p_row = dict(p_row)
                 p_row['extension'] = sum(_ext_vals) / len(_ext_vals)
-            # HR/FB% + PU% (2026-08-14): computed from THIS card's pitches
-            # (same source as the table) against the all-MLB pickle pools.
-            # Leaderboard plumbing can replace this once the stats graduate;
-            # display floors keep micro-denominator garbage off the rail.
+            # HR/FB% + PU% (2026-08-27): the stats graduated to shipped
+            # leaderboard columns, so a row that carries the shipped value and
+            # percentile uses THOSE (one machinery for card and site; the card
+            # once ranked Alcantara 73rd where the site said 68th). The
+            # card-computed pickle-pool path survives only as the fallback for
+            # rows without shipped ranks; its display floors still apply.
             _bb = _batted_ball_line(pitches)
             if _bb:
                 p_row = dict(p_row)
                 _pools = _hrfb_pu_pools()
-                if _bb['fb'] >= 10 and _pools.get('hrfb'):
+                if (p_row.get('hrFbPct_pctl') is None
+                        and _bb['fb'] >= 10 and _pools.get('hrfb')):
                     p_row['hrFbPct'] = _bb['hr'] / _bb['fb'] * 100
                     # lower = better: percentile is share of pool ABOVE us
                     p_row['hrFbPct_pctl'] = _pctl_of(
                         p_row['hrFbPct'], _pools['hrfb'], invert=True)
-                if _bb['bip'] >= 25 and _pools.get('pu'):
+                if (p_row.get('puPct_pctl') is None
+                        and _bb['bip'] >= 25 and _pools.get('pu')):
                     p_row['puPct'] = _bb['pu'] / _bb['bip'] * 100
                     p_row['puPct_pctl'] = _pctl_of(
                         p_row['puPct'], _pools['pu'], invert=False)
@@ -3157,6 +3126,16 @@ def render_card(config, pitches, output_file):
                     'Per-pitch Stuff+ graded vs the same pitch type, Loc+ vs its pitch family (100 = average for that type or family)\n'
                     'Overall Stuff+ = pitch-weighted average of per-pitch grades\n'
                     'Faded values: sample too small to grade; they color in as pitches accumulate')
+        # Pool notes (2026-08-27, per Wally). A window card's note carries the
+        # pool claim, so the two are mutually exclusive.
+        if config.get('is_date_range'):
+            _sp_note += ('\nValues are for this date window. Percentiles and the + grades '
+                         'score against the full-season MLB pools and anchors, with no minimum sample')
+        else:
+            _sp_note += '\nPercentiles rank against all MLB pitchers, no qualification gate'
+        if 'hdERA' in config.get('stat_headers', []):
+            _sp_note += ('\nhdERA = ERA from shrunk xwOBA alone; hpERA adds stuff, location, whiffs, '
+                         'grounders, role and home park. Both are calibrated to future ERA. ROC arms show hpERA only')
         fig.text(_sp_x, b - _below_off, _sp_note,
                  fontsize=8, color='#000000', va='top', ha='left', fontfamily='IBM Plex Sans', fontweight='bold', linespacing=1.5)
 
@@ -3750,6 +3729,20 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
 
     row = {'count': n}
     row.update(compute_stats(pitches))
+    # Official-TBF reconciliation (2026-08-27 audit): the no-pitch IBB marker
+    # rows were excluded from the pitch lists at the read boundary, but each
+    # one is a real batter faced. Fold them back into the PA denominator so
+    # window K%/BB%/K-BB% sit on the same official-TBF footing as the
+    # leaderboard pool these bubbles rank in (the Wood-class error).
+    _ibb = ctx.get('ibb_by_pitcher', {}).get(pitcher_name, 0)
+    if _ibb and row.get('pa'):
+        _scale = row['pa'] / (row['pa'] + _ibb)
+        for _rk in ('kPct', 'bbPct'):
+            if row.get(_rk) is not None:
+                row[_rk] = row[_rk] * _scale
+        if row.get('kPct') is not None and row.get('bbPct') is not None:
+            row['kbbPct'] = row['kPct'] - row['bbPct']
+        row['pa'] = row['pa'] + _ibb
     row.update(compute_expected_stats(pitches, None))
     row.update(compute_pitcher_batted_ball(pitches))
     rv = row.get('runValue')
@@ -3767,7 +3760,7 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
     # The leaderboard's fbVelo (process_data) pools FF+SI the same way as of
     # the same day, so the percentile pool and this value now agree.
     fbv = [v for v in (sf(p.get('Velocity')) for p in pitches
-                       if p.get('Pitch Type') in ('FF', 'FA', 'SI'))
+                       if p.get('Pitch Type') in ('FF', 'SI'))
            if v is not None]
     row['fbVelo'] = round(sum(fbv) / len(fbv), 1) if fbv else None
 
@@ -4224,7 +4217,9 @@ def main():
     _apply_runexp_currency(all_rows)
 
     # Filter by date range (and optionally by pitcher name)
+    from pipeline.utils import is_no_pitch as _is_no_pitch
     pitches_by_pitcher = defaultdict(list)
+    ibb_by_pitcher = defaultdict(int)   # no-pitch IBB markers: TBF, not pitches
     game_dates_seen = set()
     team_dates = defaultdict(set)   # source team -> game dates (per-team boxscores)
     for row in all_rows:
@@ -4237,6 +4232,17 @@ def main():
             if filter_pitchers and pitcher_name not in filter_pitchers:
                 continue
             if bats_filter and row.get('Bats') != bats_filter:
+                continue
+            # No-pitch IBB marker rows (PitchID *_00) are real batters faced
+            # but not pitches (2026-08-27 audit): keep them OUT of every
+            # per-pitch denominator (a marker even counted as a strike in
+            # Strike%), but LEDGER them so the PA-denominated rates can
+            # reconcile to official TBF.
+            if _is_no_pitch(row):
+                ibb_by_pitcher[pitcher_name] += 1
+                if row_date:
+                    game_dates_seen.add(row_date)
+                    team_dates[row.get('_card_team', team)].add(row_date)
                 continue
             pitches_by_pitcher[pitcher_name].append(row)
             if row_date:
@@ -4291,6 +4297,7 @@ def main():
             _norm = {nm: [_normalize_scratch_pitch(r) for r in pl]
                      for nm, pl in pitches_by_pitcher.items()}
             scratch_ctx = _build_scratch_league_context(_norm, stuff_k_shrink=K_SHRINK_DAILY)
+            scratch_ctx['ibb_by_pitcher'] = dict(ibb_by_pitcher)
         except Exception as _e:
             import traceback; traceback.print_exc()
             print(f"  WARNING: scratch context failed ({_e}) — rendering MiLB-style")
@@ -4307,6 +4314,7 @@ def main():
             _norm = {nm: [_normalize_scratch_pitch(r) for r in pl]
                      for nm, pl in pitches_by_pitcher.items()}
             scratch_ctx = _build_scratch_league_context(_norm, stuff_k_shrink=K_SHRINK_DAILY)
+            scratch_ctx['ibb_by_pitcher'] = dict(ibb_by_pitcher)
         except Exception as _e:
             import traceback; traceback.print_exc()
             print(f"  WARNING: daily Stuff+/Loc+ context failed ({_e}) — omitting those columns")
