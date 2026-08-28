@@ -941,6 +941,8 @@ def fetch_boxscore(game_pk):
                 'h': stats.get('hits', 0), 'hr': stats.get('homeRuns', 0),
                 'so': stats.get('strikeOuts', 0), 'bb': stats.get('baseOnBalls', 0),
                 'tbf': stats.get('battersFaced', 0),
+                'wins': stats.get('wins', 0), 'losses': stats.get('losses', 0),
+                'saves': stats.get('saves', 0), 'holds': stats.get('holds', 0),
                 'is_starter': idx == 0,
             })
     return result
@@ -1052,8 +1054,13 @@ def fetch_boxscores_for_team_dates(dates, team_abbrev, include_live=False):
 
     cache = _load_boxscore_cache()
     # Live games always refetch; Final games come from / land in the cache.
+    # A cached entry from before the decision fields existed (wins/losses/
+    # saves/holds, 2026-08-27) refetches once and re-caches with them.
+    def _cache_ok(e):
+        return bool(e) and all('wins' in q for q in e.get('pitchers', []))
     to_fetch = sorted({pk for pks in games_by_date.values()
-                       for (pk, final) in pks if not (final and str(pk) in cache)})
+                       for (pk, final) in pks
+                       if not (final and _cache_ok(cache.get(str(pk))))})
     fetched = {}
     if to_fetch:
         print(f"  Fetching {len(to_fetch)} boxscores "
@@ -1077,6 +1084,8 @@ def fetch_boxscores_for_team_dates(dates, team_abbrev, include_live=False):
     for gd in sorted(games_by_date):
         for (pk, final) in games_by_date[gd]:
             box = fetched.get(pk) if pk in fetched else cache.get(str(pk))
+            if box is not None and not _cache_ok(box) and pk not in fetched:
+                continue  # stale pre-decision-field entry that failed refetch
             if not box:
                 continue
             game = {}
@@ -1762,6 +1771,20 @@ def render_social_card(config, pitches, output_file):
     if not is_season and opp:
         kick += '  ·  VS %s' % opp
     txt(L, 0.970, kick, 10.5, ACCENT, 'bold', ha='left')
+    if not is_season:
+        _bx = config.get('social_box') or {}
+        if _bx.get('wins'):      _dec, _dc = 'W',  ACCENT
+        elif _bx.get('losses'):  _dec, _dc = 'L',  '#567698'
+        elif _bx.get('saves'):   _dec, _dc = 'SV', ACCENT
+        elif _bx.get('holds'):   _dec, _dc = 'H',  '#8a7f75'
+        else:                    _dec, _dc = 'ND', '#8a7f75'
+        from matplotlib.patches import FancyBboxPatch as _FBP
+        _cw = 0.030 + 0.011 * len(_dec)
+        ax.add_patch(_FBP((R - _cw, 0.9585), _cw, 0.0215,
+                          boxstyle='round,pad=0,rounding_size=0.008',
+                          facecolor=_dc, edgecolor='none', mutation_aspect=0.8))
+        ax.text(R - _cw / 2, 0.9693, _dec, fontsize=10.5, color='white',
+                fontweight='black', fontfamily='Bitter', ha='center', va='center')
     _nm = config['display_name'].upper()
     _nsz = 27 if len(_nm) <= 16 else (23 if len(_nm) <= 20 else 20)
     ax.text(L, 0.958, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
@@ -4604,8 +4627,8 @@ def main():
                 if not nk:
                     continue
                 if nk not in box_stats:
-                    box_stats[nk] = {k: 0 for k in ('outs', 'r', 'er', 'h', 'so', 'bb', 'hr', 'tbf', 'g', 'gs')}
-                for k in ('outs', 'r', 'er', 'h', 'so', 'bb', 'hr', 'tbf'):
+                    box_stats[nk] = {k: 0 for k in ('outs', 'r', 'er', 'h', 'so', 'bb', 'hr', 'tbf', 'g', 'gs', 'wins', 'losses', 'saves', 'holds')}
+                for k in ('outs', 'r', 'er', 'h', 'so', 'bb', 'hr', 'tbf', 'wins', 'losses', 'saves', 'holds'):
                     box_stats[nk][k] += pbox.get(k, 0)
                 box_stats[nk]['g'] += 1
                 if pbox.get('is_starter'):
@@ -4623,8 +4646,8 @@ def main():
         for pname, pbox in day_box.items():
             nk = _normalize_name(pname)
             if nk not in box_stats:
-                box_stats[nk] = {k: 0 for k in ('outs', 'r', 'er', 'h', 'so', 'bb', 'hr', 'tbf', 'g', 'gs')}
-            for k in ('outs', 'r', 'er', 'h', 'so', 'bb', 'hr', 'tbf'):
+                box_stats[nk] = {k: 0 for k in ('outs', 'r', 'er', 'h', 'so', 'bb', 'hr', 'tbf', 'g', 'gs', 'wins', 'losses', 'saves', 'holds')}
+            for k in ('outs', 'r', 'er', 'h', 'so', 'bb', 'hr', 'tbf', 'wins', 'losses', 'saves', 'holds'):
                 box_stats[nk][k] += pbox.get(k, 0)
             box_stats[nk]['g'] += 1
             if pbox.get('is_starter'):
