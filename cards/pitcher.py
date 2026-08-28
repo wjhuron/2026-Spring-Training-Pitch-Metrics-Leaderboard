@@ -2030,9 +2030,9 @@ def render_social_card(config, pitches, output_file):
         s_.set_color(SUBTLE_BORDER)
     tks = list(range(-_lim, _lim + 1, 5))
     mv.set_xticks(tks); mv.set_yticks(tks)
-    mv.tick_params(labelsize=7.5, colors=TEXT_MUTED, length=2.5)
-    mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=8, color=TEXT_MUTED, labelpad=1)
-    mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=8, color=TEXT_MUTED, labelpad=1)
+    mv.tick_params(labelsize=7.5, colors=TEXT_PRIMARY, length=2.5)
+    mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, labelpad=1)
+    mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, labelpad=1)
     mv.axhline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     mv.axvline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     groups = {}
@@ -2091,6 +2091,8 @@ def render_social_card(config, pitches, output_file):
                 sw = [p for p in pl if p.get('Description') in SWING]
                 wh = sum(1 for p in sw if p.get('Description') == 'Swinging Strike')
                 cs = sum(1 for p in pl if p.get('Description') == 'Called Strike')
+                izv = [1 if r2 else 0 for r2 in
+                       (compute_iz(p) for p in pl) if r2 is not None]
                 s_at = [int(round(sf(p.get('Stuff+')))) for p in pl
                         if sf(p.get('Stuff+')) is not None]
                 l_at = [int(round(sf(p.get('Loc+')))) for p in pl
@@ -2101,6 +2103,7 @@ def render_social_card(config, pitches, output_file):
                     'ivb': sum(ivs) / len(ivs) if ivs else None,
                     'hb': sum(hbs) / len(hbs) if hbs else None,
                     'whiff': (wh / len(sw)) if sw else None,
+                    'zone': (sum(izv) / len(izv)) if izv else None,
                     'csw': (wh + cs) / len(pl),
                     'stuff': sum(s_at) / len(s_at) if s_at else None,
                     'loc': sum(l_at) / len(l_at) if l_at else None,
@@ -2112,11 +2115,16 @@ def render_social_card(config, pitches, output_file):
         # labels carry velo (per Wally 2026-08-28).
         # '#' dropped (derivable from Usage x the section total) and the
         # spread tightened, per Wally 2026-08-28.
-        # Four columns (2026-08-28 feedback round, per Wally): Whiff% kept
-        # over CSW% — the pair was redundant on a one-game sample.
-        SPLIT_COLS = [('USAGE', 0.420, 'r', 'usepct'),
-                      ('WHIFF%', 0.590, 'r', 'whiff'),
-                      ('STUFF+', 0.760, 'c', 'stuff'), ('LOC+', 0.905, 'c', 'loc')]
+        # Columns (2026-08-28 feedback round, per Wally): Whiff% kept over
+        # CSW% (redundant pair on a one-game sample), Zone% added by the
+        # outing-grain reliability screen — split-half r at the (outing,
+        # pitch type) grain: Whiff% .242, Zone% .183 (defined on every
+        # pitch, r .35 with the Loc+ atoms so not a restatement), CSW%
+        # .048 = the least reliable candidate measured.
+        SPLIT_COLS = [('USAGE', 0.365, 'r', 'usepct'),
+                      ('ZONE%', 0.500, 'r', 'zone'),
+                      ('WHIFF%', 0.630, 'r', 'whiff'),
+                      ('STUFF+', 0.775, 'c', 'stuff'), ('LOC+', 0.910, 'c', 'loc')]
 
         def _header(hy, cols):
             for lab, cx, al, _k in cols:
@@ -2159,6 +2167,10 @@ def render_social_card(config, pitches, output_file):
                     elif k == 'csw':
                         v = '%.0f%%' % (r_['csw'] * 100)
                         c_ = TEXT_FAINT if r_['n'] < 5 else TEXT_PRIMARY
+                    elif k == 'zone':
+                        v = ('—' if r_['zone'] is None
+                             else '%.0f%%' % (r_['zone'] * 100))
+                        c_ = TEXT_PRIMARY
                     elif k == 'whiff':
                         v = ('—' if r_['whiff'] is None
                              else '%.0f%%' % (r_['whiff'] * 100))
@@ -2186,9 +2198,11 @@ def render_social_card(config, pitches, output_file):
             # arsenal shrinks; a two-pitch reliever gets the max size.
             _nrows = sum(len({p.get('Pitch Type') for p in pl_ if p.get('Pitch Type')})
                          for _nm2, pl_ in sections)
-            rh_ = min(0.034, 0.312 / (max(_nrows, 1) + 1.2))
+            rh_ = min(0.034, 0.298 / (max(_nrows, 1) + 1.2))
             fs_ = min(12.0, rh_ * 430.0)
-            yb, hdr = 0.398, True
+            # First title starts at 0.384 (was 0.398): the gap under the
+            # plot's x-label now matches the inter-section gap (per Wally).
+            yb, hdr = 0.384, True
             for name_, pl_ in sections:
                 _pw = 'PITCH' if len(pl_) == 1 else 'PITCHES'
                 yb = _table(yb, f'{name_}  ·  {len(pl_)} {_pw}',
@@ -2246,8 +2260,8 @@ def render_social_card(config, pitches, output_file):
 
     _fy = 0.016 if not is_season else 0.075
     txt(L, _fy, 'huronalytics.vercel.app', 10.5,
-        TEXT_MUTED, 'normal', ha='left', style='italic')
-    txt(R, _fy, note_r, 8.2, TEXT_FAINT, 'normal', ha='right')
+        TEXT_PRIMARY, 'normal', ha='left', style='italic')
+    txt(R, _fy, note_r, 8.2, TEXT_PRIMARY, 'normal', ha='right')
 
     plt.savefig(output_file, dpi=135, facecolor=BG)
     plt.close(fig)
