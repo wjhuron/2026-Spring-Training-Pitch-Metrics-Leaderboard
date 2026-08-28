@@ -2047,7 +2047,9 @@ def render_social_card(config, pitches, output_file):
             sf(p.get('xHorzBrk', p.get('HorzBrk')))
         if pt_ and iv is not None and hb is not None:
             groups.setdefault(pt_, []).append((hb, iv))
-    a = 0.5 if not is_season else 0.16
+    a = 0.75 if not is_season else 0.16   # daily dots: bold, overlaps still
+                                          # shade (0.5/0.75/1.0 prototyped
+                                          # 2026-08-28, per Wally)
     dsz = 26 if not is_season else 9
     for pt_, pl in groups.items():
         col = PITCH_COLORS.get(pt_, '#777')
@@ -4455,8 +4457,8 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 def main():
     # ── Settings (edit these directly or override via command line) ──
     team            = "WSH"
-    start_date      = "2026-08-27"    # Set to None for full season
-    end_date        = "2026-08-27"             # Set to a date for date range, or None for single day
+    start_date      = None    # Set to None for full season
+    end_date        = None             # Set to a date for date range, or None for single day
     filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
