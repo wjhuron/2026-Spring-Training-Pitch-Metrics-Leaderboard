@@ -1773,7 +1773,7 @@ def render_social_card(config, pitches, output_file):
         meta += f"  |  {sv[sh.index('GS')]} GS  ·  {sv[sh.index('IP')]} IP"
     else:
         meta += f"  |  {len(pitches)} pitches"
-    txt(L, 0.906, meta, 10, TEXT_MUTED, 'bold', ha='left')
+    txt(L, 0.913, meta, 10, TEXT_MUTED, 'bold', ha='left')
 
     def tile_row(y, h, cells, vsize=17, ksize=7.2, ssize=7.2):
         n = len(cells); gap = 0.012
@@ -1907,15 +1907,14 @@ def render_social_card(config, pitches, output_file):
                                    facecolor=PITCH_COLORS.get(pt_, '#777'),
                                    edgecolor=BG, linewidth=1.2))
             frac = n_ / total
-            if frac >= 0.12:
+            # Every slice labels ITSELF, inside, like the rest of the bar —
+            # the font scales down with the slice instead of falling out of it.
+            if w_ >= 0.10:
                 txt(xcur + w_ / 2, uy + uh / 2, f"{pt_} {frac*100:.0f}%", 7.5, 'white')
-            elif frac >= 0.06:
+            elif w_ >= 0.045:
                 txt(xcur + w_ / 2, uy + uh / 2, pt_, 7, 'white')
             else:
-                # Too thin for an inside label: name it just below the bar
-                # (per Wally 2026-08-27 — every slice says its pitch).
-                txt(xcur + w_ / 2, uy - 0.010, pt_, 6.5,
-                    PITCH_COLORS.get(pt_, '#777'))
+                txt(xcur + w_ / 2, uy + uh / 2, pt_, 5.5, 'white')
             xcur += w_
 
         # game grades: Stuff+/Loc+ only (Pitching+ is their fixed blend)
