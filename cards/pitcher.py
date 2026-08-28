@@ -1735,6 +1735,7 @@ def render_social_card(config, pitches, output_file):
     from matplotlib.patches import FancyBboxPatch, Rectangle
 
     is_season = (config.get('stat_headers') or [''])[0] == 'G'
+    _tbl = _spl = False
 
     fig = plt.figure(figsize=(8, 10), dpi=135)
     ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
@@ -1749,6 +1750,15 @@ def render_social_card(config, pitches, output_file):
             ha='center', va='center', style='normal'):
         ax.text(x, y, t, fontsize=size, color=color, fontweight=weight,
                 fontfamily=family, ha=ha, va=va, fontstyle=style)
+
+    def gtint(g):
+        # Grade tint on the print scale. The 4-points-per-percentile map is a
+        # display convention (a +/-12.5 grade spans the full ramp), not a
+        # measured constant.
+        if g is None:
+            return DARK_CELL
+        f, _ = _percentile_color(max(0, min(100, 50 + (g - 100) * 4)))
+        return f
 
     # usage from the card's own pitches, largest first
     from collections import Counter
@@ -1815,31 +1825,28 @@ def render_social_card(config, pitches, output_file):
     if not is_season:
         box = config.get('social_box') or {}
         ip_str = config['stat_values'][config['stat_headers'].index('IP')]
+        # One row: the official line plus the tinted verdict tiles (Whiffs
+        # dropped for room per Wally 2026-08-28; whiff detail lives in the
+        # per-type table). The freed second row goes to the plot.
+        s_at = [int(round(sf(p.get('Stuff+')))) for p in pitches
+                if sf(p.get('Stuff+')) is not None]
+        l_at = [int(round(sf(p.get('Loc+')))) for p in pitches
+                if sf(p.get('Loc+')) is not None]
+        sg = (sum(s_at) / len(s_at)) if s_at else None
+        lg_ = (sum(l_at) / len(l_at)) if l_at else None
         line = [
             {'v': ip_str, 'k': 'IP'},
             {'v': str(box.get('so', '—')), 'k': 'K'},
             {'v': str(box.get('bb', '—')), 'k': 'BB'},
             {'v': str(box.get('h', '—')), 'k': 'H'},
             {'v': str(box.get('er', '—')), 'k': 'ER'},
+            {'v': '—' if sg is None else f"{sg:.0f}", 'k': 'STUFF+', 'fc': gtint(sg)},
+            {'v': '—' if lg_ is None else f"{lg_:.0f}", 'k': 'LOC+', 'fc': gtint(lg_)},
         ]
         tile_row(0.848, 0.052, line, vsize=19)
-
-        # heroes: FB Velo | Whiffs | CSW% (order per Wally 2026-08-27)
-        fbv = [sf(p.get('Velocity')) for p in pitches
-               if p.get('Pitch Type') in ('FF', 'SI') and sf(p.get('Velocity')) is not None]
-        whiffs = [p for p in pitches if p.get('Description') == 'Swinging Strike']
-        csw_n = len(whiffs) + sum(1 for p in pitches if p.get('Description') == 'Called Strike')
-        best = Counter(p.get('Pitch Type') for p in whiffs).most_common(1)
-        heroes = [
-            {'v': f"{sum(fbv)/len(fbv):.1f}" if fbv else '—', 'k': 'FB VELO',
-             'sub': f"max {max(fbv):.1f}" if fbv else ''},
-            {'v': str(len(whiffs)), 'k': 'WHIFFS',
-             'sub': f"{best[0][1]} on the {best[0][0]}" if best else ''},
-            {'v': f"{csw_n/len(pitches)*100:.1f}%" if pitches else '—', 'k': 'CSW%',
-             'sub': f"{csw_n} of {len(pitches)}"},
-        ]
-        tile_row(0.772, 0.062, heroes, vsize=18)
-        mv_top, mv_bot = 0.742, 0.300
+        _tbl = bool(config.get('social_table'))
+        _spl = bool(config.get('social_split'))
+        mv_top, mv_bot = 0.800, (0.420 if _spl else 0.385 if _tbl else 0.215)
     else:
         sh, sv = config['stat_headers'], config['stat_values']
         prow = config.get('pctl_row') or {}
@@ -1883,15 +1890,24 @@ def render_social_card(config, pitches, output_file):
     # movement plot (faded cloud + labeled centroids; ticks every 5)
     mv = fig.add_axes([L, mv_bot, R - L, mv_top - mv_bot])
     mv.set_facecolor(PLOT_PANEL)
-    mv.set_xlim(-25, 25); mv.set_ylim(-25, 25)
+    _lim = 20 if (not is_season and _spl) else 25
+    mv.set_xlim(-_lim, _lim); mv.set_ylim(-_lim, _lim)
     for s_ in mv.spines.values():
         s_.set_color(SUBTLE_BORDER)
-    tks = list(range(-25, 26, 5))
+    tks = list(range(-_lim, _lim + 1, 5))
     mv.set_xticks(tks); mv.set_yticks(tks)
     mv.tick_params(labelsize=6, colors=TEXT_MUTED, length=2.5)
+    mv.set_xlabel('HB', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
+    mv.set_ylabel('IVB', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
     mv.axhline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     mv.axvline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     groups = {}
+    _velo_acc = {}
+    for p in pitches:
+        _pt, _v = p.get('Pitch Type'), sf(p.get('Velocity'))
+        if _pt and _v is not None:
+            _velo_acc.setdefault(_pt, []).append(_v)
+    velo_by_type = {k: sum(v) / len(v) for k, v in _velo_acc.items()}
     for p in pitches:
         pt_, iv, hb = p.get('Pitch Type'), sf(p.get('xIndVrtBrk', p.get('IndVertBrk'))), \
             sf(p.get('xHorzBrk', p.get('HorzBrk')))
@@ -1909,19 +1925,138 @@ def render_social_card(config, pitches, output_file):
         col = PITCH_COLORS.get(pt_, '#777')
         mh = sum(q[0] for q in pl) / len(pl); mvv = sum(q[1] for q in pl) / len(pl)
         mv.scatter([mh], [mvv], s=150, color=col, edgecolors=BG, linewidths=1.8, zorder=5)
-        right = mh > 17
-        mv.annotate(pt_, (mh, mvv), xytext=(-11 if right else 11, 0),
+        _vt = velo_by_type.get(pt_) if not is_season else None
+        _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
+        right = mh > 0.68 * _lim
+        mv.annotate(_lab, (mh, mvv), xytext=(-11 if right else 11, 0),
                     textcoords='offset points', fontsize=9, fontweight='bold',
                     color=col, ha='right' if right else 'left', va='center',
                     fontfamily='IBM Plex Sans',
                     path_effects=[__import__('matplotlib.patheffects', fromlist=['withStroke'])
                                   .withStroke(linewidth=2.5, foreground=BG)], zorder=6)
-    txt(L, mv_top + 0.010, 'MOVEMENT' + ('' if is_season else '  ·  THIS START'),
-        8, TEXT_FAINT, 'bold', ha='left')
+    txt(L, mv_top + 0.010, 'PITCH MOVEMENT', 8, TEXT_FAINT, 'bold', ha='left')
+
+    # per-pitch-type table (prototype, Driveline-style chips on our palette)
+    if not is_season and _tbl:
+        SWING = ('Swinging Strike', 'Foul', 'In Play')
+
+        def _stats(plist):
+            by = {}
+            for p in plist:
+                pt_ = p.get('Pitch Type')
+                if pt_:
+                    by.setdefault(pt_, []).append(p)
+            out = []
+            for pt_, pl in sorted(by.items(), key=lambda kv: -len(kv[1])):
+                velos = [sf(p.get('Velocity')) for p in pl]
+                velos = [v for v in velos if v is not None]
+                ivs = [sf(p.get('xIndVrtBrk', p.get('IndVertBrk'))) for p in pl]
+                ivs = [v for v in ivs if v is not None]
+                hbs = [sf(p.get('xHorzBrk', p.get('HorzBrk'))) for p in pl]
+                hbs = [v for v in hbs if v is not None]
+                sw = [p for p in pl if p.get('Description') in SWING]
+                wh = sum(1 for p in sw if p.get('Description') == 'Swinging Strike')
+                cs = sum(1 for p in pl if p.get('Description') == 'Called Strike')
+                s_at = [int(round(sf(p.get('Stuff+')))) for p in pl
+                        if sf(p.get('Stuff+')) is not None]
+                l_at = [int(round(sf(p.get('Loc+')))) for p in pl
+                        if sf(p.get('Loc+')) is not None]
+                out.append({
+                    'pt': pt_, 'n': len(pl), 'sw': len(sw),
+                    'velo': sum(velos) / len(velos) if velos else None,
+                    'ivb': sum(ivs) / len(ivs) if ivs else None,
+                    'hb': sum(hbs) / len(hbs) if hbs else None,
+                    'whiff': (wh / len(sw)) if sw else None,
+                    'csw': (wh + cs) / len(pl),
+                    'stuff': sum(s_at) / len(s_at) if s_at else None,
+                    'loc': sum(l_at) / len(l_at) if l_at else None,
+                })
+            return out
+
+        # Numerals right-align on their column edge ('r'); chips center ('c').
+        # Split drops Velo/IVB/HB — the plot carries shape and the centroid
+        # labels carry velo (per Wally 2026-08-28).
+        # '#' dropped (derivable from Usage x the section total) and the
+        # spread tightened, per Wally 2026-08-28.
+        SPLIT_COLS = [('USAGE', 0.340, 'r', 'usepct'),
+                      ('CSW%', 0.490, 'r', 'csw'), ('WHIFF%', 0.640, 'r', 'whiff'),
+                      ('STUFF+', 0.780, 'c', 'stuff'), ('LOC+', 0.905, 'c', 'loc')]
+        FULL_COLS = [('USAGE', 0.250, 'r', 'usepct'),
+                     ('VELO', 0.345, 'r', 'velo'), ('IVB', 0.430, 'r', 'ivb'),
+                     ('HB', 0.510, 'r', 'hb'), ('CSW%', 0.610, 'r', 'csw'),
+                     ('WHIFF%', 0.700, 'r', 'whiff'),
+                     ('STUFF+', 0.800, 'c', 'stuff'), ('LOC+', 0.915, 'c', 'loc')]
+
+        def _header(hy, cols):
+            txt(L, hy, 'PITCH', 6.4, TEXT_SECONDARY, 'bold', ha='left')
+            for lab, cx, al, _k in cols:
+                txt(cx, hy, lab, 6.4, TEXT_SECONDARY, 'bold',
+                    ha='right' if al == 'r' else 'center')
+
+        def _table(y, title, plist, rh, fs, cols, header=True):
+            rows = _stats(plist)
+            nsub = sum(r['n'] for r in rows) or 1
+            txt(L, y, title, 8, TEXT_FAINT, 'bold', ha='left')
+            ry = y - 0.006
+            if header:
+                _header(y - 0.020, cols)
+                ry = y - 0.028
+            for r_ in rows:
+                ry -= rh
+                col = PITCH_COLORS.get(r_['pt'], '#777')
+                ax.scatter([L + 0.007], [ry], s=34, color=col, edgecolors='none',
+                           transform=ax.transAxes, zorder=4)
+                txt(L + 0.022, ry, r_['pt'], fs, TEXT_PRIMARY, 'bold', ha='left')
+                for lab, cx, al, k in cols:
+                    if k in ('stuff', 'loc'):
+                        # Tinted grade chips. A cell under 5 pitches stays
+                        # neutral — the number renders, the color does not
+                        # vouch for it.
+                        g = r_[k]
+                        fc = gtint(g) if r_['n'] >= 5 else DARK_CELL
+                        rrect(cx - 0.033, ry - 0.5 * rh + 0.003, 0.066,
+                              rh - 0.006, fc, r=0.008)
+                        txt(cx, ry, '—' if g is None else '%.0f' % g, fs,
+                            TEXT_PRIMARY, 'black', family='Bitter')
+                        continue
+                    if k is None:
+                        v, c_ = str(r_['n']), TEXT_PRIMARY
+                    elif k == 'usepct':
+                        v, c_ = '%.0f%%' % (r_['n'] / nsub * 100), TEXT_PRIMARY
+                    elif k == 'csw':
+                        v = '%.0f%%' % (r_['csw'] * 100)
+                        c_ = TEXT_FAINT if r_['n'] < 5 else TEXT_PRIMARY
+                    elif k == 'whiff':
+                        v = ('—' if r_['whiff'] is None
+                             else '%.0f%%' % (r_['whiff'] * 100))
+                        # Under 5 swings the number prints but steps back.
+                        c_ = TEXT_FAINT if r_['sw'] < 5 else TEXT_PRIMARY
+                    else:
+                        v = '—' if r_[k] is None else '%.1f' % r_[k]
+                        c_ = TEXT_PRIMARY
+                    txt(cx, ry, v, fs, c_, '500',
+                        ha='right' if al == 'r' else 'center')
+            return ry - rh * 0.6
+
+        if _spl:
+            lhh = [p for p in pitches if p.get('Bats') == 'L']
+            rhh = [p for p in pitches if p.get('Bats') == 'R']
+            first, second = sorted(
+                [('VS LHH', lhh), ('VS RHH', rhh)], key=lambda kv: -len(kv[1]))
+            yb = _table(0.370, f'{first[0]}  ·  {len(first[1])} PITCHES',
+                        first[1], 0.0210, 7.2, SPLIT_COLS, header=True)
+            _table(yb - 0.0144, f'{second[0]}  ·  {len(second[1])} PITCHES',
+                   second[1], 0.0210, 7.2, SPLIT_COLS, header=False)
+        else:
+            _table(0.340, 'ARSENAL  ·  THIS START', pitches, 0.0295, 8.2,
+                   FULL_COLS, header=True)
+        note_r = 'MLB gameday feed  ·  100 = league average'
 
     # usage bar (daily: below the plot, above the grades — per Wally)
-    if not is_season:
-        uy, uh = 0.232, 0.026
+    if not is_season and _tbl:
+        pass    # the table above already replaced the usage bar and grades
+    elif not is_season:
+        uy, uh = 0.148, 0.028
         txt(L, uy + uh + 0.012, 'USAGE', 8, TEXT_FAINT, 'bold', ha='left')
         xcur = L
         for pt_, n_ in usage:
@@ -1940,22 +2075,6 @@ def render_social_card(config, pitches, output_file):
                 txt(xcur + w_ / 2, uy + uh / 2, pt_, 5.5, 'white')
             xcur += w_
 
-        # game grades: Stuff+/Loc+ only (Pitching+ is their fixed blend)
-        s_at = [int(round(sf(p.get('Stuff+')))) for p in pitches if sf(p.get('Stuff+')) is not None]
-        l_at = [int(round(sf(p.get('Loc+')))) for p in pitches if sf(p.get('Loc+')) is not None]
-        def gtint(g):
-            if g is None:
-                return DARK_CELL
-            f, _ = _percentile_color(max(0, min(100, 50 + (g - 100) * 4)))
-            return f
-        sg = (sum(s_at) / len(s_at)) if s_at else None
-        lg_ = (sum(l_at) / len(l_at)) if l_at else None
-        txt(L, 0.196, 'GAME GRADES', 8, TEXT_FAINT, 'bold', ha='left')
-        cells = [
-            {'v': '—' if sg is None else f"{sg:.0f}", 'k': 'STUFF+', 'fc': gtint(sg)},
-            {'v': '—' if lg_ is None else f"{lg_:.0f}", 'k': 'LOC+', 'fc': gtint(lg_)},
-        ]
-        tile_row(0.128, 0.056, cells, vsize=16)
         note_r = '100 = league average on both grades'
     else:
         # arsenal chips: badge · velo · usage
@@ -1979,9 +2098,10 @@ def render_social_card(config, pitches, output_file):
             cx += wch + 0.012
         note_r = 'disc = percentile among MLB pitchers · red good, blue bad'
 
-    txt(L, 0.072 if not is_season else 0.075, 'huronalytics.vercel.app', 9.5,
+    _fy = 0.028 if not is_season else 0.075
+    txt(L, _fy, 'huronalytics.vercel.app', 9.5,
         TEXT_MUTED, 'normal', ha='left', style='italic')
-    txt(R, 0.072 if not is_season else 0.075, note_r, 7.2, TEXT_FAINT, 'normal', ha='right')
+    txt(R, _fy, note_r, 7.2, TEXT_FAINT, 'normal', ha='right')
 
     plt.savefig(output_file, dpi=135, facecolor=BG)
     plt.close(fig)
@@ -4239,6 +4359,8 @@ def main():
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     social          = False              # True = consolidated social card (daily/season by date mode) instead of the full card
+    social_table    = False              # PROTOTYPE: per-pitch-type grade table on the daily social card (replaces usage bar + grades strip)
+    social_split    = False              # PROTOTYPE: split that table vs LHH / vs RHH (implies social_table)
     bats            = None               # Batter-handedness filter: "L", "R", or None for both
     rv_mode         = "per100"           # Season-card RV columns: "per100", "totals", or "both"
     pitch_qual      = None               # Min pitches for a pitch type's RV coloring (None = default 50)
@@ -4254,6 +4376,13 @@ def main():
                              'season layout by date mode) instead of the full '
                              'card: the line, three hero tiles, movement plot, '
                              'usage, and grades — sized 1080x1350 for feeds')
+    parser.add_argument('--table', action='store_true',
+                        help='Social daily card: per-pitch-type table with tinted '
+                             'Stuff+/Loc+ chips instead of the usage bar and '
+                             'grades strip (prototype)')
+    parser.add_argument('--split', action='store_true',
+                        help='Social daily card: split the per-type table vs LHH '
+                             'and vs RHH (implies --table; prototype)')
     parser.add_argument('--pitchers', default=None, help='Semicolon-separated "Last, First" names')
     parser.add_argument('--game-pk', default=None, help='Game PK for live/in-progress games')
     parser.add_argument('--output-dir', default=None, help=f'Output directory (default: {OUTPUT_DIR})')
@@ -4299,6 +4428,9 @@ def main():
     if args.display_team is not None: display_team = args.display_team
     if args.output_dir is not None: output_dir = args.output_dir
     if args.social: social = True
+    if args.table: social_table = True
+    if args.split: social_split = True
+    if social_split: social_table = True
     if args.bats is not None: bats = args.bats
     bats_filter = bats
     if args.rv_mode is not None: rv_mode = args.rv_mode
@@ -4842,6 +4974,8 @@ def main():
             'stat_values': stat_values,
             # The social daily line reads H/ER/K/BB straight from the box.
             'social_box': dict(box) if box else {},
+            'social_table': social_table,
+            'social_split': social_split,
             'headshot': headshot,
             'mlb_id': mlb_id,
             'league_avgs': league_avgs,
