@@ -404,6 +404,7 @@
 "Cavalli, Cade": 76.0,
 "Cavanaugh, Drew": 72.0,
 "Cease, Dylan": 74.0,
+"Cebert, Jack": 75.0,
 "Cecconi, Slade": 76.0,
 "Cellucci, Brendan": 76.0,
 "Cerantola, Eric": 77.0,
@@ -3844,6 +3845,9 @@
 ],
 "Cease, Dylan": [
 656302
+],
+"Cebert, Jack": [
+701411
 ],
 "Cecconi, Slade": [
 677944
@@ -10526,5 +10530,5 @@
 ]
 },
 "league_mean": 73.73,
-"n": 2629
+"n": 2630
 }
