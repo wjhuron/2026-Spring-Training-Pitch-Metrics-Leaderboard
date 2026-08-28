@@ -1783,7 +1783,7 @@ def render_social_card(config, pitches, output_file):
     txt(L, 0.970, kick, 10.5, ACCENT, 'bold', ha='left')
     _nm = config['display_name'].upper()
     _nsz = 27 if len(_nm) <= 16 else (23 if len(_nm) <= 20 else 20)
-    ax.text(L, 0.958, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
+    ax.text(L, 0.961, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
             fontweight='black', fontfamily='Bitter', ha='left', va='top')
     hand_code = 'LHP' if config.get('hand') == 'L' else 'RHP'
     meta = f"{hand_code}  |  {config.get('team','')}"
@@ -1816,9 +1816,9 @@ def render_social_card(config, pitches, output_file):
             rrect(x, y, w, h, c.get('fc', DARK_CELL))
             cy = y + h / 2
             has_sub = bool(c.get('sub'))
-            txt(x + w / 2, cy + (0.012 if has_sub else 0.004), c['v'], vsize,
+            txt(x + w / 2, cy + (0.012 if has_sub else 0.006), c['v'], vsize,
                 weight='black', family='Bitter')
-            txt(x + w / 2, cy - (0.010 if has_sub else 0.017), c['k'], ksize, TEXT_SECONDARY)
+            txt(x + w / 2, cy - (0.010 if has_sub else 0.015), c['k'], ksize, TEXT_SECONDARY)
             if has_sub:
                 txt(x + w / 2, cy - 0.022, c['sub'], ssize, TEXT_MUTED, 'normal')
 
@@ -1865,7 +1865,7 @@ def render_social_card(config, pitches, output_file):
         tile_row(0.842, 0.058, eras, vsize=19)
 
         # six percentile discs
-        txt(L, 0.822, 'PERCENTILES  ·  ALL MLB PITCHERS', 8, TEXT_FAINT, 'bold', ha='left')
+        txt(L, 0.822, 'PERCENTILES  ·  ALL MLB PITCHERS', 8, TEXT_SECONDARY, 'bold', ha='left')
         DISCS = [('PITCHER+', 'pitcherPlus', lambda v: f"{v:.0f}"),
                  ('K-BB%', 'kbbPct', lambda v: f"{v*100:.1f}%"),
                  ('WHIFF%', 'swStrPct', lambda v: f"{v*100:.1f}%"),
@@ -1897,8 +1897,8 @@ def render_social_card(config, pitches, output_file):
     tks = list(range(-_lim, _lim + 1, 5))
     mv.set_xticks(tks); mv.set_yticks(tks)
     mv.tick_params(labelsize=6, colors=TEXT_MUTED, length=2.5)
-    mv.set_xlabel('Horizontal Break (in)', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
-    mv.set_ylabel('Induced Vertical Break (in)', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
+    mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
+    mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
     mv.axhline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     mv.axvline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     groups = {}
@@ -1934,7 +1934,7 @@ def render_social_card(config, pitches, output_file):
                     fontfamily='IBM Plex Sans',
                     path_effects=[__import__('matplotlib.patheffects', fromlist=['withStroke'])
                                   .withStroke(linewidth=2.5, foreground=BG)], zorder=6)
-    txt(L, mv_top + 0.010, 'PITCH MOVEMENT', 8, TEXT_FAINT, 'bold', ha='left')
+    txt(L, mv_top + 0.010, 'PITCH MOVEMENT', 8, TEXT_SECONDARY, 'bold', ha='left')
 
     # per-pitch-type table (prototype, Driveline-style chips on our palette)
     if not is_season and _tbl:
@@ -1980,12 +1980,12 @@ def render_social_card(config, pitches, output_file):
         # spread tightened, per Wally 2026-08-28.
         SPLIT_COLS = [('USAGE', 0.340, 'r', 'usepct'),
                       ('CSW%', 0.490, 'r', 'csw'), ('WHIFF%', 0.640, 'r', 'whiff'),
-                      ('STUFF+', 0.780, 'c', 'stuff'), ('LOC+', 0.905, 'c', 'loc')]
+                      ('STUFF+', 0.787, 'c', 'stuff'), ('LOC+', 0.912, 'c', 'loc')]
         FULL_COLS = [('USAGE', 0.250, 'r', 'usepct'),
                      ('VELO', 0.345, 'r', 'velo'), ('IVB', 0.430, 'r', 'ivb'),
                      ('HB', 0.510, 'r', 'hb'), ('CSW%', 0.610, 'r', 'csw'),
                      ('WHIFF%', 0.700, 'r', 'whiff'),
-                     ('STUFF+', 0.800, 'c', 'stuff'), ('LOC+', 0.915, 'c', 'loc')]
+                     ('STUFF+', 0.787, 'c', 'stuff'), ('LOC+', 0.912, 'c', 'loc')]
 
         def _header(hy, cols):
             for lab, cx, al, _k in cols:
@@ -1995,7 +1995,7 @@ def render_social_card(config, pitches, output_file):
         def _table(y, title, plist, rh, fs, cols, header=True):
             rows = _stats(plist)
             nsub = sum(r['n'] for r in rows) or 1
-            txt(L, y, title, 8, TEXT_FAINT, 'bold', ha='left')
+            txt(L, y, title, 8, TEXT_SECONDARY, 'bold', ha='left')
             ry = y - 0.006
             if header:
                 _header(y - 0.020, cols)
@@ -2058,7 +2058,7 @@ def render_social_card(config, pitches, output_file):
         pass    # the table above already replaced the usage bar and grades
     elif not is_season:
         uy, uh = 0.148, 0.028
-        txt(L, uy + uh + 0.012, 'USAGE', 8, TEXT_FAINT, 'bold', ha='left')
+        txt(L, uy + uh + 0.012, 'USAGE', 8, TEXT_SECONDARY, 'bold', ha='left')
         xcur = L
         for pt_, n_ in usage:
             w_ = (R - L) * n_ / total
@@ -2079,7 +2079,7 @@ def render_social_card(config, pitches, output_file):
         note_r = '100 = league average on both grades'
     else:
         # arsenal chips: badge · velo · usage
-        txt(L, mv_bot - 0.020, 'ARSENAL', 8, TEXT_FAINT, 'bold', ha='left')
+        txt(L, mv_bot - 0.020, 'ARSENAL', 8, TEXT_SECONDARY, 'bold', ha='left')
         plb = config.get('pitch_lb') or {}
         cy = mv_bot - 0.058; cx = L
         for pt_, n_ in usage:
