@@ -1962,9 +1962,10 @@ def render_social_card(config, pitches, output_file):
             'fc': (_percentile_color(_opp[1])[0] if _opp[1] is not None
                    else DARK_CELL)})
         tile_row(0.835, 0.052, line, vsize=19)
-        _tbl = bool(config.get('social_table'))
-        _spl = bool(config.get('social_split'))
-        mv_top, mv_bot = 0.800, (0.420 if _spl else 0.385 if _tbl else 0.215)
+        # The split per-hand table IS the daily social card (2026-08-28,
+        # per Wally — the --table/--split prototype toggles are gone).
+        _tbl = _spl = True
+        mv_top, mv_bot = 0.800, 0.420
     else:
         sh, sv = config['stat_headers'], config['stat_values']
         prow = config.get('pctl_row') or {}
@@ -2038,8 +2039,8 @@ def render_social_card(config, pitches, output_file):
         mv.scatter([q[0] for q in pl], [q[1] for q in pl], s=dsz, color=col,
                    alpha=a, edgecolors='none', zorder=3)
     for pt_, pl in sorted(groups.items(), key=lambda kv: -len(kv[1])):
-        if len(pl) < 3:
-            continue
+        # Every thrown type gets a centroid + velo label (2026-08-28, per
+        # Wally) — a 1-pitch type's centroid is the pitch itself.
         col = PITCH_COLORS.get(pt_, '#777')
         mh = sum(q[0] for q in pl) / len(pl); mvv = sum(q[1] for q in pl) / len(pl)
         mv.scatter([mh], [mvv], s=150, color=col, edgecolors=BG, linewidths=1.8, zorder=5)
@@ -2127,11 +2128,10 @@ def render_social_card(config, pitches, output_file):
                     fs, TEXT_PRIMARY, 'bold', ha='left')
                 for lab, cx, al, k in cols:
                     if k in ('stuff', 'loc'):
-                        # Tinted grade chips. A cell under 5 pitches stays
-                        # neutral — the number renders, the color does not
-                        # vouch for it.
+                        # Tinted grade chips — no sample-size gate (2026-08-28,
+                        # per Wally): every cell colors from its value.
                         g = r_[k]
-                        fc = gtint(g) if r_['n'] >= 5 else DARK_CELL
+                        fc = gtint(g)
                         rrect(cx - 0.033, ry - 0.5 * rh + 0.003, 0.066,
                               rh - 0.006, fc, r=0.008)
                         txt(cx, ry, '—' if g is None else '%.0f' % g, fs,
@@ -2159,12 +2159,17 @@ def render_social_card(config, pitches, output_file):
         if _spl:
             lhh = [p for p in pitches if p.get('Bats') == 'L']
             rhh = [p for p in pitches if p.get('Bats') == 'R']
-            first, second = sorted(
-                [('VS LHH', lhh), ('VS RHH', rhh)], key=lambda kv: -len(kv[1]))
-            yb = _table(0.370, f'{first[0]}  ·  {len(first[1])} PITCHES',
-                        first[1], 0.0210, 7.2, SPLIT_COLS, header=True)
-            _table(yb - 0.0144, f'{second[0]}  ·  {len(second[1])} PITCHES',
-                   second[1], 0.0210, 7.2, SPLIT_COLS, header=False)
+            # A hand the pitcher never faced renders NOTHING — no title, no
+            # empty table (2026-08-28, per Wally).
+            sections = [s for s in sorted([('VS LHH', lhh), ('VS RHH', rhh)],
+                                          key=lambda kv: -len(kv[1])) if s[1]]
+            yb, hdr = 0.370, True
+            for name_, pl_ in sections:
+                _pw = 'PITCH' if len(pl_) == 1 else 'PITCHES'
+                yb = _table(yb, f'{name_}  ·  {len(pl_)} {_pw}',
+                            pl_, 0.0210, 7.2, SPLIT_COLS, header=hdr)
+                yb -= 0.0144
+                hdr = False
         else:
             _table(0.340, 'ARSENAL  ·  THIS START', pitches, 0.0295, 8.2,
                    FULL_COLS, header=True)
@@ -4414,14 +4419,12 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 def main():
     # ── Settings (edit these directly or override via command line) ──
     team            = "WSH"
-    start_date      = None    # Set to None for full season
-    end_date        = None             # Set to a date for date range, or None for single day
+    start_date      = "2026-08-27"    # Set to None for full season
+    end_date        = "2026-08-27"             # Set to a date for date range, or None for single day
     filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
-    social          = False              # True = consolidated social card (daily/season by date mode) instead of the full card
-    social_table    = False              # PROTOTYPE: per-pitch-type grade table on the daily social card (replaces usage bar + grades strip)
-    social_split    = False              # PROTOTYPE: split that table vs LHH / vs RHH (implies social_table)
+    social          = True              # True = consolidated social card (daily/season by date mode) instead of the full card
     bats            = None               # Batter-handedness filter: "L", "R", or None for both
     rv_mode         = "per100"           # Season-card RV columns: "per100", "totals", or "both"
     pitch_qual      = None               # Min pitches for a pitch type's RV coloring (None = default 50)
@@ -4437,13 +4440,6 @@ def main():
                              'season layout by date mode) instead of the full '
                              'card: the line, three hero tiles, movement plot, '
                              'usage, and grades — sized 1080x1350 for feeds')
-    parser.add_argument('--table', action='store_true',
-                        help='Social daily card: per-pitch-type table with tinted '
-                             'Stuff+/Loc+ chips instead of the usage bar and '
-                             'grades strip (prototype)')
-    parser.add_argument('--split', action='store_true',
-                        help='Social daily card: split the per-type table vs LHH '
-                             'and vs RHH (implies --table; prototype)')
     parser.add_argument('--pitchers', default=None, help='Semicolon-separated "Last, First" names')
     parser.add_argument('--game-pk', default=None, help='Game PK for live/in-progress games')
     parser.add_argument('--output-dir', default=None, help=f'Output directory (default: {OUTPUT_DIR})')
@@ -4489,9 +4485,6 @@ def main():
     if args.display_team is not None: display_team = args.display_team
     if args.output_dir is not None: output_dir = args.output_dir
     if args.social: social = True
-    if args.table: social_table = True
-    if args.split: social_split = True
-    if social_split: social_table = True
     if args.bats is not None: bats = args.bats
     bats_filter = bats
     if args.rv_mode is not None: rv_mode = args.rv_mode
@@ -5073,8 +5066,6 @@ def main():
             'stat_values': stat_values,
             # The social daily line reads H/ER/K/BB straight from the box.
             'social_box': dict(box) if box else {},
-            'social_table': social_table,
-            'social_split': social_split,
             'headshot': headshot,
             'mlb_id': mlb_id,
             'league_avgs': league_avgs,
