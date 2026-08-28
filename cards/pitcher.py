@@ -1771,20 +1771,6 @@ def render_social_card(config, pitches, output_file):
     if not is_season and opp:
         kick += '  ·  VS %s' % opp
     txt(L, 0.970, kick, 10.5, ACCENT, 'bold', ha='left')
-    if not is_season:
-        _bx = config.get('social_box') or {}
-        if _bx.get('wins'):      _dec, _dc = 'W',  ACCENT
-        elif _bx.get('losses'):  _dec, _dc = 'L',  '#567698'
-        elif _bx.get('saves'):   _dec, _dc = 'SV', ACCENT
-        elif _bx.get('holds'):   _dec, _dc = 'H',  '#8a7f75'
-        else:                    _dec, _dc = 'ND', '#8a7f75'
-        from matplotlib.patches import FancyBboxPatch as _FBP
-        _cw = 0.030 + 0.011 * len(_dec)
-        ax.add_patch(_FBP((R - _cw, 0.9585), _cw, 0.0215,
-                          boxstyle='round,pad=0,rounding_size=0.008',
-                          facecolor=_dc, edgecolor='none', mutation_aspect=0.8))
-        ax.text(R - _cw / 2, 0.9693, _dec, fontsize=10.5, color='white',
-                fontweight='black', fontfamily='Bitter', ha='center', va='center')
     _nm = config['display_name'].upper()
     _nsz = 27 if len(_nm) <= 16 else (23 if len(_nm) <= 20 else 20)
     ax.text(L, 0.958, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
@@ -1796,7 +1782,21 @@ def render_social_card(config, pitches, output_file):
         meta += f"  |  {sv[sh.index('GS')]} GS  ·  {sv[sh.index('IP')]} IP"
     else:
         meta += f"  |  {len(pitches)} pitches"
-    txt(L, 0.913, meta, 10, TEXT_MUTED, 'bold', ha='left')
+        _bx = config.get('social_box') or {}
+        if _bx.get('wins'):      _dec, _dc = 'W',  ACCENT
+        elif _bx.get('losses'):  _dec, _dc = 'L',  '#567698'
+        elif _bx.get('saves'):   _dec, _dc = 'SV', ACCENT
+        elif _bx.get('holds'):   _dec, _dc = 'H',  TEXT_MUTED
+        else:                    _dec, _dc = 'ND', TEXT_MUTED
+        meta += '  |  '
+    _mw = _measure_text_axis_w(fig, [meta], 10, 'bold') if not is_season else None
+    if not is_season and _mw is None:
+        # No renderer yet: one draw, decision inline uncolored.
+        txt(L, 0.913, meta + _dec, 10, TEXT_MUTED, 'bold', ha='left')
+    else:
+        txt(L, 0.913, meta, 10, TEXT_MUTED, 'bold', ha='left')
+        if not is_season:
+            txt(L + _mw, 0.913, _dec, 10, _dc, 'black', ha='left')
 
     def tile_row(y, h, cells, vsize=17, ksize=7.2, ssize=7.2):
         n = len(cells); gap = 0.012
@@ -4232,10 +4232,10 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = ""
+    team            = "WSH"
     start_date      = None    # Set to None for full season
     end_date        = None             # Set to a date for date range, or None for single day
-    filter_pitchers = "Marinaccio, Ron"                 # Semicolon-separated "Last, First" names, or "" for all
+    filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
     social          = False              # True = consolidated social card (daily/season by date mode) instead of the full card
