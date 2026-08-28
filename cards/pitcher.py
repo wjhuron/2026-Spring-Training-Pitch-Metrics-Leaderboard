@@ -1761,9 +1761,10 @@ def render_social_card(config, pitches, output_file):
     opp = config.get('opponent')
     if not is_season and opp:
         kick += '  ·  VS %s' % opp
-    txt(L, 0.965, ('2026 SEASON  ·  ' if False else '') + kick, 10.5, ACCENT, 'bold',
-        ha='left')
-    ax.text(L, 0.952, config['display_name'].upper(), fontsize=27, color=TEXT_PRIMARY,
+    txt(L, 0.970, kick, 10.5, ACCENT, 'bold', ha='left')
+    _nm = config['display_name'].upper()
+    _nsz = 27 if len(_nm) <= 16 else (23 if len(_nm) <= 20 else 20)
+    ax.text(L, 0.958, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
             fontweight='black', fontfamily='Bitter', ha='left', va='top')
     hand_code = 'LHP' if config.get('hand') == 'L' else 'RHP'
     meta = f"{hand_code}  |  {config.get('team','')}"
@@ -1772,7 +1773,7 @@ def render_social_card(config, pitches, output_file):
         meta += f"  |  {sv[sh.index('GS')]} GS  ·  {sv[sh.index('IP')]} IP"
     else:
         meta += f"  |  {len(pitches)} pitches"
-    txt(L, 0.912, meta, 10, TEXT_MUTED, 'bold', ha='left')
+    txt(L, 0.906, meta, 10, TEXT_MUTED, 'bold', ha='left')
 
     def tile_row(y, h, cells, vsize=17, ksize=7.2, ssize=7.2):
         n = len(cells); gap = 0.012
@@ -1782,9 +1783,9 @@ def render_social_card(config, pitches, output_file):
             rrect(x, y, w, h, c.get('fc', DARK_CELL))
             cy = y + h / 2
             has_sub = bool(c.get('sub'))
-            txt(x + w / 2, cy + (0.012 if has_sub else 0.008), c['v'], vsize,
+            txt(x + w / 2, cy + (0.012 if has_sub else 0.004), c['v'], vsize,
                 weight='black', family='Bitter')
-            txt(x + w / 2, cy - (0.010 if has_sub else 0.013), c['k'], ksize, TEXT_SECONDARY)
+            txt(x + w / 2, cy - (0.010 if has_sub else 0.017), c['k'], ksize, TEXT_SECONDARY)
             if has_sub:
                 txt(x + w / 2, cy - 0.022, c['sub'], ssize, TEXT_MUTED, 'normal')
 
@@ -1910,6 +1911,11 @@ def render_social_card(config, pitches, output_file):
                 txt(xcur + w_ / 2, uy + uh / 2, f"{pt_} {frac*100:.0f}%", 7.5, 'white')
             elif frac >= 0.06:
                 txt(xcur + w_ / 2, uy + uh / 2, pt_, 7, 'white')
+            else:
+                # Too thin for an inside label: name it just below the bar
+                # (per Wally 2026-08-27 — every slice says its pitch).
+                txt(xcur + w_ / 2, uy - 0.010, pt_, 6.5,
+                    PITCH_COLORS.get(pt_, '#777'))
             xcur += w_
 
         # game grades: Stuff+/Loc+ only (Pitching+ is their fixed blend)
