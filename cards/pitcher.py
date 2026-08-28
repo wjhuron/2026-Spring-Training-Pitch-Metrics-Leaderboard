@@ -1843,7 +1843,7 @@ def render_social_card(config, pitches, output_file):
             {'v': '—' if sg is None else f"{sg:.0f}", 'k': 'STUFF+', 'fc': gtint(sg)},
             {'v': '—' if lg_ is None else f"{lg_:.0f}", 'k': 'LOC+', 'fc': gtint(lg_)},
         ]
-        tile_row(0.848, 0.052, line, vsize=19)
+        tile_row(0.835, 0.052, line, vsize=19)
         _tbl = bool(config.get('social_table'))
         _spl = bool(config.get('social_split'))
         mv_top, mv_bot = 0.800, (0.420 if _spl else 0.385 if _tbl else 0.215)
@@ -1897,8 +1897,8 @@ def render_social_card(config, pitches, output_file):
     tks = list(range(-_lim, _lim + 1, 5))
     mv.set_xticks(tks); mv.set_yticks(tks)
     mv.tick_params(labelsize=6, colors=TEXT_MUTED, length=2.5)
-    mv.set_xlabel('HB', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
-    mv.set_ylabel('IVB', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
+    mv.set_xlabel('Horizontal Break (in)', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
+    mv.set_ylabel('Induced Vertical Break (in)', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
     mv.axhline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     mv.axvline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     groups = {}
@@ -1988,7 +1988,6 @@ def render_social_card(config, pitches, output_file):
                      ('STUFF+', 0.800, 'c', 'stuff'), ('LOC+', 0.915, 'c', 'loc')]
 
         def _header(hy, cols):
-            txt(L, hy, 'PITCH', 6.4, TEXT_SECONDARY, 'bold', ha='left')
             for lab, cx, al, _k in cols:
                 txt(cx, hy, lab, 6.4, TEXT_SECONDARY, 'bold',
                     ha='right' if al == 'r' else 'center')
@@ -2000,13 +1999,14 @@ def render_social_card(config, pitches, output_file):
             ry = y - 0.006
             if header:
                 _header(y - 0.020, cols)
-                ry = y - 0.028
+                ry = y - 0.020
             for r_ in rows:
                 ry -= rh
                 col = PITCH_COLORS.get(r_['pt'], '#777')
                 ax.scatter([L + 0.007], [ry], s=34, color=col, edgecolors='none',
                            transform=ax.transAxes, zorder=4)
-                txt(L + 0.022, ry, r_['pt'], fs, TEXT_PRIMARY, 'bold', ha='left')
+                txt(L + 0.022, ry, PITCH_NAMES.get(r_['pt'], r_['pt']).upper(),
+                    fs, TEXT_PRIMARY, 'bold', ha='left')
                 for lab, cx, al, k in cols:
                     if k in ('stuff', 'loc'):
                         # Tinted grade chips. A cell under 5 pitches stays
@@ -2050,7 +2050,8 @@ def render_social_card(config, pitches, output_file):
         else:
             _table(0.340, 'ARSENAL  ·  THIS START', pitches, 0.0295, 8.2,
                    FULL_COLS, header=True)
-        note_r = 'MLB gameday feed  ·  100 = league average'
+        note_r = ('MLB gameday feed  ·  red = good, blue = bad  ·  '
+                  'grayed out = small sample  ·  100 = league average')
 
     # usage bar (daily: below the plot, above the grades — per Wally)
     if not is_season and _tbl:
