@@ -1928,6 +1928,7 @@ def render_social_card(config, pitches, output_file):
             txt(L + _mw, 0.913, _dec, 11, _dc, 'black', ha='left')
 
     def tile_row(y, h, cells, vsize=17, ksize=8.2, ssize=7.2):
+        # ALL tile text is white (2026-08-28, per Wally).
         n = len(cells); gap = 0.012
         w = (R - L - gap * (n - 1)) / n
         for i, c in enumerate(cells):
@@ -1936,10 +1937,10 @@ def render_social_card(config, pitches, output_file):
             cy = y + h / 2
             has_sub = bool(c.get('sub'))
             txt(x + w / 2, cy + (0.012 if has_sub else 0.006), c['v'], vsize,
-                weight='black', family='Bitter')
-            txt(x + w / 2, cy - (0.010 if has_sub else 0.015), c['k'], ksize, TEXT_SECONDARY)
+                '#ffffff', weight='black', family='Bitter')
+            txt(x + w / 2, cy - (0.010 if has_sub else 0.015), c['k'], ksize, '#ffffff')
             if has_sub:
-                txt(x + w / 2, cy - 0.022, c['sub'], ssize, TEXT_MUTED, 'normal')
+                txt(x + w / 2, cy - 0.022, c['sub'], ssize, '#ffffff', 'normal')
 
     if not is_season:
         box = config.get('social_box') or {}
@@ -2016,7 +2017,9 @@ def render_social_card(config, pitches, output_file):
         mv_top, mv_bot = 0.712, 0.270
 
     # movement plot (faded cloud + labeled centroids; ticks every 5)
-    mv = fig.add_axes([L, mv_bot, R - L, mv_top - mv_bot])
+    # Inset from the left card edge so the y-axis label ('INDUCED
+    # VERTICAL BREAK') renders fully instead of pressing the border.
+    mv = fig.add_axes([L + 0.018, mv_bot, R - L - 0.018, mv_top - mv_bot])
     mv.set_facecolor(PLOT_PANEL)
     _lim = 20 if (not is_season and _spl) else 25
     mv.set_xlim(-_lim, _lim); mv.set_ylim(-_lim, _lim)
@@ -2117,17 +2120,6 @@ def render_social_card(config, pitches, output_file):
                 txt(cx, hy, lab, 8.2, TEXT_SECONDARY, 'bold',
                     ha='right' if al == 'r' else 'center')
 
-        def _chip_ink(fc):
-            # White ink on saturated fills, dark ink on the pale mid-scale —
-            # decided by fill luminance, so neither end is unreadable
-            # (2026-08-28 feedback round).
-            try:
-                r_, g_, b_ = fc[:3]
-                lum = 0.2126 * r_ + 0.7152 * g_ + 0.0722 * b_
-                return '#ffffff' if lum < 0.55 else TEXT_PRIMARY
-            except (TypeError, IndexError):
-                return TEXT_PRIMARY
-
         def _table(y, title, plist, rh, fs, cols, header=True):
             rows = _stats(plist)
             nsub = sum(r['n'] for r in rows) or 1
@@ -2151,8 +2143,10 @@ def render_social_card(config, pitches, output_file):
                         fc = gtint(g)
                         rrect(cx - 0.042, ry - 0.5 * rh + 0.003, 0.084,
                               rh - 0.006, fc, r=0.010)
+                        # White ink on every chip (2026-08-28, per Wally —
+                        # supersedes the luminance switch from earlier today).
                         txt(cx, ry, '—' if g is None else '%.0f' % g, fs,
-                            _chip_ink(fc), 'black', family='Bitter')
+                            '#ffffff', 'black', family='Bitter')
                         continue
                     if k is None:
                         v, c_ = str(r_['n']), TEXT_PRIMARY
@@ -2241,7 +2235,7 @@ def render_social_card(config, pitches, output_file):
             cx += wch + 0.012
         note_r = 'disc = percentile among MLB pitchers · red good, blue bad'
 
-    _fy = 0.028 if not is_season else 0.075
+    _fy = 0.016 if not is_season else 0.075
     txt(L, _fy, 'huronalytics.vercel.app', 10.5,
         TEXT_MUTED, 'normal', ha='left', style='italic')
     txt(R, _fy, note_r, 8.2, TEXT_FAINT, 'normal', ha='right')
