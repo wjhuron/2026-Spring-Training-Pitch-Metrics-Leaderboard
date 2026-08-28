@@ -1899,7 +1899,7 @@ def render_social_card(config, pitches, output_file):
     opp = config.get('opponent')
     if not is_season and opp:
         kick += '  ·  VS %s' % opp
-    txt(L, 0.970, kick, 10.5, ACCENT, 'bold', ha='left')
+    txt(L, 0.970, kick, 11.5, ACCENT, 'bold', ha='left')
     _nm = config['display_name'].upper()
     _nsz = 27 if len(_nm) <= 16 else (23 if len(_nm) <= 20 else 20)
     ax.text(L, 0.961, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
@@ -1918,16 +1918,16 @@ def render_social_card(config, pitches, output_file):
         elif _bx.get('holds'):   _dec, _dc = 'H',  TEXT_MUTED
         else:                    _dec, _dc = 'ND', TEXT_MUTED
         meta += '  |  '
-    _mw = _measure_text_axis_w(fig, [meta], 10, 'bold') if not is_season else None
+    _mw = _measure_text_axis_w(fig, [meta], 11, 'bold') if not is_season else None
     if not is_season and _mw is None:
         # No renderer yet: one draw, decision inline uncolored.
-        txt(L, 0.913, meta + _dec, 10, TEXT_MUTED, 'bold', ha='left')
+        txt(L, 0.913, meta + _dec, 11, TEXT_MUTED, 'bold', ha='left')
     else:
-        txt(L, 0.913, meta, 10, TEXT_MUTED, 'bold', ha='left')
+        txt(L, 0.913, meta, 11, TEXT_MUTED, 'bold', ha='left')
         if not is_season:
-            txt(L + _mw, 0.913, _dec, 10, _dc, 'black', ha='left')
+            txt(L + _mw, 0.913, _dec, 11, _dc, 'black', ha='left')
 
-    def tile_row(y, h, cells, vsize=17, ksize=7.2, ssize=7.2):
+    def tile_row(y, h, cells, vsize=17, ksize=8.2, ssize=7.2):
         n = len(cells); gap = 0.012
         w = (R - L - gap * (n - 1)) / n
         for i, c in enumerate(cells):
@@ -1974,7 +1974,7 @@ def render_social_card(config, pitches, output_file):
         # The split per-hand table IS the daily social card (2026-08-28,
         # per Wally — the --table/--split prototype toggles are gone).
         _tbl = _spl = True
-        mv_top, mv_bot = 0.800, 0.420
+        mv_top, mv_bot = 0.800, 0.436
     else:
         sh, sv = config['stat_headers'], config['stat_values']
         prow = config.get('pctl_row') or {}
@@ -2024,9 +2024,9 @@ def render_social_card(config, pitches, output_file):
         s_.set_color(SUBTLE_BORDER)
     tks = list(range(-_lim, _lim + 1, 5))
     mv.set_xticks(tks); mv.set_yticks(tks)
-    mv.tick_params(labelsize=6, colors=TEXT_MUTED, length=2.5)
-    mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
-    mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=6.5, color=TEXT_MUTED, labelpad=1)
+    mv.tick_params(labelsize=7.5, colors=TEXT_MUTED, length=2.5)
+    mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=8, color=TEXT_MUTED, labelpad=1)
+    mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=8, color=TEXT_MUTED, labelpad=1)
     mv.axhline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     mv.axvline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     groups = {}
@@ -2056,13 +2056,13 @@ def render_social_card(config, pitches, output_file):
         _vt = velo_by_type.get(pt_) if not is_season else None
         _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
         right = mh > 0.68 * _lim
-        mv.annotate(_lab, (mh, mvv), xytext=(-11 if right else 11, 0),
-                    textcoords='offset points', fontsize=9, fontweight='bold',
+        mv.annotate(_lab, (mh, mvv), xytext=(-12 if right else 12, 0),
+                    textcoords='offset points', fontsize=10.5, fontweight='bold',
                     color=col, ha='right' if right else 'left', va='center',
                     fontfamily='IBM Plex Sans',
                     path_effects=[__import__('matplotlib.patheffects', fromlist=['withStroke'])
                                   .withStroke(linewidth=2.5, foreground=BG)], zorder=6)
-    txt(L, mv_top + 0.010, 'PITCH MOVEMENT', 8, TEXT_SECONDARY, 'bold', ha='left')
+    txt(L, mv_top + 0.010, 'PITCH MOVEMENT', 9.5, TEXT_SECONDARY, 'bold', ha='left')
 
     # per-pitch-type table (prototype, Driveline-style chips on our palette)
     if not is_season and _tbl:
@@ -2106,34 +2106,42 @@ def render_social_card(config, pitches, output_file):
         # labels carry velo (per Wally 2026-08-28).
         # '#' dropped (derivable from Usage x the section total) and the
         # spread tightened, per Wally 2026-08-28.
-        SPLIT_COLS = [('USAGE', 0.340, 'r', 'usepct'),
-                      ('CSW%', 0.490, 'r', 'csw'), ('WHIFF%', 0.640, 'r', 'whiff'),
-                      ('STUFF+', 0.787, 'c', 'stuff'), ('LOC+', 0.912, 'c', 'loc')]
-        FULL_COLS = [('USAGE', 0.250, 'r', 'usepct'),
-                     ('VELO', 0.345, 'r', 'velo'), ('IVB', 0.430, 'r', 'ivb'),
-                     ('HB', 0.510, 'r', 'hb'), ('CSW%', 0.610, 'r', 'csw'),
-                     ('WHIFF%', 0.700, 'r', 'whiff'),
-                     ('STUFF+', 0.787, 'c', 'stuff'), ('LOC+', 0.912, 'c', 'loc')]
+        # Four columns (2026-08-28 feedback round, per Wally): Whiff% kept
+        # over CSW% — the pair was redundant on a one-game sample.
+        SPLIT_COLS = [('USAGE', 0.420, 'r', 'usepct'),
+                      ('WHIFF%', 0.590, 'r', 'whiff'),
+                      ('STUFF+', 0.760, 'c', 'stuff'), ('LOC+', 0.905, 'c', 'loc')]
 
         def _header(hy, cols):
             for lab, cx, al, _k in cols:
-                txt(cx, hy, lab, 6.4, TEXT_SECONDARY, 'bold',
+                txt(cx, hy, lab, 8.2, TEXT_SECONDARY, 'bold',
                     ha='right' if al == 'r' else 'center')
+
+        def _chip_ink(fc):
+            # White ink on saturated fills, dark ink on the pale mid-scale —
+            # decided by fill luminance, so neither end is unreadable
+            # (2026-08-28 feedback round).
+            try:
+                r_, g_, b_ = fc[:3]
+                lum = 0.2126 * r_ + 0.7152 * g_ + 0.0722 * b_
+                return '#ffffff' if lum < 0.55 else TEXT_PRIMARY
+            except (TypeError, IndexError):
+                return TEXT_PRIMARY
 
         def _table(y, title, plist, rh, fs, cols, header=True):
             rows = _stats(plist)
             nsub = sum(r['n'] for r in rows) or 1
-            txt(L, y, title, 8, TEXT_SECONDARY, 'bold', ha='left')
-            ry = y - 0.006
+            txt(L, y, title, 9.5, TEXT_SECONDARY, 'bold', ha='left')
+            ry = y - 0.007
             if header:
-                _header(y - 0.020, cols)
-                ry = y - 0.020
+                _header(y - 0.023, cols)
+                ry = y - 0.023
             for r_ in rows:
                 ry -= rh
                 col = PITCH_COLORS.get(r_['pt'], '#777')
-                ax.scatter([L + 0.007], [ry], s=34, color=col, edgecolors='none',
+                ax.scatter([L + 0.008], [ry], s=48, color=col, edgecolors='none',
                            transform=ax.transAxes, zorder=4)
-                txt(L + 0.022, ry, PITCH_NAMES.get(r_['pt'], r_['pt']).upper(),
+                txt(L + 0.025, ry, PITCH_NAMES.get(r_['pt'], r_['pt']).upper(),
                     fs, TEXT_PRIMARY, 'bold', ha='left')
                 for lab, cx, al, k in cols:
                     if k in ('stuff', 'loc'):
@@ -2141,10 +2149,10 @@ def render_social_card(config, pitches, output_file):
                         # per Wally): every cell colors from its value.
                         g = r_[k]
                         fc = gtint(g)
-                        rrect(cx - 0.033, ry - 0.5 * rh + 0.003, 0.066,
-                              rh - 0.006, fc, r=0.008)
+                        rrect(cx - 0.042, ry - 0.5 * rh + 0.003, 0.084,
+                              rh - 0.006, fc, r=0.010)
                         txt(cx, ry, '—' if g is None else '%.0f' % g, fs,
-                            TEXT_PRIMARY, 'black', family='Bitter')
+                            _chip_ink(fc), 'black', family='Bitter')
                         continue
                     if k is None:
                         v, c_ = str(r_['n']), TEXT_PRIMARY
@@ -2172,16 +2180,18 @@ def render_social_card(config, pitches, output_file):
             # empty table (2026-08-28, per Wally).
             sections = [s for s in sorted([('VS LHH', lhh), ('VS RHH', rhh)],
                                           key=lambda kv: -len(kv[1])) if s[1]]
-            yb, hdr = 0.370, True
+            # Row height fills the space below the plot; a huge combined
+            # arsenal (rare) shrinks rows instead of overflowing the footer.
+            _nrows = sum(len({p.get('Pitch Type') for p in pl_ if p.get('Pitch Type')})
+                         for _nm2, pl_ in sections)
+            rh_ = min(0.0265, 0.285 / max(_nrows, 1))
+            yb, hdr = 0.398, True
             for name_, pl_ in sections:
                 _pw = 'PITCH' if len(pl_) == 1 else 'PITCHES'
                 yb = _table(yb, f'{name_}  ·  {len(pl_)} {_pw}',
-                            pl_, 0.0210, 7.2, SPLIT_COLS, header=hdr)
-                yb -= 0.0144
+                            pl_, rh_, 9.0, SPLIT_COLS, header=hdr)
+                yb -= 0.016
                 hdr = False
-        else:
-            _table(0.340, 'ARSENAL  ·  THIS START', pitches, 0.0295, 8.2,
-                   FULL_COLS, header=True)
         note_r = ('MLB gameday feed  ·  red = good, blue = bad  ·  '
                   'grayed out = small sample  ·  100 = league average')
 
@@ -2232,9 +2242,9 @@ def render_social_card(config, pitches, output_file):
         note_r = 'disc = percentile among MLB pitchers · red good, blue bad'
 
     _fy = 0.028 if not is_season else 0.075
-    txt(L, _fy, 'huronalytics.vercel.app', 9.5,
+    txt(L, _fy, 'huronalytics.vercel.app', 10.5,
         TEXT_MUTED, 'normal', ha='left', style='italic')
-    txt(R, _fy, note_r, 7.2, TEXT_FAINT, 'normal', ha='right')
+    txt(R, _fy, note_r, 8.2, TEXT_FAINT, 'normal', ha='right')
 
     plt.savefig(output_file, dpi=135, facecolor=BG)
     plt.close(fig)
