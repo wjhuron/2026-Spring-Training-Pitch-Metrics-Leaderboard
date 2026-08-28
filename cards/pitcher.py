@@ -1928,19 +1928,22 @@ def render_social_card(config, pitches, output_file):
             txt(L + _mw, 0.913, _dec, 11, _dc, 'black', ha='left')
 
     def tile_row(y, h, cells, vsize=17, ksize=8.2, ssize=7.2):
-        # ALL tile text is white (2026-08-28, per Wally).
+        # Ink rule (2026-08-28, per Wally): white text on TINTED tiles,
+        # dark text on the neutral beige ones.
         n = len(cells); gap = 0.012
         w = (R - L - gap * (n - 1)) / n
         for i, c in enumerate(cells):
             x = L + i * (w + gap)
-            rrect(x, y, w, h, c.get('fc', DARK_CELL))
+            fc = c.get('fc', DARK_CELL)
+            ink = TEXT_PRIMARY if fc is DARK_CELL or fc == DARK_CELL else '#ffffff'
+            rrect(x, y, w, h, fc)
             cy = y + h / 2
             has_sub = bool(c.get('sub'))
             txt(x + w / 2, cy + (0.012 if has_sub else 0.006), c['v'], vsize,
-                '#ffffff', weight='black', family='Bitter')
-            txt(x + w / 2, cy - (0.010 if has_sub else 0.015), c['k'], ksize, '#ffffff')
+                ink, weight='black', family='Bitter')
+            txt(x + w / 2, cy - (0.010 if has_sub else 0.015), c['k'], ksize, ink)
             if has_sub:
-                txt(x + w / 2, cy - 0.022, c['sub'], ssize, '#ffffff', 'normal')
+                txt(x + w / 2, cy - 0.022, c['sub'], ssize, ink, 'normal')
 
     if not is_season:
         box = config.get('social_box') or {}
@@ -2117,13 +2120,13 @@ def render_social_card(config, pitches, output_file):
 
         def _header(hy, cols):
             for lab, cx, al, _k in cols:
-                txt(cx, hy, lab, 8.2, TEXT_SECONDARY, 'bold',
+                txt(cx, hy, lab, 9.2, TEXT_SECONDARY, 'bold',
                     ha='right' if al == 'r' else 'center')
 
         def _table(y, title, plist, rh, fs, cols, header=True):
             rows = _stats(plist)
             nsub = sum(r['n'] for r in rows) or 1
-            txt(L, y, title, 9.5, TEXT_SECONDARY, 'bold', ha='left')
+            txt(L, y, title, 10.5, TEXT_SECONDARY, 'bold', ha='left')
             ry = y - 0.007
             if header:
                 _header(y - 0.023, cols)
@@ -2141,12 +2144,13 @@ def render_social_card(config, pitches, output_file):
                         # per Wally): every cell colors from its value.
                         g = r_[k]
                         fc = gtint(g)
-                        rrect(cx - 0.042, ry - 0.5 * rh + 0.003, 0.084,
+                        rrect(cx - 0.046, ry - 0.5 * rh + 0.003, 0.092,
                               rh - 0.006, fc, r=0.010)
-                        # White ink on every chip (2026-08-28, per Wally —
-                        # supersedes the luminance switch from earlier today).
+                        # White ink on tinted chips; a valueless beige chip
+                        # keeps dark ink (2026-08-28, per Wally).
+                        _ink = TEXT_PRIMARY if g is None else '#ffffff'
                         txt(cx, ry, '—' if g is None else '%.0f' % g, fs,
-                            '#ffffff', 'black', family='Bitter')
+                            _ink, 'black', family='Bitter')
                         continue
                     if k is None:
                         v, c_ = str(r_['n']), TEXT_PRIMARY
@@ -2174,16 +2178,21 @@ def render_social_card(config, pitches, output_file):
             # empty table (2026-08-28, per Wally).
             sections = [s for s in sorted([('VS LHH', lhh), ('VS RHH', rhh)],
                                           key=lambda kv: -len(kv[1])) if s[1]]
-            # Row height fills the space below the plot; a huge combined
-            # arsenal (rare) shrinks rows instead of overflowing the footer.
+            # Rows and font fill the space below the plot exactly: the
+            # budget runs from the tables' top (0.398) to the footer
+            # clearance (0.040), minus fixed title/header/gap overheads;
+            # rh solves for the combined row count, and the font scales
+            # with the row (~60% of row height, capped). A huge combined
+            # arsenal shrinks; a two-pitch reliever gets the max size.
             _nrows = sum(len({p.get('Pitch Type') for p in pl_ if p.get('Pitch Type')})
                          for _nm2, pl_ in sections)
-            rh_ = min(0.0265, 0.285 / max(_nrows, 1))
+            rh_ = min(0.034, 0.312 / (max(_nrows, 1) + 1.2))
+            fs_ = min(12.0, rh_ * 430.0)
             yb, hdr = 0.398, True
             for name_, pl_ in sections:
                 _pw = 'PITCH' if len(pl_) == 1 else 'PITCHES'
                 yb = _table(yb, f'{name_}  ·  {len(pl_)} {_pw}',
-                            pl_, rh_, 9.0, SPLIT_COLS, header=hdr)
+                            pl_, rh_, fs_, SPLIT_COLS, header=hdr)
                 yb -= 0.016
                 hdr = False
         note_r = ('MLB gameday feed  ·  red = good, blue = bad  ·  '
