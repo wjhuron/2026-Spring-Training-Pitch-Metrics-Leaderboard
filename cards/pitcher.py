@@ -2031,8 +2031,8 @@ def render_social_card(config, pitches, output_file):
     tks = list(range(-_lim, _lim + 1, 5))
     mv.set_xticks(tks); mv.set_yticks(tks)
     mv.tick_params(labelsize=7.5, colors=TEXT_PRIMARY, length=2.5)
-    mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, labelpad=1)
-    mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, labelpad=1)
+    mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, fontweight='bold', labelpad=1)
+    mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, fontweight='bold', labelpad=1)
     mv.axhline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     mv.axvline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     groups = {}
@@ -2068,7 +2068,7 @@ def render_social_card(config, pitches, output_file):
                     fontfamily='IBM Plex Sans',
                     path_effects=[__import__('matplotlib.patheffects', fromlist=['withStroke'])
                                   .withStroke(linewidth=2.5, foreground=BG)], zorder=6)
-    txt(L, mv_top + 0.010, 'PITCH MOVEMENT', 9.5, TEXT_SECONDARY, 'bold', ha='left')
+    txt(L, mv_top + 0.010, 'PITCH MOVEMENT', 9.5, TEXT_PRIMARY, 'black', ha='left')
 
     # per-pitch-type table (prototype, Driveline-style chips on our palette)
     if not is_season and _tbl:
@@ -2128,13 +2128,13 @@ def render_social_card(config, pitches, output_file):
 
         def _header(hy, cols):
             for lab, cx, al, _k in cols:
-                txt(cx, hy, lab, 9.2, TEXT_SECONDARY, 'bold',
+                txt(cx, hy, lab, 9.2, TEXT_PRIMARY, 'black',
                     ha='right' if al == 'r' else 'center')
 
         def _table(y, title, plist, rh, fs, cols, header=True):
             rows = _stats(plist)
             nsub = sum(r['n'] for r in rows) or 1
-            txt(L, y, title, 10.5, TEXT_SECONDARY, 'bold', ha='left')
+            txt(L, y, title, 10.5, TEXT_PRIMARY, 'black', ha='left')
             ry = y - 0.007
             if header:
                 _header(y - 0.023, cols)
