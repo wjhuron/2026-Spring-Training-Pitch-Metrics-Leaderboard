@@ -553,7 +553,16 @@ def _compute_pitch_rv(pitches_list):
 # before the morning backfill drifts ~0.5 pts (p95 1.5) and self-corrects.
 PP_OUTING_W = {'stuff': 0.205, 'loc': 0.169, 'csw': 0.252, 'xrv100': 0.374}
 PP_OUTING_K = {'stuff': 42.0, 'loc': 185.0, 'csw': 398.0, 'xrv100': 1581.0}
-PP_OUTING_MIN_N = 20        # analysis floor of the search; below it no grade
+# Two floors, deliberately different (2026-08-28, per Wally):
+#   POOL_MIN 20 — the standardization pool keeps the research analysis floor,
+#     so every existing grade is unchanged and the ruler stays the measured one.
+#   MIN_N 5 — the render floor. The n/(n+k) shrinkage already prices a short
+#     outing continuously (a 16-pitch outing grades mostly on stuff and sits
+#     102 +/- 5 league-wide), so a hard 20 on top double-guarded — the same
+#     argument as SEASON_DELTA_MIN above. Below 5, CSW%/xRV arithmetic is
+#     near-empty and the grade would print a meaningless 100, so the dash.
+PP_OUTING_POOL_MIN = 20
+PP_OUTING_MIN_N = 5
 _PP_CSW_DESCRIPTIONS = ('Called Strike', 'Swinging Strike')
 
 
@@ -609,7 +618,7 @@ def _build_outing_pool(mlb_pitches):
     outings = defaultdict(list)
     for p in mlb_pitches:
         outings[(p.get('Pitcher'), p.get('Game Date'))].append(p)
-    comps = [c for ps in outings.values() if len(ps) >= PP_OUTING_MIN_N
+    comps = [c for ps in outings.values() if len(ps) >= PP_OUTING_POOL_MIN
              for c in (_outing_components(ps),) if c is not None]
     params = {}
     for f in PP_OUTING_K:
