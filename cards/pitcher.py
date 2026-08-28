@@ -1837,8 +1837,8 @@ def render_social_card(config, pitches, output_file):
     Pitching+ on the daily strip is the OUTING grade (2026-08-28, per
     Wally): the frozen stuff/loc/csw/xRV composite scored against the
     season's single-outing pool — NOT the retired 0.72/0.28 blend of the
-    two tiles beside it. Value plus percentile-of-outings, tinted by the
-    percentile. Hero order per Wally: FB Velo | Whiffs |
+    two tiles beside it. Value only, same tile format as STUFF+/LOC+; the
+    percentile-of-outings lives in the tint. Hero order per Wally: FB Velo | Whiffs |
     CSW%. Movement axes tick every 5 inches. Usage renders as one stacked
     horizontal bar between the plot and the grades. No insight notes.
     """
@@ -1954,11 +1954,12 @@ def render_social_card(config, pitches, output_file):
             {'v': '—' if sg is None else f"{sg:.0f}", 'k': 'STUFF+', 'fc': gtint(sg)},
             {'v': '—' if lg_ is None else f"{lg_:.0f}", 'k': 'LOC+', 'fc': gtint(lg_)},
         ]
+        # Same two-line format as the STUFF+/LOC+ tiles (per Wally): value
+        # over key, no sub-line — the percentile lives only in the tint.
         _opp = config.get('outing_pitching') or (None, None)
         line.append({
             'v': '—' if _opp[0] is None else f"{_opp[0]:.0f}",
             'k': 'PITCHING+',
-            'sub': None if _opp[1] is None else f"{_ordinal(_opp[1]).upper()} PCTL",
             'fc': (_percentile_color(_opp[1])[0] if _opp[1] is not None
                    else DARK_CELL)})
         tile_row(0.835, 0.052, line, vsize=19)
@@ -2377,12 +2378,10 @@ def render_card(config, pitches, output_file):
         _vfs = val_fs
         if hdr == 'PITCHING+':
             # Outing grade cell: tint straight from its real percentile of
-            # the season outing pool; "104 · 62nd" needs one size down to
-            # stay inside the shared column width.
+            # the season outing pool. Value-only text (per Wally).
             _opp = config.get('outing_pitching') or (None, None)
             if _opp[1] is not None:
                 cell_bg, _ = _percentile_color(_opp[1])
-            _vfs = val_fs - 2
         sl_cfg = STAT_LINE_COLOR.get(hdr)
         if sl_cfg and pitcher_la:
             la_val = pitcher_la.get(sl_cfg[0])
@@ -5062,8 +5061,9 @@ def main():
                               "RunExp/xwOBA on these pitches yet (drift "
                               "~0.5 pts, p95 1.5, until the supplement)")
                     stat_headers = stat_headers + ['PITCHING+']
-                    stat_values = stat_values + [
-                        f"{outing_pp[0]:.0f} · {_ordinal(outing_pp[1])}"]
+                    # Value only (2026-08-28, per Wally): the percentile
+                    # lives in the cell tint, not the text.
+                    stat_values = stat_values + [f"{outing_pp[0]:.0f}"]
 
         print(f"  Stat line: {' | '.join(f'{h}:{v}' for h,v in zip(stat_headers, stat_values))}")
 
