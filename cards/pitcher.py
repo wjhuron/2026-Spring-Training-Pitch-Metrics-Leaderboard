@@ -5052,6 +5052,15 @@ def main():
                 if outing_pp[0] is not None:
                     print(f"  Pitching+ (outing): {outing_pp[0]:.0f} "
                           f"({_ordinal(outing_pp[1])} pctl)")
+                    # Every degrade announces itself: with no RunExp/xwOBA on
+                    # any pitch (live-scrape state, supplement not yet run)
+                    # the xRV slot scores league-average and the grade leans
+                    # on process only. Fix: python3 pipeline/refresh_pickle.py
+                    # after the sheets supplement lands.
+                    if not _compute_pitch_xrv(_np_):
+                        print("  [WARN] Pitching+ scored without xRV — no "
+                              "RunExp/xwOBA on these pitches yet (drift "
+                              "~0.5 pts, p95 1.5, until the supplement)")
                     stat_headers = stat_headers + ['PITCHING+']
                     stat_values = stat_values + [
                         f"{outing_pp[0]:.0f} · {_ordinal(outing_pp[1])}"]
