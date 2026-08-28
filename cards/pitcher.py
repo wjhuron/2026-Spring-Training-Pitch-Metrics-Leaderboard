@@ -2166,16 +2166,16 @@ def render_social_card(config, pitches, output_file):
                         v, c_ = '%.0f%%' % (r_['n'] / nsub * 100), TEXT_PRIMARY
                     elif k == 'csw':
                         v = '%.0f%%' % (r_['csw'] * 100)
-                        c_ = TEXT_FAINT if r_['n'] < 5 else TEXT_PRIMARY
+                        c_ = TEXT_PRIMARY
                     elif k == 'zone':
                         v = ('—' if r_['zone'] is None
                              else '%.0f%%' % (r_['zone'] * 100))
                         c_ = TEXT_PRIMARY
                     elif k == 'whiff':
+                        # No small-sample fade (2026-08-28, per Wally).
                         v = ('—' if r_['whiff'] is None
                              else '%.0f%%' % (r_['whiff'] * 100))
-                        # Under 5 swings the number prints but steps back.
-                        c_ = TEXT_FAINT if r_['sw'] < 5 else TEXT_PRIMARY
+                        c_ = TEXT_PRIMARY
                     else:
                         v = '—' if r_[k] is None else '%.1f' % r_[k]
                         c_ = TEXT_PRIMARY
@@ -2210,7 +2210,7 @@ def render_social_card(config, pitches, output_file):
                 yb -= 0.016
                 hdr = False
         note_r = ('MLB gameday feed  ·  red = good, blue = bad  ·  '
-                  'grayed out = small sample  ·  100 = league average')
+                  '100 = league average')
 
     # usage bar (daily: below the plot, above the grades — per Wally)
     if not is_season and _tbl:
