@@ -2367,12 +2367,19 @@ def render_card(config, pitches, output_file):
     val_fs = 14 if is_season_strip else 13
     stat_y_header = photo_bottom - 0.5; stat_y_value = stat_y_header - cell_h
     pitcher_la = config.get('pitcher_league_avgs', {})
+    # Per-cell widths: uniform except PITCHING+, which takes 1.25x so its
+    # header isn't cramped (per Wally 2026-08-28).
+    _cell_ws = [col_w * (1.25 if h == 'PITCHING+' else 1.0)
+                for h in config['stat_headers']]
+    _cell_x = photo_left
     for i in range(len(config['stat_headers'])):
-        x = photo_left + i * col_w
+        x = _cell_x
+        cw = _cell_ws[i]
+        _cell_x += cw
         hdr = config['stat_headers'][i]
         val_str = config['stat_values'][i]
-        ax_main.add_patch(Rectangle((x, stat_y_header), col_w, cell_h, facecolor=DARKER, edgecolor=SUBTLE_BORDER, linewidth=0.8))
-        ax_main.text(x+col_w/2, stat_y_header+cell_h/2, hdr, fontsize=hdr_fs, ha='center', va='center', color=TEXT_SECONDARY, fontweight='bold', fontfamily='IBM Plex Sans Condensed')
+        ax_main.add_patch(Rectangle((x, stat_y_header), cw, cell_h, facecolor=DARKER, edgecolor=SUBTLE_BORDER, linewidth=0.8))
+        ax_main.text(x+cw/2, stat_y_header+cell_h/2, hdr, fontsize=hdr_fs, ha='center', va='center', color=TEXT_SECONDARY, fontweight='bold', fontfamily='IBM Plex Sans Condensed')
         # Determine cell color — blue→red percentile hue (matches the bubbles).
         cell_bg = DARK_CELL
         _vfs = val_fs
@@ -2392,9 +2399,9 @@ def render_card(config, pitches, output_file):
                                                   DARK_CELL, is_pct)
                 if tinted:
                     cell_bg = tinted
-        ax_main.add_patch(Rectangle((x, stat_y_value), col_w, cell_h, facecolor=cell_bg, edgecolor=SUBTLE_BORDER, linewidth=0.8))
-        ax_main.text(x+col_w/2, stat_y_value+cell_h/2, val_str, fontsize=_vfs, ha='center', va='center', color=TEXT_PRIMARY, fontweight='bold', fontfamily='IBM Plex Sans')
-    ax_main.add_patch(Rectangle((photo_left, stat_y_value), len(config['stat_headers'])*col_w, stat_y_header+cell_h-stat_y_value, fill=False, edgecolor=ACCENT, linewidth=2, zorder=5))
+        ax_main.add_patch(Rectangle((x, stat_y_value), cw, cell_h, facecolor=cell_bg, edgecolor=SUBTLE_BORDER, linewidth=0.8))
+        ax_main.text(x+cw/2, stat_y_value+cell_h/2, val_str, fontsize=_vfs, ha='center', va='center', color=TEXT_PRIMARY, fontweight='bold', fontfamily='IBM Plex Sans')
+    ax_main.add_patch(Rectangle((photo_left, stat_y_value), sum(_cell_ws), stat_y_header+cell_h-stat_y_value, fill=False, edgecolor=ACCENT, linewidth=2, zorder=5))
 
     # ── FB velo-by-outing sparkline — season cards only, thin strip directly
     # under the boxscore line. Combined fastball pool (FF/FA/SI) average velo
