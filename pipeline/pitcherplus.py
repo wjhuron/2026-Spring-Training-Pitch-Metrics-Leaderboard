@@ -69,6 +69,27 @@ QUAL_N = 300          # min pitches to enter the (mu, sigma) baseline pool
 SCALE_K = 10          # points per SD of the composite
 MIN_POOL = 50         # below this many qualified pitchers, don't score at all
 
+# ── Park-adjusted xRV input (2026-08-28, per Wally) ─────────────────────
+# The xRv100 COMPONENT (input only — the displayed xRV/100 column stays
+# raw) is neutralized for the parks the pitcher actually pitched in:
+#     xRv100ParkAdj = xRv100 - PARK_B * pfdev
+# where pfdev is the pitch-weighted mean of (parkFactor/100 - 1) over his
+# games. PARK_B is the FROZEN season-level pass-through of the park run
+# factor into pitcher-perspective xRV/100, measured 2026-08-28 by WLS
+# (weight = pitches) on 2021-2025 pitcher-seasons
+# (scripts/research/stuff/pitcherplus_park_target.py): per-season slopes
+# -1.15 / -3.14 / -2.94 / -3.62 / -3.02 (2021 is the pre-humidor-mandate
+# outlier), pooled -2.72. Validation: with the adjusted input the shipped
+# composite beat the raw-input version against the park-adjusted future
+# xRV/100 in 4/4 year-pair seasons (+.002 pooled r); refit weights did not
+# move, so the frozen weights stand. Display impact: mean |delta| 0.28
+# Pitcher+ points, p95 0.9, max 1.7 (Coors-heavy arms rise).
+# A row with no computable exposure (ROC/AAA, missing map, fetch failure)
+# scores from the RAW value, and the count of such rows is printed.
+PARK_B = -2.720
+PARK_ADJ_KEY = 'xRv100ParkAdj'
+GAMEPK_HOME_ASSET = 'gamepk_home_rs.json'
+
 # pitcherRuns100 = PRED_SLOPE * (Pitcher+ - 100): the run-denominated
 # companion for the hover tooltip, and — like pitchingRuns100 — deliberately
 # a MONOTONIC transform of the displayed number so it can never invert
@@ -131,6 +152,127 @@ def _count_of(row):
     return safe_float(row.get('count')) or 0.0
 
 
+def _component_value(row, key):
+    """The value the scorer consumes for a component. xRv100 reads the
+    park-adjusted input when apply_park_adjustment wrote one; every other
+    key (and any row without the adjusted key, e.g. a card's window row
+    scored against the published baseline) reads the raw column."""
+    if key == 'xRv100':
+        v = safe_float(row.get(PARK_ADJ_KEY))
+        if v is not None:
+            return v
+    return safe_float(row.get(key))
+
+
+def _load_gamepk_home(data_dir, season):
+    """{gamePk(str): home club id} for the season, from the cached artifact,
+    refreshed from the schedule API each run. Fail-closed: a fetch failure
+    keeps the cached map; no cache at all returns {} and the caller reports
+    every row as unadjusted."""
+    import json
+    import urllib.request
+    path = os.path.join(data_dir, GAMEPK_HOME_ASSET)
+    cached = {}
+    try:
+        with open(path) as f:
+            cached = json.load(f)
+    except (OSError, ValueError):
+        pass
+    url = ('https://statsapi.mlb.com/api/v1/schedule?sportId=1'
+           f'&season={int(season)}&gameType=R'
+           '&fields=dates,games,gamePk,teams,home,team,id')
+    try:
+        with urllib.request.urlopen(url, timeout=60) as r:
+            data = json.load(r)
+        fresh = {}
+        for d in data.get('dates', []):
+            for g in d.get('games', []):
+                fresh[str(g['gamePk'])] = g['teams']['home']['team']['id']
+        if fresh:
+            cached.update(fresh)
+            tmp = path + '.tmp'
+            with open(tmp, 'w') as f:
+                json.dump(cached, f)
+            os.replace(tmp, path)
+    except Exception as e:
+        print(f'  [WARN] gamePk->home schedule fetch failed ({e}) — '
+              f'park adjustment uses the cached map '
+              f'({len(cached)} games)')
+    return cached
+
+
+def apply_park_adjustment(rows, mlb_pitches, data_dir, season):
+    """Write row[PARK_ADJ_KEY] = xRv100 - PARK_B * pfdev in place.
+
+    Exposure is the pitch-weighted mean of (parkFactor/100 - 1) over the
+    pitcher's games: per (pitcher, team) for stint rows, per pitcher for
+    combined 2TM+ rows. Rows with no exposure (ROC/AAA pitches are not in
+    mlb_pitches by design — no minor-league park factors exist) keep the
+    raw value, and the split is printed."""
+    import json
+    if not mlb_pitches or not data_dir:
+        print('  [WARN] Pitcher+ park adjustment SKIPPED — no pitch list')
+        return 0
+    try:
+        with open(os.path.join(data_dir, 'park_factors.json')) as f:
+            pf_all = json.load(f)
+    except (OSError, ValueError) as e:
+        print(f'  [WARN] Pitcher+ park adjustment SKIPPED — park_factors.json '
+              f'unreadable ({e})')
+        return 0
+    pf = pf_all.get(str(int(season))) or {}
+    if not pf:
+        print(f'  [WARN] Pitcher+ park adjustment SKIPPED — no park factors '
+              f'for {season}')
+        return 0
+    gh = _load_gamepk_home(data_dir, season)
+    if not gh:
+        print('  [WARN] Pitcher+ park adjustment SKIPPED — no gamePk->home '
+              'map')
+        return 0
+
+    stint, overall = {}, {}
+    n_unmapped = 0
+    for p in mlb_pitches:
+        pid_ = str(p.get('PitchID') or '')
+        gpk = pid_.split('_', 1)[0]
+        home = gh.get(gpk)
+        if home is None:
+            n_unmapped += 1
+            continue
+        dev = pf.get(str(home))
+        if dev is None:
+            n_unmapped += 1
+            continue
+        dev = dev / 100.0 - 1.0
+        ks = (p.get('Pitcher'), p.get('PTeam'))
+        a = stint.setdefault(ks, [0.0, 0])
+        a[0] += dev
+        a[1] += 1
+        b = overall.setdefault(p.get('Pitcher'), [0.0, 0])
+        b[0] += dev
+        b[1] += 1
+
+    n_adj = n_raw = 0
+    for r in rows:
+        xrv = safe_float(r.get('xRv100'))
+        if xrv is None:
+            continue
+        rec = stint.get((r.get('pitcher'), r.get('team')))
+        if rec is None:
+            rec = overall.get(r.get('pitcher')) \
+                if (r.get('_isCombined') or _is_combined_team(r.get('team'))) \
+                else None
+        if rec and rec[1]:
+            r[PARK_ADJ_KEY] = xrv - PARK_B * (rec[0] / rec[1])
+            n_adj += 1
+        else:
+            n_raw += 1
+    print(f'  Pitcher+ park-adjusted xRV input: {n_adj} rows adjusted, '
+          f'{n_raw} raw (no MLB exposure), {n_unmapped} unmapped pitches')
+    return n_adj
+
+
 def _is_baseline(row, aaa_teams):
     """MLB only, qualified, combined 2TM/3TM rows excluded. ROC/AAA pitchers
     are SCORED but never define the baseline — same convention as Stuff+,
@@ -165,7 +307,7 @@ def build_baseline(rows, aaa_teams=('ROC', 'AAA')):
     for key, _w, _k in COMPONENTS:
         vals, wts = [], []
         for r in pool:
-            v = safe_float(r.get(key))
+            v = _component_value(r, key)
             if v is None:
                 continue
             vals.append(v)
@@ -202,7 +344,7 @@ def _raw_score(row, base):
     n = _count_of(row)
     total, seen = 0.0, 0
     for key, w, k in COMPONENTS:
-        v = safe_float(row.get(key))
+        v = _component_value(row, key)
         if v is None:
             continue
         mu, sd = base[key]
@@ -272,7 +414,7 @@ from pipeline.utils import _pctl  # single-homed percentile convention
 
 
 def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None,
-                       current_season=None):
+                       current_season=None, mlb_pitches=None):
     """Set row['pitcherPlus'] + row['pitcherPlus_pctl'] in place. Returns the
     baseline bundle (for metadata / the client-side aggregator), or None if
     the pool was too thin to calibrate.
@@ -281,8 +423,17 @@ def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None,
     percentile pool is the qualified MLB pool (matching the stuffScore /
     pitchingScore convention), and qualification stays a render-time
     coloring gate on the leaderboard.
+
+    When mlb_pitches is provided, the xRv100 COMPONENT is park-adjusted
+    first (see PARK_B); without it every row scores from the raw value and
+    the skip is announced.
     """
     aaa = set(aaa_teams)
+    if mlb_pitches is not None and data_dir and current_season is not None:
+        apply_park_adjustment(rows, mlb_pitches, data_dir, current_season)
+    else:
+        print('  Pitcher+ park adjustment not run (no pitch list) — '
+              'xRv100 input is raw')
     base = build_baseline(rows, aaa_teams)
     for r in rows:
         v = score_row(r, base) if base else None

@@ -1948,7 +1948,8 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None,
     # offseason run can emit a harmless staleness warning.
     from datetime import datetime as _dt
     _pp_base = apply_pitcher_plus(pp, data_dir=DATA,
-                                  current_season=_dt.now().year)
+                                  current_season=_dt.now().year,
+                                  mlb_pitches=mlb_pitches)
     n_pplus = sum(1 for row in pp if row.get('pitcherPlus') is not None)
     n_proj = sum(1 for row in pp if row.get('pitcherPlusProj') is not None)
 
