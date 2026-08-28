@@ -6,7 +6,7 @@ var PlayerPage = {
 
   // 2026-08-27 (per Wally): page-card parity. This list mirrors the pitcher
   // card's BUBBLE_COLUMNS (cards/pitcher.py) — same rows, same order, same
-  // section titles. Every prior page-only row the card had pruned (Pitching+,
+  // section titles. Every prior page-only row the card had pruned (e.g.
   // SIERA, xwOBA) is gone for the card's documented reasons; every card row
   // the page lacked (xRV, xRV/100, Z-Whiff%, xwOBAcon, BABIP, HR/FB%, PU%,
   // Extension) is here. Change the card list and this list in the same commit.
@@ -228,7 +228,6 @@ var PlayerPage = {
     { key: 'nHAA', label: 'nHAA', format: function(v) { return v != null ? v.toFixed(2) + '\u00B0' : '—'; } },
     { key: 'stuffScore', label: 'Stuff+', format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'locPlus', label: 'Loc+', format: function(v) { return v != null ? Math.round(v) : '—'; } },
-    { key: 'pitchingScore', label: 'Pitching+', format: function(v) { return v != null ? Math.round(v) : '—'; } },
   ],
 
   STATS_COLS: [
@@ -486,7 +485,7 @@ var PlayerPage = {
     this._addAllDownloadButtons(data);
   },
 
-  // Per-game Stuff+/Loc+/Pitching+ — plain averages of the per-pitch grade
+  // Per-game Stuff+/Loc+ — plain averages of the per-pitch grade
   // atoms (micro data), so each row matches that outing's card and the
   // Sheets AVERAGEIF for the date. "Which start had his best stuff."
   _renderGameGrades: function (data) {
@@ -505,7 +504,7 @@ var PlayerPage = {
     table.className = 'count-table';
     var thead = document.createElement('thead');
     var headRow = document.createElement('tr');
-    var headers = ['Date', 'Pitches', 'CSW%', 'Stuff+', 'Loc+', 'Pitching+'];
+    var headers = ['Date', 'Pitches', 'CSW%', 'Stuff+', 'Loc+'];
     for (var hi = 0; hi < headers.length; hi++) {
       var th = document.createElement('th');
       th.textContent = headers[hi];
@@ -525,7 +524,6 @@ var PlayerPage = {
         g.cswPct != null ? Utils.formatPct(g.cswPct) : '—',
         g.stuffScore != null ? Math.round(g.stuffScore) : '—',
         g.locPlus != null ? Math.round(g.locPlus) : '—',
-        g.pitchingScore != null ? Math.round(g.pitchingScore) : '—',
       ];
       for (var ci = 0; ci < cells.length; ci++) {
         var td = document.createElement('td');
@@ -2012,15 +2010,9 @@ var PlayerPage = {
         } else {
           var val = row[col.key];
           td.textContent = col.format ? col.format(val) : (val != null ? val : '—');
-          // Pitching+ run-value companion on hover (this table has no custom
-          // tooltip layer like the leaderboard, so use a native title). toFixed
-          // keeps '-' on negatives, adds no '+' on positives (house rule).
-          if (col.key === 'pitchingScore' && row.pitchingRuns100 != null) {
-            td.title = parseFloat(row.pitchingRuns100).toFixed(2) + ' runs/100 vs avg';
-          }
-          // Pitcher+ companion reads 'expected', not 'vs avg': its slope is
-          // predictive (next-season xRV/100 on this-season Pitcher+), not
-          // the same-season fit pitchingRuns100 uses.
+          // Pitcher+ run-value companion on hover (native title; toFixed
+          // keeps '-' on negatives, adds no '+' on positives — house rule).
+          // Reads 'expected': the slope is predictive, not same-season.
           if (col.key === 'pitcherPlus' && row.pitcherRuns100 != null) {
             td.title = parseFloat(row.pitcherRuns100).toFixed(2) + ' runs/100 expected';
           }

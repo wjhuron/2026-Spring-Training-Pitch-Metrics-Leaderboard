@@ -1319,41 +1319,6 @@ def main():
     # re-save the CSV so it carries the displayed (atom-mean) values
     agg.to_csv(os.path.join(HERE, 'pitcher_stuff.csv'), index=False)
 
-    # Pitching+ atoms: pc = round(w·S + (1-w)·L), w = PITCHING_W_STUFF, of the
-    # two INTEGER atoms —
-    # identical to the sheet's Z cells — averaged per unit / per pitcher.
-    # Loc atoms come from process_data's dump (written earlier in the same
-    # pipeline run); if it's absent the maps stay empty and injection falls
-    # back to the blend of the two displayed components.
-    pc_maps = {'pt': {}, 'ov': {}, 'pool_pt': {}, 'pool_ov': {}}
-    _loc_path = os.path.join(DATA, 'pitch_loc_grades_rs.json')
-    if os.path.exists(_loc_path):
-        with open(_loc_path) as _f:
-            _locg = json.load(_f)
-        def _pc_add(mp, key, pc):
-            s, n = mp.get(key, (0.0, 0))
-            mp[key] = (s + pc, n + 1)
-        for frame in _atom_frames:
-            for tab, rownum, pitcher, team, throws, pt, sa in zip(
-                    frame['sheet_tab'], frame['sheet_row'], frame['pitcher'],
-                    frame['team'], frame['throws'], frame['pitch_type'],
-                    frame['_ai']):
-                if tab is None or rownum is None:
-                    continue
-                lg = _locg.get(f'{tab}\t{int(rownum)}')
-                if lg is None:
-                    continue
-                pc = int(round(PITCHING_W_STUFF * int(sa)
-                               + (1.0 - PITCHING_W_STUFF) * int(round(lg))))
-                _pc_add(pc_maps['pt'], (pitcher, team, pt), pc)
-                _pc_add(pc_maps['ov'], (pitcher, team), pc)
-                if team not in AAA_TEAMS:
-                    # pooled across MLB stints — serves combined 2TM/3TM rows
-                    _pc_add(pc_maps['pool_pt'], (pitcher, pt), pc)
-                    _pc_add(pc_maps['pool_ov'], (pitcher,), pc)
-        print(f"  Pitching+ atoms: {sum(n for _s, n in pc_maps['ov'].values())} "
-              f"pitches with both grades")
-
     # ── Per-pitch grade dump for the Sheets write-back ──
     # Scale (i), unregressed (2026-07-18, per Wally): each pitch graded with the
     # SAME per-type anchors as the leaderboard value, no K_SHRINK (a pitch grade
@@ -1493,7 +1458,7 @@ def main():
         xrvoe_pt, xrvoe_ov = compute_xrvoe(df, pitches,
                                            roc_df=roc_df, roc_pitches=roc_pitches)
         inject(agg, overall, league, xrvoe_pt=xrvoe_pt, xrvoe_ov=xrvoe_ov,
-               pc_maps=pc_maps, mlb_pitches=pitches, roc_pitches=roc_pitches)
+               mlb_pitches=pitches, roc_pitches=roc_pitches)
     else:
         print('  (skipped leaderboard injection; run with --inject to surface)')
 
@@ -1520,124 +1485,12 @@ def _pctl(sc, pool):
     return round((below + 0.5 * equal) / len(pool) * 100)
 
 
-# ── Pitching+ (2026-07-07) ──
-# Validated composite of the two shipped scales (scripts/
-# pitching_plus_experiment.py + pitching_plus_stage2.py): 0.70·z(Stuff+) +
-# 0.20·z(Loc+), re-standardized so between-pitcher SD = 10 (the components
-# are near-orthogonal, r=+0.04, so the raw blend has SD ~7.6).
-#
-# 0.70 -> 0.80 (2026-07-25, scripts/research/stuff/pitchingplus_loso_full.py). The old 0.70
-# came from a bootstrap median on a single season (95% CI [0.51, 0.91], flat
-# plateau 0.60-0.80). Re-derived leave-one-season-out across 2021-2025 — each
-# season scored by a model fit on the other four, so no season sees itself —
-# and measured on the SHIPPED scales rather than z-scores. That last part is
-# what moved the answer: Stuff+ is the mean of per-pitch-type atoms, so
-# averaging across an arsenal shrinks it to SD ~7.1, while Loc+ is z-scored to
-# SD ~9.6. A nominal 0.70 was therefore delivering Stuff+ only ~63% of the
-# real influence. Solving for a true 70% influence gives w ~ 0.77, adjacent to
-# the measured optimum — the original 70/30 INTENT was right, the
-# implementation under-weighted Stuff+ because the components were never on a
-# common spread.
-#
-# Cross-season argmin (mean Fisher-z) is 0.82, but the objective is flat
-# within 1% across [0.75, 0.90], so 0.82 beats 0.80 by 0.0002 — unmeasurable.
-# 0.80 was chosen inside that flat region: near its centre (0.825), robust if
-# the region drifts, and auditable by eye from the two adjacent columns, which
-# 0.82/0.18 is not. What IS settled is that 0.70 sits OUTSIDE the flat region
-# (mean z -0.3882 vs -0.3981) and loses to 0.80 in four of five seasons.
-#
-# 0.80 -> 0.72 (2026-08-23, scripts/research/stuff/stuff_gate_v2.py): re-swept
-# on the NEXT-SEASON objective (nxt_r with paired bootstrap SE, the adoption
-# bar for every Stuff+ decision) against the v14 model; the interior optimum
-# moved to 0.72/0.28 and shipped the same day. The live value is
-# PITCHING_W_STUFF in pipeline/utils.py; this block is its derivation
-# history, oldest first.
-#
-# The FG-style JOINT model (stuff + location + count in one XGBoost,
-# season-blocked protocol) was built and RACED — it loses to this composite on
-# both axes (best joint: pred 0.373 / rel 0.756 vs composite 0.389 / 0.764;
-# adding count wrecks its reliability, same count-mix contamination as the
-# Loc+ anchoring lesson). Don't revisit joint without multi-season training data.
-# DEFINED IN pipeline_utils (single source of truth — process_data, Cards and
-# sheets_write_grades all read the same constant without importing xgboost).
-# The derivation above is why it is 0.80; that note stays here.
-from pipeline.utils import PITCHING_W_STUFF  # noqa: E402
+# ── Pitching+ (season blend) RETIRED 2026-08-28 (per Wally). The name now
+# means the per-outing composite on the daily cards (cards/pitcher.py
+# PP_OUTING_*). The 0.72/0.28 Stuff+/Loc+ season blend, its atoms, its
+# sheets column and pitchingRuns100 are gone; derivation history lives in
+# git (this file before this date) and in the memory notes.
 
-def _blend(stuff, loc):
-    return (PITCHING_W_STUFF * (stuff - 100.0) / 10.0
-            + (1.0 - PITCHING_W_STUFF) * (loc - 100.0) / 10.0)
-
-
-def _ols_slope(xs, ys):
-    """Least-squares slope of ys on xs (pure Python). None if degenerate."""
-    n = len(xs)
-    if n < 20:
-        return None
-    mx = sum(xs) / n; my = sum(ys) / n
-    var = sum((x - mx) ** 2 for x in xs)
-    if var <= 1e-12:
-        return None
-    return sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / var
-
-
-def _inject_pitching(rows, key_of, qualifies, pc_lookup=None):
-    """Write pitchingScore + pitchingScore_pctl into leaderboard rows.
-
-    Pool convention matches stuffScore percentiles: MLB rows with >=25
-    pitches, combined 2TM/3TM rows excluded; every row with both component
-    scores gets a score AND a rank (qualification is a render-time coloring
-    gate). key_of(row) -> pool bucket (pitch type at pitch level, 'ALL' at
-    pitcher level); qualifies(row) -> pool membership."""
-    # COHERENT CANON: pitchingScore = plain mean of the per-pitch Pitching+
-    # atoms (round(0.8·S + 0.2·L) of the two INTEGER atoms — the sheet's Z
-    # cells), supplied via pc_lookup. Rows the maps can't serve (loc dump
-    # absent) fall back to the blend of the two displayed components, which
-    # matches to within rounding since both are now atom means themselves.
-    n = 0
-    for row in rows:
-        pc = pc_lookup(row) if pc_lookup is not None else None
-        if pc is not None:
-            row['pitchingScore'] = pc
-            n += 1
-            continue
-        st, lc = row.get('stuffScore'), row.get('locPlus')
-        if st is None or lc is None:
-            row['pitchingScore'] = None
-            continue
-        row['pitchingScore'] = round(100.0 + 10.0 * _blend(st, lc), 1)
-        n += 1
-    pool_s = defaultdict(list)
-    for row in rows:
-        if row.get('pitchingScore') is not None and qualifies(row):
-            pool_s[key_of(row)].append(row['pitchingScore'])
-    for row in rows:
-        sc = row.get('pitchingScore')
-        pool = pool_s.get(key_of(row))
-        row['pitchingScore_pctl'] = _pctl(sc, pool) if (sc is not None and pool) else None
-
-    # pitchingRuns100 — a run-denominated companion for the hover tooltip.
-    # Deliberately a MONOTONIC transform of pitchingScore (slope * (P+ - 100)),
-    # so it can never invert against the displayed number the way a run-space
-    # re-blend (w*stuffRuns + (1-w)*locRuns) would (stuff and loc have
-    # different run SDs, so that reordering lopsided arms — the exact
-    # FanGraphs-style inconsistency we avoid). The slope is the pooled OLS of
-    # actual xRV/100 on Pitching+ over the qualified pool: it answers "a
-    # pitcher at this Pitching+ has historically prevented ~this many runs/100
-    # vs average," self-calibrating each retrain. One global slope per
-    # leaderboard (not per pitch-type) so the runs read on the same scale
-    # across a pitcher's arsenal.
-    xs = [row['pitchingScore'] for row in rows
-          if row.get('pitchingScore') is not None and row.get('xRv100') is not None
-          and qualifies(row)]
-    ys = [row['xRv100'] for row in rows
-          if row.get('pitchingScore') is not None and row.get('xRv100') is not None
-          and qualifies(row)]
-    slope = _ols_slope(xs, ys)
-    for row in rows:
-        sc = row.get('pitchingScore')
-        row['pitchingRuns100'] = (round(slope * (sc - 100.0), 2)
-                                  if (sc is not None and slope is not None) else None)
-    return n
 
 # ── xRVOE: per-pitch outperformance vs the stuff+location expectation ──
 # Validated 2026-07-14 (scripts/xrvoe_feasibility.py + xrvoe_crossyear.py):
@@ -1775,7 +1628,7 @@ def compute_xrvoe(df, pitches, roc_df=None, roc_pitches=None):
             _units(['pitcher', 'team'], XRVOE_MIN_OV))
 
 
-def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None,
+def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None,
            mlb_pitches=None, roc_pitches=None):
     """Write stuffScore into BOTH leaderboards.
 
@@ -1832,23 +1685,6 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None,
             row['stuffScore_pctl'] = _pctl(sc, qual_by_pt[pt])
         else:
             row['stuffScore_pctl'] = None
-    def _pc_mean(rec):
-        return round(rec[0] / rec[1], 1) if rec and rec[1] > 0 else None
-
-    def _pc_pt_lookup(row):
-        if pc_maps is None:
-            return None
-        rec = pc_maps['pt'].get((row['pitcher'], row['team'], row['pitchType']))
-        if rec is None and _is_combined_team(row['team']):
-            rec = pc_maps['pool_pt'].get((row['pitcher'], row['pitchType']))
-        return _pc_mean(rec)
-
-    n_ps_pl = _inject_pitching(
-        pl, key_of=lambda r: r['pitchType'],
-        qualifies=lambda r: ((r.get('count') or 0) >= 25
-                             and r.get('team') not in AAA_TEAMS
-                             and not _is_combined_team(r['team'])),
-        pc_lookup=_pc_pt_lookup)
     # ── xRVOE -> pitch rows. ROC/AAA now carries it too (its RunExp was
     # backfilled 2026-07-25); the pools below still exclude AAA, so ROC is
     # ranked against MLB without defining the distribution. Combined rows
@@ -1909,20 +1745,6 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None,
             row['stuffScore_pctl'] = _pctl(sc, qpool)
         else:
             row['stuffScore_pctl'] = None
-    def _pc_ov_lookup(row):
-        if pc_maps is None:
-            return None
-        rec = pc_maps['ov'].get((row['pitcher'], row['team']))
-        if rec is None and _is_combined_team(row['team']):
-            rec = pc_maps['pool_ov'].get((row['pitcher'],))
-        return _pc_mean(rec)
-
-    n_ps_pp = _inject_pitching(
-        pp, key_of=lambda r: 'ALL',
-        qualifies=lambda r: ((r.get('count') or 0) >= 25
-                             and r.get('team') not in AAA_TEAMS
-                             and not _is_combined_team(r['team'])),
-        pc_lookup=_pc_ov_lookup)
     n_x = 0
     if xrvoe_ov:
         pools_o = {f: [] for f in XRVOE_FIELDS}
@@ -1992,8 +1814,6 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None, pc_maps=None,
 
     print(f'  injected stuffScore: pitch-level {n_pl}/{len(pl)} rows, '
           f'pitcher-level {n_pp}/{len(pp)} rows (qualified pool = {len(qpool)})')
-    print(f'  injected pitchingScore: pitch-level {n_ps_pl}/{len(pl)} rows, '
-          f'pitcher-level {n_ps_pp}/{len(pp)} rows')
     print(f'  injected Pitcher+: pitcher-level {n_pplus}/{len(pp)} rows'
           + ('' if _pp_base else ' (pool too thin — all None)'))
     if _pp_base:

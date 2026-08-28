@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Write per-pitch Stuff+ / Loc+ / Pitching+ grades into the Sheets grade columns.
+"""Write per-pitch Stuff+ / Loc+ grades into the Sheets grade columns.
 
 Reads the two grade dumps keyed by sheet position ("tab\trow" -> float grade):
   - data/pitch_stuff_grades.json      (train_stuff.py --dump-pitch-grades)
   - data/pitch_loc_grades_rs.json     (process_data.py -> pipeline_locplus)
 
-and overwrites the Stuff+ / Loc+ / Pitching+ columns (X:Z, positions 24-26 after HAA) in
+and overwrites the Stuff+ / Loc+ columns (X:Y, positions 24-25 after HAA;
+the Pitching+ column Z retired 2026-08-28 with the season blend) in
 every migrated tab of the six division workbooks — full-column overwrite each
 run, so retags, late-arriving arm angles, and model retrains all self-heal.
 
@@ -28,15 +29,14 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '..'))
 from pipeline.fetch import _gspread_client, DIVISION_WORKBOOK_IDS
-from pipeline.utils import PITCHING_W_STUFF
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(HERE, '..', 'data')
 STUFF_DUMP = os.path.join(DATA, 'pitch_stuff_grades.json')
 LOC_DUMP = os.path.join(DATA, 'pitch_loc_grades_rs.json')
 
-GRADE_COL_RANGE = 'X{first}:Z{last}'   # cols 24-26 = Stuff+ / Loc+ / Pitching+
-HEADER_SLICE = ['Stuff+', 'Loc+', 'Pitching+']   # 1-based cols 24-26
+GRADE_COL_RANGE = 'X{first}:Y{last}'   # cols 24-25 = Stuff+ / Loc+
+HEADER_SLICE = ['Stuff+', 'Loc+']   # 1-based cols 24-25
 
 
 def _load(path, label):
@@ -96,7 +96,7 @@ def _write_tab(ws, name, stuff, loc):
     or None when the tab isn't on the migrated schema / has no data."""
     tab = ws.title
     header = _retry(lambda: ws.row_values(1), f'{name}/{tab} header')
-    if len(header) < 26 or header[23:26] != HEADER_SLICE:
+    if len(header) < 25 or header[23:25] != HEADER_SLICE:
         print(f"  {name}/{tab}: not on migrated schema — skip")
         return None
     n_rows = len(_retry(lambda: ws.col_values(1), f'{name}/{tab} rows'))
@@ -109,17 +109,7 @@ def _write_tab(ws, name, stuff, loc):
         ns += sv is not None
         nl += lv is not None
         sc, lc = _cell(sv), _cell(lv)
-        # Pitching+ cell = blend of the two VISIBLE integer cells
-        # (auditable in-sheet: =ROUND(0.8*X+0.2*Y,0))
-        # 80/20 as of 2026-08-04, matching the shipped pitchingScore and
-        # Cards.py. This column had been left on the pre-2026-07-28 70/30
-        # weights, so the sheet — and therefore every FILTERED Pitching+ on
-        # the site, which averages these per-pitch atoms — disagreed with the
-        # unfiltered leaderboard value by about a point per 10 points of
-        # Stuff+/Loc+ gap.
-        pc = (int(round(PITCHING_W_STUFF * sc + (1.0 - PITCHING_W_STUFF) * lc))
-              if (sc != '' and lc != '') else '')
-        values.append([sc, lc, pc])
+        values.append([sc, lc])
     rng = GRADE_COL_RANGE.format(first=2, last=n_rows)
     _retry(lambda: ws.update(rng, values, value_input_option='USER_ENTERED'),
            f'{name}/{tab} write')
@@ -130,10 +120,9 @@ def main():
     stuff = _load(STUFF_DUMP, 'Stuff+')
     loc = _load(LOC_DUMP, 'Loc+')
     # FAIL CLOSED when ANY dump is missing. Every write below is a
-    # full-column overwrite of X:Z, so a run missing one dump does not merely
-    # skip that column — it BLANKS it, and takes Pitching+ down with it (that
-    # cell needs both). This is exactly how the 2026-08-12 21:08 run wiped
-    # Stuff+ and Pitching+ across all six workbooks: a transient failure
+    # full-column overwrite of X:Y, so a run missing one dump does not merely
+    # skip that column — it BLANKS it. This is exactly how the 2026-08-12
+    # 21:08 run wiped Stuff+ across all six workbooks: a transient failure
     # downloading the model bundle left the stuff dump unwritten, and the old
     # guard only bailed when BOTH dumps were absent.
     # Refusing to write costs nothing — the columns keep their last-good

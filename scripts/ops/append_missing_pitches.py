@@ -10,7 +10,7 @@ cannot fully verify, and prints the row it will write before writing it.
     python3 scripts/ops/append_missing_pitches.py --apply <ids...>
 
 A new row needs the columns the sweep excludes — Game Date, PTeam, BTeam, Pitch Type
-and PitchID all identify the pitch and must be present. Stuff+, Loc+ and Pitching+
+and PitchID all identify the pitch and must be present. Stuff+ and Loc+
 are left blank: they are model output written by scripts/ci/sheets_write_grades.py,
 not values any feed carries.
 """
@@ -30,7 +30,7 @@ from scrapers.backfill_full import feed_rows, SAVANT_COLS, fetch_game_json
 from scrapers.sheet_precision import fmt, as_float, STRING_COLS
 
 # Written by the model layer, never by a feed. Blank on a new row.
-GRADE_COLS = {'Stuff+', 'Loc+', 'Pitching+'}
+GRADE_COLS = {'Stuff+', 'Loc+'}
 
 
 def main(pitch_ids, apply=False):

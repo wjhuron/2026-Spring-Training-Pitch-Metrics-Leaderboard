@@ -91,18 +91,17 @@ PARK_ADJ_KEY = 'xRv100ParkAdj'
 GAMEPK_HOME_ASSET = 'gamepk_home_rs.json'
 
 # pitcherRuns100 = PRED_SLOPE * (Pitcher+ - 100): the run-denominated
-# companion for the hover tooltip, and — like pitchingRuns100 — deliberately
+# companion for the hover tooltip, deliberately
 # a MONOTONIC transform of the displayed number so it can never invert
 # against the column it annotates.
 #
 # The slope is FROZEN and PREDICTIVE (0.039 runs/100 per Pitcher+ point, so
 # +10 = +0.39 runs/100), fit as future-season xRV/100 on current-season
-# Pitcher+ over the 2021-25 year-pair panel. Two reasons it is not the
-# same-season OLS that pitchingRuns100 uses:
+# Pitcher+ over the 2021-25 year-pair panel. Two reasons it is not a
+# same-season OLS (the retired pitchingRuns100 pattern):
 #   1. Circularity. xRV/100 is a COMPONENT of Pitcher+ (weight 0.23), so a
 #      same-season fit partly regresses a variable on itself and inflates
 #      the slope to 0.061 — a ~55% overstatement of the runs claim.
-#      Pitching+ has no results term, so its descriptive slope is clean.
 #   2. It answers the question the metric is for: "a pitcher at this
 #      Pitcher+ prevents about this many runs/100 GOING FORWARD."
 # Frozen rather than re-fit per run because the predictive slope needs a
@@ -119,7 +118,7 @@ PRED_SLOPE = 0.039
 #   Pitcher+) or when the index adds an adjustment the raw lacks (ERA- adds
 #   park/league). A plain rescale of xRV/100 does neither: "0.8 runs per 100
 #   pitches" is already concrete, and 112 is less informative. It also runs
-#   backwards against pitchingRuns100/pitcherRuns100, which exist to convert
+#   backwards against pitcherRuns100, which exists to convert
 #   indexes INTO runs precisely because runs mean more.
 #   Gap (Pitcher+ - Results+) was worse: unit-incoherent. One Pitcher+ point
 #   is 0.039 runs/100 (heavily shrunk); one Results+ point is 0.079
@@ -420,8 +419,8 @@ def apply_pitcher_plus(rows, aaa_teams=('ROC', 'AAA'), data_dir=None,
     the pool was too thin to calibrate.
 
     Every row with scorable components gets BOTH a score and a rank; the
-    percentile pool is the qualified MLB pool (matching the stuffScore /
-    pitchingScore convention), and qualification stays a render-time
+    percentile pool is the qualified MLB pool (matching the stuffScore
+    convention), and qualification stays a render-time
     coloring gate on the leaderboard.
 
     When mlb_pitches is provided, the xRv100 COMPONENT is park-adjusted

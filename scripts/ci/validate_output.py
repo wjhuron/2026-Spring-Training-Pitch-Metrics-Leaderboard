@@ -175,7 +175,7 @@ def check_chunks_match_sources():
     # (label, shipped rows, source json, key fields, compared fields)
     checks = [
         ('pitcherData', core.get('pitcherData'), 'pitcher_leaderboard_rs.json',
-         ('pitcher', 'team'), ('stuffScore', 'pitchingScore', 'era', 'kPct')),
+         ('pitcher', 'team'), ('stuffScore', 'era', 'kPct')),
         ('pitchData', tables.get('pitchData'), 'pitch_leaderboard_rs.json',
          ('pitcher', 'team', 'pitchType'), ('stuffScore', 'count', 'velocity')),
         ('hitterData', tables.get('hitterData'), 'hitter_leaderboard_rs.json',

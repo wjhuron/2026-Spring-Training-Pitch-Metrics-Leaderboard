@@ -12,30 +12,9 @@ DATA_DIR = os.path.join(_SCRIPT_DIR, 'data')
 
 
 # ── Strike zone constants ────────────────────────────────────────────────
-# Pitching+ blend weight, SINGLE SOURCE OF TRUTH. Lives here rather than in
-# train_stuff (where it is derived and documented) because process_data
-# must read it without importing xgboost/sklearn. Every surface that renders
-# a Pitching+ number imports THIS: train_stuff, process_data's per-pitch
-# grade atoms, Cards, and scripts/sheets_write_grades.
-#
-# It is one constant with four consumers, and it has drifted before. The
-# 0.70 -> 0.80 move on 2026-07-25 updated three of them; process_data's atom
-# was missed and sat on 0.70 until 2026-08-12, so FILTERED Pitching+ on the
-# site (which averages those atoms) disagreed with the unfiltered value,
-# cards, and sheets for ~3 weeks — 41% of pitchers by a point or more, up to
-# 12 points. That breaks the coherent-canon invariant (sheets = cards = site,
-# filtered or not). Never hardcode the number again; import it.
-#
-# Derivation and the flat-region argument: train_stuff.PITCHING_W_STUFF.
-# Re-audited 2026-08-12 under Stuff+ v12 (scripts/research/stuff/pitchingplus_command_loso.py):
-# kept at 0.80. Re-swept 2026-08-23 on the NEXT-SEASON objective under v14
-# (scripts/research/stuff/pitchingplus_nxt_sweep.py, data/_pplus_nxt_sweep.json):
-# luck-neutral argmax 0.70, flat [0.65, 0.76]; actual-RV argmax 0.73, flat
-# [0.67, 0.79]; 0.80 sat outside the flat region (0.70-vs-0.80 won 4/5
-# pairs, mean +0.009, z ~2.2). 0.72 is a CONVENTION inside both flat
-# regions, chosen to match the 2021-25 within-season argmin; any value in
-# [0.67, 0.76] is defensible, 0.80 is not.
-PITCHING_W_STUFF = 0.72
+# PITCHING_W_STUFF removed 2026-08-28: the season Pitching+ blend retired
+# (the name now means the per-outing grade on the daily cards). Derivation
+# history lives in git before this date.
 
 # ── Hitter-basis pulled-air xwOBA term (xwOBA_hb) ────────────────────────
 # Savant per-pitch xwOBA is EV/LA-only and underrates pulled air balls.

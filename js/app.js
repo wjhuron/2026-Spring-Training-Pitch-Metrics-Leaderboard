@@ -52,7 +52,7 @@
     // 2026-08-27 (per Wally): pitch tab leads with the stabilized grade, not
     // the noisy per-pitch xRV/100; swing tabs lead with CSW% (whole decision
     // space) and SD+ (the tab's namesake grade).
-    pitchMetrics:          { key: 'pitchingScore', dir: 'desc' },
+    pitchMetrics:          { key: 'stuffScore', dir: 'desc' },
     pitcherSwingDecisions: { key: 'cswPct',     dir: 'desc' },
     pitcherBattedBall:     { key: 'xwOBAcon',   dir: 'asc'  },
     hitterStats:           { key: 'hitterPlus', dir: 'desc' },

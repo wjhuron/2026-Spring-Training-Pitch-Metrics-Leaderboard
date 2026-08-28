@@ -1277,9 +1277,8 @@ BUBBLE_COLUMNS = [
         ('Extension',  'extension', 'extension_pctl', 'ftin'),
         ('Stuff+',     'stuffScore', 'stuffScore_pctl', 'int'),
         ('Loc+',       'locPlus',   'locPlus_pctl',   'int'),
-        # Pitching+ bubble removed 2026-08-13 (per Wally): it is the
-        # deterministic 0.8/0.2 blend of the two bubbles directly above it —
-        # same reasoning as dropping the per-pitch table column.
+        # Season Pitching+ (the Stuff+/Loc+ blend) RETIRED 2026-08-28; the
+        # name now means the per-outing grade on daily cards.
     ]),
 ]
 
@@ -2934,7 +2933,6 @@ def render_card(config, pitches, output_file):
     # pitches carry no per-pitch xwOBA (the Tier-2 fill is pipeline-only).
     xwc_by_pt = {pt: d.get('xwOBAcon') for pt, d in pitch_lb.items()}
     stuff_by_pt = {pt: d.get('stuffScore') for pt, d in pitch_lb.items()}
-    pitching_by_pt = {pt: d.get('pitchingScore') for pt, d in pitch_lb.items()}
     # RV columns: season cards default to the actual + expected per-100 pair
     # (PitchRV/100 + xPitchRV/100); --rv-mode totals swaps in the cumulative
     # pair (PitchRV + xPitchRV), --rv-mode both shows all four. PitchRV is
@@ -3170,7 +3168,6 @@ def render_card(config, pitches, output_file):
             (f"{int(round(stuff_by_pt[pt]))}"
              if stuff_by_pt.get(pt) is not None else '—'),
             (f"{int(round(locplus_by_pt[pt]))}" if locplus_by_pt.get(pt) is not None else '—'),
-            (f"{int(round(pitching_by_pt[pt]))}" if pitching_by_pt.get(pt) is not None else '—'),
             f"{iz_n/n*100:.1f}%" if n else '—',
             # CSW% — called strikes plus whiffs over PITCHES (not swings), so
             # unlike Whiff% it is defined on the full per-type sample.
@@ -3236,7 +3233,6 @@ def render_card(config, pitches, output_file):
     # Pitcher-level Loc+ for the Total row (from the bubble's leaderboard row).
     _total_locplus = (config.get('pctl_row') or {}).get('locPlus')
     _total_stuff = (config.get('pctl_row') or {}).get('stuffScore')
-    _total_pitching = (config.get('pctl_row') or {}).get('pitchingScore')
     # RV totals. xPitchRV/100 from the leaderboard (expected) for all. PitchRV/100:
     # the real rv100 (MLB) or contact-wOBA proxy (ROC). Single-game keeps cumulative.
     _pr = config.get('pctl_row') or {}
@@ -3269,7 +3265,6 @@ def render_card(config, pitches, output_file):
         f"{sum(t_armangles)/len(t_armangles):.1f}°" if t_armangles else '—',
         (f"{int(round(_total_stuff))}" if _total_stuff is not None else '—'),
         (f"{int(round(_total_locplus))}" if _total_locplus is not None else '—'),
-        (f"{int(round(_total_pitching))}" if _total_pitching is not None else '—'),
         f"{t_iz/tc*100:.1f}%" if tc else '—',
         f"{(t_called + len(t_wh))/tc*100:.1f}%" if tc else '—',
         f"{len(t_wh)/len(t_sw)*100:.1f}%" if t_sw else '—',
@@ -3285,7 +3280,7 @@ def render_card(config, pitches, output_file):
 
     # nHAA column removed entirely; RelZ/RelX sit directly after nVAA
     # (2026-08-24, per Wally).
-    all_col_headers=['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate','IVB','HB','nVAA','RelZ','RelX','Ext','Arm Angle','Stuff+','Loc+','Pitching+','Zone%','CSW%','Whiff%','Chase%','xwOBAcon','GB%'] + rv_cols
+    all_col_headers=['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate','IVB','HB','nVAA','RelZ','RelX','Ext','Arm Angle','Stuff+','Loc+','Zone%','CSW%','Whiff%','Chase%','xwOBAcon','GB%'] + rv_cols
     all_cell_data=[r[1] for r in pitch_stats]+[total_row]
 
     # Daily cards use a different column ORDER than season (Wally's layout):
@@ -3297,18 +3292,13 @@ def render_card(config, pitches, output_file):
     if not is_season:
         _daily_order = ['Pitch Type','Count','Usage','Avg Velo','Max Velo','Spin Rate',
                         'IVB','HB','RelZ','RelX','Ext','Arm Angle','nVAA',
-                        'Zone%','CSW%','Whiff%','Chase%','xwOBAcon','Stuff+','Loc+','Pitching+'] + rv_cols
+                        'Zone%','CSW%','Whiff%','Chase%','xwOBAcon','Stuff+','Loc+'] + rv_cols
         _perm = [all_col_headers.index(h) for h in _daily_order]
         all_col_headers = _daily_order
         all_cell_data = [[row[i] for i in _perm] for row in all_cell_data]
 
     # Columns to force-exclude based on data availability and card type.
     force_exclude = set()
-    # Per-pitch Pitching+ dropped EVERYWHERE (season 2026-07-30, daily
-    # 2026-08-12, both Wally): it is the deterministic 0.8/0.2 blend of the
-    # adjacent Stuff+/Loc+ columns — zero new information.
-    # GB% is season/date-range only (not in the daily column order).
-    force_exclude.add('Pitching+')
     if is_season:
         force_exclude.add('CSW%')
     _have_xrv = any(v is not None for v in xrv100_by_pt.values()) if is_season else has_pitchrv_data
@@ -3573,17 +3563,6 @@ def render_card(config, pitches, output_file):
             if tinted:
                 table.get_celld()[(r, sp_col_idx)].set_facecolor(tinted)
 
-    # Pitching+ coloring — index centered at 100, higher is better, scale 10
-    # (≈1 SD). Same convention as the Stuff+/Loc+ columns it blends.
-    if 'Pitching+' in col_headers:
-        pp_col_idx = col_headers.index('Pitching+')
-        for r in range(1, len(cell_data) + 1):
-            row_bg = DARKER if r == len(cell_data) else (DARK_CELL if r % 2 == 1 else ALT_ROW_BG)
-            val_str = cell_data[r - 1][pp_col_idx]
-            tinted = _pitcher_stat_cell_color(val_str, 100.0, 10.0, True, row_bg, False)
-            if tinted:
-                table.get_celld()[(r, pp_col_idx)].set_facecolor(tinted)
-
     # nVAA coloring vs the LEAGUE — FF and SI only (per spec). nVAA_pctl is
     # already directional (FF: flatter/closer-to-zero better; SI: steeper).
     # SEASON/DATE-RANGE ONLY: this pass runs after the self-baseline block
@@ -3743,50 +3722,8 @@ _SCRATCH_INVERT_PITCHER = {'bbPct', 'xwOBA', 'xwOBAcon', 'hardHitPct', 'barrelPc
 _SCRATCH_POOL_STATS = ['xRunValue', 'xRv100', 'xwOBA', 'kPct', 'bbPct', 'kbbPct',
                        'swStrPct', 'chasePct', 'izWhiffPct', 'twoStrikeWhiffPct',
                        'xwOBAcon', 'hardHitPct', 'barrelPctAgainst', 'gbPct', 'babip',
-                       'fbVelo', 'extension', 'stuffScore', 'locPlus', 'pitchingScore',
+                       'fbVelo', 'extension', 'stuffScore', 'locPlus',
                        'izPct', 'fpsPct']
-
-
-def _pitching_blend(stuff, loc):
-    """Stuff+/Loc+ blend in z units — the trainer's _blend. The weight's
-    single source of truth is pipeline.utils.PITCHING_W_STUFF (0.72 as of 2026-08-23); the
-    fallback reads it from there rather than hardcoding, so a weight change
-    can never silently fork the card blend again."""
-    _sv_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo root, for stuff_plus package
-    if _sv_dir not in sys.path:
-        sys.path.insert(0, _sv_dir)
-    try:
-        from stuff_plus.train_stuff import _blend
-        return _blend(stuff, loc)
-    except Exception:
-        from pipeline.utils import PITCHING_W_STUFF
-        w = PITCHING_W_STUFF
-        return w * (stuff - 100.0) / 10.0 + (1.0 - w) * (loc - 100.0) / 10.0
-
-
-def _pitching_scale(rows, min_pitches=25):
-    """League (mu, sd) of the blend from leaderboard pool rows with >=25
-    pitches — mirrors train_stuff._inject_pitching's pool convention."""
-    bs = [_pitching_blend(r['stuffScore'], r['locPlus']) for r in rows
-          if r.get('stuffScore') is not None and r.get('locPlus') is not None
-          and (r.get('count') or 0) >= min_pitches]
-    if len(bs) < 5:
-        return None
-    mu = sum(bs) / len(bs)
-    sd = (sum((b - mu) ** 2 for b in bs) / len(bs)) ** 0.5
-    return (mu, sd) if sd > 1e-9 else None
-
-
-def _pitching_score(stuff, loc, scale=None):
-    # COHERENT CANON (2026-07-18): Pitching+ = the shared PITCHING_W_STUFF
-    # blend of Stuff+ and Loc+ exactly (pipeline_utils holds the constant;
-    # train_stuff.PITCHING_W_STUFF carries the derivation) — no
-    # restandardization, no clip. `scale` is accepted for call-site compat
-    # and ignored.
-    from pipeline.utils import PITCHING_W_STUFF
-    if stuff is None or loc is None:
-        return None
-    return round(PITCHING_W_STUFF * stuff + (1.0 - PITCHING_W_STUFF) * loc, 1)
 
 
 def _normalize_scratch_pitch(row):
@@ -4207,20 +4144,15 @@ def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
             v for v in (r.get('pitcherPlus') for r in _raw_prows
                         if _pp_is_baseline(r, ('ROC', 'AAA')))
             if v is not None)
-        # Pitching+ blend scale (overall + per type) from the same MLB pools,
-        # so scratch pitchers score on the exact league standardization.
-        ctx['pitching_scale'] = _pitching_scale(_prows)
         with open(os.path.join(_data_dir, 'pitch_leaderboard_rs.json')) as f:
             _plrows = _scratch_mlb_pool_rows(json.load(f))
         pt_pools = defaultdict(dict)
         by_type = defaultdict(list)
         for r in _plrows:
             by_type[r.get('pitchType')].append(r)
-        ctx['pitching_scale_pt'] = {}
         for pt, rows in by_type.items():
             for s in ('velocity', 'nVAA', 'stuffScore', 'locPlus'):
                 pt_pools[pt][s] = sorted(v for v in (r.get(s) for r in rows) if v is not None)
-            ctx['pitching_scale_pt'][pt] = _pitching_scale(rows)
         ctx['pitch_pools'] = dict(pt_pools)
     except Exception as _e:
         print(f"  WARNING: could not build scratch percentile pools: {_e}")
@@ -4314,30 +4246,20 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
     # present (so card values equal AVERAGEIF over the sheet exactly), with
     # model-computed fallbacks only for rows whose cells are still blank.
     def _pitch_atoms(p):
-        s_c, l_c, p_c = sf(p.get('Stuff+')), sf(p.get('Loc+')), sf(p.get('Pitching+'))
+        s_c, l_c = sf(p.get('Stuff+')), sf(p.get('Loc+'))
         S = (int(round(s_c)) if s_c is not None
              else ctx.get('stuff_atoms_by_pid', {}).get(str(p.get('PitchID') or '')))
         L = (int(round(l_c)) if l_c is not None
              else (ctx['loc_atom_fn'](p) if ctx.get('loc_atom_fn') else None))
-        if p_c is not None:
-            P = int(round(p_c))
-        elif S is not None and L is not None:
-            # Canon blend — same shared constant as _pitching_score.
-            from pipeline.utils import PITCHING_W_STUFF as _PW
-            P = int(round(_PW * S + (1.0 - _PW) * L))
-        else:
-            P = None
-        return S, L, P
+        return S, L
 
-    _Sa, _La, _Pa = [], [], []
+    _Sa, _La = [], []
     for _p in pitches:
-        _s, _l, _pp = _pitch_atoms(_p)
+        _s, _l = _pitch_atoms(_p)
         if _s is not None: _Sa.append(_s)
         if _l is not None: _La.append(_l)
-        if _pp is not None: _Pa.append(_pp)
     row['stuffScore'] = round(sum(_Sa) / len(_Sa), 1) if _Sa else None
     row['locPlus'] = round(sum(_La) / len(_La), 1) if _La else None
-    row['pitchingScore'] = round(sum(_Pa) / len(_Pa), 1) if _Pa else None
 
     # Percentile bubbles — rank each computed stat into the MLB pool.
     for s in _SCRATCH_POOL_STATS:
@@ -4398,17 +4320,15 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
         d['xRunValue'] = xrv_pt
         d['xRv100'] = xrv_pt / npt * 100 if xrv_pt is not None else None
 
-        _Spt, _Lpt, _Ppt = [], [], []
+        _Spt, _Lpt = [], []
         for _p2 in pp:
-            _s2, _l2, _pp2 = _pitch_atoms(_p2)
+            _s2, _l2 = _pitch_atoms(_p2)
             if _s2 is not None: _Spt.append(_s2)
             if _l2 is not None: _Lpt.append(_l2)
-            if _pp2 is not None: _Ppt.append(_pp2)
         d['stuffScore'] = round(sum(_Spt) / len(_Spt), 1) if _Spt else None
         lp = round(sum(_Lpt) / len(_Lpt), 1) if _Lpt else None
         if lp is not None:
             locplus_by_pt[pt] = lp
-        d['pitchingScore'] = round(sum(_Ppt) / len(_Ppt), 1) if _Ppt else None
 
         pools = ctx['pitch_pools'].get(pt, {})
         d['velocity_pctl'] = _rank_in_mlb_pool(d['velocity'], pools.get('velocity') or [])
@@ -4431,7 +4351,7 @@ def _compute_scratch_pitcher_context(pitcher_name, ctx):
         for _p3 in pitches:
             if _p3.get('Bats') != _h:
                 continue
-            _s3, _l3, _pp3 = _pitch_atoms(_p3)
+            _s3, _l3 = _pitch_atoms(_p3)
             if _l3 is not None:
                 _Lh.append(_l3)
         if _Lh:
@@ -4735,7 +4655,6 @@ def main():
                         'rv100': _r.get('rv100'), 'runValue': _r.get('runValue'),
                         'xwOBAcon': _r.get('xwOBAcon'),
                         'stuffScore': _r.get('stuffScore'), 'stuffScore_pctl': _r.get('stuffScore_pctl'),
-                        'pitchingScore': _r.get('pitchingScore'),
                         'xrvoe100': _r.get('xrvoe100'),
                         # Season baselines the daily card reads back: the
                         # self-baseline cell shading, the ghost movement
@@ -4866,7 +4785,7 @@ def main():
             print(f"  WARNING: scratch context failed ({_e}) — rendering MiLB-style")
     elif start_date is not None or compute_from_pitches:
         # WINDOW cards — single game OR partial date range (2026-07-18, per
-        # Wally): Stuff+/Loc+/Pitching+ are computed from JUST the window's
+        # Wally): Stuff+/Loc+ are computed from JUST the window's
         # pitches as the plain average of per-pitch grades (no shrink), scored
         # against the season league anchors. Full-season cards (start_date
         # None) keep the season leaderboard values — EXCEPT --all-levels

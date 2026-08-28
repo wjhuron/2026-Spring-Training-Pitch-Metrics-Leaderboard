@@ -6,8 +6,8 @@ Single home for the precision policy. `backfill_supplement.py` and
 `backfill_full.py` both write the same columns, so a depth that lived in two
 places would have them overwrite each other's cells on every run: one writes
 53.6, the other writes 53.600, and each sees the other's value as a change
-forever. `pipeline/utils.py:32` carries the same warning about PITCHING_W_STUFF,
-which once ran 70/30 in one file and 80/20 in another for about three weeks.
+forever. (The retired PITCHING_W_STUFF constant once ran 70/30 in one file
+and 80/20 in another for about three weeks — same failure shape.)
 
 Depths were measured 2026-08-17 by reading every field of 5 MLB feed games and
 one Savant day as raw text, before any float parsing. That split the columns in

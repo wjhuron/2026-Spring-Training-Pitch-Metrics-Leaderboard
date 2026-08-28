@@ -528,9 +528,6 @@ def pitcher_row(pitches, lg, gs_ratio):
     row['rv100'] = (rv / n * 100) if (rv is not None and n) else None
     row['stuffPlus'] = grade_atom_mean(pitches, 'Stuff+')
     row['locPlus'] = grade_atom_mean(pitches, 'Loc+')
-    row['pitchingPlus'] = (0.8 * row['stuffPlus'] + 0.2 * row['locPlus']
-                           if row['stuffPlus'] is not None
-                           and row['locPlus'] is not None else None)
 
     by_type = defaultdict(list)
     for p in pitches:
@@ -707,7 +704,6 @@ PITCHER_METRICS = [
     ('fbVelo',          'FB Velo',      1,     True),
     ('stuffPlus',       'Stuff+',       1,     True),
     ('locPlus',         'Loc+',         1,     True),
-    ('pitchingPlus',    'Pitching+',    1,     True),
 ]
 
 # Hitter pitch-group x hand: the "what is beating him" layer. Groups rather

@@ -9,7 +9,7 @@ things the supplement path cannot do: it finds pitches that are missing from the
 sheet entirely, and it rewrites stored values at full source precision.
 
 Out of scope by instruction (Wally, 2026-08-17): Game Date, PTeam, BTeam,
-PitchID, Pitch Type, Stuff+, Loc+, Pitching+.
+PitchID, Pitch Type, Stuff+, Loc+.
 
 DRY RUN IS THE DEFAULT. Nothing is written to any sheet without --apply.
 
@@ -78,11 +78,11 @@ REPORT_DIR = os.path.join(os.path.expanduser('~'), 'Downloads')
 
 # ── Column scope ─────────────────────────────────────────────────────────────
 # Wally's exclusion list. Game Date/PTeam/BTeam/PitchID/Pitch Type are identity
-# and must never move under a row. The three grade columns are written by
+# and must never move under a row. The grade columns are written by
 # scripts/ci/sheets_write_grades.py from the models, not by any feed.
 EXCLUDED_COLS = {
     'Game Date', 'PTeam', 'BTeam', 'PitchID', 'Pitch Type',
-    'Stuff+', 'Loc+', 'Pitching+',
+    'Stuff+', 'Loc+',
 }
 
 # Columns whose authority is the MLB Stats API game feed. Six of these are

@@ -351,7 +351,7 @@ def render_hitters(eng, outdir):
 # ═════════════════════════════════════════════════════════════════════════
 
 # Cards.py names two grades differently from platoon_splits.
-_GRADE_ALIAS = {'stuffPlus': 'stuffScore', 'pitchingPlus': 'pitchingScore'}
+_GRADE_ALIAS = {'stuffPlus': 'stuffScore'}
 
 
 # Per-player hard date cap (inclusive). 2026-08-10 per Wally: caps LIFTED —

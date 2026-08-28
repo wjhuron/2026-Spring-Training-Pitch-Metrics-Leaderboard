@@ -24,7 +24,6 @@ const COLUMNS = {
     { key: 'nHAA',        label: 'nHAA',     format: Utils.formatDecimal(2), sortType: 'numeric', noPercentile: true, desc: 'HAA with the location effect removed. Measures whether the pitch approaches from a wider or straighter angle than its plate location predicts', group: 'metrics' },
     { key: 'stuffScore',  label: 'Stuff+',   format: Utils.formatInt, sortType: 'numeric', sectionStart: true, desc: 'Stuff+ for this pitch type — pitch quality from physical characteristics only (velocity, movement, release, arm angle), independent of location or outcome. Standardized within the pitch-type group. 100 = group avg, +10 = 1 SD better. Standard-deviation ruler, NOT a percent: a point is not 1% better. Hitter + metrics are percents; the pitcher ones are not, because Stuff+/Loc+/Pitching+ sit on the shared public convention so a value here means what it means on other sites.', group: 'outcomes' },
     { key: 'locPlus',     label: 'Loc+',     format: Utils.formatInt, sortType: 'numeric', desc: 'Location+ for this pitch type — xRV-weighted location quality standardized within the pitch-type group (FF, SI, FC, SL, CU, CH, plus an OTHER bucket). 100 = group avg, +10 = 1 SD better. Standard-deviation ruler, NOT a percent: a point is not 1% better. Hitter + metrics are percents; the pitcher ones are not, because Stuff+/Loc+/Pitching+ sit on the shared public convention so a value here means what it means on other sites. ROC pitchers scored against the MLB baseline.', group: 'outcomes' },
-    { key: 'pitchingScore', label: 'Pitching+', format: Utils.formatInt, sortType: 'numeric', desc: 'Pitching+ for this pitch type — overall pitch quality: 0.72 x Stuff+ + 0.28 x Loc+, blended per pitch (weight validated on next-season run prevention, re-swept 2026-08). Tiny samples can drift a point from the two displayed columns. Standard-deviation ruler, NOT a percent: a point is not 1% better. Hitter + metrics are percents; the pitcher ones are not, because Stuff+/Loc+/Pitching+ sit on the shared public convention so a value here means what it means on other sites.', group: 'outcomes' },
     { key: 'xRv100',      label: 'xRV/100',  format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Expected run value per 100 pitches (positive = better for pitcher)', group: 'outcomes' },
     { key: 'swStrPct',    label: 'Whiff%',   format: Utils.formatPct, sortType: 'numeric', desc: 'Whiff rate on swings (whiffs / swings) for this pitch type', group: 'outcomes' },
     { key: 'chasePct',    label: 'Chase%',   format: Utils.formatPct, sortType: 'numeric', desc: 'Out-of-zone swing rate for this pitch type', group: 'outcomes' },
@@ -66,7 +65,6 @@ const COLUMNS = {
     { key: 'stuffScore',  label: 'Stuff+',   format: Utils.formatInt, sortType: 'numeric', sectionStart: true, desc: 'Stuff+ — overall pitch quality from physical characteristics only (velocity, movement, release, arm angle), usage-weighted across the arsenal and independent of location or outcome. 100 = league avg. The per-pitch-type Stuff+ columns are standardized to +10 = 1 SD; this overall number is their usage-weighted mean, and averaging an arsenal compresses the spread, so 1 SD is about 8 points here. Standard-deviation ruler, NOT a percent: a point is not 1% better. Hitter + metrics are percents; the pitcher ones are not, because Stuff+/Loc+/Pitching+ sit on the shared public convention so a value here means what it means on other sites.', group: 'run_value' },
     { key: 'locPlus',     label: 'Loc+',     format: Utils.formatInt, sortType: 'numeric', desc: 'Location+ — per-pitch location quality scored against an xRV-weighted (zone × count × pitch-type × handedness) model. Command independent of stuff or contact luck. 100 = league avg. The per-pitch-type Loc+ columns are standardized to +10 = 1 SD; this overall number is the plain mean of per-pitch grades, and averaging an arsenal compresses the spread, so 1 SD is about 6 points here. Standard-deviation ruler, NOT a percent: a point is not 1% better. Hitter + metrics are percents; the pitcher ones are not, because Stuff+/Loc+/Pitching+ sit on the shared public convention so a value here means what it means on other sites.', group: 'run_value' },
     { key: 'commandPlus', label: 'Command+', format: Utils.formatInt, sortType: 'numeric', desc: "Command+ — execution repeatability: average miss distance from the pitcher's inferred targets (fit per pitch type, batter hand, and count situation, pooled coarser where he throws a pitch too rarely to read the situation). 100 = league avg and one point is one percent: a 115 misses by 15% less distance than the league. Unlike the other pitcher + columns this one IS a percent, because miss distance has a real zero (perfect command = 0). It is not run-denominated on purpose: measured 2021-2026, command's correlation with runs prevented ran +0.02 to +0.23, so a run-scaled version would be a dead column. Forecasts future walk rate beyond current BB%; it does NOT predict run prevention beyond Loc+ (command's run impact already lives in Loc+), and higher velocity trades against it. ROC pitchers scored against their own targets — no MLB translation.", group: 'run_value' },
-    { key: 'pitchingScore', label: 'Pitching+', format: Utils.formatInt, sortType: 'numeric', desc: 'Pitching+ — overall arsenal quality: 0.72 x Stuff+ + 0.28 x Loc+, blended per pitch (weight validated on next-season run prevention, re-swept 2026-08). It inherits their compression, so 1 SD is about 6 points. Standard-deviation ruler, NOT a percent: a point is not 1% better. Hitter + metrics are percents; the pitcher ones are not, because Stuff+/Loc+/Pitching+ sit on the shared public convention so a value here means what it means on other sites.', group: 'run_value' },
     { key: 'pitcherPlus', label: 'Pitcher+', format: Utils.formatInt, sortType: 'numeric', desc: 'Pitcher+ — the all-encompassing pitcher grade: stuff, command, whiffs, and results blended into one number. 100 = league avg, +10 = 1 SD better. Standard-deviation ruler, NOT a percent: a point is not 1% better. Hitter + metrics are percents; the pitcher ones are not, because Stuff+/Loc+/Pitching+ sit on the shared public convention so a value here means what it means on other sites. Measured 2021-2025 on next-season run prevention (same-season is circular, xRV/100 is a component): one point predicts about 1.2 points, so this scale understates it by roughly a fifth.', group: 'run_value' },
     { key: 'pitcherPlusProj', label: 'Pitcher+ Proj', format: Utils.formatInt, sortType: 'numeric', desc: 'Projected NEXT-SEASON Pitcher+: 70% this season + 30% last season, re-standardized to 100 = league avg. Pitchers without a prior season keep their current Pitcher+ (the standard Marcel/Steamer pattern). Blending two years lifts out-of-fold prediction of next-season xRV/100 from .61 to .63; a third year adds nothing. Not age-adjusted.', group: 'run_value' },
     { key: 'kPct',        label: 'K%',       format: Utils.formatPct, sortType: 'numeric', sectionStart: true, desc: 'Strikeout rate (K / TBF)', group: 'stats' },
@@ -286,7 +284,7 @@ const Leaderboard = {
 
   _TAB_HIDDEN_DEFAULTS: {
     pitchMetrics:          ['maxVelo', 'vaa', 'haa', 'cswPct', 'barrelPctAgainst', 'xwOBA', 'xBA', 'xSLG', 'rv100', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100', 'xrvoe100'],
-    pitcherStats:          ['w', 'l', 'sv', 'hld', 'tbf', 'siera', 'fip', 'xFIP', 'pitchingScore', 'hdERAPlus', 'hpERAPlus', 'rv100', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100'],
+    pitcherStats:          ['w', 'l', 'sv', 'hld', 'tbf', 'siera', 'fip', 'xFIP', 'hdERAPlus', 'hpERAPlus', 'rv100', 'runValue', 'xRunValue', 'rvoe', 'xrvoe', 'rvoe100'],
     pitcherSwingDecisions: ['twoStrikeWhiffPct', 'fpsPct', 'oneOneWinPct', 'earlyActionPct'],
     // hrFbPct unhidden 2026-08-27 (per Wally): it completes the visible
     // Barrel% -> HR/FB fortune pair, mirroring the card's Contact Mgmt read.
@@ -529,11 +527,10 @@ const Leaderboard = {
     avg.hitter = 'League Avg';
     avg._isLeagueAvg = true;
     avg._rank = '';
-    // wRC+, xWRC+, Stuff+, and Pitching+ are by definition 100 for league average
+    // wRC+, xWRC+, and Stuff+ are by definition 100 for league average
     avg.wRCplus = 100;
     avg.xWRCplus = 100;
     avg.stuffScore = 100;
-    avg.pitchingScore = 100;
     avg.pitcherPlus = 100;
     avg.pitcherPlusProj = 100;
     avg.hdERAPlus = 100;
@@ -914,14 +911,8 @@ const Leaderboard = {
         td.setAttribute('data-low-support', '1');
       }
 
-      // Pitching+ run-value companion: surfaced in the hover tooltip (app.js
-      // reads the data attribute) so the composite index also reads in runs.
-      if (col.key === 'pitchingScore' && !isAvgRow &&
-          row.pitchingRuns100 !== null && row.pitchingRuns100 !== undefined) {
-        td.setAttribute('data-runs100', row.pitchingRuns100);
-      }
-      // Same for Pitcher+ — app.js words this one 'expected' rather than
-      // 'vs avg' (its slope is predictive, not same-season).
+      // Pitcher+ run-value companion in the hover tooltip — app.js words it
+      // 'expected' (its slope is predictive, not same-season).
       if (col.key === 'pitcherPlus' && !isAvgRow &&
           row.pitcherRuns100 !== null && row.pitcherRuns100 !== undefined) {
         td.setAttribute('data-runs100', row.pitcherRuns100);

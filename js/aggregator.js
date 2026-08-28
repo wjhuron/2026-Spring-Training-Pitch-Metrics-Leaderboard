@@ -683,12 +683,11 @@ const Aggregator = {
     // a couple per league-season — negligible). Mirrors pipeline_compute.
     const hrFbPct = fb_cnt > 0 ? Math.max(nHrBip - ldHr, 0) / fb_cnt : null;
 
-    // Grade atoms (fields 31-36): filtered overall Stuff+/Loc+/Pitching+ as
+    // Grade atoms (fields 31-34): filtered overall Stuff+/Loc+ as
     // plain averages of the per-pitch integers (same digits as the Sheets
     // grade columns / window cards). Zero counts on pre-atom embeds -> null.
     const sumStuff = c[31] || 0, nStuff = c[32] || 0;
     const sumLoc = c[33] || 0, nLoc = c[34] || 0;
-    const sumPitching = c[35] || 0, nPitching = c[36] || 0;
 
     const pitcherName = g.pitcherIdx != null ? lookups.pitchers[g.pitcherIdx] : null;
     const teamName = lookups.teams[g.teamIdx];
@@ -730,7 +729,6 @@ const Aggregator = {
       stuffScore: nStuff > 0 ? Number((sumStuff / nStuff).toFixed(1)) : null,
       locPlus: nLoc > 0 ? Number((sumLoc / nLoc).toFixed(1)) : null,
       locPlusN: nLoc > 0 ? nLoc : null,
-      pitchingScore: nPitching > 0 ? Number((sumPitching / nPitching).toFixed(1)) : null,
     };
   },
 
@@ -749,7 +747,7 @@ const Aggregator = {
     let STAT_KEYS = ['strikePct', 'izPct', 'cswPct', 'izWhiffPct', 'swStrPct', 'chasePct', 'gbPct', 'puPct', 'kPct', 'bbPct', 'kbbPct', 'babip', 'fpsPct', 'oneOneWinPct', 'earlyActionPct', 'hrFbPct',
                      'avgAgainst', 'obpAgainst',
                      'avgEVAgainst', 'maxEVAgainst', 'hardHitPct', 'barrelPctAgainst', 'xwOBAsp',
-                     'stuffScore', 'locPlus', 'pitchingScore'];
+                     'stuffScore', 'locPlus'];
     let INVERT = { bbPct: true, babip: true, hrFbPct: true, avgAgainst: true, obpAgainst: true, avgEVAgainst: true, maxEVAgainst: true, hardHitPct: true, barrelPctAgainst: true, xwOBAsp: true };
     if (teamMode) {
       // Boxscore-merged stats have no pre-aggregated _pctl at team level —
@@ -803,12 +801,12 @@ const Aggregator = {
                      // and merging the season value here clobbered that recompute,
                      // making the stat silently ignore date/hand filters.
                      'twoStrikeWhiffPct', 'twoStrikeWhiffPct_pctl',
-                     // Stuff+/Loc+/Pitching+ VALUES come from micro grade
+                     // Stuff+/Loc+ VALUES come from micro grade
                      // atoms (exact filtered plain averages, computed in
                      // _buildPitcherRow) — only season-level metadata is
                      // merged here; a conditional fallback below covers
                      // pre-atom embeds where the atoms are absent.
-                     'locPlusRaw', 'stuffScore_lowSupport', 'pitchingRuns100',
+                     'locPlusRaw', 'stuffScore_lowSupport',
                      'xrvoe100', 'xrvoe100_pctl', 'rvoe100', 'rvoe100_pctl',
                      'rvoe', 'rvoe_pctl', 'xrvoe', 'xrvoe_pctl',
                      // Pitcher+ is season-level like SIERA/FIP/xRV100: its
@@ -868,7 +866,6 @@ const Aggregator = {
           rows[mi].locPlus = pre.locPlus;
           if (pre.locPlusN !== undefined) rows[mi].locPlusN = pre.locPlusN;
         }
-        if (rows[mi].pitchingScore == null && pre.pitchingScore !== undefined) rows[mi].pitchingScore = pre.pitchingScore;
         // K%/BB%/K-BB% over official TBF, but ONLY when this aggregation
         // covered the whole season. The micro denominator cannot see a
         // no-pitch intentional walk (no pitch thrown since 2017 = no pitch
@@ -1249,8 +1246,6 @@ const Aggregator = {
       tg.metricSums.nStuff += ms.nStuff || 0;
       tg.metricSums.sumLoc += ms.sumLoc || 0;
       tg.metricSums.nLoc += ms.nLoc || 0;
-      tg.metricSums.sumPitching += ms.sumPitching || 0;
-      tg.metricSums.nPitching += ms.nPitching || 0;
 
       // Per-pitcher model values, weighted into the team accumulator.
       // Magnitude for hand-mirrored values (nHAA, xHB); HBOE aligned to the
@@ -1374,7 +1369,6 @@ const Aggregator = {
     wadd(a, 'twoStrikeWhiffPct', p.twoStrikeWhiffPct, p.nSwings);
     wadd(a, 'stuffScore', p.stuffScore, p.count);
     wadd(a, 'locPlus', p.locPlus, p.locPlusN);
-    wadd(a, 'pitchingScore', p.pitchingScore, p.count);
     for (let xi = 0; xi < X_KEYS.length; xi++) {
       const xk = X_KEYS[xi];
       const v = (handSfx && p[xk + handSfx] !== undefined) ? p[xk + handSfx] : p[xk];
@@ -1395,7 +1389,7 @@ const Aggregator = {
     r.maxVelo = a.maxVelo;
     // Grade metrics: keep the micro-atom plain averages (exact under any
     // filter) — only fall back to season pre-agg when no atoms existed.
-    const GRADE_KEYS = { stuffScore: true, locPlus: true, pitchingScore: true };
+    const GRADE_KEYS = { stuffScore: true, locPlus: true };
     for (const sk in a.sums) {
       if (GRADE_KEYS[sk] && r[sk] != null) continue;
       if (a.wts[sk] > 0) r[sk] = a.sums[sk] / a.wts[sk];
@@ -1489,7 +1483,7 @@ const Aggregator = {
     // swStrRate rides along (server ranks it; the filtered rows carry the
     // value). strikePct/twoStrikeWhiffPct stay out in player mode: the micro
     // counters cannot rebuild them, so their season pctls merge via ppre.
-    let PITCH_PCTL_KEYS = METRIC_PCTL_KEYS.concat(['nVAA', 'nHAA', 'ivbOE', 'hbOE', 'stuffScore', 'pitchingScore', 'locPlus', 'swStrRate']).concat(PITCH_STAT_KEYS).concat(PITCH_BB_KEYS).concat(PITCH_EXPECTED_KEYS);
+    let PITCH_PCTL_KEYS = METRIC_PCTL_KEYS.concat(['nVAA', 'nHAA', 'ivbOE', 'hbOE', 'stuffScore', 'locPlus', 'swStrRate']).concat(PITCH_STAT_KEYS).concat(PITCH_BB_KEYS).concat(PITCH_EXPECTED_KEYS);
     if (teamMode) {
       // Stats merged from pre-agg data carry no team-level _pctl — rank them here
       PITCH_PCTL_KEYS = PITCH_PCTL_KEYS.concat(['runValue', 'rv100', 'xRunValue', 'xRv100', 'strikePct', 'twoStrikeWhiffPct']);
@@ -1531,13 +1525,11 @@ const Aggregator = {
         groups[gk].metricSums.sumTiltCos = 0;
         groups[gk].metricSums.nTilt = 0;
         // Grade-atom sums: the same integers as the Sheets grade columns,
-        // so filtered Stuff+/Loc+/Pitching+ = plain average = AVERAGEIF.
+        // so filtered Stuff+/Loc+ = plain average = AVERAGEIF.
         groups[gk].metricSums.sumStuff = 0;
         groups[gk].metricSums.nStuff = 0;
         groups[gk].metricSums.sumLoc = 0;
         groups[gk].metricSums.nLoc = 0;
-        groups[gk].metricSums.sumPitching = 0;
-        groups[gk].metricSums.nPitching = 0;
       }
 
       const g = groups[gk];
@@ -1557,8 +1549,6 @@ const Aggregator = {
         g.metricSums.nStuff += row[ci.nStuff] || 0;
         g.metricSums.sumLoc += row[ci.sumLoc] || 0;
         g.metricSums.nLoc += row[ci.nLoc] || 0;
-        g.metricSums.sumPitching += row[ci.sumPitching] || 0;
-        g.metricSums.nPitching += row[ci.nPitching] || 0;
       }
     }
 
@@ -1680,12 +1670,11 @@ const Aggregator = {
         obj.hbOE = null;
       }
 
-      // Grade atoms: filtered Stuff+/Loc+/Pitching+ as plain averages of the
+      // Grade atoms: filtered Stuff+/Loc+ as plain averages of the
       // per-pitch integers (identical to the Sheets columns / window cards).
       obj.stuffScore = ms.nStuff > 0 ? Number((ms.sumStuff / ms.nStuff).toFixed(1)) : null;
       obj.locPlus = ms.nLoc > 0 ? Number((ms.sumLoc / ms.nLoc).toFixed(1)) : null;
       obj.locPlusN = ms.nLoc > 0 ? ms.nLoc : null;
-      obj.pitchingScore = ms.nPitching > 0 ? Number((ms.sumPitching / ms.nPitching).toFixed(1)) : null;
 
       // Break Tilt (circular mean)
       if (ms.nTilt > 0) {
@@ -1800,7 +1789,7 @@ const Aggregator = {
         // under filters). Filtered views fall back to the season value.
         if (ppre.releaseTilt !== undefined) rows[pmi].releaseTilt = ppre.releaseTilt;
         if (ppre.releaseTiltMinutes !== undefined) rows[pmi].releaseTiltMinutes = ppre.releaseTiltMinutes;
-        // Stuff+/Loc+/Pitching+: computed from micro grade atoms when present
+        // Stuff+/Loc+: computed from micro grade atoms when present
         // (filtered plain averages, matching sheets/cards); merge the season
         // value only as a fallback for rows without atoms (pre-atom embeds).
         if (rows[pmi].stuffScore == null && ppre.stuffScore !== undefined) rows[pmi].stuffScore = ppre.stuffScore;
@@ -1809,8 +1798,6 @@ const Aggregator = {
           rows[pmi].locPlus = ppre.locPlus;
           if (ppre.locPlusN !== undefined) rows[pmi].locPlusN = ppre.locPlusN;
         }
-        if (rows[pmi].pitchingScore == null && ppre.pitchingScore !== undefined) rows[pmi].pitchingScore = ppre.pitchingScore;
-        if (ppre.pitchingRuns100 !== undefined) rows[pmi].pitchingRuns100 = ppre.pitchingRuns100;
         // RVOE/xRVOE family (pre-computed residuals vs the stuff+loc
         // expectation — needs the OOF fold models + Loc surfaces,
         // unavailable client-side)
@@ -3324,11 +3311,11 @@ const Aggregator = {
   },
 
   /**
-   * Per-game Stuff+/Loc+/Pitching+ for one pitcher — plain averages of the
+   * Per-game Stuff+/Loc+ for one pitcher — plain averages of the
    * per-pitch grade atoms in pitchMicro, summed across pitch types and
    * batter hands per date. The same integers as the Sheets grade columns,
    * so each row matches that outing's window card / sheet AVERAGEIF.
-   * Returns [{date, n, stuffScore, locPlus, pitchingScore}], newest first;
+   * Returns [{date, n, stuffScore, locPlus}], newest first;
    * [] when the embed predates grade atoms.
    */
   getPitcherGameGrades: function (pitcher, team) {
@@ -3347,12 +3334,11 @@ const Aggregator = {
       if (row[ci.pitcherIdx] !== pIdx || row[ci.teamIdx] !== tIdx) continue;
       const di = row[ci.dateIdx];
       let a = byDate[di];
-      if (!a) a = byDate[di] = { n: 0, csw: 0, sS: 0, nS: 0, sL: 0, nL: 0, sP: 0, nP: 0 };
+      if (!a) a = byDate[di] = { n: 0, csw: 0, sS: 0, nS: 0, sL: 0, nL: 0 };
       a.n += row[ci.n];
       a.csw += row[ci.csw] || 0;
       a.sS += row[ci.sumStuff] || 0; a.nS += row[ci.nStuff] || 0;
       a.sL += row[ci.sumLoc] || 0;  a.nL += row[ci.nLoc] || 0;
-      a.sP += row[ci.sumPitching] || 0; a.nP += row[ci.nPitching] || 0;
     }
     const out = [];
     for (const di2 in byDate) {
@@ -3365,7 +3351,6 @@ const Aggregator = {
         cswPct: a2.n > 0 ? a2.csw / a2.n : null,
         stuffScore: a2.nS > 0 ? Number((a2.sS / a2.nS).toFixed(1)) : null,
         locPlus: a2.nL > 0 ? Number((a2.sL / a2.nL).toFixed(1)) : null,
-        pitchingScore: a2.nP > 0 ? Number((a2.sP / a2.nP).toFixed(1)) : null,
       });
     }
     out.sort(function (x, y) { return x.date < y.date ? 1 : -1; });
