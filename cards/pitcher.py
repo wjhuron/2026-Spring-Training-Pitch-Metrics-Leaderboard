@@ -2031,8 +2031,8 @@ def render_social_card(config, pitches, output_file):
     tks = list(range(-_lim, _lim + 1, 5))
     mv.set_xticks(tks); mv.set_yticks(tks)
     mv.tick_params(labelsize=7.5, colors=TEXT_PRIMARY, length=2.5)
-    mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, fontweight='bold', labelpad=1)
-    mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, fontweight='bold', labelpad=1)
+    mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, fontweight='bold', labelpad=4)
+    mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, fontweight='bold', labelpad=5)
     mv.axhline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     mv.axvline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
     groups = {}
