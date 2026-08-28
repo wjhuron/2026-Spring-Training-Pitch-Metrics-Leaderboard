@@ -57,8 +57,9 @@ def main():
     out_path = os.path.join(DATA, f'micro_data_{LABEL}.json')
     with open(out_path, 'w') as f:
         json.dump(PD.round_floats_inplace(micro), f, separators=(',', ':'))
-    n_stuff = sum(r[-5] for r in micro['pitchMicro'])
-    n_loc = sum(r[-3] for r in micro['pitchMicro'])
+    # Row tail after the Pitching+ retirement: sumStuff, nStuff, sumLoc, nLoc.
+    n_stuff = sum(r[-3] for r in micro['pitchMicro'])
+    n_loc = sum(r[-1] for r in micro['pitchMicro'])
     print(f'  wrote {out_path}: {len(micro["pitchMicro"])} pitch micro rows '
           f'({n_stuff} stuff atoms, {n_loc} loc atoms)')
 
