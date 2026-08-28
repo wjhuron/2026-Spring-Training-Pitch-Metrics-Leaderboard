@@ -535,6 +535,116 @@ def _compute_pitch_rv(pitches_list):
                 vals.append(rv)
     return vals
 
+# ── Pitching+ — the OUTING grade (2026-08-28, per Wally) ─────────────────
+# Replaces the retired 0.72/0.28 Stuff+/Loc+ season blend as the meaning of
+# "Pitching+": one 100±10 number for how well the pitcher pitched THIS
+# outing. Composite of the outing's Stuff+ atoms, Loc+ atoms, CSW% and
+# xRV/100, each z-scored against this season's league pool of single MLB
+# outings and shrunk by its measured outing-grain stabilization constant.
+#
+# Weights are FROZEN from the 2021-2025 odd/even-PA split-half search
+# (scripts/research/stuff/pitcherplus_outing_grade.py + _pick.py: fit
+# components on one half of an outing to the xRV/100 of the other half,
+# OOF by season; the chosen set sits in a flat top region and beat a
+# stuff-only grade in 5/5 seasons, and in the never-fitted 2026 sheets
+# replicate, r .109 vs .087). k are the measured outing-grain stabilization
+# constants; stuff keeps the season 42 because no within-outing stuff split
+# exists to measure one. xRV rides the sheet supplement, so a card built
+# before the morning backfill drifts ~0.5 pts (p95 1.5) and self-corrects.
+PP_OUTING_W = {'stuff': 0.205, 'loc': 0.169, 'csw': 0.252, 'xrv100': 0.374}
+PP_OUTING_K = {'stuff': 42.0, 'loc': 185.0, 'csw': 398.0, 'xrv100': 1581.0}
+PP_OUTING_MIN_N = 20        # analysis floor of the search; below it no grade
+_PP_CSW_DESCRIPTIONS = ('Called Strike', 'Swinging Strike')
+
+
+def _ordinal(n):
+    n = int(n)
+    if 10 <= n % 100 <= 20:
+        return f'{n}th'
+    return f"{n}{ {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th') }"
+
+
+def _outing_components(ps, stuff_of=None, loc_of=None):
+    """Outing components in card units (Stuff+/Loc+ atom means, CSW%,
+    xRV/100). stuff_of/loc_of resolve a pitch's atom — sheet cell first,
+    computed fallback — so a fresh game before the pipeline ran still
+    grades; default is the sheet cell alone (the pool path)."""
+    n = len(ps)
+    if not n:
+        return None
+    if stuff_of is None:
+        stuff_of = lambda q: sf(q.get('Stuff+'))
+    if loc_of is None:
+        loc_of = lambda q: sf(q.get('Loc+'))
+    s_at = [v for v in (stuff_of(p) for p in ps) if v is not None]
+    l_at = [v for v in (loc_of(p) for p in ps) if v is not None]
+    xv = _compute_pitch_xrv(ps)
+    return {'n': n,
+            'stuff': sum(s_at) / len(s_at) if s_at else None,
+            'loc': sum(l_at) / len(l_at) if l_at else None,
+            'csw': sum(1 for p in ps
+                       if p.get('Description') in _PP_CSW_DESCRIPTIONS) / n,
+            'xrv100': (sum(xv) / n * 100) if xv else None}
+
+
+def _outing_raw(c, params):
+    """Weighted shrunk-z composite. A missing component contributes 0 —
+    under shrinkage logic no evidence = league average (same convention as
+    pipeline/pitcherplus.py)."""
+    tot = 0.0
+    for f, w in PP_OUTING_W.items():
+        v = c.get(f)
+        if v is None:
+            continue
+        mu, sd = params[f]
+        tot += w * ((v - mu) / sd) * (c['n'] / (c['n'] + PP_OUTING_K[f]))
+    return tot
+
+
+def _build_outing_pool(mlb_pitches):
+    """Season pool of single MLB outings from the pitch pickle: per-component
+    (mu, sd), the composite (mu, sd), and the sorted composite values for the
+    percentile. None when the pool is too thin to standardize (early season);
+    the grade then does not render, it never falls back to a stale scale."""
+    outings = defaultdict(list)
+    for p in mlb_pitches:
+        outings[(p.get('Pitcher'), p.get('Game Date'))].append(p)
+    comps = [c for ps in outings.values() if len(ps) >= PP_OUTING_MIN_N
+             for c in (_outing_components(ps),) if c is not None]
+    params = {}
+    for f in PP_OUTING_K:
+        vals = [c[f] for c in comps if c[f] is not None]
+        if len(vals) < 100:
+            return None
+        mu = sum(vals) / len(vals)
+        var = sum((v - mu) ** 2 for v in vals) / (len(vals) - 1)
+        if var <= 0:
+            return None
+        params[f] = (mu, var ** 0.5)
+    raws = sorted(_outing_raw(c, params) for c in comps)
+    rmu = sum(raws) / len(raws)
+    rsd = (sum((x - rmu) ** 2 for x in raws) / (len(raws) - 1)) ** 0.5
+    if not rsd:
+        return None
+    return {'params': params, 'mu': rmu, 'sd': rsd, 'pool': raws}
+
+
+def _outing_pitching_plus(ps, pool, stuff_of=None, loc_of=None):
+    """(value, percentile) of one outing's Pitching+, or (None, None) when
+    the outing is under the floor or the pool is unavailable."""
+    import bisect
+    if not pool or len(ps) < PP_OUTING_MIN_N:
+        return None, None
+    c = _outing_components(ps, stuff_of, loc_of)
+    if c is None:
+        return None, None
+    raw = _outing_raw(c, pool['params'])
+    val = round(100.0 + 10.0 * (raw - pool['mu']) / pool['sd'])
+    pct = int(round(bisect.bisect_left(pool['pool'], raw)
+                    / len(pool['pool']) * 100))
+    return val, min(pct, 99)
+
+
 def pct_cell_color(value_str, league_avg, row_bg_hex, higher_is_better=True):
     """Return cell background color based on how a percentage compares to league average.
     value_str: cell text like '65.3%'
@@ -1724,10 +1834,11 @@ def render_social_card(config, pitches, output_file):
     card stays on the website; this is the feed variant, one question per
     card — daily: "how did the start go"; season: "how good is he".
 
-    Pitching+ is deliberately absent from the daily grades strip: it is the
-    fixed PITCHING_W_STUFF blend of the two tiles shown, so it adds nothing
-    the pair does not already say (the same reasoning that removed its
-    bubble from the full card). Hero order per Wally: FB Velo | Whiffs |
+    Pitching+ on the daily strip is the OUTING grade (2026-08-28, per
+    Wally): the frozen stuff/loc/csw/xRV composite scored against the
+    season's single-outing pool — NOT the retired 0.72/0.28 blend of the
+    two tiles beside it. Value plus percentile-of-outings, tinted by the
+    percentile. Hero order per Wally: FB Velo | Whiffs |
     CSW%. Movement axes tick every 5 inches. Usage renders as one stacked
     horizontal bar between the plot and the grades. No insight notes.
     """
@@ -1843,6 +1954,13 @@ def render_social_card(config, pitches, output_file):
             {'v': '—' if sg is None else f"{sg:.0f}", 'k': 'STUFF+', 'fc': gtint(sg)},
             {'v': '—' if lg_ is None else f"{lg_:.0f}", 'k': 'LOC+', 'fc': gtint(lg_)},
         ]
+        _opp = config.get('outing_pitching') or (None, None)
+        line.append({
+            'v': '—' if _opp[0] is None else f"{_opp[0]:.0f}",
+            'k': 'PITCHING+',
+            'sub': None if _opp[1] is None else f"{_ordinal(_opp[1]).upper()} PCTL",
+            'fc': (_percentile_color(_opp[1])[0] if _opp[1] is not None
+                   else DARK_CELL)})
         tile_row(0.835, 0.052, line, vsize=19)
         _tbl = bool(config.get('social_table'))
         _spl = bool(config.get('social_split'))
@@ -2256,6 +2374,15 @@ def render_card(config, pitches, output_file):
         ax_main.text(x+col_w/2, stat_y_header+cell_h/2, hdr, fontsize=hdr_fs, ha='center', va='center', color=TEXT_SECONDARY, fontweight='bold', fontfamily='IBM Plex Sans Condensed')
         # Determine cell color — blue→red percentile hue (matches the bubbles).
         cell_bg = DARK_CELL
+        _vfs = val_fs
+        if hdr == 'PITCHING+':
+            # Outing grade cell: tint straight from its real percentile of
+            # the season outing pool; "104 · 62nd" needs one size down to
+            # stay inside the shared column width.
+            _opp = config.get('outing_pitching') or (None, None)
+            if _opp[1] is not None:
+                cell_bg, _ = _percentile_color(_opp[1])
+            _vfs = val_fs - 2
         sl_cfg = STAT_LINE_COLOR.get(hdr)
         if sl_cfg and pitcher_la:
             la_val = pitcher_la.get(sl_cfg[0])
@@ -2267,7 +2394,7 @@ def render_card(config, pitches, output_file):
                 if tinted:
                     cell_bg = tinted
         ax_main.add_patch(Rectangle((x, stat_y_value), col_w, cell_h, facecolor=cell_bg, edgecolor=SUBTLE_BORDER, linewidth=0.8))
-        ax_main.text(x+col_w/2, stat_y_value+cell_h/2, val_str, fontsize=val_fs, ha='center', va='center', color=TEXT_PRIMARY, fontweight='bold', fontfamily='IBM Plex Sans')
+        ax_main.text(x+col_w/2, stat_y_value+cell_h/2, val_str, fontsize=_vfs, ha='center', va='center', color=TEXT_PRIMARY, fontweight='bold', fontfamily='IBM Plex Sans')
     ax_main.add_patch(Rectangle((photo_left, stat_y_value), len(config['stat_headers'])*col_w, stat_y_header+cell_h-stat_y_value, fill=False, edgecolor=ACCENT, linewidth=2, zorder=5))
 
     # ── FB velo-by-outing sparkline — season cards only, thin strip directly
@@ -3985,6 +4112,13 @@ def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
     ctx['bip_count_means'] = build_bip_count_means(mlb, GUTS_LG_WOBA, GUTS_WOBA_SCALE,
                                                    ctx['count_offsets'])
 
+    # Pitching+ outing pool — this season's league distribution of single
+    # outings, from the same pickle. None early season (pool < 100 outings
+    # on any component); the grade then does not render.
+    ctx['outing_pool'] = _build_outing_pool(mlb)
+    print(f"  [ctx] Pitching+ outing pool: "
+          f"{len(ctx['outing_pool']['pool']) if ctx['outing_pool'] else 0} outings")
+
     # Loc+ — the pipeline's own entry point. Scratch pitchers are keyed under
     # team 'AAA' so they score against the MLB surfaces but stay OUT of the
     # normalization (mu, sigma) pool, exactly like ROC pitchers.
@@ -4837,6 +4971,7 @@ def main():
         ip_str = outs_to_ip_str(box['outs'])
         ip_float = box['outs'] / 3.0
         pitch_count = len(pitches_by_pitcher[pitcher_name])
+        outing_pp = (None, None)   # Pitching+ outing grade — single-game only
 
         if is_multi_game:
             # Season/range stat line: G, IP, ERA, SIERA, K%, BB%, Zone%, Whiff%, GB%
@@ -4892,6 +5027,34 @@ def main():
             stat_headers = ['IP', 'P', 'TBF', 'R', 'ER', 'K', 'BB', 'Whiffs']
             stat_values = [ip_str, str(pitch_count), str(box['tbf']), str(box['r']),
                            str(box['er']), str(box['so']), str(box['bb']), str(whiff_count)]
+
+            # Pitching+ — the outing grade, single-game cards only. Scored
+            # from the normalized window pitches so the atom fallbacks (a
+            # fresh game whose sheet grade cells are still blank) type-match
+            # the pipeline scorers.
+            if scratch_ctx is not None and scratch_ctx.get('outing_pool'):
+                _np_ = scratch_ctx['norm_by_pitcher'].get(pitcher_name) or []
+                _atoms = scratch_ctx.get('stuff_atoms_by_pid') or {}
+                _lfn = scratch_ctx.get('loc_atom_fn')
+
+                def _stuff_of(q):
+                    v = sf(q.get('Stuff+'))
+                    return v if v is not None else _atoms.get(str(q.get('PitchID')))
+
+                def _loc_of(q):
+                    v = sf(q.get('Loc+'))
+                    if v is not None:
+                        return v
+                    return _lfn(q) if _lfn else None
+
+                outing_pp = _outing_pitching_plus(
+                    _np_, scratch_ctx['outing_pool'], _stuff_of, _loc_of)
+                if outing_pp[0] is not None:
+                    print(f"  Pitching+ (outing): {outing_pp[0]:.0f} "
+                          f"({_ordinal(outing_pp[1])} pctl)")
+                    stat_headers = stat_headers + ['PITCHING+']
+                    stat_values = stat_values + [
+                        f"{outing_pp[0]:.0f} · {_ordinal(outing_pp[1])}"]
 
         print(f"  Stat line: {' | '.join(f'{h}:{v}' for h,v in zip(stat_headers, stat_values))}")
 
@@ -4990,6 +5153,9 @@ def main():
             # 1.3x window like a single game (2026-08-22, per Wally).
             'is_date_range': bool(is_multi_game and date_filter is not None),
             'pctl_row': pctl_row,
+            # Pitching+ outing grade (value, percentile) — single-game daily
+            # cards only; (None, None) elsewhere.
+            'outing_pitching': outing_pp,
             'pitch_locplus': (scratch_locplus if scratch_ctx is not None
                               else locplus_by_pitcher.get((pitcher_name, eff_team), {})),
             'pitch_lb': (scratch_pitch_lb if scratch_ctx is not None
