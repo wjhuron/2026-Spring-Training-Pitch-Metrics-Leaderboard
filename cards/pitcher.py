@@ -2035,7 +2035,8 @@ def render_social_card(config, pitches, output_file):
     # VERTICAL BREAK') renders fully instead of pressing the border.
     mv = fig.add_axes([L + 0.018, mv_bot, R - L - 0.018, mv_top - mv_bot])
     mv.set_facecolor(PLOT_PANEL)
-    _lim = 20 if (not is_season and _spl) else 25
+    _lim = 25   # one frame for daily + season (daily was 20 until
+                # 2026-08-28, per Wally: big-run arsenals clipped at the edge)
     mv.set_xlim(-_lim, _lim); mv.set_ylim(-_lim, _lim)
     for s_ in mv.spines.values():
         s_.set_color(SUBTLE_BORDER)
