@@ -1,5 +1,14 @@
-"""resync_recent_platez.py — keep recent games' PlateZ current as Statcast
-reprocesses them.
+"""resync_recent_platez.py — RETIRED 2026-08-29. Do not run.
+
+Superseded by the Savant PlateX/PlateZ overwrite pass in backfill_supplement.
+The feed serves a different pZ calibration than Savant (+0.081..+0.085 ft,
+measured 2026-08-29), and Savant is now the authority for these columns. This
+script syncs toward the FEED, so a run would drag freshly backfilled Savant
+values back to the biased feed calibration: the systematic offset falls inside
+its THRESH..CAP (0.02..0.20) window on nearly every pitch.
+
+Original purpose, kept for the record: keep recent games' PlateZ current as
+Statcast reprocesses them.
 
 Statcast revises plate_z after games (the early-2026 vertical recalibration is
 the big example: March games ran ~1" high, corrected weeks later — see
@@ -151,11 +160,10 @@ def resync(gc, days=35, apply=False, log=print):
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--days', type=int, default=35)
-    ap.add_argument('--apply', action='store_true')
-    args = ap.parse_args()
-    resync(gspread_client(), days=args.days, apply=args.apply)
+    raise SystemExit(
+        "RETIRED: this script syncs PlateZ toward the FEED, which carries a "
+        "+0.08 ft bias vs Savant. Savant is the PlateX/PlateZ authority now — "
+        "run scrapers/backfill_supplement.py instead. See the docstring.")
 
 
 if __name__ == '__main__':

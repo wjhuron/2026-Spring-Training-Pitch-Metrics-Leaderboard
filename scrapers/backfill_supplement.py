@@ -40,13 +40,6 @@ filter_teams = None
 # Produce an Excel report of all changes? "yes" or "no"
 produce_report = "no"
 
-# Also re-sync recent games' PlateZ to the current feed? "yes" or "no".
-# Statcast reprocesses plate_z weeks after games (esp. the early-season vertical
-# recalibration); this catches up the last RESYNC_PLATEZ_DAYS of games. Off by
-# default — flip to "yes" (or pass --resync-platez yes) when you want it.
-resync_platez = "no"
-resync_platez_days = 200
-
 # Also run the MLB Stats API feed pass over ROC/AAA? "yes" or "no". This fills
 # Outs and Runners from the feed. It is separate from (and complementary to)
 # the Savant minor-league supplement pass, which the main loop now runs for
@@ -74,6 +67,18 @@ SUPPLEMENT_MAP = {
     'Outs': 'outs_when_up',
     'Event': 'events',
     'Barrel': 'launch_speed_angle',
+    # Plate coordinates. The MLB gameday feed serves a different calibration of
+    # pZ than Savant: measured 2026-08-29, feed pZ sits +0.081..+0.085 ft
+    # (~1 in) ABOVE Savant's plate_z, sd 0.025, every pitcher, stable June and
+    # August. SzTop/SzBot agree between the sources and plate_x differs by
+    # +0.005 ft (noise). Savant's reprocessed value is the authority: InZone is
+    # defined as Savant's zone call (compute_in_zone, validated 0 mismatches on
+    # 11,574 pitches AGAINST SAVANT COORDINATES), so feed pz flips borderline
+    # low pitches into the zone. Savant serves these at 2 decimals; they are
+    # written at the sheet's 4-decimal depth (0.5500) so the format pin reads
+    # back the identical string and reruns skip the cell.
+    'PlateX': 'plate_x',
+    'PlateZ': 'plate_z',
 }
 
 # Swing-tracking cluster: if BatSpeed is missing or sub-50, the entire
@@ -91,7 +96,9 @@ STRING_COLS = {'Event'}
 # (even if the cell already has a value from the initial download). Barrel is
 # included because Pitcher2026 seeds it with the code_barrel estimate (6 or
 # blank), which the official launch_speed_angle (1-6) should replace.
-ALWAYS_OVERWRITE_COLS = {'ArmAngle', 'Barrel'}
+# PlateX/PlateZ are included because the scrape writes the feed's biased pZ
+# calibration (see SUPPLEMENT_MAP); Savant's reprocessed value replaces it.
+ALWAYS_OVERWRITE_COLS = {'ArmAngle', 'Barrel', 'PlateX', 'PlateZ'}
 
 # Columns that only ever OVERWRITE existing values; they are never used to
 # fill a blank cell. Intended for scoring-change corrections (e.g., official
@@ -261,6 +268,9 @@ MILB_PLAYER_TYPES = ('pitcher', 'batter')
 #     play. Savant additionally carries EV/LA on FOULS, which the feed does
 #     not; filling from here would silently redefine ExitVelo from "in play"
 #     to "in play + fouls" and shift every EV-based metric.
+#   - PlateX/PlateZ: the feed-vs-Savant pZ offset was measured on MLB games
+#     only (2026-08-29). Whether the minors feed carries the same bias is
+#     unmeasured, so ROC/AAA keep feed coordinates until it is.
 MILB_SUPPLEMENT_COLS = {'ArmAngle', 'RunExp', 'xBA', 'xSLG', 'xwOBA', 'Barrel'}
 
 # Days per minors request. Was 3 when every request dragged back all four
@@ -520,6 +530,15 @@ def download_statcast(team_tab, date_min, date_max, session):
                 'sort_order': 'desc',
             },
             session, team_tab)
+        # Same silent 25k cap as the minors endpoint. A team season is ~20k
+        # pitches by late August, so a full-season request now runs close
+        # enough to the cap that a truncated response would otherwise pass as
+        # complete and quietly skip the tail of the season. Fail closed.
+        if df is not None and len(df) >= MILB_ROW_CAP:
+            print(f"    WARNING: {team_tab} returned {len(df)} rows "
+                  f"(cap {MILB_ROW_CAP}) — results were truncated. Re-run "
+                  f"with --start/--end windows; this tab is being skipped.")
+            return None
 
     if df is None:
         return None
@@ -960,8 +979,15 @@ def main():
                 # USER_ENTERED so numeric supplement columns land as real
                 # numbers and sort correctly in the sheet; the format pin below
                 # keeps the read-back strings byte-identical to what RAW wrote.
-                update_cells_with_retry(ws, cells_to_update,
-                                        value_input_option='USER_ENTERED')
+                # Chunked by row order: update_cells sends one bounding rect,
+                # and the first PlateX/PlateZ pass touches nearly every row of
+                # a tab, which would put the whole season in a single request.
+                cells_to_update.sort(key=lambda c: (c.row, c.col))
+                for i0 in range(0, len(cells_to_update), 20000):
+                    update_cells_with_retry(ws, cells_to_update[i0:i0 + 20000],
+                                            value_input_option='USER_ENTERED')
+                    if i0 + 20000 < len(cells_to_update):
+                        time.sleep(1.0)
                 try:
                     pin_supplement_formats(ws, header, supp_col_idx.keys())
                 except Exception as _e:
@@ -992,15 +1018,6 @@ def main():
         if report_path:
             print(f"Report saved to: {report_path}")
 
-    if resync_platez == 'yes':
-        print(f"\n{'='*60}\n[PlateZ re-sync] catching up recent games to the current feed\n{'='*60}")
-        import importlib.util
-        _rp = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                           'scripts', 'audits', 'resync_recent_platez.py')
-        _spec = importlib.util.spec_from_file_location('resync_recent_platez', _rp)
-        _mod = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_mod)
-        _mod.resync(gc, days=resync_platez_days, apply=True)  # reuses the write-capable client
-
     if backfill_milb == 'yes':
         print(f"\n{'='*60}\n[MiLB backfill] Outs + Runners for ROC/AAA (feed)\n{'='*60}")
         import importlib.util
@@ -1018,8 +1035,6 @@ if __name__ == '__main__':
     parser.add_argument('--end', default=None, help='End date YYYY-MM-DD, or "none" for all dates')
     parser.add_argument('--teams', default=None, help='Comma-separated team abbreviations (e.g., BOS,NYY)')
     parser.add_argument('--report', default=None, help='"yes" to produce an Excel report of changes')
-    parser.add_argument('--resync-platez', default=None,
-                        help='"yes" to also re-sync recent games\' PlateZ to the current feed')
     parser.add_argument('--backfill-milb', default=None,
                         help='"yes"/"no" to backfill ROC/AAA Outs+Runners from the feed (default yes)')
     args = parser.parse_args()
@@ -1033,8 +1048,6 @@ if __name__ == '__main__':
         filter_teams = [t for t in args.teams.split(',') if t.strip()]   # main() normalizes
     if args.report is not None:
         produce_report = args.report.lower()
-    if args.resync_platez is not None:
-        resync_platez = args.resync_platez.lower()
     if args.backfill_milb is not None:
         backfill_milb = args.backfill_milb.lower()
 
