@@ -1916,8 +1916,10 @@ def render_social_card(config, pitches, output_file):
         elif _bx.get('losses'):  _dec, _dc = 'L',  '#567698'
         elif _bx.get('saves'):   _dec, _dc = 'SV', ACCENT
         elif _bx.get('holds'):   _dec, _dc = 'H',  TEXT_MUTED
-        else:                    _dec, _dc = 'ND', TEXT_MUTED
-        meta += '  |  '
+        else:                    _dec, _dc = '',   TEXT_MUTED   # no decision:
+                                                               # nothing renders
+        if _dec:
+            meta += '  |  '
     _mw = _measure_text_axis_w(fig, [meta], 11, 'bold') if not is_season else None
     if not is_season and _mw is None:
         # No renderer yet: one draw, decision inline uncolored.
