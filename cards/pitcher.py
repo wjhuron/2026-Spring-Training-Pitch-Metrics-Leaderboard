@@ -2058,8 +2058,17 @@ def render_social_card(config, pitches, output_file):
     mv.tick_params(labelsize=7.5, colors=TEXT_PRIMARY, length=2.5)
     mv.set_xlabel('HORIZONTAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, fontweight='bold', labelpad=4)
     mv.set_ylabel('INDUCED VERTICAL BREAK (in)', fontsize=8, color=TEXT_PRIMARY, fontweight='bold', labelpad=5)
-    mv.axhline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
-    mv.axvline(0, color=GRID_COLOR, lw=0.9, ls=(0, (4, 4)))
+    # Dashed gridlines every 5" on both axes (2026-08-28, per Wally;
+    # alpha 0.7 chosen from an A/B against 0.9 — reads when queried,
+    # recedes otherwise). The zero lines keep a heavier weight so the
+    # origin still anchors the frame.
+    for _t in tks:
+        if _t == 0 or abs(_t) == _lim:
+            continue
+        mv.axhline(_t, color=GRID_COLOR, lw=0.75, ls=(0, (3, 4)), alpha=0.7)
+        mv.axvline(_t, color=GRID_COLOR, lw=0.75, ls=(0, (3, 4)), alpha=0.7)
+    mv.axhline(0, color=GRID_COLOR, lw=1.2, ls=(0, (4, 4)))
+    mv.axvline(0, color=GRID_COLOR, lw=1.2, ls=(0, (4, 4)))
     groups = {}
     _velo_acc = {}
     for p in pitches:
@@ -2262,7 +2271,21 @@ def render_social_card(config, pitches, output_file):
             rh_ = min(0.034, 0.326 / max(_nlines - 1, 1))
             fs_ = min(12.0, rh_ * 430.0)
             yb, hdr = 0.366, True
+            # Solid rule under the plot's x-label, above the header row
+            # (2026-08-28, per Wally — Driveline-style section rules).
+            ax.plot([L, R], [0.3895, 0.3895], color=SUBTLE_BORDER, lw=1.1,
+                    transform=ax.transAxes, zorder=2, solid_capstyle='butt')
             for name_, pl_ in sections:
+                if not hdr:
+                    # Solid rule between the two handedness sections.
+                    # 0.42, not 0.50: the chips above are nearly row-
+                    # height while the title below is short text, so a
+                    # centered rule crowds the chips — biased toward the
+                    # text side to read equidistant.
+                    _ly = yb + rh_ * 0.42
+                    ax.plot([L, R], [_ly, _ly], color=SUBTLE_BORDER, lw=1.1,
+                            transform=ax.transAxes, zorder=2,
+                            solid_capstyle='butt')
                 _pw = 'PITCH' if len(pl_) == 1 else 'PITCHES'
                 yb = _table(yb, f'{name_}  ·  {len(pl_)} {_pw}',
                             pl_, rh_, fs_, SPLIT_COLS, header=hdr)
@@ -4516,7 +4539,7 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "ROC"
+    team            = "BOS"
     start_date      = None    # Set to None for full season
     end_date        = None             # Set to a date for date range, or None for single day
     filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
