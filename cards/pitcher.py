@@ -1899,10 +1899,11 @@ def render_social_card(config, pitches, output_file):
     opp = config.get('opponent')
     if not is_season and opp:
         kick += '  ·  VS %s' % opp
-    txt(L, 0.9774, kick, 11.5, ACCENT, 'bold', ha='left')
+    _hx_kick, _hx_name, _hx_meta = 0.03648, 0.03926, 0.03556
+    txt(_hx_kick, 0.970, kick, 11.5, ACCENT, 'bold', ha='left')
     _nm = config['display_name'].upper()
     _nsz = 27 if len(_nm) <= 16 else (23 if len(_nm) <= 20 else 20)
-    ax.text(L, 0.9580, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
+    ax.text(_hx_name, 0.961, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
             fontweight='black', fontfamily='Bitter', ha='left', va='top')
     hand_code = 'LHP' if config.get('hand') == 'L' else 'RHP'
     meta = f"{hand_code}  |  {config.get('team','')}"
@@ -1923,17 +1924,21 @@ def render_social_card(config, pitches, output_file):
     _mw = _measure_text_axis_w(fig, [meta], 11, 'bold') if not is_season else None
     if not is_season and _mw is None:
         # No renderer yet: one draw, decision inline uncolored.
-        txt(L, 0.907, meta + _dec, 11, TEXT_MUTED, 'bold', ha='left')
+        txt(_hx_meta, 0.913, meta + _dec, 11, TEXT_MUTED, 'bold', ha='left')
     else:
-        txt(L, 0.907, meta, 11, TEXT_MUTED, 'bold', ha='left')
+        txt(_hx_meta, 0.913, meta, 11, TEXT_MUTED, 'bold', ha='left')
         if not is_season:
-            txt(L + _mw, 0.907, _dec, 11, _dc, 'black', ha='left')
+            txt(_hx_meta + _mw, 0.913, _dec, 11, _dc, 'black', ha='left')
 
     def tile_row(y, h, cells, vsize=17, ksize=8.2, ssize=7.2):
         # Ink rule (2026-08-28, per Wally): white text on TINTED tiles,
         # dark text on the neutral beige ones.
+        # OPTICAL right margin: the rounded last tile overshoots the plot
+        # spine's extreme by ~3px so its flat face reads flush (rounded
+        # shapes look short of a straight edge they mathematically touch).
+        _R_opt = R + 0.0028
         n = len(cells); gap = 0.012
-        w = (R - L - gap * (n - 1)) / n
+        w = (_R_opt - L - gap * (n - 1)) / n
         for i, c in enumerate(cells):
             x = L + i * (w + gap)
             fc = c.get('fc', DARK_CELL)
@@ -1991,7 +1996,7 @@ def render_social_card(config, pitches, output_file):
         # The split per-hand table IS the daily social card (2026-08-28,
         # per Wally — the --table/--split prototype toggles are gone).
         _tbl = _spl = True
-        mv_top, mv_bot = 0.800, 0.436
+        mv_top, mv_bot = 0.800, 0.418
     else:
         sh, sv = config['stat_headers'], config['stat_values']
         prow = config.get('pctl_row') or {}
@@ -2070,6 +2075,7 @@ def render_social_card(config, pitches, output_file):
             col = PITCH_COLORS.get(pt_, '#777')
             mv.scatter([q[0] for q in pl], [q[1] for q in pl], s=9, color=col,
                        alpha=0.16, edgecolors='none', zorder=3)
+    _placed_labels = []      # (x0, x1, y) in data units, for collision flips
     for pt_, pl in sorted(groups.items(), key=lambda kv: -len(kv[1])):
         # Every thrown type gets a centroid + velo label (2026-08-28, per
         # Wally) — a 1-pitch type's centroid is the pitch itself.
@@ -2080,14 +2086,31 @@ def render_social_card(config, pitches, output_file):
         _vt = velo_by_type.get(pt_) if not is_season else None
         _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
         right = mh > 0.68 * _lim
+        # Two centroids in nearly the same spot would stack their labels on
+        # the same side — flip the later (lower-usage) one to the other side
+        # when its box would overlap a placed label's box and the flipped box
+        # stays inside the frame (2026-08-28, per Wally).
+        _lw = 0.9 + 0.42 * len(_lab)    # label width in data units (~measured)
+        def _box(is_right):
+            return ((mh - 0.9 - _lw, mh - 0.9) if is_right
+                    else (mh + 0.9, mh + 0.9 + _lw))
+        def _hits(box):
+            return any(box[0] < x1 and x0 < box[1] and abs(mvv - y_) < 1.9
+                       for x0, x1, y_ in _placed_labels)
+        _b = _box(right)
+        if _hits(_b):
+            _flip = _box(not right)
+            if not _hits(_flip) and _flip[0] > -_lim + 0.4 and _flip[1] < _lim - 0.4:
+                right = not right
+                _b = _flip
+        _placed_labels.append((_b[0], _b[1], mvv))
         mv.annotate(_lab, (mh, mvv), xytext=(-15 if right else 15, 0),
                     textcoords='offset points', fontsize=10.5, fontweight='bold',
                     color=col, ha='right' if right else 'left', va='center',
                     fontfamily='IBM Plex Sans',
                     path_effects=[__import__('matplotlib.patheffects', fromlist=['withStroke'])
                                   .withStroke(linewidth=2.5, foreground=BG)], zorder=6)
-    txt(L + 0.018, mv_top + 0.010, 'PITCH MOVEMENT', 9.5, TEXT_PRIMARY,
-        'black', ha='left')   # starts at the plot spine, clear of the y ticks
+    # PROTO2: PITCH MOVEMENT title removed — the axis labels already say it
 
     # per-pitch-type table (prototype, Driveline-style chips on our palette)
     if not is_season and _tbl:
@@ -2143,7 +2166,10 @@ def render_social_card(config, pitches, output_file):
         SPLIT_COLS = [('USAGE', 0.365, 'r', 'usepct'),
                       ('ZONE%', 0.500, 'r', 'zone'),
                       ('WHIFF%', 0.630, 'r', 'whiff'),
-                      ('STUFF+', 0.775, 'c', 'stuff'), ('LOC+', 0.910, 'c', 'loc')]
+                      ('STUFF+', 0.775, 'c', 'stuff'),
+                      # LOC+ chips: optical overshoot past the spine (see
+                      # tile_row) — flat face flush at the right margin.
+                      ('LOC+', 0.9018, 'c', 'loc')]
 
         def _header(hy, cols):
             for lab, cx, al, _k in cols:
@@ -2153,7 +2179,7 @@ def render_social_card(config, pitches, output_file):
         def _table(y, title, plist, rh, fs, cols, header=True):
             rows = _stats(plist)
             nsub = sum(r['n'] for r in rows) or 1
-            txt(L, y, title, 10.5, TEXT_PRIMARY, 'black', ha='left')
+            txt(L + 0.0019, y, title, 10.5, TEXT_PRIMARY, 'black', ha='left')
             ry = y - 0.007
             if header:
                 _header(y - 0.023, cols)
@@ -2161,7 +2187,7 @@ def render_social_card(config, pitches, output_file):
             for r_ in rows:
                 ry -= rh
                 col = PITCH_COLORS.get(r_['pt'], '#777')
-                ax.scatter([L + 0.008], [ry], s=48, color=col, edgecolors='none',
+                ax.scatter([L + 0.006], [ry], s=48, color=col, edgecolors='none',
                            transform=ax.transAxes, zorder=4)
                 txt(L + 0.025, ry, PITCH_NAMES.get(r_['pt'], r_['pt']).upper(),
                     fs, TEXT_PRIMARY, 'bold', ha='left')
@@ -2217,11 +2243,11 @@ def render_social_card(config, pitches, output_file):
             # arsenal shrinks; a two-pitch reliever gets the max size.
             _nrows = sum(len({p.get('Pitch Type') for p in pl_ if p.get('Pitch Type')})
                          for _nm2, pl_ in sections)
-            rh_ = min(0.034, 0.298 / (max(_nrows, 1) + 1.2))
+            rh_ = min(0.034, 0.280 / (max(_nrows, 1) + 1.2))
             fs_ = min(12.0, rh_ * 430.0)
             # First title starts at 0.384 (was 0.398): the gap under the
             # plot's x-label now matches the inter-section gap (per Wally).
-            yb, hdr = 0.384, True
+            yb, hdr = 0.366, True
             for name_, pl_ in sections:
                 _pw = 'PITCH' if len(pl_) == 1 else 'PITCHES'
                 yb = _table(yb, f'{name_}  ·  {len(pl_)} {_pw}',
