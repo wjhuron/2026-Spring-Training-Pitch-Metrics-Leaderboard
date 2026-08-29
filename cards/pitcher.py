@@ -2059,24 +2059,26 @@ def render_social_card(config, pitches, output_file):
             sf(p.get('xHorzBrk', p.get('HorzBrk')))
         if pt_ and iv is not None and hb is not None:
             groups.setdefault(pt_, []).append((hb, iv))
-    a = 0.75 if not is_season else 0.16   # daily dots: bold, overlaps still
-                                          # shade (0.5/0.75/1.0 prototyped
-                                          # 2026-08-28, per Wally)
-    dsz = 26 if not is_season else 9
-    for pt_, pl in groups.items():
-        col = PITCH_COLORS.get(pt_, '#777')
-        mv.scatter([q[0] for q in pl], [q[1] for q in pl], s=dsz, color=col,
-                   alpha=a, edgecolors='none', zorder=3)
+    # DAILY: centroids only — the pitch cloud is gone (2026-08-28, per
+    # Wally, after cloud/alpha prototypes): one big labeled chip per type
+    # reads instantly at feed size. Season social cards keep their faded
+    # cloud (a different question: season shape consistency).
+    if is_season:
+        for pt_, pl in groups.items():
+            col = PITCH_COLORS.get(pt_, '#777')
+            mv.scatter([q[0] for q in pl], [q[1] for q in pl], s=9, color=col,
+                       alpha=0.16, edgecolors='none', zorder=3)
     for pt_, pl in sorted(groups.items(), key=lambda kv: -len(kv[1])):
         # Every thrown type gets a centroid + velo label (2026-08-28, per
         # Wally) — a 1-pitch type's centroid is the pitch itself.
         col = PITCH_COLORS.get(pt_, '#777')
         mh = sum(q[0] for q in pl) / len(pl); mvv = sum(q[1] for q in pl) / len(pl)
-        mv.scatter([mh], [mvv], s=150, color=col, edgecolors=BG, linewidths=1.8, zorder=5)
+        mv.scatter([mh], [mvv], s=(320 if not is_season else 150), color=col,
+                   edgecolors=BG, linewidths=1.8, zorder=5)
         _vt = velo_by_type.get(pt_) if not is_season else None
         _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
         right = mh > 0.68 * _lim
-        mv.annotate(_lab, (mh, mvv), xytext=(-12 if right else 12, 0),
+        mv.annotate(_lab, (mh, mvv), xytext=(-15 if right else 15, 0),
                     textcoords='offset points', fontsize=10.5, fontweight='bold',
                     color=col, ha='right' if right else 'left', va='center',
                     fontfamily='IBM Plex Sans',
