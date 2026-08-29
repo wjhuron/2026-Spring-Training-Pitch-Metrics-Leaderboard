@@ -1951,10 +1951,21 @@ def render_social_card(config, pitches, output_file):
         # One row: the official line plus the tinted verdict tiles (Whiffs
         # dropped for room per Wally 2026-08-28; whiff detail lives in the
         # per-type table). The freed second row goes to the plot.
-        s_at = [int(round(sf(p.get('Stuff+')))) for p in pitches
-                if sf(p.get('Stuff+')) is not None]
-        l_at = [int(round(sf(p.get('Loc+')))) for p in pitches
-                if sf(p.get('Loc+')) is not None]
+        _satoms = config.get('social_atoms') or {}
+
+        def _atom_of(p, col, kind):
+            # Sheet grade cell first; computed fallback for a live-scraped
+            # game whose cells are still blank (2026-08-28, parity with the
+            # full card).
+            v = sf(p.get(col))
+            if v is not None:
+                return int(round(v))
+            return (_satoms.get(kind) or {}).get(str(p.get('PitchID') or ''))
+
+        s_at = [v for v in (_atom_of(p, 'Stuff+', 'stuff') for p in pitches)
+                if v is not None]
+        l_at = [v for v in (_atom_of(p, 'Loc+', 'loc') for p in pitches)
+                if v is not None]
         sg = (sum(s_at) / len(s_at)) if s_at else None
         lg_ = (sum(l_at) / len(l_at)) if l_at else None
         line = [
@@ -2095,10 +2106,10 @@ def render_social_card(config, pitches, output_file):
                 cs = sum(1 for p in pl if p.get('Description') == 'Called Strike')
                 izv = [1 if r2 else 0 for r2 in
                        (compute_iz(p) for p in pl) if r2 is not None]
-                s_at = [int(round(sf(p.get('Stuff+')))) for p in pl
-                        if sf(p.get('Stuff+')) is not None]
-                l_at = [int(round(sf(p.get('Loc+')))) for p in pl
-                        if sf(p.get('Loc+')) is not None]
+                s_at = [v for v in (_atom_of(p, 'Stuff+', 'stuff')
+                                    for p in pl) if v is not None]
+                l_at = [v for v in (_atom_of(p, 'Loc+', 'loc')
+                                    for p in pl) if v is not None]
                 out.append({
                     'pt': pt_, 'n': len(pl), 'sw': len(sw),
                     'velo': sum(velos) / len(velos) if velos else None,
@@ -3744,7 +3755,7 @@ def render_card(config, pitches, output_file):
 # anything up. Instead we follow the ROC translation pattern: every derived
 # quantity is COMPUTED from the scratch pitches against MLB baselines, then
 # RANKED into the MLB leaderboard pools:
-#   Stuff+  — stuff_plus bundle, v12 config (full model when the pitcher has ArmAngle
+#   Stuff+  — stuff_plus bundle at its own stored version (full model when the pitcher has ArmAngle
 #             data, else the no-arm companion + its MLB anchor scales)
 #   Loc+    — pipeline_locplus.compute_loc_plus with MLB pickle pitches as the
 #             baseline/pool and the scratch pitchers keyed under 'AAA' (scored
@@ -3834,13 +3845,13 @@ K_SHRINK_DAILY = 0
 
 
 def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
-    """Stuff+ (v12 config since 2026-08-09) for scratch pitchers. Returns
-    ({pitcher: overall}, {(pitcher, pitch_type): score}). The v12 features
-    (nVAA, release-axis cross, FF/SI velo_diff mask) live inside
-    train_stuff.build_df, so this path picks them up automatically —
-    the guard below only enforces that the LOCAL bundle is a v12 retrain
-    (a stale v11 bundle would score transformed features with models
-    trained on raw ones, silently drifting every grade).
+    """Stuff+ for scratch pitchers, at whatever config the LOCAL bundle
+    carries (the bundle stores its version; the current one is v14). The
+    feature transforms live inside train_stuff.build_df, so this path picks
+    them up automatically — the guard below only enforces that the local
+    bundle matches the current feature set (a stale bundle would score
+    transformed features with models trained on different ones, silently
+    drifting every grade).
     Full model when the pitcher has any
     ArmAngle data (build_df fills gaps with his own average); otherwise the
     no-arm companion model anchored to its MLB (no-arm) scales — exactly the
@@ -3860,16 +3871,19 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
     _bundle_path = os.path.join(_repo_root, 'stuff_plus', 'stuff_models.pkl')
     with open(_bundle_path, 'rb') as f:
         bundle = _pickle.load(f)
-    if 'kin_eff__ff' not in bundle.get('features', []) \
-            or 'cross' not in bundle.get('features', []):
+    if any(f not in bundle.get('features', [])
+           for f in ('kin_eff__ff', 'cross', 'height')):
         raise RuntimeError(
-            'stuff_models.pkl predates the v13 config — its models '
+            'stuff_models.pkl predates the current config (v14 needs '
+            'kin_eff__ff + cross + height) — its models '
             'trained on different features than build_df now emits. Refresh '
             'it from the latest-data release:\n  curl -sL https://github.com/'
             'wjhuron/Huronalytics/releases/download/latest-data/'
             'stuff_models.pkl.gz | gunzip -c > '
             'stuff_plus/stuff_models.pkl')
 
+    print(f"  [scratch] Stuff+ bundle {bundle.get('version', '?')} "
+          f"(trained through {bundle.get('trained_through', '?')})")
     all_pitches = [p for pl in norm_by_pitcher.values() for p in pl]
     # v13: 2026 kinematics ride the PitchID sidecar; daily/scratch pitches
     # come off the sheets without KinEff. Absent sidecar degrades to the
@@ -4066,7 +4080,7 @@ def _backfill_arm_angle(norm_by_pitcher, lookup):
 
 def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
     """Heavy one-time setup for scratch-tab / daily cards: MLB pickle baselines
-    (Loc+ surfaces + norm pool, xRV count anchoring), Stuff+ scoring (v12
+    (Loc+ surfaces + norm pool, xRV count anchoring), Stuff+ scoring (bundle
     config via the bundle),
     leaderboard percentile pools, nVAA/nHAA regressions. stuff_k_shrink is
     passed through to Stuff+ scoring (light for daily cards)."""
@@ -4153,9 +4167,9 @@ def _build_scratch_league_context(norm_by_pitcher, stuff_k_shrink=None):
             ctx['loc_pt'][(_nm, _pt2)] = round(sum(_arr) / len(_arr), 1)
     print(f"  [scratch] Loc+ done ({time_module.time()-t0:.0f}s)")
 
-    # Stuff+ (v12 config; version enforced by the bundle guard in
-    # _scratch_stuff_scores)
-    print("  [scratch] Scoring Stuff+ v12...")
+    # Stuff+ at the local bundle's own version (enforced by the guard in
+    # _scratch_stuff_scores, which also prints it).
+    print("  [scratch] Scoring Stuff+...")
     try:
         (ctx['stuff_overall'], ctx['stuff_pt'],
          ctx['stuff_atoms_by_pid']) = _scratch_stuff_scores(norm_by_pitcher, stuff_k_shrink)
@@ -4457,8 +4471,8 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 def main():
     # ── Settings (edit these directly or override via command line) ──
     team            = "WSH"
-    start_date      = None    # Set to None for full season
-    end_date        = None             # Set to a date for date range, or None for single day
+    start_date      = "2026-08-28"    # Set to None for full season
+    end_date        = "2026-08-28"             # Set to a date for date range, or None for single day
     filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
@@ -4928,6 +4942,7 @@ def main():
         ip_float = box['outs'] / 3.0
         pitch_count = len(pitches_by_pitcher[pitcher_name])
         outing_pp = (None, None)   # Pitching+ outing grade — single-game only
+        social_atoms = None        # PitchID->atom fallbacks for the social card
 
         if is_multi_game:
             # Season/range stat line: G, IP, ERA, SIERA, K%, BB%, Zone%, Whiff%, GB%
@@ -5002,6 +5017,23 @@ def main():
                     if v is not None:
                         return v
                     return _lfn(q) if _lfn else None
+
+                # Atom maps for the SOCIAL renderer (sheet cell first,
+                # computed fallback), keyed by PitchID so the raw window
+                # rows resolve — a live-scraped game has blank grade cells
+                # and previously rendered '—' tiles/chips on the social
+                # card while the full card scored fine (2026-08-28).
+                social_atoms = {'stuff': {}, 'loc': {}}
+                for _q in _np_:
+                    _pid2 = str(_q.get('PitchID') or '')
+                    if not _pid2:
+                        continue
+                    _sv = _stuff_of(_q)
+                    _lv = _loc_of(_q)
+                    if _sv is not None:
+                        social_atoms['stuff'][_pid2] = int(round(_sv))
+                    if _lv is not None:
+                        social_atoms['loc'][_pid2] = int(round(_lv))
 
                 outing_pp = _outing_pitching_plus(
                     _np_, scratch_ctx['outing_pool'], _stuff_of, _loc_of)
@@ -5120,6 +5152,7 @@ def main():
             # Pitching+ outing grade (value, percentile) — single-game daily
             # cards only; (None, None) elsewhere.
             'outing_pitching': outing_pp,
+            'social_atoms': social_atoms,
             'pitch_locplus': (scratch_locplus if scratch_ctx is not None
                               else locplus_by_pitcher.get((pitcher_name, eff_team), {})),
             'pitch_lb': (scratch_pitch_lb if scratch_ctx is not None
