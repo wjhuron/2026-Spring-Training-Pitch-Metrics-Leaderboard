@@ -2081,8 +2081,10 @@ def render_social_card(config, pitches, output_file):
         # Wally) — a 1-pitch type's centroid is the pitch itself.
         col = PITCH_COLORS.get(pt_, '#777')
         mh = sum(q[0] for q in pl) / len(pl); mvv = sum(q[1] for q in pl) / len(pl)
+        # zorder rises with usage so a same-spot pair shows the
+        # HIGHER-usage pitch's dot (2026-08-28, per Wally: Lyon SI/CH).
         mv.scatter([mh], [mvv], s=(320 if not is_season else 150), color=col,
-                   edgecolors=BG, linewidths=1.8, zorder=5)
+                   edgecolors=BG, linewidths=1.8, zorder=5 + len(pl) * 1e-4)
         _vt = velo_by_type.get(pt_) if not is_season else None
         _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
         right = mh > 0.68 * _lim
@@ -2177,13 +2179,18 @@ def render_social_card(config, pitches, output_file):
                     ha='right' if al == 'r' else 'center')
 
         def _table(y, title, plist, rh, fs, cols, header=True):
+            # The title shares its row with the column headers (first
+            # section) and every line — header row, data rows, the second
+            # section's title — sits on ONE uniform rh rhythm, so the
+            # header row is exactly as far from its first data row as the
+            # VS LHH title is from the rows around it (2026-08-28, per
+            # Wally).
             rows = _stats(plist)
             nsub = sum(r['n'] for r in rows) or 1
             txt(L + 0.0019, y, title, 10.5, TEXT_PRIMARY, 'black', ha='left')
-            ry = y - 0.007
             if header:
-                _header(y - 0.023, cols)
-                ry = y - 0.023
+                _header(y, cols)
+            ry = y
             for r_ in rows:
                 ry -= rh
                 col = PITCH_COLORS.get(r_['pt'], '#777')
@@ -2243,17 +2250,18 @@ def render_social_card(config, pitches, output_file):
             # arsenal shrinks; a two-pitch reliever gets the max size.
             _nrows = sum(len({p.get('Pitch Type') for p in pl_ if p.get('Pitch Type')})
                          for _nm2, pl_ in sections)
-            rh_ = min(0.034, 0.280 / (max(_nrows, 1) + 1.2))
+            # Uniform rhythm: (nrows + one title row per section) lines,
+            # last line's baseline stays >= 0.040 above the footer.
+            _nlines = _nrows + len(sections)
+            rh_ = min(0.034, 0.326 / max(_nlines - 1, 1))
             fs_ = min(12.0, rh_ * 430.0)
-            # First title starts at 0.384 (was 0.398): the gap under the
-            # plot's x-label now matches the inter-section gap (per Wally).
             yb, hdr = 0.366, True
             for name_, pl_ in sections:
                 _pw = 'PITCH' if len(pl_) == 1 else 'PITCHES'
                 yb = _table(yb, f'{name_}  ·  {len(pl_)} {_pw}',
                             pl_, rh_, fs_, SPLIT_COLS, header=hdr)
-                yb -= 0.016
-                hdr = False
+                yb -= rh_ - rh_ * 0.6   # next title lands one rh below the
+                hdr = False             # last row (return already ate 0.6rh)
         note_r = ('MLB gameday feed  ·  red = good, blue = bad  ·  '
                   '100 = league average')
 
