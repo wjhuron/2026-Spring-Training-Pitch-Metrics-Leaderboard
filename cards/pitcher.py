@@ -4553,8 +4553,8 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 def main():
     # ── Settings (edit these directly or override via command line) ──
     team            = ""
-    start_date      = "2026-08-29"    # Set to None for full season
-    end_date        = "2026-08-29"             # Set to a date for date range, or None for single day
+    start_date      = None    # Set to None for full season
+    end_date        = None             # Set to a date for date range, or None for single day
     filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
