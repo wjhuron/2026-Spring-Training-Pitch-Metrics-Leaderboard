@@ -1899,7 +1899,11 @@ def render_social_card(config, pitches, output_file):
     opp = config.get('opponent')
     if not is_season and opp:
         kick += '  ·  VS %s' % opp
-    _hx_kick, _hx_name, _hx_meta = 0.03648, 0.03926, 0.03556
+    # Stem-aligned (not ink-aligned) header margin: each x is tuned so
+    # the CAP-HEIGHT stems land on the y-tick numbers' edge (px 39);
+    # JACKSON's J hook overshoots left below the baseline by design —
+    # classic optical margin alignment (2026-08-28, per Wally's eye).
+    _hx_kick, _hx_name, _hx_meta = 0.03648, 0.03556, 0.03556
     txt(_hx_kick, 0.970, kick, 11.5, ACCENT, 'bold', ha='left')
     _nm = config['display_name'].upper()
     _nsz = 27 if len(_nm) <= 16 else (23 if len(_nm) <= 20 else 20)
@@ -1996,7 +2000,9 @@ def render_social_card(config, pitches, output_file):
         # The split per-hand table IS the daily social card (2026-08-28,
         # per Wally — the --table/--split prototype toggles are gone).
         _tbl = _spl = True
-        mv_top, mv_bot = 0.800, 0.418
+        # Plot shifted up by HALF the former tile-to-plot gap (0.035/2,
+        # 2026-08-28 per Wally) — same height, more air under the x-label.
+        mv_top, mv_bot = 0.8175, 0.4355
     else:
         sh, sv = config['stat_headers'], config['stat_values']
         prow = config.get('pctl_row') or {}
@@ -2311,7 +2317,7 @@ def render_social_card(config, pitches, output_file):
             cx += wch + 0.012
         note_r = 'disc = percentile among MLB pitchers · red good, blue bad'
 
-    _fy = 0.016 if not is_season else 0.075
+    _fy = 0.009 if not is_season else 0.075
     txt(L, _fy, 'huronalytics.vercel.app', 10.5,
         TEXT_PRIMARY, 'normal', ha='left', style='italic')
     txt(R, _fy, note_r, 8.2, TEXT_PRIMARY, 'normal', ha='right')
