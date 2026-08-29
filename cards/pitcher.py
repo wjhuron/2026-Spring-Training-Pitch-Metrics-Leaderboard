@@ -1899,10 +1899,10 @@ def render_social_card(config, pitches, output_file):
     opp = config.get('opponent')
     if not is_season and opp:
         kick += '  ·  VS %s' % opp
-    txt(L, 0.970, kick, 11.5, ACCENT, 'bold', ha='left')
+    txt(L, 0.9774, kick, 11.5, ACCENT, 'bold', ha='left')
     _nm = config['display_name'].upper()
     _nsz = 27 if len(_nm) <= 16 else (23 if len(_nm) <= 20 else 20)
-    ax.text(L, 0.961, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
+    ax.text(L, 0.9580, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
             fontweight='black', fontfamily='Bitter', ha='left', va='top')
     hand_code = 'LHP' if config.get('hand') == 'L' else 'RHP'
     meta = f"{hand_code}  |  {config.get('team','')}"
