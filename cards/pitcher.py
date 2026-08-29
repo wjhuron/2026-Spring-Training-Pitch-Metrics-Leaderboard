@@ -2100,6 +2100,19 @@ def render_social_card(config, pitches, output_file):
         # HIGHER-usage pitch's dot (2026-08-28, per Wally: Lyon SI/CH).
         mv.scatter([mh], [mvv], s=(320 if not is_season else 150), color=col,
                    edgecolors=BG, linewidths=1.8, zorder=5 + len(pl) * 1e-4)
+        if not is_season:
+            # Pitch count inside the chip (2026-08-28, per Wally) —
+            # restores the volume signal the cloud used to carry. All-white
+            # ink (A/B'd against luminance ink; Wally chose white).
+            _cnt = sum(1 for q in pitches if q.get('Pitch Type') == pt_)
+            # +0.013/-0.125 data-unit offsets: measured digit-ink centers
+            # vs disc centers, iterated to the rasterization floor (means
+            # <1px; per-digit ink shapes bound the rest).
+            mv.text(mh + 0.013, mvv - 0.125, str(_cnt), fontsize=7.5,
+                    color='#ffffff',
+                    ha='center', va='center', fontweight='bold',
+                    fontfamily='IBM Plex Sans',
+                    zorder=5.5 + len(pl) * 1e-4)
         _vt = velo_by_type.get(pt_) if not is_season else None
         _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
         right = mh > 0.68 * _lim
@@ -4539,9 +4552,9 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "BOS"
-    start_date      = None    # Set to None for full season
-    end_date        = None             # Set to a date for date range, or None for single day
+    team            = ""
+    start_date      = "2026-08-29"    # Set to None for full season
+    end_date        = "2026-08-29"             # Set to a date for date range, or None for single day
     filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
     game_pk         = ""                 # Optional game PK for live/in-progress games
     display_team    = None               # Header team label override (display only)
