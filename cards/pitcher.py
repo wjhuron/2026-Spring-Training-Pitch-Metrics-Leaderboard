@@ -1923,11 +1923,11 @@ def render_social_card(config, pitches, output_file):
     _mw = _measure_text_axis_w(fig, [meta], 11, 'bold') if not is_season else None
     if not is_season and _mw is None:
         # No renderer yet: one draw, decision inline uncolored.
-        txt(L, 0.913, meta + _dec, 11, TEXT_MUTED, 'bold', ha='left')
+        txt(L, 0.907, meta + _dec, 11, TEXT_MUTED, 'bold', ha='left')
     else:
-        txt(L, 0.913, meta, 11, TEXT_MUTED, 'bold', ha='left')
+        txt(L, 0.907, meta, 11, TEXT_MUTED, 'bold', ha='left')
         if not is_season:
-            txt(L + _mw, 0.913, _dec, 11, _dc, 'black', ha='left')
+            txt(L + _mw, 0.907, _dec, 11, _dc, 'black', ha='left')
 
     def tile_row(y, h, cells, vsize=17, ksize=8.2, ssize=7.2):
         # Ink rule (2026-08-28, per Wally): white text on TINTED tiles,
@@ -2086,7 +2086,8 @@ def render_social_card(config, pitches, output_file):
                     fontfamily='IBM Plex Sans',
                     path_effects=[__import__('matplotlib.patheffects', fromlist=['withStroke'])
                                   .withStroke(linewidth=2.5, foreground=BG)], zorder=6)
-    txt(L, mv_top + 0.010, 'PITCH MOVEMENT', 9.5, TEXT_PRIMARY, 'black', ha='left')
+    txt(L + 0.018, mv_top + 0.010, 'PITCH MOVEMENT', 9.5, TEXT_PRIMARY,
+        'black', ha='left')   # starts at the plot spine, clear of the y ticks
 
     # per-pitch-type table (prototype, Driveline-style chips on our palette)
     if not is_season and _tbl:
@@ -4475,7 +4476,7 @@ def _resolve_pitcher_teams(names, include_non_mlb=False):
 
 def main():
     # ── Settings (edit these directly or override via command line) ──
-    team            = "WSH"
+    team            = "ROC"
     start_date      = None    # Set to None for full season
     end_date        = None             # Set to a date for date range, or None for single day
     filter_pitchers = ""                 # Semicolon-separated "Last, First" names, or "" for all
