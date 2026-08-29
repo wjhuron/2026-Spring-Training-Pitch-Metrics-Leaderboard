@@ -1357,6 +1357,7 @@
 "Lyles, Jordan": 77.0,
 "Lynch IV, Daniel": 78.0,
 "Lynn, Lance": 77.0,
+"Lyon, Isaac": 75.0,
 "L\u00f3pez, Jorge": 75.0,
 "L\u00f3pez, Pablo": 76.0,
 "L\u00f3pez, Reynaldo": 73.0,
@@ -2009,6 +2010,7 @@
 "Rosso, Ram\u00f3n": 76.0,
 "Roupp, Landen": 74.0,
 "Rowen, Ben": 76.0,
+"Roxby, Braxton": 75.0,
 "Roycroft, Chris": 80.0,
 "Rucinski, Drew": 74.0,
 "Rucker, Michael": 73.0,
@@ -6706,6 +6708,9 @@
 "Lynn, Lance": [
 458681
 ],
+"Lyon, Isaac": [
+805214
+],
 "L\u00f3pez, Jorge": [
 605347
 ],
@@ -8664,6 +8669,9 @@
 "Rowen, Ben": [
 594985
 ],
+"Roxby, Braxton": [
+694820
+],
 "Roycroft, Chris": [
 688297
 ],
@@ -10530,5 +10538,5 @@
 ]
 },
 "league_mean": 73.73,
-"n": 2630
+"n": 2632
 }
