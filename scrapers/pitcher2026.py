@@ -1562,6 +1562,18 @@ class BaseballSavantFocusedDownloader:
         """
         if not plate or df is None or df.empty:
             return df
+        # download_game_data's display pass has already rendered PlateX/PlateZ
+        # as FORMATTED STRINGS at the sheet's depth by the time this runs, so
+        # a raw float cannot be assigned into them: under pandas 3 the column
+        # is a StringDtype and the write raises TypeError (pandas 2 silently
+        # allowed it, which is why this first shipped broken — the repo runs
+        # pandas 3.0.5 in .venv, so TEST WITH .venv/bin/python). Match what the
+        # column already holds, and render through sheet_precision.fmt so the
+        # depth stays single-homed. The raw_precision path (backfill_full)
+        # keeps numeric columns and takes the float branch.
+        from scrapers.sheet_precision import fmt as _fmt
+        as_text = not pd.api.types.is_numeric_dtype(df['PlateZ'])
+        new_x, new_z = {}, {}
         matched = unmatched = 0
         for idx, row in df.iterrows():
             parts = str(row.get('PitchID', '')).split('_')
@@ -1573,8 +1585,15 @@ class BaseballSavantFocusedDownloader:
             if coords is None:
                 unmatched += 1
                 continue
-            df.at[idx, 'PlateX'], df.at[idx, 'PlateZ'] = coords
+            px, pz = coords
+            new_x[idx] = _fmt('PlateX', px) if as_text else px
+            new_z[idx] = _fmt('PlateZ', pz) if as_text else pz
             matched += 1
+        if matched:
+            # Whole-column assignment: an element-wise write would fight the
+            # existing dtype one cell at a time.
+            df['PlateX'] = [new_x.get(i, v) for i, v in zip(df.index, df['PlateX'])]
+            df['PlateZ'] = [new_z.get(i, v) for i, v in zip(df.index, df['PlateZ'])]
         print(f"  Savant plate coordinates: {matched} merged, "
               f"{unmatched} kept feed values")
         if unmatched:
