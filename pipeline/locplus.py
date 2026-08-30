@@ -258,13 +258,27 @@ COUNTS = [(b, s) for b in range(4) for s in range(3)]
 HANDS = ('L', 'R')
 SWING_DESC = {'Swinging Strike', 'Foul', 'In Play'}
 TAKE_DESC = {'Ball', 'Called Strike'}
-EXCLUDE_DESC = {'Hit By Pitch', 'Foul Bunt', 'Missed Bunt', 'Bunt Foul Tip',
+# Non-competitive pitches. Excluded from BOTH the baseline and scoring: the
+# pitcher was not trying to hit a target (pitchout, intentional walk), or the
+# pitch hit the batter.
+EXCLUDE_DESC = {'Hit By Pitch',
                 'Pitchout', 'Swinging Pitchout', 'Foul Pitchout'}
+# Bunts. Excluded from the BASELINE only (Wally, 2026-08-30). A bunt's swing,
+# foul and contact behaviour is nothing like normal hitting, so bunts must not
+# shape the league surfaces. They ARE scored, because score_pitch reads only
+# (group, hand, count, location) and never the outcome — so a bunted pitch is
+# perfectly scorable, and dropping it would penalise the pitcher for the
+# BATTER's choice. Loc+ grades where the pitch went, not what was done with
+# it; that is the same decision-based rule the rest of the repo follows.
+# Before the split, one bunt could erase a whole pitch type's Loc+ on a game
+# card (Kranick 2026-08-28: his only slider was bunted, so the row was blank).
+BUNT_DESC = {'Foul Bunt', 'Missed Bunt', 'Bunt Foul Tip'}
 # EP tags a POSITION PLAYER on the mound, not a pitch a pitcher throws (Wally,
 # 2026-07-25). The data bears it out: all 40 EP throwers this season are 100%
 # EP with no other pitch type — Trevino, McCann, Higashioka, Rojas, Straw.
 # So EP pitches neither define the league surfaces nor get scored. Excluding
-# them here covers both, since is_eligible_baseline() delegates to _is_scorable().
+# them in _is_scorable covers both, since is_eligible_baseline() delegates to
+# it and then adds the bunt rule on top.
 EXCLUDE_PT = {'EP'}
 BUNT_BB = {'bunt', 'bunt_grounder', 'bunt_popup', 'bunt_line_drive'}
 
@@ -294,8 +308,6 @@ def _is_scorable(p):
         return False
     if p.get('Description') in EXCLUDE_DESC:
         return False
-    if p.get('BBType') in BUNT_BB:
-        return False
     if p.get('Pitch Type') in EXCLUDE_PT:
         return False
     if group_of(p) is None:
@@ -308,8 +320,20 @@ def _is_scorable(p):
         return False
     return True
 
+def is_bunt(p):
+    """A bunt attempt, by description or by batted-ball type."""
+    return (p.get('Description') in BUNT_DESC
+            or p.get('BBType') in BUNT_BB)
+
+
 def is_eligible_baseline(p):
-    return p.get('_source') == 'MLB' and _is_scorable(p)
+    """May this pitch SHAPE the league surfaces?
+
+    Stricter than _is_scorable on purpose: bunts are scorable but must not
+    define the surfaces everything else is measured against. See BUNT_DESC.
+    """
+    return (p.get('_source') == 'MLB' and _is_scorable(p)
+            and not is_bunt(p))
 
 
 # ═════════════════════════════════════════════════════════════════════════
