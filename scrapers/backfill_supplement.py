@@ -164,6 +164,15 @@ OVERWRITE_EPSILON = {
 SWING_CLUSTER_COLS = {'BatSpeed', 'SwingLength', 'AttackAngle',
                       'AttackDirection', 'SwingPathTilt'}
 
+# Position-player pitching (Pitch Type 'EP'): never touch the pitch-shape /
+# release metrics — a lob's tracking is garbage and backfill_full already
+# skips these rows for the same reason (Wally 2026-08-30). Everything else
+# stays fair game on EP rows: plate coordinates, counts, descriptions, and
+# every hitter-side metric (bat tracking, EV/LA, xstats). Velocity, Spin
+# Rate, tilts, Extension and RelPos are excluded from this script globally,
+# so the set below is the full EP-sensitive remainder of the map.
+EP_SKIP_COLS = {'IndVertBrk', 'HorzBrk', 'ArmAngle'}
+
 # Columns that store raw integer values from Statcast (no rounding needed)
 INT_COLS = {'Outs', 'Barrel'}  # Raw integer values (Barrel = launch_speed_angle 1-6)
 
@@ -593,7 +602,11 @@ def _download_statcast_minors(team_tab, date_min, date_max, session):
 
 def download_statcast(team_tab, date_min, date_max, session):
     """Download Statcast Search CSV for a team and date range.
-    Returns a dict keyed by (game_pk, at_bat_number, pitch_number) -> row dict.
+    Returns (lookup, roster), or None when no data:
+      lookup: (game_pk, at_bat_number, pitch_number) -> {sheet_col: value}
+      roster: same keys -> display info for EVERY real Savant pitch, whether
+              or not it carries supplement data — the missing-pitch detector
+              compares this against the sheet's PitchIDs.
 
     MLB tabs use the standard Statcast Search; ROC/AAA use the minor-league
     search, which needs windowed requests and a client-side club filter.
@@ -750,12 +763,20 @@ def download_statcast(team_tab, date_min, date_max, session):
             count_str = (_b.fillna(0).astype(int).astype(str) + '-'
                          + _s.fillna(0).astype(int).astype(str))
 
-        # Assemble lookup dict
+        # Assemble lookup dict + full roster (for missing-pitch detection)
         lookup = {}
+        roster = {}
+        roster_cols = [c for c in ('game_date', 'player_name', 'inning',
+                                   'pitch_type', 'description',
+                                   'release_speed') if c in df.columns]
         for i in df.index:
             if is_auto.at[i]:
                 continue   # automatic ball/strike: not a real pitch, no key
             key = (keys_df.at[i, 'k0'], keys_df.at[i, 'k1'], keys_df.at[i, 'k2'])
+            info = {c: df.at[i, c] for c in roster_cols}
+            if has_count and count_valid.at[i]:
+                info['count'] = count_str.at[i]
+            roster[key] = info
             data = {}
             for sheet_col in formatted:
                 if i in formatted[sheet_col].index:
@@ -772,7 +793,7 @@ def download_statcast(team_tab, date_min, date_max, session):
 
         print(f"    Got {len(lookup)} pitches with supplement data "
               f"(columns: {available})")
-        return lookup
+        return lookup, roster
 
     except requests.exceptions.Timeout:
         print(f"    Timeout downloading Statcast data")
@@ -962,6 +983,7 @@ def main():
     col_fills = Counter()       # per-column staged fills (grand total)
     col_overwrites = Counter()  # per-column staged overwrites (grand total)
     ledger_skips = Counter()    # per-column skips honouring declined values
+    missing_pitches = []        # savant-has / sheet-lacks, across all tabs
 
     for sheet_label, sheet_id in SPREADSHEET_IDS.items():
         if remaining is not None and not remaining:
@@ -1029,6 +1051,8 @@ def main():
             # cols_to_update entries: (sheet_col, existing_value) — empty string means new fill
             game_dates = set()
             date_col = col_idx.get('Game Date')
+            pt_col = col_idx.get('Pitch Type')
+            sheet_pids = []   # (game_date, pid) for missing-pitch detection
 
             for r_idx, row in enumerate(rows[1:], start=2):
                 pid = row[pitch_id_col] if pitch_id_col < len(row) else ''
@@ -1040,6 +1064,9 @@ def main():
                     gd = row[date_col] if date_col < len(row) else ''
                     if not date_in_range(gd):
                         continue
+                    sheet_pids.append((gd, pid))
+                is_ep = (pt_col is not None and pt_col < len(row)
+                         and row[pt_col] == 'EP')
 
                 # Check which supplement columns need updating:
                 # - Empty columns need filling (but NOT for OVERWRITE_ONLY_COLS)
@@ -1049,6 +1076,8 @@ def main():
                 #   corrections like hit↔error); never used to fill a blank cell.
                 cols_to_update = []
                 for sheet_col, c_idx in supp_col_idx.items():
+                    if is_ep and sheet_col in EP_SKIP_COLS:
+                        continue
                     val = row[c_idx] if c_idx < len(row) else ''
                     is_empty = (val == '' or val is None)
                     if is_empty and sheet_col in OVERWRITE_ONLY_COLS:
@@ -1081,11 +1110,44 @@ def main():
             date_max = max(game_dates)
 
             time.sleep(3)  # Be polite to Baseball Savant
-            lookup = download_statcast(ws.title, date_min, date_max, session)
+            fetched = download_statcast(ws.title, date_min, date_max, session)
 
-            if lookup is None:
+            if fetched is None:
                 print(f"  No Statcast data available — skipping")
                 continue
+            lookup, roster = fetched
+
+            # ── Missing-pitch detection ────────────────────────────────────
+            # Savant has a real pitch that the sheet does not. A missing pitch
+            # silently shortens every denominator it belongs to, so this is
+            # reported LOUDLY and always lands in the .xlsx at the end of the
+            # run (Wally 2026-08-30), independent of produce_report. No-pitch
+            # IBB markers (*_00) are sheet-only by design and are excluded
+            # from the comparison in both directions.
+            sheet_keys = set()
+            for _gd, _pid in sheet_pids:
+                _p = _pid.split('_')
+                if len(_p) != 3:
+                    continue
+                try:
+                    _ab, _pn = int(_p[1]), int(_p[2])
+                except ValueError:
+                    continue
+                if _pn == 0:
+                    continue   # no-pitch IBB marker
+                sheet_keys.add((_p[0], str(_ab), str(_pn)))
+            tab_missing = [(key, info) for key, info in roster.items()
+                           if key not in sheet_keys]
+            print(f"  Missing pitches (Savant has, sheet lacks): {len(tab_missing)}")
+            for key, info in tab_missing:
+                missing_pitches.append({
+                    'Tab': tab_name, 'GamePk': key[0], 'AB': key[1],
+                    'Pitch': key[2],
+                    'PitchID': f"{key[0]}_{int(key[1]):03d}_{int(key[2]):02d}",
+                    **{k: info.get(k) for k in ('game_date', 'player_name',
+                                                'inning', 'count', 'pitch_type',
+                                                'description', 'release_speed')},
+                })
 
             # Match and prepare cell updates
             cells_to_update = []
@@ -1219,6 +1281,36 @@ def main():
         for col in sorted(set(col_fills) | set(col_overwrites) | set(ledger_skips)):
             print(f"  {col:16s} {col_fills.get(col, 0):7d} / "
                   f"{col_overwrites.get(col, 0):7d} / {ledger_skips.get(col, 0):d}")
+
+    # Missing pitches always produce the .xlsx, dry run or not — a missing
+    # pitch is the one finding that must never scroll away in a log.
+    print(f"\nMissing pitches across all tabs: {len(missing_pitches)}")
+    if missing_pitches:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font
+        wb = Workbook()
+        ws_m = wb.active
+        ws_m.title = 'MISSING PITCHES'
+        cols = ['Tab', 'game_date', 'PitchID', 'GamePk', 'AB', 'Pitch',
+                'player_name', 'inning', 'count', 'pitch_type', 'description',
+                'release_speed']
+        for c_i, name in enumerate(cols, 1):
+            cell = ws_m.cell(row=1, column=c_i, value=name)
+            cell.font = Font(bold=True)
+        for r_i, m in enumerate(sorted(missing_pitches,
+                                       key=lambda m: (m['Tab'], str(m.get('game_date')))),
+                                start=2):
+            for c_i, name in enumerate(cols, 1):
+                v = m.get(name)
+                ws_m.cell(row=r_i, column=c_i,
+                          value=None if v is None else str(v))
+        stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        mpath = os.path.join(os.path.expanduser('~'), 'Downloads',
+                             f'missing_pitches_{stamp}.xlsx')
+        wb.save(mpath)
+        print(f"MISSING PITCH REPORT: {mpath}")
+        print("Repair by re-scraping the listed games (Pitcher2026 game mode) "
+              "so tilt/VAA/x-movement are built, not synthesized.")
 
     if produce_report == 'yes':
         report_path = write_report(report_data)
