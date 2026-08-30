@@ -146,7 +146,23 @@ CMD_SCALE_K = 10                       # RETIRED 2026-08-18. Command+ is now
 # gate exactly as Loc+ does. Re-measure at season end with the Loc+ gates.
 STABILIZE_N = 143
 
-EXCLUDE_DESC = {'Hit By Pitch', 'Foul Bunt', 'Missed Bunt', 'Bunt Foul Tip',
+# Non-competitive pitches only: the pitcher was not throwing at a target.
+#
+# Bunts are NOT excluded (Wally, 2026-08-30, mirroring the Loc+ split). A
+# pitcher releases the ball before he knows the batter will bunt, so the
+# location is a pre-outcome fact and a perfectly valid observation of where
+# he puts that pitch type in that count. Dropping it would grade him on a
+# subset the BATTER selected.
+#
+# Command+ has no separate baseline to exclude them from, unlike Loc+:
+# build_cells fits every target on exactly the pitches it scores, and a
+# target is just the mean location of the pitcher's own pitches, which a
+# bunt does not distort.
+#
+# This also removes a real incoherence. Until now the three bunt
+# DESCRIPTIONS were excluded while in-play bunts (BBType, never tested here)
+# were scored — 1,378 in, 1,500 out, decided by whether the bunt went fair.
+EXCLUDE_DESC = {'Hit By Pitch',
                 'Pitchout', 'Swinging Pitchout', 'Foul Pitchout', 'Intent Ball'}
 EXCLUDE_PT = {'EP', 'PO'}
 HANDS = ('L', 'R')
