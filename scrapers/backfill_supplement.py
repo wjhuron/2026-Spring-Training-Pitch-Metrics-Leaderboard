@@ -103,7 +103,11 @@ SUPPLEMENT_MAP = {
     'BBType': 'bb_type',                # bunt guard below — see write loop
     'HC_X': 'hc_x',                     # 100% identical
     'HC_Y': 'hc_y',                     # 100% identical
-    'Extension': 'release_extension',   # identical to savant's 1-dec quantum
+    # Extension is deliberately ABSENT (Wally 2026-08-30). Savant serves
+    # release_extension at 1 decimal while the sheet stores the feed's 4
+    # real decimals; the sources agree within that quantum (reconciliation
+    # mean +0.0001), so every possible write replaces a finer measurement
+    # with a coarser one. Savant has nothing to add to this column.
     'IndVertBrk': 'pfx_z',              # x12 (ft->in); exact
     'HorzBrk': 'pfx_x',                 # x-12 (ft->in, mirrored); exact both hands
 }
@@ -147,12 +151,7 @@ SAVANT_TO_SHEET_DESCRIPTION = {
 # cell would rewrite by rounding noise on every run. A genuine revision
 # (|diff| > quantum) always writes.
 OVERWRITE_EPSILON = {
-    # Extension is 0.055, not 0.05: a stored 4-dec value ending exactly .X500
-    # sits ON savant's 1-dec rounding midpoint, so |diff| lands at exactly
-    # 0.050000000000000044 in floats and a 0.05 bound lets it through. The
-    # 2026-08-30 dry run staged 140 Extension cells and 139 were exactly this
-    # echo (one real revision at 0.076 survives the wider bound).
-    'Extension': 0.055, 'AttackAngle': 0.05, 'AttackDirection': 0.05,
+    'AttackAngle': 0.05, 'AttackDirection': 0.05,
     'SwingPathTilt': 0.05, 'ExitVelo': 0.05, 'BatSpeed': 0.05,
     'SwingLength': 0.005, 'IndVertBrk': 0.05, 'HorzBrk': 0.05,
     'Distance': 0.5, 'LaunchAngle': 0.5, 'HC_X': 0.005, 'HC_Y': 0.005,
@@ -194,7 +193,7 @@ ALWAYS_OVERWRITE_COLS = {'ArmAngle', 'Barrel', 'PlateX', 'PlateZ',
 # "in play + fouls"). Count is constructed from balls/strikes like Runners.
 OVERWRITE_ONLY_COLS = {'Event', 'Description', 'Count', 'ExitVelo',
                        'LaunchAngle', 'Distance', 'BBType', 'HC_X', 'HC_Y',
-                       'Extension', 'IndVertBrk', 'HorzBrk'}
+                       'IndVertBrk', 'HorzBrk'}
 
 # Statcast `events` code -> MLB Stats API event string (the format Wally's
 # sheet already stores, produced by Pitcher2026.py via play.result.event).
