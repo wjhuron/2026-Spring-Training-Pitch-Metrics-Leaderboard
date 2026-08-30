@@ -767,8 +767,9 @@ def download_statcast(team_tab, date_min, date_max, session):
         lookup = {}
         roster = {}
         roster_cols = [c for c in ('game_date', 'player_name', 'inning',
-                                   'pitch_type', 'description',
-                                   'release_speed') if c in df.columns]
+                                   'pitch_type', 'description', 'release_speed',
+                                   'home_team', 'away_team', 'inning_topbot')
+                       if c in df.columns]
         for i in df.index:
             if is_auto.at[i]:
                 continue   # automatic ball/strike: not a real pitch, no key
@@ -984,6 +985,8 @@ def main():
     col_overwrites = Counter()  # per-column staged overwrites (grand total)
     ledger_skips = Counter()    # per-column skips honouring declined values
     missing_pitches = []        # savant-has / sheet-lacks, across all tabs
+    milb_sheet_keys = {}        # tab -> sheet keys; compared as a UNION below
+    milb_roster = {}            # merged two-sided Rochester roster
 
     for sheet_label, sheet_id in SPREADSHEET_IDS.items():
         if remaining is not None and not remaining:
@@ -1136,18 +1139,33 @@ def main():
                 if _pn == 0:
                     continue   # no-pitch IBB marker
                 sheet_keys.add((_p[0], str(_ab), str(_pn)))
-            tab_missing = [(key, info) for key, info in roster.items()
-                           if key not in sheet_keys]
-            print(f"  Missing pitches (Savant has, sheet lacks): {len(tab_missing)}")
-            for key, info in tab_missing:
-                missing_pitches.append({
-                    'Tab': tab_name, 'GamePk': key[0], 'AB': key[1],
-                    'Pitch': key[2],
-                    'PitchID': f"{key[0]}_{int(key[1]):03d}_{int(key[2]):02d}",
-                    **{k: info.get(k) for k in ('game_date', 'player_name',
-                                                'inning', 'count', 'pitch_type',
-                                                'description', 'release_speed')},
-                })
+            # The minors comparison CANNOT run per tab. The download carries
+            # both sides of every Rochester game, and tab membership does not
+            # follow pitching side: a pitcher released or traded away has his
+            # PTeam (and tab) moved from ROC to AAA — the ONE place in the
+            # sheets where rows change teams retroactively (Wally 2026-08-30;
+            # a per-side filter mis-flagged 3,500 ex-ROC arms, and no filter
+            # at all flagged all 37,948 other-side pitches). So ROC and AAA
+            # are checked as ONE union after both tabs are read: together
+            # they must cover every real pitch of every Rochester game.
+            if is_milb_tab:
+                milb_sheet_keys[tab_name] = sheet_keys
+                milb_roster.update(roster)
+                print("  Missing-pitch check deferred to the combined "
+                      "ROC+AAA pass at the end of the run")
+            else:
+                tab_missing = [(key, info) for key, info in roster.items()
+                               if key not in sheet_keys]
+                print(f"  Missing pitches (Savant has, sheet lacks): {len(tab_missing)}")
+                for key, info in tab_missing:
+                    missing_pitches.append({
+                        'Tab': tab_name, 'GamePk': key[0], 'AB': key[1],
+                        'Pitch': key[2],
+                        'PitchID': f"{key[0]}_{int(key[1]):03d}_{int(key[2]):02d}",
+                        **{k: info.get(k) for k in ('game_date', 'player_name',
+                                                    'inning', 'count', 'pitch_type',
+                                                    'description', 'release_speed')},
+                    })
 
             # Match and prepare cell updates
             cells_to_update = []
@@ -1281,6 +1299,27 @@ def main():
         for col in sorted(set(col_fills) | set(col_overwrites) | set(ledger_skips)):
             print(f"  {col:16s} {col_fills.get(col, 0):7d} / "
                   f"{col_overwrites.get(col, 0):7d} / {ledger_skips.get(col, 0):d}")
+
+    # Combined ROC+AAA missing-pitch pass (see the deferral note above).
+    if milb_roster:
+        if {'ROC', 'AAA'} <= set(milb_sheet_keys):
+            union = set().union(*milb_sheet_keys.values())
+            milb_missing = [(k, v) for k, v in milb_roster.items()
+                            if k not in union]
+            print(f"\nMissing pitches (ROC+AAA union): {len(milb_missing)}")
+            for key, info in milb_missing:
+                missing_pitches.append({
+                    'Tab': 'ROC/AAA', 'GamePk': key[0], 'AB': key[1],
+                    'Pitch': key[2],
+                    'PitchID': f"{key[0]}_{int(key[1]):03d}_{int(key[2]):02d}",
+                    **{k: info.get(k) for k in ('game_date', 'player_name',
+                                                'inning', 'count', 'pitch_type',
+                                                'description', 'release_speed')},
+                })
+        else:
+            print("\nNOTE: minors missing-pitch check skipped — it needs BOTH "
+                  "the ROC and AAA tabs in the same run, because either tab "
+                  "alone holds only part of every Rochester game.")
 
     # Missing pitches always produce the .xlsx, dry run or not — a missing
     # pitch is the one finding that must never scroll away in a log.
