@@ -183,20 +183,35 @@ NX = int(round((X_MAX - X_MIN) / BIN_X))           # 18
 # changing js/player-page.js rendering, for a number indistinguishable from
 # zero. Unlike the X direction, all three objectives agree here.
 Z_MIN, Z_MAX = -0.6, 1.6           # zone-normalized (0 = bottom, 1 = top)
-# BIN_Z swept 0.05-0.20 on 2021-2025 at constant physical bandwidth. Every
+# BIN_Z: 0.10 stays. REJECTED 2026-08-30 — a grid-offset change that looked
+# strong on 2021-2025 and then REVERSED on the live season. Recorded in full
+# so nobody re-derives it.
+#
+# What looked real: swept 0.05-0.20 at constant physical bandwidth, every
 # width from 0.05 to 0.1375 scores RAW .1962-.1970 EXCEPT 0.10, alone at
-# .1953 — a reproducible hole at the shipped value, confirmed by a fill-in
-# run where all four neighbours beat it. Cause (measured, not guessed): with
-# Z_MIN=-0.6 a 0.10 bin puts grid EDGES exactly on znorm 0.0 and 1.0, the
-# zone boundaries where called-strike probability steps hardest. Sliding the
-# grid half a bin so those boundaries sit at bin CENTRES scores +.0029
-# (t=4.09, 5/5), and the offset curve peaks at exactly half a bin and falls
-# off symmetrically toward alignment — offset is cyclic mod BIN_Z, so those
-# points cover the whole domain. The same mechanism explains the width
-# sweep: 0.10 and 0.20 are the grid-aligned widths and the two worst scores.
-# NOT ACTED ON as of 2026-08-30 — see the open item in the memory notes; it
-# would move shipped Loc+ values and needs the live season plus an
-# end-to-end pipeline diff first.
+# .1953 — a hole at exactly the shipped value, confirmed by a fill-in run
+# where all four neighbours beat it. Apparent cause: with Z_MIN=-0.6 a 0.10
+# bin puts grid EDGES exactly on znorm 0.0 and 1.0, the zone boundaries
+# where called-strike probability steps hardest. Sliding the grid half a bin
+# (Z_MIN/Z_MAX -0.65/1.55, NZ unchanged) so those boundaries sit at bin
+# CENTRES scored +.0029, t=4.09, 5/5 seasons, and the offset curve peaked at
+# exactly half a bin and fell off symmetrically toward alignment. Offset is
+# cyclic mod BIN_Z, so that was a bracketed interior optimum, and the width
+# sweep agreed: 0.10 and 0.20 are the grid-aligned widths and the two worst.
+#
+# Why it is rejected: the 2026 replicate (live season, run on the production
+# cache) reverses it. Half-bin offset scores -.0038 vs shipped, 0/2 halves;
+# 0.075 also flips negative; only the QUARTER-bin offset is positive, so the
+# symmetric-peak shape that made the mechanism credible does not reproduce
+# either. Five agreeing seasons plus a sixth that reverses is the same trap
+# already in the notes with the signs swapped (a 2026-tuned config that lost
+# 5/5 on 2021-2025). The live season is the deployment target and it does
+# not confirm.
+# Caveat, stated because it cuts against the rejection: 2026 was partial
+# (155 dates), its signal is weaker throughout (RAW ~.129 vs ~.195), and its
+# pairing unit is two halves, so it cannot confirm the finding either. A
+# change that reverses sign on the season it would ship into still does not
+# meet the bar. Re-test on the full 2026 season before reopening.
 BIN_Z = 0.10
 NZ = int(round((Z_MAX - Z_MIN) / BIN_Z))           # 22
 PHYS_X_IN = 4.5                    # physical smoothing bandwidths
