@@ -2554,7 +2554,19 @@ var PlayerPage = {
     var W = canvas.width, H = canvas.height;
 
     // Grid mirrors pipeline_locplus.py: x in feet, z is zone-normalized.
-    var X_MIN = -1.5, BIN_X = 2 / 12, Z_MIN = -0.6, BIN_Z = 0.10;
+    // Grid geometry is single-homed in pipeline/locplus.py and SHIPPED in
+    // metadata.locPlusWeights.config — read it, never re-declare it. This
+    // used to be a hardcoded second copy with nothing marking it as paired,
+    // so any change to the Python grid would have silently drawn every cell
+    // of this map in the wrong place (found 2026-08-30). The literals below
+    // are a last-resort fallback for a stale cached metadata blob only.
+    var _lc = (typeof DataStore !== 'undefined' && DataStore.metadata
+               && DataStore.metadata.locPlusWeights
+               && DataStore.metadata.locPlusWeights.config) || {};
+    var X_MIN = (_lc.xMin != null) ? _lc.xMin : -1.5;
+    var Z_MIN = (_lc.zMin != null) ? _lc.zMin : -0.6;
+    var BIN_X = (_lc.binX_in != null) ? _lc.binX_in / 12 : 2 / 12;
+    var BIN_Z = (_lc.binZ_frac != null) ? _lc.binZ_frac : 0.10;
     // Display bounds (a little padding beyond the zone).
     var xMin = -1.7, xMax = 1.7, znMin = -0.5, znMax = 1.6;
     function cx(px) { return ((px - xMin) / (xMax - xMin)) * W; }

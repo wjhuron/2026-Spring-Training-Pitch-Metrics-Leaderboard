@@ -160,8 +160,18 @@ def group_of_code(pt):
 # surface instead of a clamped edge bin. That was the motivating idea on
 # 2026-08-30 and this sweep killed it.
 X_MIN, X_MAX = -1.5, 1.5            # feet (plate center = 0)
-BIN_X = 2.0 / 12.0                  # 2-inch bins. Held FIXED by the sweep
-                                    # above, so the WIDTH is still unmeasured.
+# BIN_X_IN is the ONE home for the horizontal bin width. It used to be
+# hardcoded as a bare `2.0` in _KX, _kernels_for and the shipped config dict
+# while BIN_Z was single-homed, so changing BIN_X silently changed the
+# PHYSICAL smoothing bandwidth as well as the resolution — the exact trap
+# that would invalidate any sweep of it (found 2026-08-30).
+# Width swept 1-4 inches on 2021-2025 at constant physical bandwidth: RAW
+# moves 0.0013 across the whole range and every paired test is flat
+# (|t| <= 1.62), i.e. the objective is SHOWN FLAT, not optimised. 2 inches is
+# therefore a CONVENTION trading heatmap display resolution against cell
+# count (792 cells at 1 inch vs 198 at 4), not a measured optimum.
+BIN_X_IN = 2.0
+BIN_X = BIN_X_IN / 12.0
 NX = int(round((X_MAX - X_MIN) / BIN_X))           # 18
 # Z: the bounds are a symmetric margin of 0.6 zone-heights beyond each edge,
 # and that margin was swept 0.2-1.0. `raw` climbs steeply to 0.6 and then
@@ -173,7 +183,21 @@ NX = int(round((X_MAX - X_MIN) / BIN_X))           # 18
 # changing js/player-page.js rendering, for a number indistinguishable from
 # zero. Unlike the X direction, all three objectives agree here.
 Z_MIN, Z_MAX = -0.6, 1.6           # zone-normalized (0 = bottom, 1 = top)
-BIN_Z = 0.10                       # held FIXED by the sweep; width unmeasured
+# BIN_Z swept 0.05-0.20 on 2021-2025 at constant physical bandwidth. Every
+# width from 0.05 to 0.1375 scores RAW .1962-.1970 EXCEPT 0.10, alone at
+# .1953 — a reproducible hole at the shipped value, confirmed by a fill-in
+# run where all four neighbours beat it. Cause (measured, not guessed): with
+# Z_MIN=-0.6 a 0.10 bin puts grid EDGES exactly on znorm 0.0 and 1.0, the
+# zone boundaries where called-strike probability steps hardest. Sliding the
+# grid half a bin so those boundaries sit at bin CENTRES scores +.0029
+# (t=4.09, 5/5), and the offset curve peaks at exactly half a bin and falls
+# off symmetrically toward alignment — offset is cyclic mod BIN_Z, so those
+# points cover the whole domain. The same mechanism explains the width
+# sweep: 0.10 and 0.20 are the grid-aligned widths and the two worst scores.
+# NOT ACTED ON as of 2026-08-30 — see the open item in the memory notes; it
+# would move shipped Loc+ values and needs the live season plus an
+# end-to-end pipeline diff first.
+BIN_Z = 0.10
 NZ = int(round((Z_MAX - Z_MIN) / BIN_Z))           # 22
 PHYS_X_IN = 4.5                    # physical smoothing bandwidths
 PHYS_Z_FRAC = 0.22
@@ -379,7 +403,7 @@ def _k1d(bw):
     win = max(1, int(math.ceil(3 * bw)))
     return [(d, math.exp(-0.5 * (d / bw) ** 2)) for d in range(-win, win + 1)]
 
-_KX = _k1d(PHYS_X_IN / 2.0)        # bandwidth in cells (bins are 2", 0.10z)
+_KX = _k1d(PHYS_X_IN / BIN_X_IN)    # bandwidth in CELLS, from the one home
 _KZ = _k1d(PHYS_Z_FRAC / BIN_Z)
 
 def _zeros():
@@ -390,7 +414,7 @@ def _kernels_for(grp):
     bw = PHYS_BW_PT.get(grp)
     if not bw:
         return _KX, _KZ
-    return _k1d(bw[0] / 2.0), _k1d(bw[1] / BIN_Z)
+    return _k1d(bw[0] / BIN_X_IN), _k1d(bw[1] / BIN_Z)
 
 
 def _smooth(num, den, prior, kprior, kx=None, kz=None):
@@ -795,7 +819,7 @@ def serialize_surfaces(S):
     the league value surface per group×hand (the count-collapsed ExpRV proxy
     is reconstructable client-side from these if needed for a league heatmap)."""
     return {
-        'config': {'binX_in': 2.0, 'binZ_frac': BIN_Z, 'nx': NX, 'nz': NZ,
+        'config': {'binX_in': BIN_X_IN, 'binZ_frac': BIN_Z, 'nx': NX, 'nz': NZ,
                    'xMin': X_MIN, 'xMax': X_MAX, 'zMin': Z_MIN, 'zMax': Z_MAX,
                    'physX_in': PHYS_X_IN, 'physZ_frac': PHYS_Z_FRAC,
                    'scaleK': LOC_SCALE_K, 'nPriorOverall': N_PRIOR_OVERALL,
