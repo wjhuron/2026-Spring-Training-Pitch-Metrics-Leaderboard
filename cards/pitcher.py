@@ -4825,6 +4825,16 @@ def main():
 
     _apply_runexp_currency(all_rows)
 
+    # Recompute InZone from the plate coordinates, exactly as process_data
+    # does before any stat touches the rows. The sheet's InZone column is
+    # stamped at scrape time from FEED coordinates, and the Savant
+    # PlateX/PlateZ backfill (2026-08-29) corrects the coordinates but not
+    # the stamped flag, so the stored column goes stale after every
+    # supplement run. Derive it; never trust the stamp.
+    from pipeline.utils import compute_in_zone as _ciz_all
+    for _r in all_rows:
+        _r['InZone'] = _ciz_all(_r)
+
     # Filter by date range (and optionally by pitcher name)
     from pipeline.utils import is_no_pitch as _is_no_pitch
     pitches_by_pitcher = defaultdict(list)
