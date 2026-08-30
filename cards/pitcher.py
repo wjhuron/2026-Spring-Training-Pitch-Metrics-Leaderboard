@@ -1871,13 +1871,14 @@ def render_social_card(config, pitches, output_file):
                 fontfamily=family, ha=ha, va=va, fontstyle=style)
 
     def ink_txt(x, y, t, size, color, weight='bold', family='IBM Plex Sans',
-                zorder=5):
+                zorder=5, ax_=None):
         # Center a string on its GLYPH INK, not on the layout box. matplotlib's
         # ha/va='center' centers the advance box, which carries side bearings
         # and full font ascent/descent, so '1' and digits with no descender sit
         # visibly off inside a small disc. TextPath gives the real ink extents
-        # in points; the offset converts through the figure dpi (data coords
-        # here span the whole 8x10in figure, so 1 unit = 8in wide, 10in tall).
+        # in points; the offset converts to the TARGET axes' data units by
+        # asking that axes what one point is worth, so the same call works on
+        # the card's 0-1 canvas and inside the movement plot's inch scale.
         # It draws the glyphs as PATHS, not as text: Agg grid-fits a text
         # object's glyph origin to a whole device pixel, which at this size
         # throws the ink up to a pixel off center and by a different amount
@@ -1888,18 +1889,23 @@ def render_social_card(config, pitches, output_file):
         from matplotlib.font_manager import FontProperties
         from matplotlib.patches import PathPatch
         from matplotlib.transforms import Affine2D
+        a = ax if ax_ is None else ax_
         fp = FontProperties(family=family, weight=weight, size=size)
         tp = TextPath((0, 0), t, prop=fp)
         bb = tp.get_extents()
         ppd = fig.dpi / 72.0
-        sx = ppd / (fig.get_figwidth() * fig.dpi)
-        sy = ppd / (fig.get_figheight() * fig.dpi)
+        inv = a.transData.inverted()
+        d0 = inv.transform((0.0, 0.0))
+        d1 = inv.transform((ppd, ppd))
+        # Signed on purpose: an inverted axis gives a negative factor, which is
+        # what keeps the glyphs reading forward on screen.
+        sx, sy = d1[0] - d0[0], d1[1] - d0[1]
         tr = (Affine2D()
               .translate(-0.5 * (bb.x0 + bb.x1), -0.5 * (bb.y0 + bb.y1))
               .scale(sx, sy).translate(x, y))
-        ax.add_patch(PathPatch(tr.transform_path(tp), facecolor=color,
-                               edgecolor='none', zorder=zorder,
-                               transform=ax.transData))
+        a.add_patch(PathPatch(tr.transform_path(tp), facecolor=color,
+                              edgecolor='none', zorder=zorder,
+                              transform=a.transData, clip_on=False))
 
     def gtint(g):
         # Grade tint on the print scale. The 4-points-per-percentile map is a
@@ -2136,14 +2142,13 @@ def render_social_card(config, pitches, output_file):
             # restores the volume signal the cloud used to carry. All-white
             # ink (A/B'd against luminance ink; Wally chose white).
             _cnt = sum(1 for q in pitches if q.get('Pitch Type') == pt_)
-            # +0.013/-0.125 data-unit offsets: measured digit-ink centers
-            # vs disc centers, iterated to the rasterization floor (means
-            # <1px; per-digit ink shapes bound the rest).
-            mv.text(mh + 0.013, mvv - 0.125, str(_cnt), fontsize=7.5,
-                    color='#ffffff',
-                    ha='center', va='center', fontweight='bold',
-                    fontfamily='IBM Plex Sans',
-                    zorder=5.5 + len(pl) * 1e-4)
+            # Ink-centered glyph paths, same as the table chips. The centroid
+            # sits at the pitch's true mean movement, so this chip is NOT
+            # pixel-snapped the way a table row is: the disc and the numeral
+            # both render subpixel-accurate, which keeps them concentric
+            # wherever the data puts them.
+            ink_txt(mh, mvv, str(_cnt), 7.5, '#ffffff',
+                    zorder=5.5 + len(pl) * 1e-4, ax_=mv)
         _vt = velo_by_type.get(pt_) if not is_season else None
         _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
         right = mh > 0.68 * _lim
