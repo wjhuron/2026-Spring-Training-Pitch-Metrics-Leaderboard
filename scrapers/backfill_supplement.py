@@ -268,10 +268,13 @@ MILB_PLAYER_TYPES = ('pitcher', 'batter')
 #     play. Savant additionally carries EV/LA on FOULS, which the feed does
 #     not; filling from here would silently redefine ExitVelo from "in play"
 #     to "in play + fouls" and shift every EV-based metric.
-#   - PlateX/PlateZ: the feed-vs-Savant pZ offset was measured on MLB games
-#     only (2026-08-29). Whether the minors feed carries the same bias is
-#     unmeasured, so ROC/AAA keep feed coordinates until it is.
-MILB_SUPPLEMENT_COLS = {'ArmAngle', 'RunExp', 'xBA', 'xSLG', 'xwOBA', 'Barrel'}
+# PlateX/PlateZ joined 2026-08-30: the minors feed carries the SAME vertical
+# bias as the MLB feed. Measured on 1,180 pitches across 4 Rochester games
+# (2026-08-25..28, 100% match rate vs Savant-minors): feed pZ +0.086 ft
+# (+1.03 in) above Savant plate_z, sd 0.024, consistent per game
+# (+0.079..+0.090); plate_x -0.014 ft.
+MILB_SUPPLEMENT_COLS = {'ArmAngle', 'RunExp', 'xBA', 'xSLG', 'xwOBA', 'Barrel',
+                        'PlateX', 'PlateZ'}
 
 # Days per minors request. Was 3 when every request dragged back all four
 # affiliate levels (~5.5k rows/day vs the 25k cap). With the server-side club
