@@ -133,11 +133,47 @@ def group_of_code(pt):
     return GROUP.get(pt, 'OTHER')
 
 # ── Grid + smoothing ────────────────────────────────────────────────────
+# The grid BOUNDS were swept 2026-08-30 on 2021-2025 (five independent
+# seasons rebuilt self-contained), holding the bin widths fixed so that only
+# COVERAGE changed and the smoothing kernels stayed identical throughout.
+# Reproduce with scripts/research/locplus/locplus_grid_bounds_sweep.py.
+#
+# The decider is `raw`: first-half Loc+ against second-half actual run value,
+# paired across seasons. The other two objectives are NOT usable in the
+# narrowing direction, and this is the whole reason the sweep needed care:
+#   - reliability climbs monotonically as the grid shrinks, peaking at
+#     X_MAX=0.5 where 55% of pitches are crushed into six bins and `raw` is
+#     WORSE than shipped. Smoothing toward a constant buys repeatability by
+#     destroying information, so rel is a DIAGNOSTIC here, not an objective.
+#   - the velocity-controlled partial inflates for a second, purely
+#     mechanical reason: r(Loc+, velo) rises .130 -> .165 as X_MAX shrinks
+#     (t=9.5, 5/5), and with r(velo, RV) negative that lifts the partial even
+#     while `raw` is flat.
+#
+# X: `raw` sits on a plateau spanning roughly 1.0-1.5 ft, bracketed on BOTH
+# sides (0.5 ft +.1931, shipped 1.5 ft +.1953, 2.5 ft +.1902). Widening is
+# significantly worse — 1.667 t=-3.6, 2.0 t=-5.4, 2.5 t=-5.0, each 0/5
+# seasons. Narrowing is flat: every value 0.5-1.333 lands inside one SE, and
+# win counts collapse to 2/5 at the extremes. 1.5 is the point in that
+# plateau with the least velocity contamination, so it stays.
+# Corollary, measured: do NOT widen the grid to give hit-by-pitches real
+# surface instead of a clamped edge bin. That was the motivating idea on
+# 2026-08-30 and this sweep killed it.
 X_MIN, X_MAX = -1.5, 1.5            # feet (plate center = 0)
-BIN_X = 2.0 / 12.0                  # 2-inch horizontal bins
+BIN_X = 2.0 / 12.0                  # 2-inch bins. Held FIXED by the sweep
+                                    # above, so the WIDTH is still unmeasured.
 NX = int(round((X_MAX - X_MIN) / BIN_X))           # 18
+# Z: the bounds are a symmetric margin of 0.6 zone-heights beyond each edge,
+# and that margin was swept 0.2-1.0. `raw` climbs steeply to 0.6 and then
+# SATURATES (0.6 +.1953, 0.8 +.1959, 1.0 +.1956) — structurally, not
+# statistically: only 2.3% of pitches remain outside the grid at 0.8 and 1.0%
+# at 1.0, so there is nothing left to admit. Narrower is worse (0.2 t=-2.7,
+# 0.4 t=-1.9, both 0/5). Wider is inside one SE (0.8 t=0.8, 1.0 t=0.3, 3/5)
+# and would grow NZ 22 -> 26, enlarging every shipped heatmap payload and
+# changing js/player-page.js rendering, for a number indistinguishable from
+# zero. Unlike the X direction, all three objectives agree here.
 Z_MIN, Z_MAX = -0.6, 1.6           # zone-normalized (0 = bottom, 1 = top)
-BIN_Z = 0.10
+BIN_Z = 0.10                       # held FIXED by the sweep; width unmeasured
 NZ = int(round((Z_MAX - Z_MIN) / BIN_Z))           # 22
 PHYS_X_IN = 4.5                    # physical smoothing bandwidths
 PHYS_Z_FRAC = 0.22
