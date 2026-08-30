@@ -1870,6 +1870,37 @@ def render_social_card(config, pitches, output_file):
         ax.text(x, y, t, fontsize=size, color=color, fontweight=weight,
                 fontfamily=family, ha=ha, va=va, fontstyle=style)
 
+    def ink_txt(x, y, t, size, color, weight='bold', family='IBM Plex Sans',
+                zorder=5):
+        # Center a string on its GLYPH INK, not on the layout box. matplotlib's
+        # ha/va='center' centers the advance box, which carries side bearings
+        # and full font ascent/descent, so '1' and digits with no descender sit
+        # visibly off inside a small disc. TextPath gives the real ink extents
+        # in points; the offset converts through the figure dpi (data coords
+        # here span the whole 8x10in figure, so 1 unit = 8in wide, 10in tall).
+        # It draws the glyphs as PATHS, not as text: Agg grid-fits a text
+        # object's glyph origin to a whole device pixel, which at this size
+        # throws the ink up to a pixel off center and by a different amount
+        # per string ('5' and '26' land differently). A path goes through the
+        # same subpixel renderer as the disc itself, so the ink lands where
+        # the math puts it on every row.
+        from matplotlib.textpath import TextPath
+        from matplotlib.font_manager import FontProperties
+        from matplotlib.patches import PathPatch
+        from matplotlib.transforms import Affine2D
+        fp = FontProperties(family=family, weight=weight, size=size)
+        tp = TextPath((0, 0), t, prop=fp)
+        bb = tp.get_extents()
+        ppd = fig.dpi / 72.0
+        sx = ppd / (fig.get_figwidth() * fig.dpi)
+        sy = ppd / (fig.get_figheight() * fig.dpi)
+        tr = (Affine2D()
+              .translate(-0.5 * (bb.x0 + bb.x1), -0.5 * (bb.y0 + bb.y1))
+              .scale(sx, sy).translate(x, y))
+        ax.add_patch(PathPatch(tr.transform_path(tp), facecolor=color,
+                               edgecolor='none', zorder=zorder,
+                               transform=ax.transData))
+
     def gtint(g):
         # Grade tint on the print scale. The 4-points-per-percentile map is a
         # display convention (a +/-12.5 grade spans the full ramp), not a
@@ -2222,12 +2253,22 @@ def render_social_card(config, pitches, output_file):
             for r_ in rows:
                 ry -= rh
                 col = PITCH_COLORS.get(r_['pt'], '#777')
-                ax.scatter([L + 0.010], [ry], s=215, color=col, edgecolors='none',
+                # Snap the count chip to a whole device pixel. The row rhythm
+                # (rh) is not a whole number of pixels, so consecutive chips
+                # otherwise land alternately on pixel centers and pixel
+                # boundaries: the disc renders subpixel-accurate but Agg snaps
+                # glyph origins to integers, so the numeral drifts a half pixel
+                # one way on odd rows and the other way on even rows. Every
+                # chip measures centered on its own, and the STACK still reads
+                # ragged. Snapping the pair to the same grid on every row makes
+                # all of them rasterize identically.
+                _cy = round(ry * fig.get_figheight() * fig.dpi) / (
+                    fig.get_figheight() * fig.dpi)
+                _cx = round((L + 0.010) * fig.get_figwidth() * fig.dpi) / (
+                    fig.get_figwidth() * fig.dpi)
+                ax.scatter([_cx], [_cy], s=215, color=col, edgecolors='none',
                            transform=ax.transAxes, zorder=4)
-                ax.text(L + 0.010 - 0.0003, ry - 0.0007, str(r_['n']), fontsize=6.8,
-                        color='#ffffff', fontweight='bold',
-                        fontfamily='IBM Plex Sans', ha='center', va='center',
-                        zorder=5)
+                ink_txt(_cx, _cy, str(r_['n']), 6.8, '#ffffff')
                 txt(L + 0.032, ry, PITCH_NAMES.get(r_['pt'], r_['pt']).upper(),
                     fs, TEXT_PRIMARY, 'bold', ha='left')
                 for lab, cx, al, k in cols:
