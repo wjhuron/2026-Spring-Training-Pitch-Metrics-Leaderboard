@@ -40,6 +40,10 @@ filter_teams = None
 # Produce an Excel report of all changes? "yes" or "no"
 produce_report = "no"
 
+# Dry run: stage and count everything, write nothing. Pair with
+# produce_report="yes" to get the Excel diff without touching a sheet.
+dry_run = "no"
+
 # Also run the MLB Stats API feed pass over ROC/AAA? "yes" or "no". This fills
 # Outs and Runners from the feed. It is separate from (and complementary to)
 # the Savant minor-league supplement pass, which the main loop now runs for
@@ -79,6 +83,76 @@ SUPPLEMENT_MAP = {
     # back the identical string and reruns skip the cell.
     'PlateX': 'plate_x',
     'PlateZ': 'plate_z',
+    # ── Expanded overwrite set (Wally 2026-08-30) ──────────────────────────
+    # Savant becomes the authority for these columns too: overwrite existing
+    # values when Savant differs, but NEVER fill a blank (OVERWRITE_ONLY).
+    # Reconciled 2026-08-30 on 12,214 matched pitches across three dates
+    # (2026-06-10, 08-20, 08-29): agreement, signs and units are all measured,
+    # not assumed. Deliberately EXCLUDED, per Wally: Velocity, Spin Rate,
+    # RTilt, OTilt, SzTop, SzBot (the historical churn/rejection columns:
+    # 1,766 + 647 + 334 + 324 declined values in the 08-23 audit) and
+    # Pitch Type (retagging would orphan the per-pitch grade cells).
+    # RelPosX/RelPosZ are HELD OUT: savant release differs systematically
+    # (-0.089 ft z; 0.20 ft x scatter) and the frozen Stuff+ bundle was
+    # trained on feed-denominated release — adopting them is a separate
+    # migration decision, not a ride-along.
+    'Description': 'description',       # via SAVANT_TO_SHEET_DESCRIPTION
+    'ExitVelo': 'launch_speed',         # 99.9% identical; rare real revisions
+    'LaunchAngle': 'launch_angle',      # 100% identical in reconciliation
+    'Distance': 'hit_distance_sc',      # savant recomputes; mean +1.3 ft drift
+    'BBType': 'bb_type',                # bunt guard below — see write loop
+    'HC_X': 'hc_x',                     # 100% identical
+    'HC_Y': 'hc_y',                     # 100% identical
+    'Extension': 'release_extension',   # identical to savant's 1-dec quantum
+    'IndVertBrk': 'pfx_z',              # x12 (ft->in); exact
+    'HorzBrk': 'pfx_x',                 # x-12 (ft->in, mirrored); exact both hands
+}
+
+# Unit/sign transforms applied to the Savant value before rounding. Measured
+# 2026-08-30: IVB = pfx_z*12 matches the sheet to the rounding digit on all
+# 12,119 pitches; HorzBrk needs the mirror (-pfx_x*12), confirmed separately
+# on LHP (mean as-is -9.2) and RHP (+8.4) so the flip is hand-independent.
+SAVANT_TRANSFORM = {
+    'IndVertBrk': lambda v: v * 12.0,
+    'HorzBrk': lambda v: v * -12.0,
+}
+
+# Savant `description` -> the sheet's exact Description vocabulary. Built from
+# the full 12,214-pitch cross-tab (2026-08-30): every observed Savant code maps
+# to exactly ONE sheet string, no exceptions. An unmapped code is skipped, so a
+# new Savant vocabulary word can never invent a new sheet spelling — the
+# pipeline's swing/CSW sets key on these exact strings.
+SAVANT_TO_SHEET_DESCRIPTION = {
+    'ball': 'Ball',
+    'blocked_ball': 'Ball',
+    'called_strike': 'Called Strike',
+    'swinging_strike': 'Swinging Strike',
+    'swinging_strike_blocked': 'Swinging Strike',
+    'foul': 'Foul',
+    'foul_tip': 'Swinging Strike',
+    'bunt_foul_tip': 'Swinging Strike',
+    'foul_bunt': 'Foul Bunt',
+    'missed_bunt': 'Missed Bunt',
+    'hit_into_play': 'In Play',
+    'hit_by_pitch': 'Hit By Pitch',
+    'pitchout': 'Pitchout',
+}
+
+# Anti-churn epsilon for numeric OVERWRITES (never gates a blank fill): skip
+# the write when |new - old| <= eps, i.e. when the difference is at or below
+# the coarser source's own rounding quantum, because that is a precision echo,
+# not information. Quanta measured 2026-08-30 from the reconciliation
+# (max |diff| bands): savant serves Extension and the attack cluster at 1
+# decimal while the sheet stores finer feed digits — without this, every such
+# cell would rewrite by rounding noise on every run. A genuine revision
+# (|diff| > quantum) always writes.
+OVERWRITE_EPSILON = {
+    'Extension': 0.05, 'AttackAngle': 0.05, 'AttackDirection': 0.05,
+    'SwingPathTilt': 0.05, 'ExitVelo': 0.05, 'BatSpeed': 0.05,
+    'SwingLength': 0.005, 'IndVertBrk': 0.05, 'HorzBrk': 0.05,
+    'Distance': 0.5, 'LaunchAngle': 0.5, 'HC_X': 0.005, 'HC_Y': 0.005,
+    'RunExp': 0.0005, 'xBA': 0.0005, 'xSLG': 0.0005, 'xwOBA': 0.0005,
+    'PlateX': 0.005, 'PlateZ': 0.005, 'ArmAngle': 0.05,
 }
 
 # Swing-tracking cluster: if BatSpeed is missing or sub-50, the entire
@@ -90,7 +164,7 @@ SWING_CLUSTER_COLS = {'BatSpeed', 'SwingLength', 'AttackAngle',
 INT_COLS = {'Outs', 'Barrel'}  # Raw integer values (Barrel = launch_speed_angle 1-6)
 
 # Columns that store free-form strings (no numeric coercion, custom translator).
-STRING_COLS = {'Event'}
+STRING_COLS = {'Event', 'Description', 'BBType'}
 
 # Columns where official Statcast data should always overwrite estimates
 # (even if the cell already has a value from the initial download). Barrel is
@@ -98,13 +172,24 @@ STRING_COLS = {'Event'}
 # blank), which the official launch_speed_angle (1-6) should replace.
 # PlateX/PlateZ are included because the scrape writes the feed's biased pZ
 # calibration (see SUPPLEMENT_MAP); Savant's reprocessed value replaces it.
-ALWAYS_OVERWRITE_COLS = {'ArmAngle', 'Barrel', 'PlateX', 'PlateZ'}
+# The whole pre-2026-08-30 fill set joined too (Wally): those columns keep
+# their blank-fill behaviour AND now adopt Savant revisions to existing
+# values. Runners is constructed from on_1b/2b/3b rather than mapped, but
+# membership here works by name the same way.
+ALWAYS_OVERWRITE_COLS = {'ArmAngle', 'Barrel', 'PlateX', 'PlateZ',
+                         'BatSpeed', 'SwingLength', 'AttackAngle',
+                         'AttackDirection', 'SwingPathTilt',
+                         'RunExp', 'xBA', 'xSLG', 'xwOBA', 'Outs', 'Runners'}
 
 # Columns that only ever OVERWRITE existing values; they are never used to
-# fill a blank cell. Intended for scoring-change corrections (e.g., official
-# scorer flips a play from hit to error), where the initial download already
-# populated the cell via the MLB Stats API feed.
-OVERWRITE_ONLY_COLS = {'Event'}
+# fill a blank cell. Two reasons to be here: scoring-change corrections
+# (Event), and the 2026-08-30 expansion columns, where a blank is a deliberate
+# state the sheet already settled (e.g. ExitVelo blank on fouls — Savant
+# carries foul EV and filling it would redefine the column from "in play" to
+# "in play + fouls"). Count is constructed from balls/strikes like Runners.
+OVERWRITE_ONLY_COLS = {'Event', 'Description', 'Count', 'ExitVelo',
+                       'LaunchAngle', 'Distance', 'BBType', 'HC_X', 'HC_Y',
+                       'Extension', 'IndVertBrk', 'HorzBrk'}
 
 # Statcast `events` code -> MLB Stats API event string (the format Wally's
 # sheet already stores, produced by Pitcher2026.py via play.result.event).
@@ -601,13 +686,18 @@ def download_statcast(team_tab, date_min, date_max, session):
                 continue
             series = df[csv_col]
             if sheet_col in STRING_COLS:
-                # String column: custom translator. For Event, translate Statcast
-                # lowercase_underscore codes to MLB Stats API title-case strings
-                # that Wally's sheet uses. Unmapped codes (including `field_out`)
-                # are dropped so the downstream overwrite step leaves the cell
-                # alone.
+                # String column: custom translator. For Event and Description,
+                # translate Statcast lowercase_underscore codes to the exact
+                # strings Wally's sheet uses. Unmapped codes (including
+                # `field_out`) are dropped so the downstream overwrite step
+                # leaves the cell alone. BBType shares Savant's vocabulary
+                # verbatim (fly_ball/ground_ball/line_drive/popup) — its bunt
+                # guard lives in the write loop, not here.
                 if sheet_col == 'Event':
                     mapped = series.map(STATCAST_TO_MLB_EVENT)
+                    formatted[sheet_col] = mapped.dropna()
+                elif sheet_col == 'Description':
+                    mapped = series.map(SAVANT_TO_SHEET_DESCRIPTION)
                     formatted[sheet_col] = mapped.dropna()
                 else:
                     formatted[sheet_col] = series.dropna().astype(str)
@@ -618,6 +708,8 @@ def download_statcast(team_tab, date_min, date_max, session):
             else:
                 decimals = ROUND_DECIMALS.get(sheet_col, 1)
                 numeric = pd.to_numeric(series, errors='coerce')
+                if sheet_col in SAVANT_TRANSFORM:
+                    numeric = numeric.map(SAVANT_TRANSFORM[sheet_col])
                 if sheet_col in SWING_CLUSTER_COLS:
                     numeric = numeric.where(~swing_invalid)
                 rounded = numeric.round(decimals)
@@ -643,6 +735,17 @@ def download_statcast(team_tab, date_min, date_max, session):
                 runners = (parts[0] + '+' + parts[1] + '+' + parts[2]).str.strip('+').str.replace(r'\++', '+', regex=True)
                 runners = runners.replace('', '0')
 
+        # Count is constructed like Runners: balls/strikes are the count
+        # BEFORE the pitch on both sides, and the reconciliation found
+        # 12,214/12,214 agreement, so a write here is a genuine correction.
+        has_count = all(c in df.columns for c in ['balls', 'strikes'])
+        if has_count:
+            _b = pd.to_numeric(df['balls'], errors='coerce')
+            _s = pd.to_numeric(df['strikes'], errors='coerce')
+            count_valid = _b.notna() & _s.notna()
+            count_str = (_b.fillna(0).astype(int).astype(str) + '-'
+                         + _s.fillna(0).astype(int).astype(str))
+
         # Assemble lookup dict
         lookup = {}
         for i in df.index:
@@ -657,6 +760,9 @@ def download_statcast(team_tab, date_min, date_max, session):
                     data[sheet_col] = ''
             if has_runners and (allowed_cols is None or 'Runners' in allowed_cols):
                 data['Runners'] = runners.at[i]
+            if has_count and count_valid.at[i] and (allowed_cols is None
+                                                    or 'Count' in allowed_cols):
+                data['Count'] = count_str.at[i]
             if data:
                 lookup[key] = data
 
@@ -670,6 +776,58 @@ def download_statcast(team_tab, date_min, date_max, session):
     except Exception as e:
         print(f"    Error: {e}")
         return None
+
+
+# ── Decisions ledger (backfill_full review history) ─────────────────────────
+# data/backfill_decisions.json records values Wally explicitly DECLINED in a
+# backfill_full review. This sweep must not re-write a declined value: exact
+# string match for string columns, and within the column's OVERWRITE_EPSILON
+# for numerics (the declined value was feed-sourced at feed precision, so the
+# Savant spelling of the same measurement differs in trailing digits).
+_DECISIONS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    'data', 'backfill_decisions.json')
+
+
+def load_declined():
+    """{(pitch_id, column): [declined value strings]} from the ledger."""
+    try:
+        with open(_DECISIONS_PATH) as f:
+            import json
+            raw = json.load(f).get('decisions', {})
+    except FileNotFoundError:
+        return {}
+    out = {}
+    for key, rec in raw.items():
+        pid, _, col = key.partition('|')
+        vals = rec.get('rejected') or []
+        if pid and col and vals:
+            out[(pid, col)] = [str(v) for v in vals]
+    return out
+
+
+def is_declined(declined, pid, col, val):
+    """True when `val` matches a value Wally declined for this cell."""
+    vals = declined.get((pid, col))
+    if not vals:
+        return False
+    sval = str(val)
+    if sval in vals:
+        return True
+    eps = OVERWRITE_EPSILON.get(col)
+    if eps is None:
+        return False
+    try:
+        v = float(sval)
+    except (TypeError, ValueError):
+        return False
+    for d in vals:
+        try:
+            if abs(v - float(d)) <= eps:
+                return True
+        except (TypeError, ValueError):
+            continue
+    return False
 
 
 _TRANSIENT_SHEETS_CODES = ('429', '500', '502', '503', '504')
@@ -795,6 +953,11 @@ def main():
     total_filled = 0
     total_overwritten = 0
     report_data = {}  # team -> list of {header, row_values, changes}
+    declined = load_declined()
+    from collections import Counter
+    col_fills = Counter()       # per-column staged fills (grand total)
+    col_overwrites = Counter()  # per-column staged overwrites (grand total)
+    ledger_skips = Counter()    # per-column skips honouring declined values
 
     for sheet_label, sheet_id in SPREADSHEET_IDS.items():
         if remaining is not None and not remaining:
@@ -849,6 +1012,8 @@ def main():
                     supp_col_idx[sheet_col] = col_idx[sheet_col]
             if 'Runners' in col_idx and (allowed is None or 'Runners' in allowed):
                 supp_col_idx['Runners'] = col_idx['Runners']
+            if 'Count' in col_idx and (allowed is None or 'Count' in allowed):
+                supp_col_idx['Count'] = col_idx['Count']
             if not supp_col_idx:
                 print(f"  No supplement columns found — skipping")
                 continue
@@ -946,6 +1111,27 @@ def main():
                         # Skip if overwrite value is identical to existing
                         if existing_val and str(val) == str(existing_val):
                             continue
+                        # Bunt guard: Savant classifies bunts as
+                        # ground_ball/popup (all 35 BBType mismatches in the
+                        # 2026-08-30 reconciliation were exactly this). The
+                        # sheet's 'bunt' marker is what keeps bunts out of
+                        # GB%/swing metrics — never replace it.
+                        if sheet_col == 'BBType' and existing_val == 'bunt':
+                            continue
+                        # Anti-churn epsilon on numeric overwrites: a
+                        # difference at or below the coarser source's rounding
+                        # quantum is a precision echo, not a revision.
+                        if existing_val and sheet_col in OVERWRITE_EPSILON:
+                            try:
+                                if abs(float(val) - float(existing_val)) \
+                                        <= OVERWRITE_EPSILON[sheet_col]:
+                                    continue
+                            except (TypeError, ValueError):
+                                pass
+                        # Honour the backfill_full review ledger.
+                        if is_declined(declined, pid, sheet_col, val):
+                            ledger_skips[sheet_col] += 1
+                            continue
                         cell = gspread.Cell(
                             row=r_idx,
                             col=supp_col_idx[sheet_col] + 1,  # 1-indexed
@@ -955,9 +1141,11 @@ def main():
                         c_idx = col_idx[sheet_col]
                         if existing_val:
                             overwrite_cells += 1
+                            col_overwrites[sheet_col] += 1
                             row_changes[c_idx] = 'overwrite'
                         else:
                             new_fill_cells += 1
+                            col_fills[sheet_col] += 1
                             row_changes[c_idx] = 'new'
 
                 # Collect report data for this row if anything changed
@@ -976,7 +1164,12 @@ def main():
                         'changes': row_changes,
                     })
 
-            if cells_to_update:
+            if cells_to_update and dry_run == 'yes':
+                print(f"  DRY RUN: would write {len(cells_to_update)} cells "
+                      f"({new_fill_cells} new, {overwrite_cells} overwritten)")
+                total_filled += new_fill_cells
+                total_overwritten += overwrite_cells
+            elif cells_to_update:
                 print(f"  Writing {len(cells_to_update)} cells "
                       f"({new_fill_cells} new, {overwrite_cells} overwritten)...")
                 # USER_ENTERED so numeric supplement columns land as real
@@ -1011,10 +1204,17 @@ def main():
         parts.append(f"{total_filled} new cells filled")
     if total_overwritten:
         parts.append(f"{total_overwritten} cells overwritten")
+    verb = "Would change (DRY RUN)" if dry_run == 'yes' else "Done."
     if parts:
-        print(f"\nDone. {', '.join(parts)}.")
+        print(f"\n{verb} {', '.join(parts)}.")
     else:
-        print(f"\nDone. No new data added, no data overwritten.")
+        print(f"\n{verb} No new data added, no data overwritten.")
+
+    if col_fills or col_overwrites or ledger_skips:
+        print("\nPer-column totals (fills / overwrites / ledger skips):")
+        for col in sorted(set(col_fills) | set(col_overwrites) | set(ledger_skips)):
+            print(f"  {col:16s} {col_fills.get(col, 0):7d} / "
+                  f"{col_overwrites.get(col, 0):7d} / {ledger_skips.get(col, 0):d}")
 
     if produce_report == 'yes':
         report_path = write_report(report_data)
@@ -1038,6 +1238,9 @@ if __name__ == '__main__':
     parser.add_argument('--end', default=None, help='End date YYYY-MM-DD, or "none" for all dates')
     parser.add_argument('--teams', default=None, help='Comma-separated team abbreviations (e.g., BOS,NYY)')
     parser.add_argument('--report', default=None, help='"yes" to produce an Excel report of changes')
+    parser.add_argument('--dry-run', default=None,
+                        help='"yes" to stage and count everything but write '
+                             'nothing (pair with --report yes for the Excel diff)')
     parser.add_argument('--backfill-milb', default=None,
                         help='"yes"/"no" to backfill ROC/AAA Outs+Runners from the feed (default yes)')
     args = parser.parse_args()
@@ -1051,6 +1254,8 @@ if __name__ == '__main__':
         filter_teams = [t for t in args.teams.split(',') if t.strip()]   # main() normalizes
     if args.report is not None:
         produce_report = args.report.lower()
+    if args.dry_run is not None:
+        dry_run = args.dry_run.lower()
     if args.backfill_milb is not None:
         backfill_milb = args.backfill_milb.lower()
 
