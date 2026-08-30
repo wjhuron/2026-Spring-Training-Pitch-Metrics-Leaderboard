@@ -2127,49 +2127,102 @@ def render_social_card(config, pitches, output_file):
             col = PITCH_COLORS.get(pt_, '#777')
             mv.scatter([q[0] for q in pl], [q[1] for q in pl], s=9, color=col,
                        alpha=0.16, edgecolors='none', zorder=3)
-    _placed_labels = []      # (x0, x1, y) in data units, for collision flips
-    for pt_, pl in sorted(groups.items(), key=lambda kv: -len(kv[1])):
+    # Label placement (rebuilt 2026-08-30, per Wally). The previous version
+    # scored a label only against labels already placed, so it never saw the
+    # DOTS: every real failure was a label running through a chip, not through
+    # another label (Van Scoyoc FC into FF, Ribalta CH into SI, Lord ST into
+    # SL). Two changes fix that class. Chips all exist before any label is
+    # placed, so a label is scored against every chip, not just the drawn
+    # ones. And the side is chosen by LEAST overlap rather than by first-clear,
+    # so a label with both sides blocked still takes the better one.
+    _pinv = mv.transData.inverted()
+    _org = _pinv.transform((0.0, 0.0))
+
+    def _pts(n):
+        """n typographic points as (dx, dy) in this axes' data units."""
+        p = _pinv.transform((n * fig.dpi / 72.0, n * fig.dpi / 72.0))
+        return abs(p[0] - _org[0]), abs(p[1] - _org[1])
+
+    def _ink_size(t, size, weight='bold', family='IBM Plex Sans'):
+        """Rendered ink extents of a string, in data units."""
+        from matplotlib.textpath import TextPath
+        from matplotlib.font_manager import FontProperties
+        bb = TextPath((0, 0), t, prop=FontProperties(
+            family=family, weight=weight, size=size)).get_extents()
+        ux, uy = _pts(1.0)
+        return (bb.x1 - bb.x0) * ux, (bb.y1 - bb.y0) * uy
+
+    def _overlap(b, c):
+        return (max(0.0, min(b[1], c[1]) - max(b[0], c[0]))
+                * max(0.0, min(b[3], c[3]) - max(b[2], c[2])))
+
+    # Marker area s is a squared diameter in points, so the radius is sqrt(s)/2.
+    _crx, _cry = _pts(0.5 * math.sqrt(320 if not is_season else 150))
+    _cents = [(pt_, sum(q[0] for q in pl) / len(pl),
+               sum(q[1] for q in pl) / len(pl), len(pl))
+              for pt_, pl in sorted(groups.items(), key=lambda kv: -len(kv[1]))]
+    _chip_boxes = [(mh - _crx, mh + _crx, mvv - _cry, mvv + _cry)
+                   for _p, mh, mvv, _n in _cents]
+
+    _drawn = []
+    for pt_, mh, mvv, n_ in _cents:
         # Every thrown type gets a centroid + velo label (2026-08-28, per
         # Wally) — a 1-pitch type's centroid is the pitch itself.
         col = PITCH_COLORS.get(pt_, '#777')
-        mh = sum(q[0] for q in pl) / len(pl); mvv = sum(q[1] for q in pl) / len(pl)
         # zorder rises with usage so a same-spot pair shows the
         # HIGHER-usage pitch's dot (2026-08-28, per Wally: Lyon SI/CH).
         mv.scatter([mh], [mvv], s=(320 if not is_season else 150), color=col,
-                   edgecolors=BG, linewidths=1.8, zorder=5 + len(pl) * 1e-4)
+                   edgecolors=BG, linewidths=1.8, zorder=5 + n_ * 1e-4)
         if not is_season:
             # Pitch count inside the chip (2026-08-28, per Wally) —
             # restores the volume signal the cloud used to carry. All-white
             # ink (A/B'd against luminance ink; Wally chose white).
-            _cnt = sum(1 for q in pitches if q.get('Pitch Type') == pt_)
             # Ink-centered glyph paths, same as the table chips. The centroid
             # sits at the pitch's true mean movement, so this chip is NOT
             # pixel-snapped the way a table row is: the disc and the numeral
             # both render subpixel-accurate, which keeps them concentric
             # wherever the data puts them.
-            ink_txt(mh, mvv, str(_cnt), 7.5, '#ffffff',
-                    zorder=5.5 + len(pl) * 1e-4, ax_=mv)
+            # A chip that lands on top of an earlier one hides it, and drawing
+            # the second count as well only garbles the pair (Lyon 8/28: a
+            # sinker and a changeup half an inch apart printed '10' over '10').
+            # The chips keep their true positions, because two pitches with the
+            # same movement IS the finding. The occluded count drops instead —
+            # the per-hand table carries every count anyway.
+            _hidden = any((mh - x_) ** 2 / (_crx ** 2)
+                          + (mvv - y_) ** 2 / (_cry ** 2) < 1.0
+                          for x_, y_ in _drawn)
+            if not _hidden:
+                _cnt = sum(1 for q in pitches if q.get('Pitch Type') == pt_)
+                ink_txt(mh, mvv, str(_cnt), 7.5, '#ffffff',
+                        zorder=5.5 + n_ * 1e-4, ax_=mv)
+        _drawn.append((mh, mvv))
+
+    _placed = []             # label boxes already committed, in data units
+    for pt_, mh, mvv, n_ in _cents:
+        col = PITCH_COLORS.get(pt_, '#777')
         _vt = velo_by_type.get(pt_) if not is_season else None
         _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
-        right = mh > 0.68 * _lim
-        # Two centroids in nearly the same spot would stack their labels on
-        # the same side — flip the later (lower-usage) one to the other side
-        # when its box would overlap a placed label's box and the flipped box
-        # stays inside the frame (2026-08-28, per Wally).
-        _lw = 0.9 + 0.42 * len(_lab)    # label width in data units (~measured)
+        _lw, _lh = _ink_size(_lab, 10.5)
+        _offx = _pts(15)[0]
+        _self = (mh - _crx, mh + _crx, mvv - _cry, mvv + _cry)
+        _others = [b for b in _chip_boxes if b != _self] + _placed
+
         def _box(is_right):
-            return ((mh - 0.9 - _lw, mh - 0.9) if is_right
-                    else (mh + 0.9, mh + 0.9 + _lw))
-        def _hits(box):
-            return any(box[0] < x1 and x0 < box[1] and abs(mvv - y_) < 1.9
-                       for x0, x1, y_ in _placed_labels)
+            x1 = mh - _offx if is_right else mh + _offx + _lw
+            return (x1 - _lw, x1, mvv - 0.5 * _lh, mvv + 0.5 * _lh)
+
+        def _score(box):
+            # Running off the frame is worse than any overlap inside it.
+            out = (max(0.0, (-_lim + 0.4) - box[0])
+                   + max(0.0, box[1] - (_lim - 0.4)))
+            return sum(_overlap(box, c) for c in _others) + 1000.0 * out
+
+        _default = mh > 0.68 * _lim
+        _cand = [(_score(_box(s)), s != _default, s) for s in (_default, not _default)]
+        _cand.sort()
+        right = _cand[0][2]
         _b = _box(right)
-        if _hits(_b):
-            _flip = _box(not right)
-            if not _hits(_flip) and _flip[0] > -_lim + 0.4 and _flip[1] < _lim - 0.4:
-                right = not right
-                _b = _flip
-        _placed_labels.append((_b[0], _b[1], mvv))
+        _placed.append(_b)
         mv.annotate(_lab, (mh, mvv), xytext=(-15 if right else 15, 0),
                     textcoords='offset points', fontsize=10.5, fontweight='bold',
                     color=col, ha='right' if right else 'left', va='center',
