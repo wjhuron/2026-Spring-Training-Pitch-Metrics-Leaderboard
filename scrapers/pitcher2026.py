@@ -1738,6 +1738,12 @@ class BaseballSavantFocusedDownloader:
             df = self.download_game_data(game_pk, filter_team)
 
             if df is not None:
+                # Savant game feed: plate coordinates (always overwrite) and
+                # bat speed (fill-only). Game-ID mode skipped this entirely
+                # until 2026-08-30, so its rows carried the feed's ~1in-high
+                # pZ and no bat speed at all, while team mode got both — and
+                # game mode pushes to Sheets just like team mode does.
+                df = self.merge_bat_speed(df, game_pk)
                 all_dfs.append(df)
                 print(f"Successfully downloaded data for game {game_pk}")
             else:
