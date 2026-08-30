@@ -2222,9 +2222,13 @@ def render_social_card(config, pitches, output_file):
             for r_ in rows:
                 ry -= rh
                 col = PITCH_COLORS.get(r_['pt'], '#777')
-                ax.scatter([L + 0.006], [ry], s=48, color=col, edgecolors='none',
+                ax.scatter([L + 0.010], [ry], s=215, color=col, edgecolors='none',
                            transform=ax.transAxes, zorder=4)
-                txt(L + 0.025, ry, PITCH_NAMES.get(r_['pt'], r_['pt']).upper(),
+                ax.text(L + 0.010 - 0.0003, ry - 0.0007, str(r_['n']), fontsize=6.8,
+                        color='#ffffff', fontweight='bold',
+                        fontfamily='IBM Plex Sans', ha='center', va='center',
+                        zorder=5)
+                txt(L + 0.032, ry, PITCH_NAMES.get(r_['pt'], r_['pt']).upper(),
                     fs, TEXT_PRIMARY, 'bold', ha='left')
                 for lab, cx, al, k in cols:
                     if k in ('stuff', 'loc'):
