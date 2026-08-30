@@ -1328,6 +1328,7 @@
 "Logue, Zach": 72.0,
 "Lombard Jr., George": 74.0,
 "Long, Sam": 73.0,
+"Lonsway, Seth": 72.0,
 "Loperfido, Joey": 75.0,
 "Lopez, Alejo": 68.0,
 "Lopez, Jacob": 76.0,
@@ -1392,6 +1393,7 @@
 "Marinaccio, Ron": 74.0,
 "Mariot, Michael": 72.0,
 "Markel, Parker": 77.0,
+"Marozas, Austin": 80.0,
 "Marrero, Elih": 67.0,
 "Marsee, Jakob": 72.0,
 "Marsh, Alec": 74.0,
@@ -2566,6 +2568,7 @@
 "Winn, Cole": 74.0,
 "Winn, Keaton": 76.0,
 "Winn, Masyn": 69.0,
+"Winquest, Cade": 73.0,
 "Wisdom, Patrick": 74.0,
 "Wisely, Brett": 69.0,
 "Wisler, Matt": 75.0,
@@ -6621,6 +6624,9 @@
 "Long, Sam": [
 669674
 ],
+"Lonsway, Seth": [
+675920
+],
 "Loperfido, Joey": [
 694388
 ],
@@ -6812,6 +6818,9 @@
 ],
 "Markel, Parker": [
 571917
+],
+"Marozas, Austin": [
+676540
 ],
 "Marrero, Elih": [
 663503
@@ -10338,6 +10347,9 @@
 "Winn, Masyn": [
 691026
 ],
+"Winquest, Cade": [
+685464
+],
 "Wisdom, Patrick": [
 621550
 ],
@@ -10538,5 +10550,5 @@
 ]
 },
 "league_mean": 73.73,
-"n": 2632
+"n": 2635
 }
