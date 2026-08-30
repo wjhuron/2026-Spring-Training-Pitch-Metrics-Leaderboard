@@ -1488,48 +1488,109 @@ class BaseballSavantFocusedDownloader:
 
         return merged
 
-    def download_savant_bat_speed(self, game_pk):
+    def download_savant_gf(self, game_pk):
         """
-        Download bat speed from the Baseball Savant game feed API.
-        Available in near real-time (same day, after game completes).
-        Returns a dict keyed by (game_pk, at_bat_number, pitch_number) -> bat_speed value.
+        Download one game's Baseball Savant game feed (`gf`).
+
+        Returns (bat_speed, plate), both keyed
+        (game_pk, at_bat_number, pitch_number) as strings:
+          bat_speed: key -> bat speed (>= 50 only)
+          plate:     key -> (plate_x, plate_z), Savant's own calibration
+
+        One request serves both, so this replaces the old bat-speed-only
+        fetch rather than adding a second call per game.
         """
-        print(f"  Fetching bat speed from Savant game feed for {game_pk}...")
+        print(f"  Fetching Savant game feed for {game_pk}...")
         url = f"https://baseballsavant.mlb.com/gf?game_pk={game_pk}"
 
         try:
             response = self.session.get(url, timeout=30)
             if response.status_code != 200:
                 print(f"  Savant game feed returned status {response.status_code}")
-                return {}
+                return {}, {}
 
             data = response.json()
-            lookup = {}
+            bat_speed, plate = {}, {}
 
             # Bat speed is in team_away and team_home pitch arrays
             for side in ['team_away', 'team_home']:
                 pitches = data.get(side, [])
                 for p in pitches:
+                    key = (str(game_pk), str(p.get('ab_number', '')),
+                           str(p.get('pitch_number', '')))
                     bs = p.get('batSpeed')
                     if bs is not None:
                         bs_val = round(float(bs), 1)
                         if bs_val >= 50:  # Filter out check swings / artifacts
-                            key = (str(game_pk), str(p.get('ab_number', '')), str(p.get('pitch_number', '')))
-                            lookup[key] = bs_val
+                            bat_speed[key] = bs_val
+                    px, pz = p.get('plate_x'), p.get('plate_z')
+                    if px is not None and pz is not None:
+                        plate[key] = (float(px), float(pz))
 
-            print(f"  Got bat speed for {len(lookup)} swings")
-            return lookup
+            print(f"  Got bat speed for {len(bat_speed)} swings, "
+                  f"plate coordinates for {len(plate)} pitches")
+            return bat_speed, plate
 
         except Exception as e:
             print(f"  Error fetching Savant game feed: {e}")
-            return {}
+            return {}, {}
+
+    def merge_savant_plate_coords(self, df, plate):
+        """
+        Replace the feed's PlateX/PlateZ with Savant's for every matched pitch.
+
+        The MLB gameday feed serves a different VERTICAL calibration than
+        Savant: measured 2026-08-29/30 across five games and 1,900+ pitches
+        (MLB and Triple-A alike), feed pZ sits ~+0.085 ft (about one inch)
+        ABOVE Savant's plate_z, sd 0.025, while SzTop/SzBot agree exactly.
+        InZone is defined as Savant's zone call, so the feed's pz flips
+        borderline low pitches into the zone — Zone% on a curveball-heavy
+        outing read 33% against Savant's 19% before this merge existed.
+
+        Savant is therefore the authority for these two columns, and
+        backfill_supplement already always-overwrites them from the Statcast
+        Search CSV. That CSV is NOT populated at the final out (verified
+        2026-08-30: zero rows one minute after a game went Final), but `gf`
+        IS: it served all 291 pitches immediately, already Savant-calibrated,
+        and it agrees with the search CSV to the digit once a game settles
+        (n=281, max difference 0.00000). So this merge closes the same-night
+        window, and the nightly supplement run corrects anything it misses.
+
+        Fails OPEN, never closed: an unmatched pitch keeps its feed value and
+        the count is logged, because a feed coordinate is ~1 inch off while a
+        blank one is a missing pitch.
+        """
+        if not plate or df is None or df.empty:
+            return df
+        matched = unmatched = 0
+        for idx, row in df.iterrows():
+            parts = str(row.get('PitchID', '')).split('_')
+            if len(parts) != 3:
+                continue
+            key = (parts[0], parts[1].lstrip('0') or '0',
+                   parts[2].lstrip('0') or '0')
+            coords = plate.get(key)
+            if coords is None:
+                unmatched += 1
+                continue
+            df.at[idx, 'PlateX'], df.at[idx, 'PlateZ'] = coords
+            matched += 1
+        print(f"  Savant plate coordinates: {matched} merged, "
+              f"{unmatched} kept feed values")
+        if unmatched:
+            print(f"    NOTE: {unmatched} pitches hold the feed's ~1in-high "
+                  f"pZ until the next backfill_supplement run")
+        return df
 
     def merge_bat_speed(self, df, game_pk):
         """
-        Merge bat speed from Savant game feed into the DataFrame.
-        Only fills BatSpeed where it's currently empty/NaN.
+        Merge the Savant game feed into the DataFrame: bat speed (fill-only,
+        where it is currently empty/NaN) and plate coordinates (always
+        overwrite — see merge_savant_plate_coords for why Savant wins).
+        One `gf` request serves both.
         """
-        lookup = self.download_savant_bat_speed(game_pk)
+        lookup, plate = self.download_savant_gf(game_pk)
+        df = self.merge_savant_plate_coords(df, plate)
         if not lookup:
             return df
 
