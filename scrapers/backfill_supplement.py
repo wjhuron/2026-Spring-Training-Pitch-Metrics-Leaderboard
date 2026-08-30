@@ -147,7 +147,12 @@ SAVANT_TO_SHEET_DESCRIPTION = {
 # cell would rewrite by rounding noise on every run. A genuine revision
 # (|diff| > quantum) always writes.
 OVERWRITE_EPSILON = {
-    'Extension': 0.05, 'AttackAngle': 0.05, 'AttackDirection': 0.05,
+    # Extension is 0.055, not 0.05: a stored 4-dec value ending exactly .X500
+    # sits ON savant's 1-dec rounding midpoint, so |diff| lands at exactly
+    # 0.050000000000000044 in floats and a 0.05 bound lets it through. The
+    # 2026-08-30 dry run staged 140 Extension cells and 139 were exactly this
+    # echo (one real revision at 0.076 survives the wider bound).
+    'Extension': 0.055, 'AttackAngle': 0.05, 'AttackDirection': 0.05,
     'SwingPathTilt': 0.05, 'ExitVelo': 0.05, 'BatSpeed': 0.05,
     'SwingLength': 0.005, 'IndVertBrk': 0.05, 'HorzBrk': 0.05,
     'Distance': 0.5, 'LaunchAngle': 0.5, 'HC_X': 0.005, 'HC_Y': 0.005,
