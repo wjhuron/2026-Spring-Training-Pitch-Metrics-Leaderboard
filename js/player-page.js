@@ -222,7 +222,10 @@ var PlayerPage = {
     { key: 'relPosZ', label: 'RelHeight', format: function(v) { return v != null ? Utils.formatFeetInches(v) : '—'; } },
     { key: 'relPosX', label: 'RelSide', format: function(v) { return v != null ? Utils.formatFeetInches(v) : '—'; } },
     { key: 'extension', label: 'Extension', format: function(v) { return v != null ? Utils.formatFeetInches(v) : '—'; } },
-    { key: 'armAngle', label: 'Arm Angle', format: function(v) { return v != null ? v.toFixed(1) + '\u00B0' : '—'; }, rocHide: true },
+    // ROC arm angle IS served (144/150 pitch-type rows carry it, 2026-08-31),
+    // so gate on the data, not on the assumption that MiLB lacks it. The
+    // formatter already renders the handful of nulls as an em dash.
+    { key: 'armAngle', label: 'Arm Angle', format: function(v) { return v != null ? v.toFixed(1) + '\u00B0' : '—'; } },
     { key: 'nVAA', label: 'nVAA', format: function(v) { return v != null ? v.toFixed(2) + '\u00B0' : '—'; } },
     { key: 'nHAA', label: 'nHAA', format: function(v) { return v != null ? v.toFixed(2) + '\u00B0' : '—'; } },
     { key: 'stuffScore', label: 'Stuff+', format: function(v) { return v != null ? Math.round(v) : '—'; } },
