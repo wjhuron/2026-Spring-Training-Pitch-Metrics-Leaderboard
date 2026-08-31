@@ -1279,11 +1279,8 @@ BUBBLE_COLUMNS = [
     ]),
     ('COMMAND & SHAPE', [
         ('Velocity',   'fbVelo',    'fbVelo_pctl',    'mph'),
-        # Extension sits with Velocity as the second physical/release input:
-        # r = +0.011 with velo and 0.11 against anything else on the card
-        # (scripts/research/cards/bubble_redundancy.py), and perceived velo is a function of
-        # both, so the pair reads together.
-        ('Extension',  'extension', 'extension_pctl', 'ftin'),
+        # Extension bubble REMOVED 2026-08-31 (per Wally). The per-pitch
+        # table keeps its Ext column; only the percentile bubble is gone.
         ('Stuff+',     'stuffScore', 'stuffScore_pctl', 'int'),
         ('Loc+',       'locPlus',   'locPlus_pctl',   'int'),
         # Season Pitching+ (the Stuff+/Loc+ blend) RETIRED 2026-08-28; the
@@ -3873,10 +3870,25 @@ def render_card(config, pitches, output_file):
     if is_season and 'Stuff+' in col_headers:
         _sp_cell = table.get_celld()[(0, col_headers.index('Stuff+'))]
         _sp_x = _sp_cell.get_window_extent(renderer).x0 / fig_bbox.width
-        _sp_note = ('PitchRV/100 actual, xPitchRV/100 expected runs saved per 100 pitches. xPitchRV is luck-neutral on contact, so the gap is batted-ball fortune\n'
+        # RV line names the columns the card ACTUALLY carries: --rv-mode swaps
+        # them (see rv_cols above), and the old hardcoded per-100 wording named
+        # absent columns and the wrong unit on a totals card.
+        _rv_line = {
+            'per100': 'PitchRV/100 actual, xPitchRV/100 expected runs saved per 100 pitches.',
+            'totals': 'PitchRV actual, xPitchRV expected runs saved, cumulative over the window.',
+            'both':   'PitchRV/xPitchRV are cumulative runs saved; the /100 pair is the same thing per 100 pitches.',
+        }[config.get('rv_mode') or 'per100']
+        # Two DIFFERENT gates: outcome-rate cells fade under the constant, while
+        # the RV columns fade under _pt_qual_min, which --pitch-qual moves.
+        _fade_line = (f'Faded values: fewer than {CARD_COLOR_MIN_PITCHES} pitches of that type, '
+                      f'too small to grade; the value still renders and colors in as pitches accumulate')
+        if _pt_qual_min != CARD_COLOR_MIN_PITCHES:
+            _fade_line = (f'Faded values: fewer than {CARD_COLOR_MIN_PITCHES} pitches of that type '
+                          f'({_pt_qual_min} for the RV columns), too small to grade; the value still renders')
+        _sp_note = (_rv_line + ' xPitchRV is luck-neutral on contact, so the gap is batted-ball fortune\n'
                     'Per-pitch Stuff+ graded vs the same pitch type, Loc+ vs its pitch family (100 = average for that type or family)\n'
                     'Overall Stuff+ = pitch-weighted average of per-pitch grades\n'
-                    'Faded values: sample too small to grade; they color in as pitches accumulate')
+                    + _fade_line)
         # Pool notes (2026-08-27, per Wally). A window card's note carries the
         # pool claim, so the two are mutually exclusive.
         if config.get('is_date_range'):
@@ -3885,8 +3897,9 @@ def render_card(config, pitches, output_file):
         else:
             _sp_note += '\nPercentiles rank against all MLB pitchers, no qualification gate'
         if 'hdERA' in config.get('stat_headers', []):
-            _sp_note += ('\nhdERA = ERA from shrunk xwOBA alone; hpERA adds stuff, location, whiffs, '
-                         'grounders, role and home park. Both are calibrated to future ERA. ROC arms show hpERA only')
+            _sp_note += ('\nhdERA = ERA from shrunk xwOBA alone, luck stripped; it describes the season. '
+                         'hpERA is a SEPARATE forward estimate from stuff, role, park, grounders, xRV, '
+                         'location, in-zone whiffs and K%; only it is calibrated to future ERA')
         fig.text(_sp_x, b - _below_off, _sp_note,
                  fontsize=8, color='#000000', va='top', ha='left', fontfamily='IBM Plex Sans', fontweight='bold', linespacing=1.5)
 

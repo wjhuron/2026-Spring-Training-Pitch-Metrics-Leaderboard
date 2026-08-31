@@ -38,7 +38,6 @@ var PlayerPage = {
     { _section: 'Command & Shape' },
     // Velocity (dynamic — expands to FF and/or SI velo when present).
     { key: '_veloPlaceholder',  label: '',                  format: function() { return ''; }, _dynamic: true },
-    { key: 'extension',         label: 'Extension',        format: function(v) { return Utils.formatFeetInches(v); } },
     { key: 'stuffScore',        label: 'Stuff+',           format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'locPlus',           label: 'Loc+',             format: function(v) { return v != null ? Math.round(v) : '—'; } },
   ],
