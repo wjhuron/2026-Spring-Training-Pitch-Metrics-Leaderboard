@@ -4904,8 +4904,17 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # the canonical FG values for MLB pitchers. Same motivation as the
     # hitter wRC+ override above — pipeline values match FG approximately
     # but small precision/rounding deltas read as bugs when readers
-    # cross-reference. AAA pitchers (_isROC) keep the pipeline values
-    # since FG doesn't publish AAA-baseline FIP/xFIP/SIERA cleanly.
+    # cross-reference.
+    #
+    # ROC/AAA rows are overridden too, from the minor-league endpoint (added
+    # 2026-09-01). The previous note here claimed FG "doesn't publish
+    # AAA-baseline FIP/xFIP/SIERA cleanly" and so left AAA rows on the
+    # pipeline's own numbers. FIP and xFIP publish fine; only SIERA does not.
+    # Leaving them cost real accuracy: the pipeline applies the MLB FIP
+    # constant (3.084) and the MLB league HR/FB rate to AAA components, which
+    # measured FIP +0.426 too low (sd 0.003 across 29 arms matched on
+    # identical IP — a pure constant) and xFIP +0.577 too low. The implied FG
+    # AAA constant is 3.510. That number was comparable to NEITHER league.
     try:
         if window_mode:
             raise _SkipSeasonOverride
@@ -4937,6 +4946,35 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 n_pit_replaced += 1
         print(f"  FG FIP/xFIP/SIERA override: replaced "
               f"{n_pit_replaced}/{n_pit} MLB pitchers with FanGraphs values")
+
+        # AAA rows, from the minor-league endpoint. FIP and xFIP only —
+        # FanGraphs publishes no SIERA for the minors, so ROC siera stays on
+        # the pipeline's MLB-calibrated value and carries the same bias the
+        # FIP/xFIP override just removed. Do not read a ROC SIERA as an
+        # International League number.
+        _fg_aaa_p = _fg_pit_cache.get('aaaPitchers', {})
+        n_aaa_replaced = n_aaa = 0
+        for row in pitcher_leaderboard:
+            if not row.get('_isROC') or row.get('_isCombined'):
+                continue
+            mid = row.get('mlbId')
+            if mid is None:
+                continue
+            fg_a = _fg_aaa_p.get(str(int(mid)))
+            if not fg_a:
+                continue
+            n_aaa += 1
+            changed = False
+            if fg_a.get('fip') is not None:
+                row['fip'] = fg_a['fip']
+                changed = True
+            if fg_a.get('xfip') is not None:
+                row['xFIP'] = fg_a['xfip']
+                changed = True
+            if changed:
+                n_aaa_replaced += 1
+        print(f"  FG AAA FIP/xFIP override: replaced "
+              f"{n_aaa_replaced}/{n_aaa} ROC/AAA pitchers with FanGraphs values")
     except _SkipSeasonOverride:
         print("  FG pitcher override SKIPPED (window run — our FG cache is "
               "season-scoped)")

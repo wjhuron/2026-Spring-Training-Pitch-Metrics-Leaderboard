@@ -191,6 +191,48 @@ def fetch_mlb_pitchers(year=2026):
     return out
 
 
+def fetch_aaa_pitchers(year=2026):
+    """Returns dict keyed by xMLBAMID with FIP, xFIP, IP, name for AAA.
+
+    The pitcher twin of fetch_aaa_hitters, on the same minor-league endpoint
+    with level=1. NO SIERA: FanGraphs does not publish it for the minors, and
+    the field comes back null on every row.
+
+    Why this exists (2026-09-01): the pipeline computed ROC/AAA FIP and xFIP
+    with the MLB FIP constant (3.084) and the MLB league HR/FB rate, against
+    AAA components. Measured on 29 Rochester arms matched to FanGraphs on
+    identical IP, that ran FIP +0.426 (sd 0.003 -- a pure constant) and xFIP
+    +0.577 too low; the implied FanGraphs AAA constant is 3.510. The number
+    was comparable to neither league: wrong constant for the International
+    League, unadjusted components for MLB. Overriding from the source is the
+    same thing we already do for MLB rows.
+    """
+    params = (
+        f'pos=all&level=1&lg=&stats=pit&qual=0&type=1'
+        f'&season={year}&seasonEnd={year}'
+        f'&org=&ind=0&splitTeam=false'
+        f'&pageitems=5000&pagenum=1'
+    )
+    rows = _http_get_json(f'{FG_MILB_API}?{params}', timeout=30)
+    if not isinstance(rows, list):
+        raise RuntimeError(f'Unexpected response from FG minor-league API: {type(rows).__name__}')
+    out = {}
+    for r in rows:
+        mid = r.get('xMLBAMID')
+        if mid is None:
+            continue
+        fip, xfip = r.get('FIP'), r.get('xFIP')
+        if fip is None and xfip is None:
+            continue
+        out[str(int(mid))] = {
+            'fip':  round(float(fip), 2) if fip is not None else None,
+            'xfip': round(float(xfip), 2) if xfip is not None else None,
+            'ip':   float(r.get('IP') or 0),
+            'name': r.get('PlayerName') or r.get('Name'),
+        }
+    return out
+
+
 def fetch_aaa_hitters(year=2026):
     """Returns dict keyed by xMLBAMID with wRC+, PA, name. Uses the
     minor-league endpoint with level=1 (AAA) and org= empty (all orgs)."""
@@ -232,12 +274,17 @@ def build_cache(year=2026, verbose=False):
     aaa_h = fetch_aaa_hitters(year)
     if verbose:
         print(f'  FG override: fetched {len(aaa_h)} AAA hitters')
+        print(f'  FG override: fetching AAA pitchers for {year}...')
+    aaa_p = fetch_aaa_pitchers(year)
+    if verbose:
+        print(f'  FG override: fetched {len(aaa_p)} AAA pitchers')
     return {
         'fetchedAt': datetime.datetime.now().isoformat(timespec='seconds'),
         'season': year,
         'mlbHitters': mlb_h,
         'mlbPitchers': mlb_p,
         'aaaHitters': aaa_h,
+        'aaaPitchers': aaa_p,
     }
 
 
@@ -262,7 +309,7 @@ def is_stale(cache, max_age_hours=24):
     if not cache or 'fetchedAt' not in cache:
         return True
     # Also stale if any of the three groups is missing (older cache shape)
-    for k in ('mlbHitters', 'mlbPitchers', 'aaaHitters'):
+    for k in ('mlbHitters', 'mlbPitchers', 'aaaHitters', 'aaaPitchers'):
         if k not in cache:
             return True
     try:
@@ -374,6 +421,7 @@ def refresh_if_stale(year=2026, max_age_hours=24, path=CACHE_PATH, verbose=False
             return {
                 'fetchedAt': '', 'season': year,
                 'mlbHitters': {}, 'mlbPitchers': {}, 'aaaHitters': {},
+                'aaaPitchers': {},
             }
     return cache
 
@@ -399,6 +447,7 @@ def main():
     print(f'  MLB hitters:  {len(cache["mlbHitters"])}')
     print(f'  MLB pitchers: {len(cache["mlbPitchers"])}')
     print(f'  AAA hitters:  {len(cache["aaaHitters"])}')
+    print(f'  AAA pitchers: {len(cache.get("aaaPitchers", {}))}')
 
     # Show a few samples
     print('\nSample MLB hitters:')
