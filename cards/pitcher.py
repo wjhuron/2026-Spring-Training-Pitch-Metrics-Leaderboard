@@ -1318,6 +1318,31 @@ def _measure_text_axis_w(fig, strings, fontsize, weight, family='IBM Plex Sans')
     return (widest / fig_px) if fig_px else None
 
 
+def _ink_left_pad(fig, s, size, weight, family='IBM Plex Sans'):
+    """Gap from a ha='left' anchor to the string's first INK, as a fraction of
+    figure width.
+
+    matplotlib anchors a left-aligned string on its ADVANCE box, whose leading
+    edge sits a side bearing short of the first painted pixel. That bearing
+    differs by font, size and first glyph, so one constant cannot make three
+    header lines flush with the same hard edge. Subtract this from a target x
+    and the ink lands ON that x. TextPath reports real ink extents in points;
+    dpi cancels, so only the figure width matters.
+    """
+    from matplotlib.textpath import TextPath
+    from matplotlib.font_manager import FontProperties
+    if not s:
+        return 0.0
+    try:
+        tp = TextPath((0, 0), s,
+                      prop=FontProperties(family=family, weight=weight, size=size))
+        x0 = tp.get_extents().x0
+    except Exception:
+        return 0.0          # unmeasurable: fall back to the raw anchor
+    fw = fig.get_size_inches()[0]
+    return (x0 / (72.0 * fw)) if fw else 0.0
+
+
 def _format_bubble_value(v, spec):
     if v is None:
         return '—'
@@ -1929,18 +1954,32 @@ def render_social_card(config, pitches, output_file):
 
     # header
     L, R = 0.055, 0.945
+    # The card's LEFT RAIL. rrect() strokes lw=0.9pt centred on the path, so a
+    # tile's PAINTED edge sits half a stroke left of L. Text anchored at L would
+    # read ~1px inside the tiles, so every left-aligned element on the rail backs
+    # off that half stroke and then subtracts its own ink bearing.
+    _rail = L - (0.9 / 2.0) / (72.0 * fig.get_size_inches()[0])
     kick = ('%s' % config.get('game_date', '')).upper()
     opp = config.get('opponent')
     if not is_season and opp:
         kick += '  ·  VS %s' % opp
-    # Stem-aligned (not ink-aligned) header margin: each x is tuned so
-    # the CAP-HEIGHT stems land on the y-tick numbers' edge (px 39);
-    # JACKSON's J hook overshoots left below the baseline by design —
-    # classic optical margin alignment (2026-08-28, per Wally's eye).
-    _hx_kick, _hx_name, _hx_meta = 0.03648, 0.03556, 0.03556
+    # Header lines sit on the card's LEFT RAIL: the same edge the tile row, the
+    # section labels and the footer already use. They were stem-aligned to the
+    # y-tick numbers (px 39) until 2026-08-31; per Wally they now align to the
+    # leftmost tile's left face.
+    #
+    # Two corrections make that flush to the PIXEL rather than to the maths:
+    #  1. Each line subtracts its OWN ink bearing. The bearing differs by font,
+    #     size and first glyph, so one constant leaves only one line flush.
+    #  2. The rail backs off half the tile's border stroke. rrect() strokes
+    #     lw=0.9pt centred on the path, so the tile's PAINTED edge sits ~0.84px
+    #     left of L while text ink starts at L. The eye compares painted edges,
+    #     so without this the header reads 1px inside the tiles.
+    _hx_kick = _rail - _ink_left_pad(fig, kick, 11.5, 'bold')
     txt(_hx_kick, 0.970, kick, 11.5, ACCENT, 'bold', ha='left')
     _nm = config['display_name'].upper()
     _nsz = 27 if len(_nm) <= 16 else (23 if len(_nm) <= 20 else 20)
+    _hx_name = _rail - _ink_left_pad(fig, _nm, _nsz, 'black', 'Bitter')
     ax.text(_hx_name, 0.961, _nm, fontsize=_nsz, color=TEXT_PRIMARY,
             fontweight='black', fontfamily='Bitter', ha='left', va='top')
     hand_code = 'LHP' if config.get('hand') == 'L' else 'RHP'
@@ -1959,6 +1998,7 @@ def render_social_card(config, pitches, output_file):
                                                                # nothing renders
         if _dec:
             meta += '  |  '
+    _hx_meta = _rail - _ink_left_pad(fig, meta, 11, 'bold')
     _mw = _measure_text_axis_w(fig, [meta], 11, 'bold') if not is_season else None
     if not is_season and _mw is None:
         # No renderer yet: one draw, decision inline uncolored.
@@ -2055,7 +2095,8 @@ def render_social_card(config, pitches, output_file):
         tile_row(0.842, 0.058, eras, vsize=19)
 
         # six percentile discs
-        txt(L, 0.822, 'PERCENTILES  ·  ALL MLB PITCHERS', 8, TEXT_SECONDARY, 'bold', ha='left')
+        txt(_rail - _ink_left_pad(fig, 'PERCENTILES  ·  ALL MLB PITCHERS', 8, 'bold'),
+            0.822, 'PERCENTILES  ·  ALL MLB PITCHERS', 8, TEXT_SECONDARY, 'bold', ha='left')
         DISCS = [('PITCHER+', 'pitcherPlus', lambda v: f"{v:.0f}"),
                  ('K-BB%', 'kbbPct', lambda v: f"{v*100:.1f}%"),
                  ('WHIFF%', 'swStrPct', lambda v: f"{v*100:.1f}%"),
@@ -2301,7 +2342,8 @@ def render_social_card(config, pitches, output_file):
             # Wally).
             rows = _stats(plist)
             nsub = sum(r['n'] for r in rows) or 1
-            txt(L + 0.0019, y, title, 10.5, TEXT_PRIMARY, 'black', ha='left')
+            txt(_rail - _ink_left_pad(fig, title, 10.5, 'black'),
+                y, title, 10.5, TEXT_PRIMARY, 'black', ha='left')
             if header:
                 _header(y, cols)
             ry = y
@@ -2412,7 +2454,8 @@ def render_social_card(config, pitches, output_file):
         pass    # the table above already replaced the usage bar and grades
     elif not is_season:
         uy, uh = 0.148, 0.028
-        txt(L, uy + uh + 0.012, 'USAGE', 8, TEXT_SECONDARY, 'bold', ha='left')
+        txt(_rail - _ink_left_pad(fig, 'USAGE', 8, 'bold'),
+            uy + uh + 0.012, 'USAGE', 8, TEXT_SECONDARY, 'bold', ha='left')
         xcur = L
         for pt_, n_ in usage:
             w_ = (R - L) * n_ / total
@@ -2433,7 +2476,8 @@ def render_social_card(config, pitches, output_file):
         note_r = '100 = league average on both grades'
     else:
         # arsenal chips: badge · velo · usage
-        txt(L, mv_bot - 0.020, 'ARSENAL', 8, TEXT_SECONDARY, 'bold', ha='left')
+        txt(_rail - _ink_left_pad(fig, 'ARSENAL', 8, 'bold'),
+            mv_bot - 0.020, 'ARSENAL', 8, TEXT_SECONDARY, 'bold', ha='left')
         plb = config.get('pitch_lb') or {}
         cy = mv_bot - 0.058; cx = L
         for pt_, n_ in usage:
@@ -2453,9 +2497,18 @@ def render_social_card(config, pitches, output_file):
             cx += wch + 0.012
         note_r = 'disc = percentile among MLB pitchers · red good, blue bad'
 
-    _fy = 0.009 if not is_season else 0.075
-    txt(L, _fy, 'huronalytics.vercel.app', 10.5,
-        TEXT_PRIMARY, 'normal', ha='left', style='italic')
+    # Daily footer lifted 0.009 -> 0.016 (2026-09-01, per Wally): at 0.009 the
+    # 'y' descender in huronalytics.vercel.app ended 3px off the card edge and
+    # read as pinched against it. 0.016 leaves ~12px, and still clears the
+    # table's last baseline (which the row solver floors at 0.040) by 32px.
+    _fy = 0.016 if not is_season else 0.075
+    txt(_rail - _ink_left_pad(fig, 'huronalytics.vercel.app', 10.5, 'normal'), _fy,
+        'huronalytics.vercel.app', 10.5, TEXT_PRIMARY, 'normal', ha='left', style='italic')
+    # Right rail is R itself: the tile row's ~3px overshoot exists only so its
+    # ROUNDED corners read flush against a straight edge, so straight-edged
+    # things (the rules, this line) end on R. Measured 2026-08-31: this string's
+    # right side bearing is 0.10px, so no bearing correction is worth carrying;
+    # the residual 1px is FreeType stem hinting at 8.2pt, not geometry.
     txt(R, _fy, note_r, 8.2, TEXT_PRIMARY, 'normal', ha='right')
 
     plt.savefig(output_file, dpi=135, facecolor=BG)
