@@ -2143,8 +2143,23 @@ def render_social_card(config, pitches, output_file):
         _erav = sv[sh.index('ERA')] if 'ERA' in sh else '—'
         line = [{'v': _ipv, 'k': 'IP'},                       # neutral, like daily
                 {'v': _erav, 'k': 'ERA', 'fc': _tint(prow.get('era_pctl'))}]
+        # hdERA -> xFIP when the row has no hdERA. Gated on the DATA, never on
+        # team == ROC: the bat-speed bubble and the rocHide arm angle both
+        # encoded "this can never happen" and went stale silently, so if hdERA
+        # ever becomes scoreable for AAA this reverts with no code change.
+        #
+        # WHY hdERA is absent for AAA, and why xFIP is the stand-in: measured on
+        # ~800 pitcher-seasons at both levels 2023-2025, the AAA->MLB shift is
+        # +0.077 ERA for hpERA and +0.765 for hdERA, because hdERA is nearly
+        # pure xwOBA and contact outcomes do not translate across levels. xFIP
+        # normalises HR/FB, the most level- and park-sensitive component, so it
+        # travels better than FIP or SIERA. It still rests on K and BB, which do
+        # blend AAA hitters, so it is the least-bad ERA-family stand-in rather
+        # than a clean translation.
+        _mid = (('hdERA', 'hdERA') if prow.get('hdERA') is not None
+                else ('xFIP', 'xFIP'))
         for key, lab, fmt in (
-                ('hdERA',       'hdERA',    lambda v: f"{v:.2f}"),
+                (_mid[0],       _mid[1],    lambda v: f"{v:.2f}"),
                 ('hpERA',       'hpERA',    lambda v: f"{v:.2f}"),
                 ('kPct',        'K%',       lambda v: f"{v*100:.1f}%"),
                 ('bbPct',       'BB%',      lambda v: f"{v*100:.1f}%"),
