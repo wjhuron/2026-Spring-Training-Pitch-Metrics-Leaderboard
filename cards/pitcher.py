@@ -488,6 +488,13 @@ PITCH_QUAL_MIN = 25
 # (flat 45-60). 50 IS Whiff%'s measured constant; Zone% k=29, Chase% k=96;
 # the RV pair colors as a ledger convention (its own k would be 359/1234).
 CARD_COLOR_MIN_PITCHES = 50
+# Widest a split-table grade chip may get, as a ratio of the NOMINAL box the
+# code asks for. Not the ratio you measure on the PNG: rrect() draws through
+# FancyBboxPatch with mutation_aspect=0.8 and a fixed corner radius, which
+# inflates the drawn height 1.25x on a tall row and 1.33x on a short one, so a
+# nominal 4.0 renders about 3.1. Measured 2026-09-01 on Gallen (102x45px) and
+# Lugo (102x20px). Binds only on 15+ line tables, i.e. 7+ pitch types.
+CHIP_MAX_ASPECT = 4.0
 # Stuff+ is shape-family: measured per-type k = 13 (seeds 12.9-13.8), so 15
 # colors only cells that are >=half signal without hiding real information.
 STUFF_COLOR_MIN_PITCHES = 15
@@ -2114,14 +2121,33 @@ def render_social_card(config, pitches, output_file):
             return {'v': '—' if v is None else fmt(v), 'k': None,
                     'fc': _tint(prow.get(pctl_key or (key + '_pctl')))}
 
+        # Tiles read as a sentence: volume, then what HAPPENED (ERA), what he
+        # DESERVED (hdERA), what is COMING (hpERA), then the two raw inputs
+        # that explain it, then one overall verdict.
+        #
+        # K% and BB% rather than K-BB% and Whiff% (2026-09-01, per Wally, and
+        # the data agrees): K% and Whiff% correlate +0.830 across 412 arms at
+        # 30+ IP, so that pair is 83% one number, while K% and BB% correlate
+        # +0.085 and are effectively independent. It costs nothing to split
+        # them — R^2 against hpERA is .447 for K%+BB% and .455 for
+        # K-BB%+Whiff%. The card already carries four derived numbers; these
+        # two are raw inputs, which is what it was short of.
+        #
+        # STUFF+/LOC+ are NOT tiles: the split table below already prints both
+        # per pitch type, which is strictly more useful than one blended pair.
+        #
+        # No percentile inversion here. bbPct_pctl and era_pctl already put the
+        # GOOD end high (a 3.4% walk rate scores 96), so _percentile_color
+        # tints them the right way round — verified 2026-09-01.
         _ipv = sv[sh.index('IP')] if 'IP' in sh else '—'
-        line = [{'v': _ipv, 'k': 'IP'}]                      # neutral, like daily
+        _erav = sv[sh.index('ERA')] if 'ERA' in sh else '—'
+        line = [{'v': _ipv, 'k': 'IP'},                       # neutral, like daily
+                {'v': _erav, 'k': 'ERA', 'fc': _tint(prow.get('era_pctl'))}]
         for key, lab, fmt in (
-                ('kbbPct',      'K-BB%',    lambda v: f"{v*100:.1f}%"),
                 ('hdERA',       'hdERA',    lambda v: f"{v:.2f}"),
                 ('hpERA',       'hpERA',    lambda v: f"{v:.2f}"),
-                ('stuffScore',  'STUFF+',   lambda v: f"{v:.0f}"),
-                ('locPlus',     'LOC+',     lambda v: f"{v:.0f}"),
+                ('kPct',        'K%',       lambda v: f"{v*100:.1f}%"),
+                ('bbPct',       'BB%',      lambda v: f"{v*100:.1f}%"),
                 ('pitcherPlus', 'PITCHER+', lambda v: f"{v:.0f}")):
             cell = _num(key, fmt)
             cell['k'] = lab
@@ -2387,8 +2413,19 @@ def render_social_card(config, pitches, output_file):
                         # per Wally): every cell colors from its value.
                         g = r_[k]
                         fc = gtint(g)
-                        rrect(cx - 0.046, ry - 0.5 * rh + 0.003, 0.092,
-                              rh - 0.006, fc, r=0.010)
+                        # Chip HEIGHT already tracks the row, so on a dense
+                        # arsenal the fixed 0.092 width stretched the chip to
+                        # 5.1:1 as rendered (Lugo, 20 lines). Cap it and let the
+                        # width give way (2026-09-01, per Wally). Deliberately a
+                        # cap, not a proportional scale: a sparse card renders
+                        # 2.3:1, so every table at or under 14 lines is
+                        # BYTE-IDENTICAL (verified on Gallen) and only 7+
+                        # pitch-type arsenals move. Lugo lands at 3.1:1.
+                        _ch = rh - 0.006
+                        _cw = min(0.092, CHIP_MAX_ASPECT * _ch
+                                  * fig.get_figheight() / fig.get_figwidth())
+                        rrect(cx - 0.5 * _cw, ry - 0.5 * rh + 0.003, _cw,
+                              _ch, fc, r=0.010)
                         # White ink on tinted chips; a valueless beige chip
                         # keeps dark ink (2026-08-28, per Wally).
                         _ink = TEXT_PRIMARY if g is None else '#ffffff'
