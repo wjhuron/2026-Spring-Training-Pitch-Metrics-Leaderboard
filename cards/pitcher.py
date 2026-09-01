@@ -3885,21 +3885,18 @@ def render_card(config, pitches, output_file):
         if _pt_qual_min != CARD_COLOR_MIN_PITCHES:
             _fade_line = (f'Faded values: fewer than {CARD_COLOR_MIN_PITCHES} pitches of that type '
                           f'({_pt_qual_min} for the RV columns), too small to grade; the value still renders')
-        _sp_note = (_rv_line + ' xPitchRV is luck-neutral on contact, so the gap is batted-ball fortune\n'
-                    'Per-pitch Stuff+ graded vs the same pitch type, Loc+ vs its pitch family (100 = average for that type or family)\n'
-                    'Overall Stuff+ = pitch-weighted average of per-pitch grades\n'
-                    + _fade_line)
-        # Pool notes (2026-08-27, per Wally). A window card's note carries the
-        # pool claim, so the two are mutually exclusive.
+        _sp_note = _rv_line + ' xPitchRV is luck-neutral on contact\n' + _fade_line
+        # Window cards keep their pool claim (the values and the pools come
+        # from different spans, so it is load-bearing there). The season-card
+        # equivalent was dropped 2026-08-31 per Wally: on a season card the
+        # values and the pool are the same span, so it said nothing.
         if config.get('is_date_range'):
             _sp_note += ('\nValues are for this date window. Percentiles and the + grades '
                          'score against the full-season MLB pools and anchors, with no minimum sample')
-        else:
-            _sp_note += '\nPercentiles rank against all MLB pitchers, no qualification gate'
         if 'hdERA' in config.get('stat_headers', []):
-            _sp_note += ('\nhdERA = ERA from shrunk xwOBA alone, luck stripped; it describes the season. '
-                         'hpERA is a SEPARATE forward estimate from stuff, role, park, grounders, xRV, '
-                         'location, in-zone whiffs and K%; only it is calibrated to future ERA')
+            _sp_note += ('\nhdERA = ERA from shrunk xwOBA alone, luck stripped; it describes the season'
+                         '\nhpERA is a forward estimate from stuff, role, park, grounders, xRV, '
+                         'location, in-zone whiffs and K%')
         fig.text(_sp_x, b - _below_off, _sp_note,
                  fontsize=8, color='#000000', va='top', ha='left', fontfamily='IBM Plex Sans', fontweight='bold', linespacing=1.5)
 
