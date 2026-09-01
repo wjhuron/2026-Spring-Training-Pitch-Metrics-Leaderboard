@@ -1986,7 +1986,25 @@ def render_social_card(config, pitches, output_file):
     meta = f"{hand_code}  |  {config.get('team','')}"
     if is_season:
         sh, sv = config['stat_headers'], config['stat_values']
-        meta += f"  |  {sv[sh.index('GS')]} GS  ·  {sv[sh.index('IP')]} IP"
+
+        def _sval(k):
+            return sv[sh.index(k)] if k in sh else None
+
+        # Appearances beside the team (2026-09-01, per Wally). GS only shows
+        # when he actually started: a pure reliever reads '61 G', not
+        # '61 G · 0 GS'. IP left out on purpose, it is a tile now.
+        _bits = []
+        _g, _gs = _sval('G'), _sval('GS')
+        if _g is not None:
+            _bits.append(f"{_g} G")
+        try:
+            _started = int(str(_gs)) > 0
+        except (TypeError, ValueError):
+            _started = False
+        if _started:
+            _bits.append(f"{_gs} GS")
+        if _bits:
+            meta += "  |  " + "  |  ".join(_bits)
     else:
         meta += f"  |  {len(pitches)} pitches"
         _bx = config.get('social_box') or {}
@@ -2030,23 +2048,24 @@ def render_social_card(config, pitches, output_file):
             if has_sub:
                 txt(x + w / 2, cy - 0.022, c['sub'], ssize, ink, 'normal')
 
+    # Per-pitch grade atoms. Defined for BOTH card types since 2026-09-01:
+    # the split table reads them, and season/range cards now render that table.
+    _satoms = config.get('social_atoms') or {}
+
+    def _atom_of(p, col, kind):
+        # Sheet grade cell first; computed fallback for a live-scraped game
+        # whose cells are still blank (2026-08-28, parity with the full card).
+        v = sf(p.get(col))
+        if v is not None:
+            return int(round(v))
+        return (_satoms.get(kind) or {}).get(str(p.get('PitchID') or ''))
+
     if not is_season:
         box = config.get('social_box') or {}
         ip_str = config['stat_values'][config['stat_headers'].index('IP')]
         # One row: the official line plus the tinted verdict tiles (Whiffs
         # dropped for room per Wally 2026-08-28; whiff detail lives in the
         # per-type table). The freed second row goes to the plot.
-        _satoms = config.get('social_atoms') or {}
-
-        def _atom_of(p, col, kind):
-            # Sheet grade cell first; computed fallback for a live-scraped
-            # game whose cells are still blank (2026-08-28, parity with the
-            # full card).
-            v = sf(p.get(col))
-            if v is not None:
-                return int(round(v))
-            return (_satoms.get(kind) or {}).get(str(p.get('PitchID') or ''))
-
         s_at = [v for v in (_atom_of(p, 'Stuff+', 'stuff') for p in pitches)
                 if v is not None]
         l_at = [v for v in (_atom_of(p, 'Loc+', 'loc') for p in pitches)
@@ -2078,45 +2097,38 @@ def render_social_card(config, pitches, output_file):
         # 2026-08-28 per Wally) — same height, more air under the x-label.
         mv_top, mv_bot = 0.8175, 0.4355
     else:
+        # Season / date-range social cards use the DAILY layout (2026-09-01,
+        # per Wally): same tile row shape, same centroid movement plot, same
+        # per-hand split table. Only the tile CONTENTS differ, because a season
+        # has no single box score to show. The old layout — an ERA trio, a row
+        # of six percentile discs and arsenal chips — is gone.
         sh, sv = config['stat_headers'], config['stat_values']
         prow = config.get('pctl_row') or {}
+
         def _tint(p):
             f, _ = _percentile_color(p)
             return f
-        eras = [
-            {'v': sv[sh.index('ERA')], 'k': 'ERA', 'fc': _tint(prow.get('era_pctl'))},
-            {'v': sv[sh.index('hdERA')], 'k': 'hdERA · DESERVED', 'fc': _tint(prow.get('hdERA_pctl'))},
-            {'v': sv[sh.index('hpERA')], 'k': 'hpERA · PROJECTED', 'fc': _tint(prow.get('hpERA_pctl'))},
-        ] if 'hdERA' in sh else [
-            {'v': sv[sh.index('ERA')], 'k': 'ERA', 'fc': _tint(prow.get('era_pctl'))},
-            {'v': sv[sh.index('FIP')], 'k': 'FIP'},
-            {'v': sv[sh.index('SIERA')], 'k': 'SIERA', 'fc': _tint(prow.get('siera_pctl'))},
-        ]
-        tile_row(0.842, 0.058, eras, vsize=19)
 
-        # six percentile discs
-        txt(_rail - _ink_left_pad(fig, 'PERCENTILES  ·  ALL MLB PITCHERS', 8, 'bold'),
-            0.822, 'PERCENTILES  ·  ALL MLB PITCHERS', 8, TEXT_SECONDARY, 'bold', ha='left')
-        DISCS = [('PITCHER+', 'pitcherPlus', lambda v: f"{v:.0f}"),
-                 ('K-BB%', 'kbbPct', lambda v: f"{v*100:.1f}%"),
-                 ('WHIFF%', 'swStrPct', lambda v: f"{v*100:.1f}%"),
-                 ('XWOBACON', 'xwOBAcon', lambda v: f"{v:.3f}".lstrip('0')),
-                 ('GB%', 'gbPct', lambda v: f"{v*100:.1f}%"),
-                 ('FB VELO', 'fbVelo', lambda v: f"{v:.1f}")]
-        n = len(DISCS); step = (R - L - 0.04) / (n - 1)
-        for i, (lab, key, fmt) in enumerate(DISCS):
-            x = L + 0.02 + i * step
-            pv = prow.get(key + '_pctl')
-            val = prow.get(key)
-            fill, ring = _percentile_color(pv)
-            ax.scatter([x], [0.782], s=1900, color=[fill], edgecolor=[ring],
-                       linewidth=1.6, transform=ax.transAxes, zorder=5)
-            ax.text(x, 0.782, '—' if pv is None else f"{pv:.0f}", fontsize=13,
-                    color=TEXT_PRIMARY, fontweight='black', fontfamily='Bitter',
-                    ha='center', va='center', zorder=6)
-            txt(x, 0.749, lab, 6.8, TEXT_SECONDARY)
-            txt(x, 0.737, '—' if val is None else fmt(val), 8, TEXT_PRIMARY)
-        mv_top, mv_bot = 0.712, 0.270
+        def _num(key, fmt, pctl_key=None):
+            v = prow.get(key)
+            return {'v': '—' if v is None else fmt(v), 'k': None,
+                    'fc': _tint(prow.get(pctl_key or (key + '_pctl')))}
+
+        _ipv = sv[sh.index('IP')] if 'IP' in sh else '—'
+        line = [{'v': _ipv, 'k': 'IP'}]                      # neutral, like daily
+        for key, lab, fmt in (
+                ('kbbPct',      'K-BB%',    lambda v: f"{v*100:.1f}%"),
+                ('hdERA',       'hdERA',    lambda v: f"{v:.2f}"),
+                ('hpERA',       'hpERA',    lambda v: f"{v:.2f}"),
+                ('stuffScore',  'STUFF+',   lambda v: f"{v:.0f}"),
+                ('locPlus',     'LOC+',     lambda v: f"{v:.0f}"),
+                ('pitcherPlus', 'PITCHER+', lambda v: f"{v:.0f}")):
+            cell = _num(key, fmt)
+            cell['k'] = lab
+            line.append(cell)
+        tile_row(0.835, 0.052, line, vsize=19)
+        _tbl = _spl = True
+        mv_top, mv_bot = 0.8175, 0.4355
 
     # movement plot (faded cloud + labeled centroids; ticks every 5)
     # Inset from the left card edge so the y-axis label ('INDUCED
@@ -2160,11 +2172,6 @@ def render_social_card(config, pitches, output_file):
     # Wally, after cloud/alpha prototypes): one big labeled chip per type
     # reads instantly at feed size. Season social cards keep their faded
     # cloud (a different question: season shape consistency).
-    if is_season:
-        for pt_, pl in groups.items():
-            col = PITCH_COLORS.get(pt_, '#777')
-            mv.scatter([q[0] for q in pl], [q[1] for q in pl], s=9, color=col,
-                       alpha=0.16, edgecolors='none', zorder=3)
     # Label placement (rebuilt 2026-08-30, per Wally). The previous version
     # scored a label only against labels already placed, so it never saw the
     # DOTS: every real failure was a label running through a chip, not through
@@ -2195,7 +2202,7 @@ def render_social_card(config, pitches, output_file):
                 * max(0.0, min(b[3], c[3]) - max(b[2], c[2])))
 
     # Marker area s is a squared diameter in points, so the radius is sqrt(s)/2.
-    _crx, _cry = _pts(0.5 * math.sqrt(320 if not is_season else 150))
+    _crx, _cry = _pts(0.5 * math.sqrt(320))
     _cents = [(pt_, sum(q[0] for q in pl) / len(pl),
                sum(q[1] for q in pl) / len(pl), len(pl))
               for pt_, pl in sorted(groups.items(), key=lambda kv: -len(kv[1]))]
@@ -2209,7 +2216,7 @@ def render_social_card(config, pitches, output_file):
         col = PITCH_COLORS.get(pt_, '#777')
         # zorder rises with usage so a same-spot pair shows the
         # HIGHER-usage pitch's dot (2026-08-28, per Wally: Lyon SI/CH).
-        mv.scatter([mh], [mvv], s=(320 if not is_season else 150), color=col,
+        mv.scatter([mh], [mvv], s=320, color=col,
                    edgecolors=BG, linewidths=1.8, zorder=5 + n_ * 1e-4)
         if not is_season:
             # Pitch count inside the chip (2026-08-28, per Wally) —
@@ -2238,7 +2245,9 @@ def render_social_card(config, pitches, output_file):
     _placed = []             # label boxes already committed, in data units
     for pt_, mh, mvv, n_ in _cents:
         col = PITCH_COLORS.get(pt_, '#777')
-        _vt = velo_by_type.get(pt_) if not is_season else None
+        # Velo on the centroid label for every card type now that season and
+        # range share the daily layout (2026-09-01, per Wally).
+        _vt = velo_by_type.get(pt_)
         _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
         _lw, _lh = _ink_size(_lab, 10.5)
         _offx = _pts(15)[0]
@@ -2270,7 +2279,7 @@ def render_social_card(config, pitches, output_file):
     # PROTO2: PITCH MOVEMENT title removed — the axis labels already say it
 
     # per-pitch-type table (prototype, Driveline-style chips on our palette)
-    if not is_season and _tbl:
+    if _tbl:
         SWING = ('Swinging Strike', 'Foul', 'In Play')
 
         def _stats(plist):
@@ -2365,7 +2374,11 @@ def render_social_card(config, pitches, output_file):
                     fig.get_figwidth() * fig.dpi)
                 ax.scatter([_cx], [_cy], s=215, color=col, edgecolors='none',
                            transform=ax.transAxes, zorder=4)
-                ink_txt(_cx, _cy, str(r_['n']), 6.8, '#ffffff')
+                # Season/range discs are a pure colour swatch: a 3-digit count
+                # measures 22.0px against a 22.0px usable chord, and 4 digits
+                # (season highs reach 1442) overflow the disc outright.
+                if not is_season:
+                    ink_txt(_cx, _cy, str(r_['n']), 6.8, '#ffffff')
                 txt(L + 0.032, ry, PITCH_NAMES.get(r_['pt'], r_['pt']).upper(),
                     fs, TEXT_PRIMARY, 'bold', ha='left')
                 for lab, cx, al, k in cols:
@@ -2449,59 +2462,13 @@ def render_social_card(config, pitches, output_file):
         note_r = ('MLB gameday feed  ·  red = good, blue = bad  ·  '
                   '100 = league average')
 
-    # usage bar (daily: below the plot, above the grades — per Wally)
-    if not is_season and _tbl:
-        pass    # the table above already replaced the usage bar and grades
-    elif not is_season:
-        uy, uh = 0.148, 0.028
-        txt(_rail - _ink_left_pad(fig, 'USAGE', 8, 'bold'),
-            uy + uh + 0.012, 'USAGE', 8, TEXT_SECONDARY, 'bold', ha='left')
-        xcur = L
-        for pt_, n_ in usage:
-            w_ = (R - L) * n_ / total
-            ax.add_patch(Rectangle((xcur, uy), w_, uh,
-                                   facecolor=PITCH_COLORS.get(pt_, '#777'),
-                                   edgecolor=BG, linewidth=1.2))
-            frac = n_ / total
-            # Every slice labels ITSELF, inside, like the rest of the bar —
-            # the font scales down with the slice instead of falling out of it.
-            if w_ >= 0.10:
-                txt(xcur + w_ / 2, uy + uh / 2, f"{pt_} {frac*100:.0f}%", 7.5, 'white')
-            elif w_ >= 0.045:
-                txt(xcur + w_ / 2, uy + uh / 2, pt_, 7, 'white')
-            else:
-                txt(xcur + w_ / 2, uy + uh / 2, pt_, 5.5, 'white')
-            xcur += w_
-
-        note_r = '100 = league average on both grades'
-    else:
-        # arsenal chips: badge · velo · usage
-        txt(_rail - _ink_left_pad(fig, 'ARSENAL', 8, 'bold'),
-            mv_bot - 0.020, 'ARSENAL', 8, TEXT_SECONDARY, 'bold', ha='left')
-        plb = config.get('pitch_lb') or {}
-        cy = mv_bot - 0.058; cx = L
-        for pt_, n_ in usage:
-            frac = n_ / total
-            v = (plb.get(pt_) or {}).get('velocity')
-            label = f"{pt_}  {v:.1f}" if v is not None else pt_
-            label2 = f"{frac*100:.0f}%"
-            wch = 0.033 + 0.0128 * (len(label) + len(label2))
-            if cx + wch > R:
-                cx = L; cy -= 0.042
-            rrect(cx, cy, wch, 0.032, DARK_CELL, r=0.016)
-            ax.add_patch(Rectangle((cx + 0.008, cy + 0.008), 0.030, 0.016,
-                                   facecolor=PITCH_COLORS.get(pt_, '#777'), edgecolor='none'))
-            txt(cx + 0.023, cy + 0.016, pt_, 6.4, 'white')
-            txt(cx + 0.042, cy + 0.016, (f"{v:.1f}" if v is not None else '—') +
-                f"  ·  {label2}", 8.2, TEXT_PRIMARY, ha='left')
-            cx += wch + 0.012
-        note_r = 'disc = percentile among MLB pitchers · red good, blue bad'
-
-    # Daily footer lifted 0.009 -> 0.016 (2026-09-01, per Wally): at 0.009 the
-    # 'y' descender in huronalytics.vercel.app ended 3px off the card edge and
-    # read as pinched against it. 0.016 leaves ~12px, and still clears the
-    # table's last baseline (which the row solver floors at 0.040) by 32px.
-    _fy = 0.016 if not is_season else 0.075
+    # Footer height, tuned by measured clearance from the card's bottom edge
+    # (2026-09-01, per Wally). At the original 0.009 the 'y' descender in
+    # huronalytics.vercel.app stopped 3px short and read as pinched; 0.016 gave
+    # 12px, which Wally called too much air. 0.0123 lands the descender 7px off
+    # the edge. One value for every card type now that season and range share
+    # the daily layout (they used to sit at 0.075 to clear the arsenal chips).
+    _fy = 0.0123
     txt(_rail - _ink_left_pad(fig, 'huronalytics.vercel.app', 10.5, 'normal'), _fy,
         'huronalytics.vercel.app', 10.5, TEXT_PRIMARY, 'normal', ha='left', style='italic')
     # Right rail is R itself: the tile row's ~3px overshoot exists only so its
