@@ -2583,8 +2583,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # Loc+ — pitcher location-quality index (v2 decomposition model): per
     # pitch, ExpRV = P(swing)·[whiff/foul/BIP value surfaces] + P(take)·
     # [CS/ball count values], surfaces per (pitch group × hands) on a smoothed
-    # 2-inch × zone-normalized grid, count-specific RV weights; per-pitcher
-    # mean Bayesian-regressed and z-scored to 100 ± 10. See pipeline_locplus.py.
+    # 2-inch × zone-normalized grid, count-specific RV weights; the displayed
+    # per-pitcher value is the PLAIN MEAN of per-pitch integer atoms
+    # (100 - 10·z within the pitch-type group; no pitcher-level prior since the
+    # 2026-07-18 coherent canon). See pipeline/locplus.py.
     # Also computes per-pitch-type Loc+ for the Arsenal tab (each row in
     # pitch_leaderboard gets a Loc+ standardized within its pitch-type group).
     from pipeline.locplus import compute_loc_plus

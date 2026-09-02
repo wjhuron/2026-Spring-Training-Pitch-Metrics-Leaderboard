@@ -1,14 +1,16 @@
-"""train_stuff.py — Stuff+ v11 trainer.
+"""train_stuff.py — Stuff+ trainer (live config: BUNDLE_VERSION below;
+version notes sit above BASE_FEATS).
 
-A from-scratch rebuild validated against v10 (scripts/stuff_lab*.py). Key
-changes that won the experiments:
+A from-scratch rebuild of v10 in mid-2026. The architecture that won:
   - ONE pooled model across pitch types (not 9 per-type models)
   - ONE learned luck-neutral xRV target (not hand-weighted whiff/GB/contact)
-  - lean feature set (no SSW residuals, no location, no overfit-prone extras)
+  - lean physics-only feature set (no SSW residuals, no location)
 
-Out-of-fold it predicts future luck-neutral run prevention at ~0.23, above the
-persistence ceiling (~0.195) and far above v10's architecture (~0.02-0.06 in the
-same harness). Reliability ~0.87.
+Current telemetry (data/stuff_metrics_history.csv, 2026-09): OOF descriptive
+|r| ~0.31 at the (pitcher, type) unit; split-half reliability ~0.97, which is
+INFLATED because every fold's training set carries each pitcher's own
+2021-2025 rows; next-season pitcher-level r 0.37-0.49 per 2021-26 pair
+(scripts/research/stuff/stuff_gate_v2.py, the adoption gate).
 
 Offline trainer (xgboost is fine here): trains on the cleaned pitch pickle,
 scores every MLB pitch OUT-OF-FOLD (pitcher-grouped, so no pitcher's own
@@ -44,15 +46,21 @@ def _load_live_guts():
         _lg, _sc = _g.get('lgWOBA'), _g.get('wOBAScale')
         if _lg and _sc:
             return float(_lg), float(_sc)
-    except Exception:
-        pass
+    except (OSError, ValueError) as e:
+        # Announce the fallback (repo rule): a silent frozen Guts once hid a
+        # stale metadata file for a season.
+        print(f'  guts: data/metadata_rs.json unreadable ({e}); using frozen '
+              f'fallback 0.3172/1.2343')
     return 0.3172, 1.2343
 
 LG_WOBA, WOBA_SCALE = _load_live_guts()
 sys.path.insert(0, ROOT)
 try:
     from pipeline.utils import AAA_TEAMS
-except Exception:
+except ImportError as e:
+    # Announce it: with the wrong set, AAA rows would enter the MLB
+    # percentile pools and nothing else would error.
+    print(f'  WARNING: pipeline.utils.AAA_TEAMS unavailable ({e}); using {{"ROC"}}')
     AAA_TEAMS = {'ROC'}
 
 SUPPORTED = {'FF', 'SI', 'SL', 'CH', 'ST', 'FC', 'CU', 'FS', 'SV', 'KC', 'KN'}
@@ -199,10 +207,20 @@ HEIGHT_LEAGUE_MEAN = 73.72       # measured 2026-08-23 on 2623 pitchers
 # alone — Schultz's sweeper graded 66 while missing bats at an
 # above-average clip. Gate v2: clip[70,80] is indistinguishable from
 # unclipped at the pool level (d_nxt -0.0006, z -0.45; unit nxt 5/5) and
-# clip[70,79] LOSES (-0.0046, z -2.5), so 80 is the measured boundary, not
-# a guess. Pool percentiles p1=70, p99=80 (pitch-weighted). Pitchers outside
+# clip[70,79] LOSES (-0.0046, z -2.5). The curve is monotone toward "no
+# clip", so 80 is a CONVENTION at the populated edge chosen on the Schultz
+# face-validity case, not a measured optimum; the lower bound was never
+# swept. Pool percentiles p1=70, p99=80 (pitch-weighted). Pitchers outside
 # the range also flag low-support (see compute_support's height-tail rule).
 HEIGHT_CLIP = (70.0, 80.0)
+
+# The bundle version. Bump it on ANY change that alters scoring (features,
+# params, clips, imputes): the score-only and card guards compare a bundle's
+# stored version against this string, so a stale bundle fails closed instead
+# of scoring transformed features with models trained on different ones.
+# v14.1 (2026-08-23) kept 'v14' and the pre-clip local bundle passed every
+# guard for ten days.
+BUNDLE_VERSION = 'v14.1'
 _HEIGHTS = None
 
 
@@ -805,7 +823,7 @@ def main():
                     help='write per-pitch Stuff+ grades keyed by sheet position '
                          '("tab\trow" -> grade) for the Sheets write-back '
                          '(scripts/ci/sheets_write_grades.py). Unregressed scale-(i) '
-                         'values: 100 + 10*(raw - mu_type)/sd_type, clip 40-180.')
+                         'values: 100 + 10*(raw - mu_type)/sd_type, no clip.')
     ap.add_argument('--score-only', action='store_true',
                     help='score with the cached fold models from the saved bundle '
                          '(no training, no prior pickles needed — seconds instead '
@@ -921,6 +939,10 @@ def main():
             B = pickle.load(f)
         if 'fold_models' not in B:
             sys.exit('--score-only needs a bundle with fold models — run a full retrain first')
+        if B.get('version') != BUNDLE_VERSION:
+            sys.exit(f"--score-only bundle is version {B.get('version')!r}, trainer "
+                     f"expects {BUNDLE_VERSION!r} — refresh the bundle from the "
+                     f"latest-data release or run a full retrain (workflow: retrain=true)")
         if 'height' not in B.get('features', []):
             sys.exit('--score-only bundle predates the v14 config (height, '
                      'depth 6) — refresh the bundle from the latest-data '
@@ -1190,8 +1212,10 @@ def main():
         # so a pitcher is effectively all-or-nothing here. Anyone still without
         # any arm angle — a game Savant has not processed yet, or a stale
         # cache — falls back to the no-arm companion and its anchored baseline,
-        # exactly as before. Both paths stay out-of-sample: ROC pitches never
-        # enter the training pool.
+        # exactly as before. ROC pitches never enter the training pool, but
+        # `model` is the full in-sample fit, so a pitcher with 2026 MLB rows
+        # has his ROC rows scored by a model that saw his own MLB outcomes;
+        # only pure-ROC arms are fully out-of-sample here (audit 2026-09-02).
         _arm = roc_df['arm_angle'].notna().values
         roc_df['_raw'] = np.nan
         if _arm.any():
@@ -1364,7 +1388,7 @@ def main():
     if B is None:
         with open(os.path.join(HERE, 'stuff_models.pkl'), 'wb') as f:
             pickle.dump({'model': model, 'features': list(X.columns), 'base_feats': BASE_FEATS,
-                         'league': league, 'params': TUNED, 'version': 'v14.1',
+                         'league': league, 'params': TUNED, 'version': BUNDLE_VERSION,
                          'model_na': model_na, 'noarm_feats': NOARM_FEATS,
                          'features_na': list(Xna.columns),
                          'na_pt_scale': na_pt, 'na_ov_scale': na_ov,
@@ -1380,10 +1404,12 @@ def main():
         with open(os.path.join(HERE, 'stuff_models.pkl'), 'wb') as f:
             pickle.dump(B, f)
 
-    # report + metric history (drift visibility: every retrain appends its
-    # OOF descriptive r and split-half reliability to data/, which CI
-    # commits — see "They Don't Make Pitch Models Like They Used To" for
-    # why watching these decay matters)
+    # report + metric history (drift visibility: EVERY run, retrain and
+    # score-only alike, appends its OOF descriptive r and split-half
+    # reliability to data/, which CI commits — so dates repeat and there is
+    # no version column; read retrain dates from CI run durations. See "They
+    # Don't Make Pitch Models Like They Used To" for why watching these decay
+    # matters.)
     from numpy import corrcoef
     g = df.groupby(['pitcher', 'pitch_type'])
     recs = []

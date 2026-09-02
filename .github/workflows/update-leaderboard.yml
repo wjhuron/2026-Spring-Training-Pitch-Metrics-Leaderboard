@@ -191,7 +191,12 @@ jobs:
           # trade.html + catch.html carry ?v= stamps from bump_asset_version
           # too — without them here the stamps regenerate every run but
           # never publish, leaving those pages on stale cache keys.
-          git add data/ index.html trade.html catch.html css/ js/
+          # stuff_plus/pitcher_stuff.csv carries the kNN low-support flags.
+          # Score-only runs READ it (the flags are only recomputed on a
+          # retrain), so a retrain's fresh flags must be committed here or
+          # every later run carries the last LOCAL commit's flags: the
+          # v14.1 height-tail rule never reached the site until 2026-09-02.
+          git add data/ index.html trade.html catch.html css/ js/ stuff_plus/pitcher_stuff.csv
           if git diff --cached --quiet; then
             echo "No changes to deploy."
           else

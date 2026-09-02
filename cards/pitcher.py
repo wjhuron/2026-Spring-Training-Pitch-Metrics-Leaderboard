@@ -4099,11 +4099,11 @@ def _scratch_mlb_pool_rows(rows):
 
 
 # Stuff+ shrinkage for DAILY (single-game) cards. Season/scratch-season cards
-# use train_stuff.K_SHRINK (=100) because they estimate a stable between-
-# pitcher grade over hundreds of pitches. On one game that would compress every
-# pitch type toward 100. Stuff+ grades pitch SHAPES, which stabilize in ~10
-# pitches, so a daily card can grade the shapes he actually threw with light
-# shrinkage — the number moves game-to-game (Wally's "grade today's shapes").
+# use train_stuff.K_SHRINK, which is 0 since the 2026-07-18 coherent canon
+# (every displayed grade is a plain mean of per-pitch integer atoms). Stuff+
+# grades pitch SHAPES, which stabilize in ~10 pitches, so a daily card grades
+# the shapes he actually threw — the number moves game-to-game (Wally's
+# "grade today's shapes").
 # Window cards (single game / date range / scratch) show the PLAIN AVERAGE
 # of per-pitch grades — no shrink (2026-07-18, per Wally: 'card should be
 # average'). k=0 makes _scratch_stuff_scores' unit value exactly the mean
@@ -4113,7 +4113,8 @@ K_SHRINK_DAILY = 0
 
 def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
     """Stuff+ for scratch pitchers, at whatever config the LOCAL bundle
-    carries (the bundle stores its version; the current one is v14). The
+    carries (the bundle stores its version; the guard below requires it to
+    equal train_stuff.BUNDLE_VERSION, since 2026-09-02). The
     feature transforms live inside train_stuff.build_df, so this path picks
     them up automatically — the guard below only enforces that the local
     bundle matches the current feature set (a stale bundle would score
@@ -4138,13 +4139,16 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
     _bundle_path = os.path.join(_repo_root, 'stuff_plus', 'stuff_models.pkl')
     with open(_bundle_path, 'rb') as f:
         bundle = _pickle.load(f)
-    if any(f not in bundle.get('features', [])
-           for f in ('kin_eff__ff', 'cross', 'height')):
+    if (any(f not in bundle.get('features', [])
+            for f in ('kin_eff__ff', 'cross', 'height'))
+            or bundle.get('version') != _sv.BUNDLE_VERSION):
         raise RuntimeError(
-            'stuff_models.pkl predates the current config (v14 needs '
-            'kin_eff__ff + cross + height) — its models '
-            'trained on different features than build_df now emits. Refresh '
-            'it from the latest-data release:\n  curl -sL https://github.com/'
+            f"stuff_models.pkl is version {bundle.get('version')!r}; the "
+            f"trainer expects {_sv.BUNDLE_VERSION!r} — its models trained on "
+            'different features/clips than build_df now emits (v14.1 kept the '
+            "'v14' string, so a feature-name check alone passed a pre-clip "
+            'bundle for ten days). Refresh it from the latest-data release:'
+            '\n  curl -sfL https://github.com/'
             'wjhuron/Huronalytics/releases/download/latest-data/'
             'stuff_models.pkl.gz | gunzip -c > '
             'stuff_plus/stuff_models.pkl')

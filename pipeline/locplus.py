@@ -12,16 +12,22 @@ pitches and normalize. Lower expected RV = better location for the pitcher.
 The expected value is a DECOMPOSITION over smooth league surfaces:
 
   ExpRV(x, z | grp, hands, count) =
-      Pswing · [ Pwhiff·rvWhiff(count) + Pfoul·rvFoul(count) + Pbip·xwOBAcon(x,z) ]
-    + (1-Pswing) · [ Pcs·rvCS(count) + (1-Pcs)·rvBall(count) ]
+      Pswing(count) · [ Pwhiff(count)·rvWhiff(count) + Pfoul·rvFoul(count)
+                        + Pbip·( xwOBAcon(x,z) + XWOFF(count) ) ]
+    + (1-Pswing(count)) · [ Pcs(count)·rvCS(count) + (1-Pcs(count))·rvBall(count) ]
 
   - Pwhiff, Pfoul, xwOBAcon, Pcs (called-strike prob) and Pswing are league
     SURFACES over a (PlateX, zone-normalized PlateZ) grid, built per pitch-type
-    GROUP × batter-hand × pitcher-hand. Physical surfaces (whiff/foul/contact/
-    called-strike) are count-independent for sample size; swing propensity is
-    count-specific. The run-value WEIGHTS (rvWhiff/rvFoul/rvCS/rvBall) are
+    GROUP × batter-hand × pitcher-hand. Since 2026-08-15 the count enters the
+    surfaces too: swing and whiff grids are per count (shrunk toward the
+    collapsed grid times a league count multiplier), the contact value carries
+    a per-count LEVEL offset XWOFF, and the called-strike surface takes a
+    per-count logit shift (CS_COUNT_TRANSFORM). Only the foul surface is
+    count-free. The run-value WEIGHTS (rvWhiff/rvFoul/rvCS/rvBall) are
     count-specific. Surfaces are smoothed with an anisotropic separable
-    Gaussian (4.5" horizontal, 0.22 zone vertical).
+    Gaussian (PHYS_X_IN horizontal, PHYS_Z_FRAC of the zone vertical); every
+    K_* pseudo-count is in KERNEL-WEIGHTED units, so K and bandwidth are
+    coupled (see _smooth).
   - Scoring at TRUE count level (no count-demeaning): empirically this is more
     predictive and no less stuff-independent than demeaning.
   - Contact (xwOBAcon) surface is heavily shrunk toward the group mean because
@@ -282,7 +288,7 @@ N_PRIOR_PT_DEFAULT = 0
 # above are zeroed. With an UNSHRUNK displayed mean, reliability at n pitches
 # is n/(n+k) for the group's k, so these values ARE the render-time
 # qualification gates the canon note defers to: a 25-pitch FF cell is only
-# 25/(25+71) = 0.26 reliable, which is why pitch-type Loc+ cannot ride the flat
+# 25/(25+73) = 0.26 reliable, which is why pitch-type Loc+ cannot ride the flat
 # 25-pitch outcome gate the other per-pitch metrics use (2026-07-25 audit: 771
 # rows, 30% of all colored pitch-type Loc+ cells, sat below r=0.5).
 # MIRRORED in js/aggregator.js (QUAL.MIN_PITCH_LOCPLUS) — keep the two in
@@ -481,6 +487,11 @@ def build_surfaces(baseline, lg_woba, woba_scale):
     """Build all league surfaces + count value scalars from MLB baseline pitches.
     Returns a dict bundle consumed by score_pitch()."""
     has_guts = (lg_woba is not None and woba_scale not in (None, 0))
+    if not has_guts:
+        # Announce the degrade (repo rule): without Guts every ball in play is
+        # valued at 0 runs and Loc+ silently becomes a swing/take/whiff model.
+        print('  WARNING Loc+: lg_woba/woba_scale missing — contact surfaces '
+              'are ZERO, every BIP valued at 0 runs (check metadata gutsConstants)')
 
     # count value scalars (hitter perspective = -RunExp)
     cv = {k: defaultdict(lambda: [0.0, 0]) for k in ('whiff', 'foul', 'cs', 'ball')}
