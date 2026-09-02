@@ -318,6 +318,7 @@
 "Burgos, Raymond": 77.0,
 "Burke, Brock": 76.0,
 "Burke, Sean": 78.0,
+"Burkhalter, Blake": 72.0,
 "Burleson, Alec": 72.0,
 "Burnes, Corbin": 75.0,
 "Burns, Andy": 74.0,
@@ -551,6 +552,7 @@
 "De La Cruz, Bryan": 72.0,
 "De La Cruz, Elly": 78.0,
 "De Le\u00f3n, Jos\u00e9": 72.0,
+"De Le\u00f3n, Luis": 75.0,
 "De Los Santos, Deyvison": 73.0,
 "De Los Santos, Enyel": 75.0,
 "De los Santos, Yerry": 75.0,
@@ -1529,6 +1531,7 @@
 "Mesa Jr., Victor": 71.0,
 "Messick, Parker": 72.0,
 "Messinger, Zach": 78.0,
+"Metoyer, Brian": 75.0,
 "Mey, Luis": 77.0,
 "Meyer, Max": 72.0,
 "Meyers, Jake": 72.0,
@@ -1778,6 +1781,7 @@
 "Peralta, Wily": 73.0,
 "Peraza, Oswald": 71.0,
 "Perdomo, Angel": 80.0,
+"Perdomo, Cesar": 70.0,
 "Perdomo, Geraldo": 74.0,
 "Perdomo, Luis": 74.0,
 "Pereda, Jhonny": 73.0,
@@ -3592,6 +3596,9 @@
 "Burke, Sean": [
 680732
 ],
+"Burkhalter, Blake": [
+686628
+],
 "Burleson, Alec": [
 676475
 ],
@@ -4291,6 +4298,9 @@
 ],
 "De Le\u00f3n, Jos\u00e9": [
 592254
+],
+"De Le\u00f3n, Luis": [
+801725
 ],
 "De Los Santos, Deyvison": [
 691277
@@ -7227,6 +7237,9 @@
 "Messinger, Zach": [
 684725
 ],
+"Metoyer, Brian": [
+682260
+],
 "Mey, Luis": [
 682825
 ],
@@ -7975,6 +7988,9 @@
 ],
 "Perdomo, Angel": [
 622780
+],
+"Perdomo, Cesar": [
+702885
 ],
 "Perdomo, Geraldo": [
 672695
@@ -10550,5 +10566,5 @@
 ]
 },
 "league_mean": 73.73,
-"n": 2635
+"n": 2639
 }
