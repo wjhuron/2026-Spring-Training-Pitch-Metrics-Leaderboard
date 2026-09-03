@@ -498,10 +498,11 @@ CHIP_MAX_ASPECT = 4.0
 # Stuff+ is shape-family: measured per-type k = 13 (seeds 12.9-13.8), so 15
 # colors only cells that are >=half signal without hiding real information.
 STUFF_COLOR_MIN_PITCHES = 15
-# Loc+ rides the site's measured per-group gates (retested 2026-07-30, all
-# six inside fresh seed spreads) — keeps card/Arsenal-leaderboard parity.
-# Mirrors js/aggregator.js QUAL.MIN_PITCH_LOCPLUS + LOCPLUS_GROUP.
-LOCPLUS_COLOR_MIN = {'FF': 73, 'SI': 81, 'FC': 74, 'SL': 67, 'CU': 83, 'CH': 79}
+# Loc+ rides the site's measured per-group gates (re-measured 2026-09-02 on
+# Savant-denominated PlateZ) — keeps card/Arsenal-leaderboard parity.
+# Mirrors js/aggregator.js QUAL.MIN_PITCH_LOCPLUS + LOCPLUS_GROUP and
+# pipeline/locplus.py STABILIZE_N_PT; the three move together.
+LOCPLUS_COLOR_MIN = {'FF': 73, 'SI': 77, 'FC': 89, 'SL': 68, 'CU': 81, 'CH': 76}
 LOCPLUS_COLOR_GROUP = {
     'FF': 'FF', 'FA': 'FF', 'SI': 'SI', 'FC': 'FC', 'CF': 'FC',
     'SL': 'SL', 'ST': 'SL', 'SW': 'SL', 'SV': 'SL',
@@ -555,9 +556,19 @@ def _compute_pitch_rv(pitches_list):
 # OOF by season; the chosen set sits in a flat top region and beat a
 # stuff-only grade in 5/5 seasons, and in the never-fitted 2026 sheets
 # replicate, r .109 vs .087). k are the measured outing-grain stabilization
-# constants; stuff keeps the season 42 because no within-outing stuff split
-# exists to measure one. xRV rides the sheet supplement, so a card built
-# before the morning backfill drifts ~0.5 pts (p95 1.5) and self-corrects.
+# constants for loc/csw/xrv.
+# RE-TESTED 2026-09-02 WITH TRUE PER-HALF STUFF ATOMS (the original search
+# reused the full-game stuff value on both halves; pitcherplus_outing_refit.py,
+# data/_pplus_outing_refit_2026_09.md): the frozen weights still win (pooled
+# r .0788 vs .0779 for the out-of-fold refit at k 42; the leaked stuff weight
+# was high by 1.3 SE, .205 vs .165), the PAIRED 1-SE rule now selects this
+# 4-term set, and the composite objective is FLAT in stuff k from ~20 to
+# ~150 (peak 30-50). Stuff's outing-grain reliability crossing is only 5,
+# but shrinkage here acts as an n-weighting device (the slope of unshrunk
+# stuff on the other half grows .15 -> .39 from 20-pitch to 80-pitch
+# outings), so 42 is a CONVENTION inside the flat region, not a reliability
+# constant. xRV rides the sheet supplement, so a card built before the
+# morning backfill drifts ~0.5 pts (p95 1.5) and self-corrects.
 PP_OUTING_W = {'stuff': 0.205, 'loc': 0.169, 'csw': 0.252, 'xrv100': 0.374}
 PP_OUTING_K = {'stuff': 42.0, 'loc': 185.0, 'csw': 398.0, 'xrv100': 1581.0}
 # Two floors, deliberately different (2026-08-28, per Wally):

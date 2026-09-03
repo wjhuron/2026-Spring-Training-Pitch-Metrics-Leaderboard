@@ -113,7 +113,8 @@ def score_pitch_cs(p, S, PCSV, keyfn):
     i = lp._xbin(px)
     j = lp._zbin(zn)
     psw = S['SW'][key][c][i][j]
-    pwh = S['WH'][key][i][j]
+    # 2026-09-02: live S['WH'][key] is per-count; base.wh_at reads either shape.
+    pwh = base.wh_at(S, key, c, i, j)
     pfl = S['FL'][key][i][j]
     pbip = max(0.0, 1.0 - pwh - pfl)
     vbip = S['XW'][key][i][j] + S['BIPOFF'].get(c, 0.0)

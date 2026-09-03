@@ -1,0 +1,10 @@
+{
+  "NEST400":  {"params": {"n_estimators": 400}},
+  "NEST1200": {"params": {"n_estimators": 1200}},
+  "LR0125":   {"params": {"learning_rate": 0.0125}},
+  "LR05":     {"params": {"learning_rate": 0.05}},
+  "MCW5":     {"params": {"min_child_weight": 5}},
+  "MCW40":    {"params": {"min_child_weight": 40}},
+  "LAMBDA05": {"params": {"reg_lambda": 0.5}},
+  "LAMBDA5":  {"params": {"reg_lambda": 5.0}}
+}

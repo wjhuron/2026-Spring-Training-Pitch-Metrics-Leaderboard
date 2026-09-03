@@ -110,7 +110,8 @@ def score_pitch_v(p, S, FLC=None, XWC=None):
     i = lp._xbin(px)
     j = lp._zbin(zn)
     psw = S['SW'][key][c][i][j]
-    pwh = S['WH'][key][i][j]
+    # 2026-09-02: live S['WH'][key] is per-count; base.wh_at reads either shape.
+    pwh = base.wh_at(S, key, c, i, j)
     ft = FLC.get(key) if FLC is not None else None
     pfl = ft[c][i][j] if ft is not None else S['FL'][key][i][j]
     pbip = max(0.0, 1.0 - pwh - pfl)

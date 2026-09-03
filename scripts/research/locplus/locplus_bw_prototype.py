@@ -20,6 +20,7 @@ from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, ROOT)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import numpy as np
 import matplotlib
@@ -29,6 +30,7 @@ from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
 from matplotlib.patches import Rectangle
 
 import pipeline.locplus as lp
+import locplus_constants_multiseason as base
 
 LG, SCALE = 0.3172, 1.2343
 PITCHER = 'Taylor, Grant'
@@ -53,7 +55,8 @@ def league_map(S, grp, count=(0, 0), bh='R', ph='R'):
     for i in range(lp.NX):
         for j in range(lp.NZ):
             psw = S['SW'][key][count][i][j]
-            pwh = S['WH'][key][i][j]
+            # 2026-09-02: live S['WH'][key] is per-count; base.wh_at reads either shape.
+            pwh = base.wh_at(S, key, count, i, j)
             pfl = S['FL'][key][i][j]
             pbip = max(0.0, 1.0 - pwh - pfl)
             vbip = S['XW'][key][i][j] + S['BIPOFF'].get(count, 0.0)

@@ -34,7 +34,8 @@ def score_pitch_c(p, S, WHC=None, XWC=None):
     j = lp._zbin(zn)
     psw = S['SW'][key][c][i][j]
     wt = WHC.get(key) if WHC is not None else None
-    pwh = wt[c][i][j] if wt is not None else S['WH'][key][i][j]
+    # 2026-09-02: live S['WH'][key] is per-count; base.wh_at reads either shape.
+    pwh = wt[c][i][j] if wt is not None else base.wh_at(S, key, c, i, j)
     pfl = S['FL'][key][i][j]
     pbip = max(0.0, 1.0 - pwh - pfl)
     vbip = S['XW'][key][i][j] + (XWC.get(c, 0.0) if XWC is not None else 0.0)

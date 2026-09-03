@@ -1,0 +1,6 @@
+{
+  "SHIPPED":   {"seeds": [0, 1, 2]},
+  "DEPTH5":    {"params": {"max_depth": 5}, "seeds": [0, 1, 2]},
+  "NOCLIP":    {"replace": {"height": "height_raw"}},
+  "ACCEL_ADD": {"add": ["acc_v", "acc_h", "acc_v_diff", "acc_h_diff"]}
+}

@@ -1,0 +1,6 @@
+{
+  "VD_NOMASK":  {"mask": {"velo_diff": []}},
+  "VD_MASKALL": {"mask": {"velo_diff": ["FF", "SI", "SL", "CH", "ST", "FC", "CU", "FS", "SV", "KC", "KN"]}},
+  "NOKIN":      {"drop": ["kin_eff__ff"]},
+  "HARMONIZE":  {"frames": {"2025": "2025H"}}
+}

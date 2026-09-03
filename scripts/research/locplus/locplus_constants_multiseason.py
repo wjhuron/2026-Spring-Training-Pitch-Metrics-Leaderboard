@@ -142,6 +142,18 @@ def adapt(path):
     return out
 
 
+def wh_at(S, key, c, i, j):
+    """Whiff-surface lookup that reads the LIVE shape (2026-09-02). Since
+    2026-08-15 (WH_COUNT_LEVEL) S['WH'][key] is {count: grid}; before that it
+    was one collapsed grid. Takes the per-count grid when present and falls
+    back to the collapsed grid otherwise, so the research scorers below and
+    in the sibling scripts keep working against either shape."""
+    wh = S['WH'][key]
+    if isinstance(wh, dict):
+        return wh[c][i][j]
+    return wh[i][j]
+
+
 def by_pitcher(pitches):
     d = defaultdict(list)
     for p in pitches:

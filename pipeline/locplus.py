@@ -218,17 +218,63 @@ Z_MIN, Z_MAX = -0.6, 1.6           # zone-normalized (0 = bottom, 1 = top)
 # pairing unit is two halves, so it cannot confirm the finding either. A
 # change that reverses sign on the season it would ship into still does not
 # meet the bar. Re-test on the full 2026 season before reopening.
+# SETTLED 2026-09-02: on FULL-season surfaces (the production sample size;
+# scripts/research/locplus/locplus_fullseason_replicate.py) both variants are
+# FLAT on 2021-2026: half-bin offset raw -0.0003 +/- 0.0013 (3/6), width 0.11
+# -0.0002 +/- 0.0007 (3/6). The 5/5, t 4-5 wins above were an artifact of the
+# QUARTER-season surfaces the old harness builds. 0.10 stays as a convention.
 BIN_Z = 0.10
 NZ = int(round((Z_MAX - Z_MIN) / BIN_Z))           # 22
 PHYS_X_IN = 4.5                    # physical smoothing bandwidths
 PHYS_Z_FRAC = 0.22
+# PROVENANCE (added 2026-09-02; the values had none). Set in June 2026 on
+# ~3 months of one season by archive/locplus_final_validate.py, grid 3.5-5.5
+# in and 0.17-0.28, on a composite that included reliability. Replicates
+# tested only narrower x (3.0/2.5/1.5, shipped won 5/5) and never varied z.
+# Re-measured 2026-09-02 on two objectives that DISAGREE:
+#   (1) out-of-sample CELL fit (train one full season, score another, 30
+#       pairs; locplus_cellfit_sweep.py): every surface prefers NARROWER,
+#       interior optimum ~2 in / 0.12 for whiff, foul, contact (1.5 / 0.12
+#       swing; the called-strike step wants ~1 in / <0.04), 30/30 pairs.
+#   (2) pitcher-level prediction on FULL-season surfaces (first-half Loc+ vs
+#       second-half luck-neutral xRV, 2021-2026; the metric's PURPOSE):
+#       narrower LOSES 0/6 (2 in / 0.12: rendered -0.014, t -3.7) and
+#       moderately WIDER WINS: 6 in / 0.30 rendered +0.011 (6/6, t 5.7),
+#       raw +0.010 (4/6), velo-partial +0.011 (5/6); the velo-controlled
+#       objective peaks near 9-13 in / 0.40 (+0.021), beyond which gains
+#       grow but turn season-heterogeneous (2025 and 2026 disagree on z).
+#       Stuff+ leak does not rise with smoothing (r -0.18 -> -0.16).
+# Reading: smoothing at the scale of a pitcher's command scatter isolates the
+# location value he can intend; the cell objective rewards structure he
+# cannot target. For a PITCHER grade, objective (2) decides, so 4.5 / 0.22
+# is NOT an optimum: it sits on the rising side of the pitcher-level curve.
+# Left in place because a bandwidth change redefines every atom and the
+# command map; the choice (6/0.30 conservative, ~9-13/0.40 argmax of the
+# velo-controlled objective) is Wally's. Results:
+# data/_loc_fullseason_replicate_{cellfit,wide,widegrid}.json.
 # Optional per-group bandwidth override, {group: (x_inches, z_frac)}. Empty
 # means one bandwidth for every pitch-type group. Applies to the physical
 # surfaces built per (group, bh, ph) — whiff / foul / xwOBAcon / swing. The
 # called-strike surface is per hand only, so it always uses the global pair.
 PHYS_BW_PT = {}
 
-# Per-surface shrinkage pseudo-counts toward the group mean
+# Per-surface shrinkage pseudo-counts toward the group mean.
+# PROVENANCE (added 2026-09-02): K_XWCON 200 and K_SWING_COUNT 20 came from the
+# June 2026 composite above (grids 100-500 and 10-50); K_WHIFF/K_FOUL/
+# K_SWING_COLL/K_CS were never swept. All are in KERNEL-WEIGHTED units
+# (_smooth adds K to a kernel-weighted denominator), so they are coupled to
+# PHYS_X_IN/PHYS_Z_FRAC. Measured 2026-09-02 at the shipped bandwidth:
+#   cell fit (30 out-of-sample season pairs): argmin K_WHIFF 0-1, K_FOUL 0-1,
+#   K_SWING_COLL 1, K_XWCON 0-2, K_CS 0-1 (30/30 each); the per-count K's are
+#   INTERIOR: K_WH_COUNT 16, K_SWING_COUNT 16 (shipped 20 within 1-4 SE).
+#   pitcher level (full-season surfaces, 2021-2026): the cell-fit K's are
+#   FLAT vs shipped (rendered -0.001 +/- 0.001, velo-partial +0.001, 4/6;
+#   reliability +0.003, 5/6); 2026 pitcher Loc+ r .9985 with shipped, mean
+#   |d| 0.28 pts, but per-pitch atoms move 3.1 pts on average (41% by >= 3)
+#   because less-shrunk surfaces carry more spatial contrast.
+# Claim class: pitcher-level CONVENTION; the cell-fit optimum is the better-
+# founded convention and is a one-line swap (1, 1, 2 / 1, 16 / 1) awaiting
+# Wally, because it changes the shipped atoms and the Sheets grade cells.
 K_WHIFF, K_FOUL, K_XWCON = 8, 8, 200
 K_SWING_COLL, K_SWING_COUNT, K_CS = 6, 20, 10
 
@@ -314,13 +360,18 @@ N_PRIOR_PT_DEFAULT = 0
 # anyone had validated at the cell level.) To start coloring a new type, measure
 # it with scripts/research/locplus/locplus_stabilize_celllevel.py and add it to STABILIZE_N_PT.
 STABILIZE_N_UNVALIDATED = float('inf')
-STABILIZE_N_PT = {'FF': 73, 'SI': 81, 'FC': 74, 'SL': 67, 'CU': 83, 'CH': 79}
+STABILIZE_N_PT = {'FF': 73, 'SI': 77, 'FC': 89, 'SL': 68, 'CU': 81, 'CH': 76}
 # Re-measured 2026-08-15 on the count-aware surfaces (WH_COUNT_LEVEL +
 # XW_COUNT_LEVEL): the new per-pitch atoms are less noisy, so five of six
-# groups stabilize faster (FC 122 -> 74 is the big mover; CH 72 -> 79).
+# groups stabilize faster (FC 122 -> 74 was the big mover; CH 72 -> 79).
+# Re-measured AGAIN 2026-09-02 on SAVANT-denominated PlateZ (the 08-15 run
+# used feed PlateZ, +0.086 ft = half a z bin; 160 dates, 10 seeds): FF 73,
+# SI 81 -> 77, FC 74 -> 89 (seed range 78-107; the old value sits below it,
+# FC has only ~127 cells and is the noisiest gate), SL 67 -> 68, CU 83 -> 81,
+# CH 79 -> 76. Five moved inside their seed spread; FC did not.
 # Leaderboard pitch-CATEGORY rows pool several types (js/aggregator.js
 # PITCH_CATEGORIES), so they take the stiffest member gate.
-STABILIZE_N_CATEGORY = {'Hard': 81, 'Breaking': 83, 'Offspeed': 79}
+STABILIZE_N_CATEGORY = {'Hard': 77, 'Breaking': 89, 'Offspeed': 76}
 
 
 def stabilize_n(pitch_type):
