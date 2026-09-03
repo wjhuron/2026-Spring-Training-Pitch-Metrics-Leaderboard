@@ -1,51 +1,40 @@
 """Expected movement: xIVB / xHB and the IVBOE / HBOE residuals.
 
-What a pitch "should" do, given how it was thrown. One linear model per
-(pitch type, throwing hand), fit on the season's MLB pitches, on:
+What a pitch "should" do, judged the way a HITTER judges it. One ridge fit per
+(pitch type, throwing hand), fit on the season's MLB pitches, on the three
+things a hitter can read before the ball moves:
 
-    arm angle, extension, velocity, spin rate,
-    sin/cos of the release spin axis (two harmonics),
-    spin rate x each of those four harmonics.
+    arm angle, extension, velocity.
 
-The release axis is the measured RELEASE tilt (Sheets column RTilt, from the
-feed's spin axis), never the movement-derived OTilt: OTilt is atan2(HB, IVB),
-the answer restated. The axis enters as a hand-signed angle (12:00 = 0, arm
-side positive) so one fit serves either hand's mirror image, and HB is fit
-hand-signed for the same reason and mirrored back for display.
+Spin rate and the release spin axis are deliberately NOT inputs. Both are in
+the data and a basis on them (BASIS = 'physics' below: two axis harmonics plus
+a spin x axis tensor) explains far more of the movement itself, 0.49 / 0.42
+within-type R^2 against 0.27 / 0.18. It shipped for about four hours on
+2026-09-03 and was pulled the same day, because it answers the wrong question
+for the chart it sits on. Measured across 2021-2025, each season predicted from
+the other four (scripts/research/xmove/xmove_residual_value.py):
 
-Why this basis and not the earlier one. The shipped model until 2026-09-03
-conditioned on arm angle, extension and velocity only. Spin rate and the
-release axis are the two largest physical causes of movement and both are in
-the data at 99%+, so that model explained 0.27 / 0.18 of within-type movement
-and its residual restated the raw column (|corr| 0.80 / 0.84). This basis
-explains 0.49 / 0.42 out of sample, wins in every season 2021-2025 when each is
-fit self-contained, and its residual correlates 0.62 / 0.66 with the raw
-column. The two harmonics and the spin x axis tensor bracket an interior
-optimum (harmonics 1/2/3 give 0.519 / 0.528 / 0.517; a spin spline buys
-nothing); velocity x axis, slot x axis, squares and release point each add at
-most 0.01 and lose in at least one season. docs/expected_movement_review.md
-Findings 1-5 and scripts/research/xmove/xmove_pertype_ladder.py hold the
-grids.
+    residual measured against      whiff r   run-value r   whiff r with raw movement in
+    slot only                        0.11        0.02              0.15
+    slot + extension + velocity      0.13        0.07              0.22
+    slot + ext + velo + spin + axis  0.05        0.05              0.15
 
-Two things this model is NOT. It is not label-free: a re-tagged pitch moves
-its own expectation, because the class is an interaction with the release
-parameters and nothing measured at release separates a four-seam from a
-sinker (xmove_agnostic_flight.py, 2026-09-03: release-only, spin-efficiency
-and drag inputs all leave the FF/SI expected gap under 3 inches; the label
-gives 9.3). And it is not a physics calculation: the expectation is what
-pitches THROWN like this usually do, so the residual is seam-shifted wake plus
-gyro fraction plus whatever the sensors miss, measured against that pool.
+Extra spin and a clean axis ARE the weapon. A physics expectation credits them
+away, so its residual explains results worse than raw movement does. The
+hitter expectation leaves them in the residual, where they read as surprise.
+So the chart's ghost is "what a pitcher who looks like this usually throws",
+and the arrow to the actual pitch is what the hitter did not see coming. Per
+Wally, 2026-09-03: "put the hitter model back on the chart." The physics
+basis stays in this module for research and scouting use; it is not scored.
 
-The fit is a ridge (XMOVE_RIDGE) on standardised columns; see the constant
-note for why and for the sweep.
-
-Scoring is per pitch. The basis is nonlinear in tilt, so scoring at group
-means is wrong by a median 0.1" and up to 3" on gyro sliders
-(xmove_basis_at_means.py); every consumer sums per-pitch expectations instead.
-
-The ROC variant swaps arm angle for the release point (RelPosZ, RelPosX) and
+The 'roc' variant swaps arm angle for the release point (RelPosZ, RelPosX) and
 serves only pitches with no arm angle; both variants are fit on MLB pitches so
 a ROC arm is measured against the MLB baseline.
+
+Scoring is per pitch and the site sums the per-pitch expectations (micro rows
+sumXIVB/nXIVB/sumXHB/nXHB). For the hitter basis that is exact either way; it
+is kept per pitch so the physics basis, which is nonlinear in tilt, can be
+switched in without touching a consumer.
 """
 import math
 
@@ -53,29 +42,30 @@ import numpy as np
 
 from pipeline.utils import break_tilt_to_minutes, safe_float
 
-# Ridge penalty on the standardised columns, intercept unpenalised. When a
-# group's release tilt barely varies its harmonic columns are nearly straight
-# lines in tilt and the spin tensor copies them, so an unpenalised fit is
-# near-singular at small pools (CH_L: 1.8" excess RMSE at n = 1000 with no
-# penalty). Swept 2026-09-03 (scripts/research/xmove/xmove_ridge_sweep.py,
-# 2025, four groups, held-out RMSE excess over the full-pool OLS fit): both
-# grid edges (0 and 1.0) are worse at every n, 3e-3 to 1e-2 is the interior
-# optimum, and at n >= 5000 the cost is 0.004" (indistinguishable from OLS, so
-# the five-season ladder verdict carries).
-XMOVE_RIDGE = 3e-3
-# Per-(type, hand) pool floor. Same sweep: under XMOVE_RIDGE the worst group's
-# excess drops under 0.10" at n = 300 (0.064"), 0.032" at 500. The 0.10" bar
-# is a convention: below it the floor's cost is invisible at the 0.1" the site
-# rounds to. A group under the floor blanks, as before (the old floor was 150
-# for 3 regressors).
-XMOVE_MIN_N = 300
+BASIS = 'hitter'          # 'hitter' (shipped) or 'physics' (research only)
+
+# Ridge penalty on the standardised columns (intercept unpenalised) and the
+# per-(type, hand) pool floor, swept JOINTLY per basis on 2025
+# (scripts/research/xmove/xmove_ridge_sweep.py: four groups incl. FS_L, held-out
+# RMSE excess over the full-pool OLS fit, median of 20 draws, after the MAD
+# screen).
+#   hitter (shipped): the excess is FLAT in lambda from 0 to 3e-2 at every n
+#     (worst group 0.046" at n=150, 0.025" at 300), so 0 is a convention on a
+#     flat region, i.e. plain least squares; the floor stays at the original
+#     150 because the worst group is already under the 0.10" bar there (0.10"
+#     = display rounding, itself a convention).
+#   physics (research): 3e-3 is an interior optimum (0 and 1.0 both worse at
+#     every n) because the harmonic columns go collinear in narrow-tilt groups
+#     (CH_L: 1.8" excess at n=1000 unpenalised); floor 300 = first n under
+#     0.10" on the worst group.
+XMOVE_RIDGE = {'hitter': 0.0, 'physics': 3e-3}[BASIS]
+XMOVE_MIN_N = {'hitter': 150, 'physics': 300}[BASIS]
 MAD_THRESH = 6.0
 SPIN_SCALE = 1000.0
 
-TERMS_MLB = ['aa', 'ext', 'velo', 'spin',
-             'h1s', 'h1c', 'h2s', 'h2c', 'sp1s', 'sp1c', 'sp2s', 'sp2c']
-TERMS_ROC = ['rz', 'rx', 'ext', 'velo', 'spin',
-             'h1s', 'h1c', 'h2s', 'h2c', 'sp1s', 'sp1c', 'sp2s', 'sp2c']
+HARMONIC_TERMS = ['spin', 'h1s', 'h1c', 'h2s', 'h2c', 'sp1s', 'sp1c', 'sp2s', 'sp2c']
+TERMS_MLB = ['aa', 'ext', 'velo'] + (HARMONIC_TERMS if BASIS == 'physics' else [])
+TERMS_ROC = ['rz', 'rx', 'ext', 'velo'] + (HARMONIC_TERMS if BASIS == 'physics' else [])
 
 
 def hand_sign(throws):
@@ -90,22 +80,34 @@ def release_theta(rtilt, throws):
     return minutes / 720.0 * 2.0 * math.pi * hand_sign(throws)
 
 
+def _spin_theta(p, throws):
+    """Spin rate and hand-signed release axis for the physics basis. The
+    hitter basis reads neither, so it returns placeholders that never gate a
+    pitch out (coverage then matches the pre-2026-09-03 model exactly)."""
+    if BASIS != 'physics':
+        return 0.0, 0.0
+    return safe_float(p.get('Spin Rate')), release_theta(p.get('RTilt'), throws)
+
+
 def _design(cols, theta):
-    """cols: dict of 1-D arrays (aa or rz/rx, ext, velo, spin); theta: array.
-    Returns the design matrix with an intercept column first."""
-    n = len(theta)
-    sp = cols['spin'] / SPIN_SCALE
+    """cols: dict of 1-D arrays (aa or rz/rx, ext, velo, and spin for the
+    physics basis); theta: hand-signed release axis, read only by the physics
+    basis. Returns the design matrix with an intercept column first."""
+    n = len(cols['ext'])
     parts = [np.ones(n)]
     for k in ('rz', 'rx', 'aa'):
         if k in cols:
             parts.append(cols[k])
-    parts += [cols['ext'], cols['velo'], cols['spin']]
-    for k in (1, 2):
-        s, c = np.sin(k * theta), np.cos(k * theta)
-        parts += [s, c]
-    for k in (1, 2):
-        s, c = np.sin(k * theta), np.cos(k * theta)
-        parts += [sp * s, sp * c]
+    parts += [cols['ext'], cols['velo']]
+    if BASIS == 'physics':
+        sp = cols['spin'] / SPIN_SCALE
+        parts.append(cols['spin'])
+        for k in (1, 2):
+            s, c = np.sin(k * theta), np.cos(k * theta)
+            parts += [s, c]
+        for k in (1, 2):
+            s, c = np.sin(k * theta), np.cos(k * theta)
+            parts += [sp * s, sp * c]
     return np.column_stack(parts)
 
 
@@ -123,7 +125,7 @@ def _mad_keep(X):
 def _fit(rows, use_relpt):
     """rows: list of (ivb, hb_s, aa, rz, rx, ext, velo, spin, theta)."""
     A = np.asarray(rows, dtype='f8')
-    screen_cols = [0, 1, 5, 6, 7] + ([3, 4] if use_relpt else [2])
+    screen_cols = [0, 1, 5, 6] + ([7] if BASIS == 'physics' else []) + ([3, 4] if use_relpt else [2])
     keep = _mad_keep(A[:, screen_cols])
     if keep.sum() < XMOVE_MIN_N:
         keep[:] = True
@@ -170,8 +172,7 @@ def fit_models(all_pitches):
         hb = safe_float(p.get('xHorzBrk'))
         ext = safe_float(p.get('Extension'))
         velo = safe_float(p.get('Velocity'))
-        spin = safe_float(p.get('Spin Rate'))
-        theta = release_theta(p.get('RTilt'), throws)
+        spin, theta = _spin_theta(p, throws)
         if None in (ivb, hb, ext, velo, spin, theta):
             continue
         s = hand_sign(throws)
@@ -206,8 +207,7 @@ def score_pitch(models, p):
         return None, None
     ext = safe_float(p.get('Extension'))
     velo = safe_float(p.get('Velocity'))
-    spin = safe_float(p.get('Spin Rate'))
-    theta = release_theta(p.get('RTilt'), throws)
+    spin, theta = _spin_theta(p, throws)
     if None in (ext, velo, spin, theta):
         return None, None
     s = hand_sign(throws)
@@ -241,8 +241,7 @@ def score_all(models, all_pitches):
             continue
         ext = safe_float(p.get('Extension'))
         velo = safe_float(p.get('Velocity'))
-        spin = safe_float(p.get('Spin Rate'))
-        theta = release_theta(p.get('RTilt'), throws)
+        spin, theta = _spin_theta(p, throws)
         if None in (ext, velo, spin, theta):
             continue
         aa = safe_float(p.get('ArmAngle'))

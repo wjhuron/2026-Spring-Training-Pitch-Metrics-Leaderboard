@@ -1,11 +1,16 @@
 # Expected movement (xIVB / xHB, IVBOE / HBOE) — review and rebuild
 
-Status: the per-class spin + release-axis basis (Finding 5's interior optimum)
-SHIPPED 2026-09-03 as `pipeline/xmove.py`, with a ridge penalty and a 300-pitch
-floor measured that day (`scripts/research/xmove/xmove_ridge_sweep.py`); the
-per-type ladder that closed the remaining candidates is
-`xmove_pertype_ladder.py`. Everything below is the analysis that led there.
-Scripts under `scripts/research/xmove/`.
+Status: the Finding 5 basis (spin + release axis) SHIPPED on 2026-09-03 and was
+PULLED the same day. It explains movement far better, but its residual explains
+pitch RESULTS worse than raw movement, because it credits away the spin and
+axis that are the weapon (`scripts/research/xmove/xmove_residual_value.py`,
+5-season LOSO: whiff r 0.05 vs 0.13 for the slot + extension + velocity
+residual). The chart on the player page is about performance, so
+`pipeline/xmove.py` ships the HITTER basis (slot, extension, velocity, the
+same inputs as the pre-review model) with the per-pitch scoring and micro-row
+sums built for the physics basis; the physics basis stays in the module for
+research. Everything below is the movement-fit analysis. Scripts under
+`scripts/research/xmove/`.
 Findings 1-5 are the model rebuild; 6 covers whether the pitch-type label can be
 removed (it cannot) and what a retag costs; 7 covers cross-axis break, which is
 the only measurement here that needs no model and no label; 8 renders the two

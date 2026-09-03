@@ -110,7 +110,11 @@ def score(df, feats, coefs):
 
 def mvn_shipped(df):
     """Score with the shipped metadata mvnModels, per pitch (the site's numbers)."""
-    meta = json.load(open(f'{ROOT}/data/metadata_rs.json'))['mvnModels']
+    meta = json.load(open(f'{ROOT}/data/metadata_rs.json')).get('mvnModels')
+    if not meta:
+        # mvnModels left metadata when the basis shipped (2026-09-03); refit
+        # the old form locally (reproduction check: median 0.02" from shipped)
+        return score(df, OLD, fit_per_group(df, OLD))
     xi, xh = np.full(len(df), np.nan), np.full(len(df), np.nan)
     for (pt, thr), idx in df.groupby(['Pitch Type', 'Throws']).indices.items():
         m = meta.get(f'{pt}_{thr}', {}).get('mlb')
