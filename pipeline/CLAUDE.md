@@ -19,6 +19,7 @@ The build. Sheets in, leaderboard JSON and gzipped embeds out. Read the root `CL
 | `eraplus.py` | The ERA estimator family |
 | `xwoba3d.py` | xwOBA on the EV × LA × spray grid |
 | `pitcherplus.py` | Pitcher+ composite |
+| `xmove.py` | Expected movement (xIVB/xHB), per-type ridge on spin + release axis, scored per pitch |
 
 ## Constants are measured, not chosen
 

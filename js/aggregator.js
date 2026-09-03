@@ -72,69 +72,6 @@ const Aggregator = {
   loaded: false,
   _colIdx: {},
 
-  _matInvGeneral: function (M) {
-    const n = M.length;
-    const aug = [];
-    for (let i = 0; i < n; i++) {
-      aug[i] = [];
-      for (let j = 0; j < n; j++) aug[i][j] = M[i][j];
-      for (let j2 = 0; j2 < n; j2++) aug[i][n + j2] = (i === j2) ? 1.0 : 0.0;
-    }
-    for (let col = 0; col < n; col++) {
-      let maxRow = col;
-      for (let r = col + 1; r < n; r++) {
-        if (Math.abs(aug[r][col]) > Math.abs(aug[maxRow][col])) maxRow = r;
-      }
-      const tmp = aug[col]; aug[col] = aug[maxRow]; aug[maxRow] = tmp;
-      if (Math.abs(aug[col][col]) < 1e-15) return null;
-      for (let r2 = col + 1; r2 < n; r2++) {
-        const f = aug[r2][col] / aug[col][col];
-        for (let c = 0; c < 2 * n; c++) aug[r2][c] -= f * aug[col][c];
-      }
-    }
-    for (let col2 = n - 1; col2 >= 0; col2--) {
-      const piv = aug[col2][col2];
-      for (let c2 = 0; c2 < 2 * n; c2++) aug[col2][c2] /= piv;
-      for (let r3 = 0; r3 < col2; r3++) {
-        const f2 = aug[r3][col2];
-        for (let c3 = 0; c3 < 2 * n; c3++) aug[r3][c3] -= f2 * aug[col2][c3];
-      }
-    }
-    const inv = [];
-    for (let ii = 0; ii < n; ii++) inv[ii] = aug[ii].slice(n);
-    return inv;
-  },
-
-  _mvnConditional: function (modelParams, relValues) {
-    const mu = modelParams.mu;
-    const cov = modelParams.cov;
-    const nAcc = 2; // IVB, HB
-    const nRel = mu.length - nAcc;
-    if (relValues.length !== nRel) return null;
-    const sigmaRel = [];
-    for (let i = 0; i < nRel; i++) {
-      sigmaRel[i] = [];
-      for (let j = 0; j < nRel; j++) sigmaRel[i][j] = cov[nAcc + i][nAcc + j];
-    }
-    const sigmaRel_inv = this._matInvGeneral(sigmaRel);
-    if (!sigmaRel_inv) return null;
-    const rDiff = [];
-    for (let k = 0; k < nRel; k++) rDiff[k] = relValues[k] - mu[nAcc + k];
-    const sriRdiff = [];
-    for (let ii = 0; ii < nRel; ii++) {
-      let s = 0;
-      for (let jj = 0; jj < nRel; jj++) s += sigmaRel_inv[ii][jj] * rDiff[jj];
-      sriRdiff[ii] = s;
-    }
-    const muBar = [];
-    for (let a = 0; a < nAcc; a++) {
-      let adj = 0;
-      for (let b = 0; b < nRel; b++) adj += cov[a][nAcc + b] * sriRdiff[b];
-      muBar[a] = mu[a] + adj;
-    }
-    return muBar;
-  },
-
   load: function (microData) {
     this._roleCache = null;  // Clear role cache on reload
     if (microData) {
@@ -1142,7 +1079,7 @@ const Aggregator = {
   /**
    * Model-derived values for a per-(pitcher, pitchType) micro group: nVAA/nHAA
    * (location-normalized approach angles via per-type regressions) and
-   * xIVB/xHB + IVBOE/HBOE (MVN conditional movement model, hand-specific).
+   * xIVB/xHB + IVBOE/HBOE (per-pitch expected movement, summed in the pipeline).
    * All values signed from the pitcher's POV; callers decide whether to
    * magnitude/align them when mixing hands.
    */
@@ -1166,30 +1103,20 @@ const Aggregator = {
     const plateXMean = mean('sumPlateX', 'nPlateX');
     // leagueAvgPlateX is hand-specific ({R:…, L:…}); slope is fit mirrored +
     // within-pitcher server-side. Hand-mixed groups (team mode, throws=null)
-    // get null, same as the hand-specific MVN model below.
+    // get null, same as the hand-specific expected movement below.
     const haaLgPX = (haaReg && haaReg.leagueAvgPlateX) ? haaReg.leagueAvgPlateX[g.throws] : null;
     if (haaMean != null && plateXMean != null && haaReg && haaLgPX != null) {
       out.nHAA = haaMean - haaReg.slope * (plateXMean - haaLgPX);
     }
 
-    const mvnModels = DataStore.metadata && DataStore.metadata.mvnModels;
-    const ptModel = mvnModels && mvnModels[ptName + '_' + g.throws];
-    const armMean = mean('sumArmAngle', 'nArmAngle');
-    const extMean = mean('sumExt', 'nExt');
-    const veloMean = mean('sumVelo', 'nVelo');
-    const relZMean = mean('sumRelZ', 'nRelZ');
-    const relXMean = mean('sumRelX', 'nRelX');
+    // Expected movement (pipeline/xmove.py) is scored PER PITCH in the
+    // pipeline and arrives as sums; the basis is nonlinear in release tilt,
+    // so it must never be re-scored here from group means (up to 3" wrong on
+    // gyro sliders). Embeds built before 2026-09-03 carry no sums -> null.
     const ivbMean = mean('sumIVB', 'nIVB');
     const hbMean = mean('sumHB', 'nHB');
-    let xIVB_i = null, xHB_i = null;
-    if (ptModel && ptModel.mlb && armMean != null && extMean != null && veloMean != null) {
-      const muBar = this._mvnConditional(ptModel.mlb, [armMean, extMean, veloMean]);
-      if (muBar) { xIVB_i = muBar[0]; xHB_i = muBar[1]; }
-    }
-    if (xIVB_i === null && ptModel && ptModel.roc && relZMean != null && relXMean != null && extMean != null && veloMean != null) {
-      const muBar2 = this._mvnConditional(ptModel.roc, [relZMean, relXMean, extMean, veloMean]);
-      if (muBar2) { xIVB_i = muBar2[0]; xHB_i = muBar2[1]; }
-    }
+    const xIVB_i = mean('sumXIVB', 'nXIVB');
+    const xHB_i = mean('sumXHB', 'nXHB');
     if (xIVB_i != null) {
       out.xIVB = xIVB_i;
       if (ivbMean != null) out.ivbOE = ivbMean - xIVB_i;
@@ -1246,6 +1173,15 @@ const Aggregator = {
       tg.metricSums.nStuff += ms.nStuff || 0;
       tg.metricSums.sumLoc += ms.sumLoc || 0;
       tg.metricSums.nLoc += ms.nLoc || 0;
+      // Expected-movement sums; xHB is hand-mirrored like HB (magnitude).
+      if (ms.nXIVB) {
+        tg.metricSums.sumXIVB += ms.sumXIVB || 0;
+        tg.metricSums.nXIVB += ms.nXIVB;
+      }
+      if (ms.nXHB) {
+        tg.metricSums.sumXHB += Math.abs(ms.sumXHB / ms.nXHB) * ms.nXHB;
+        tg.metricSums.nXHB += ms.nXHB;
+      }
 
       // Per-pitcher model values, weighted into the team accumulator.
       // Magnitude for hand-mirrored values (nHAA, xHB); HBOE aligned to the
@@ -1530,6 +1466,10 @@ const Aggregator = {
         groups[gk].metricSums.nStuff = 0;
         groups[gk].metricSums.sumLoc = 0;
         groups[gk].metricSums.nLoc = 0;
+        groups[gk].metricSums.sumXIVB = 0;
+        groups[gk].metricSums.nXIVB = 0;
+        groups[gk].metricSums.sumXHB = 0;
+        groups[gk].metricSums.nXHB = 0;
       }
 
       const g = groups[gk];
@@ -1549,6 +1489,13 @@ const Aggregator = {
         g.metricSums.nStuff += row[ci.nStuff] || 0;
         g.metricSums.sumLoc += row[ci.sumLoc] || 0;
         g.metricSums.nLoc += row[ci.nLoc] || 0;
+      }
+      // Expected-movement sums (absent in embeds built before 2026-09-03 — guard)
+      if (ci.sumXIVB !== undefined) {
+        g.metricSums.sumXIVB += row[ci.sumXIVB] || 0;
+        g.metricSums.nXIVB += row[ci.nXIVB] || 0;
+        g.metricSums.sumXHB += row[ci.sumXHB] || 0;
+        g.metricSums.nXHB += row[ci.nXHB] || 0;
       }
     }
 
@@ -1640,21 +1587,11 @@ const Aggregator = {
       delete obj._plateZ;  // internal, not displayed
       delete obj._plateX;  // internal, not displayed
 
-      // xIVB/xHB + IVBOE/HBOE from MVN conditional model (per pitch type + handedness)
-      const mvnModels = DataStore.metadata && DataStore.metadata.mvnModels;
-      const mvnKey = obj.pitchType + '_' + obj.throws;
-      const ptModel = mvnModels && mvnModels[mvnKey];
-      let xIVB_val = null, xHB_val = null;
-      // Try MLB model first: condition on [ArmAngle, Extension, Velocity]
-      if (ptModel && ptModel.mlb && obj.armAngle !== null && obj.extension !== null && obj.velocity !== null) {
-        const muBar = self._mvnConditional(ptModel.mlb, [obj.armAngle, obj.extension, obj.velocity]);
-        if (muBar) { xIVB_val = muBar[0]; xHB_val = muBar[1]; }
-      }
-      // Fallback to ROC model if no MLB model or missing ArmAngle: [RelPosZ, RelPosX, Extension, Velocity]
-      if (xIVB_val === null && ptModel && ptModel.roc && obj.relPosZ !== null && obj.relPosX !== null && obj.extension !== null && obj.velocity !== null) {
-        const muBar2 = self._mvnConditional(ptModel.roc, [obj.relPosZ, obj.relPosX, obj.extension, obj.velocity]);
-        if (muBar2) { xIVB_val = muBar2[0]; xHB_val = muBar2[1]; }
-      }
+      // xIVB/xHB + IVBOE/HBOE: per-pitch expectations (pipeline/xmove.py)
+      // summed in the micro rows; the site never scores the model (nonlinear
+      // in release tilt). Embeds built before 2026-09-03 carry no sums -> null.
+      const xIVB_val = ms.nXIVB > 0 ? ms.sumXIVB / ms.nXIVB : null;
+      const xHB_val = ms.nXHB > 0 ? ms.sumXHB / ms.nXHB : null;
       if (xIVB_val !== null) {
         obj.xIVB = Number(xIVB_val.toFixed(1));
         obj.ivbOE = obj.indVertBrk !== null ? Number((obj.indVertBrk - xIVB_val).toFixed(1)) : null;
@@ -1697,7 +1634,7 @@ const Aggregator = {
         // Model-derived values for team and category rows: replace the
         // generic group-sum versions with the per-(pitcher, type) weighted
         // means accumulated during rollup/combination (the per-type
-        // regressions and hand-specific MVN models don't apply to mixed
+        // regressions and hand-specific expected movement don't apply to mixed
         // groups directly).
         const o = g._ovr;
         obj.nVAA = o.nVaaW > 0 ? Number((o.nVaaS / o.nVaaW).toFixed(2)) : null;

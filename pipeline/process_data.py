@@ -36,6 +36,8 @@ from pipeline.fetch import (
     SPREADSHEET_IDS, SERVICE_ACCOUNT_FILE,
     WOBA_WEIGHTS_FALLBACK, FIP_CONSTANT_FALLBACK,
 )
+from pipeline.xmove import (fit_models as fit_xmove_models, score_all as score_xmove,
+                            export as export_xmove)
 from pipeline.compute import (
     compute_expected_stats, compute_stats, compute_xrv,
     compute_pitcher_batted_ball, compute_hitter_stats,
@@ -349,7 +351,7 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
     # ==========================================================
     #  Pitch micro-aggs
     #  Key: (pitcherIdx, teamIdx, throws, pitchTypeIdx, dateIdx, batterHand)
-    #  Values: 22 count fields + 29 metric fields = 51 fields
+    #  Values: 22 count fields + 37 metric fields = 59 fields
     #  0:n  1:iz  2:sw  3:wh  4:csw  5:ooz  6:oozSw  7:bip  8:gb
     #  9:pa  10:h  11:hr  12:k  13:bb  14:hbp  15:sf  16:sh  17:ci
     #  18:izSw  19:izWh  20:firstPitches  21:firstPitchStrikes
@@ -364,6 +366,9 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
     #  49:sumEffVelo 50:nEffVelo
     #  51:sumStuff 52:nStuff  53:sumLoc 54:nLoc
     #  (integer grade-atom sums/counts — see _grade_atoms)
+    #  55:sumXIVB 56:nXIVB  57:sumXHB 58:nXHB
+    #  (per-pitch expected movement, pipeline/xmove.py; the site divides
+    #  sum/count and never scores the model itself)
     # ==========================================================
     METRIC_OFFSETS = [
         ('Velocity', 22), ('Spin Rate', 24), ('xIndVrtBrk', 26),
@@ -372,7 +377,7 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
         ('PlateZ', 42), ('PlateX', 47),
     ]
 
-    pitch_micro = defaultdict(lambda: [0.0] * 55)
+    pitch_micro = defaultdict(lambda: [0.0] * 59)
 
     for p in all_pitches:
         pitcher = p.get('Pitcher')
@@ -461,6 +466,11 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
         if _la is not None:
             c[53] += _la; c[54] += 1
 
+        # Expected movement per pitch (pipeline/xmove.py)
+        if p.get('_xivb') is not None:
+            c[55] += p['_xivb']; c[56] += 1
+            c[57] += p['_xhb']; c[58] += 1
+
     pitch_rows = []
     for (pi, ti, throws, pti, di, bh), c in pitch_micro.items():
         row = [pi, ti, throws, pti, di, bh]
@@ -480,6 +490,9 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
         # Grade-atom sums/counts (all integers)
         for gi in range(51, 55):
             row.append(int(c[gi]))
+        # Expected-movement sums/counts
+        row.append(round(c[55], 4)); row.append(int(c[56]))
+        row.append(round(c[57], 4)); row.append(int(c[58]))
         pitch_rows.append(row)
 
     # ==========================================================
@@ -1052,11 +1065,11 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
             pitchmicro_by_pitcher[(pi, throws)].append((ti, pti, di, bh, c))
         for (pi, throws), combined_ti in combined_pitcher_ti.items():
             teamset = pitcher_mlb_team_set_micro[(pi, throws)]
-            by_key = defaultdict(lambda: [0.0] * 55)
+            by_key = defaultdict(lambda: [0.0] * 59)
             for (ti, pti, di, bh, c) in pitchmicro_by_pitcher[(pi, throws)]:
                 if ti not in teamset:
                     continue
-                _sum_counts(by_key[(pti, di, bh)], c, 55)
+                _sum_counts(by_key[(pti, di, bh)], c, 59)
             for (pti, di, bh), c in by_key.items():
                 # Emit in the SAME reordered layout as the per-team pitch builder
                 # (22 counts, then METRIC_OFFSETS sum/count pairs, then tilt). The
@@ -1075,6 +1088,8 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
                 # Grade-atom sums/counts (all integers)
                 for gi in range(51, 55):
                     row.append(int(c[gi]))
+                row.append(round(c[55], 4)); row.append(int(c[56]))
+                row.append(round(c[57], 4)); row.append(int(c[58]))
                 pitch_rows.append(row)
 
     # --- Hitter micro: sum across teams for same (bats, di, ph) ---
@@ -1239,6 +1254,7 @@ def generate_micro_data(all_pitches, mlb_id_cache=None, ep_pitchers=None,
             'sumPlateX', 'nPlateX',
             'sumTiltSin', 'sumTiltCos', 'nTilt',
             'sumStuff', 'nStuff', 'sumLoc', 'nLoc',
+            'sumXIVB', 'nXIVB', 'sumXHB', 'nXHB',
         ],
         'pitchMicro': pitch_rows,
         'hitterCols': [
@@ -1847,6 +1863,22 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     XRV_BIP_COUNT_MEANS = build_bip_count_means(_mlb_for_xrv, _xrv_lg, _xrv_scale,
                                                 XRV_COUNT_OFFSETS)
 
+    # --- Expected movement (pipeline/xmove.py): fit per (type, hand) on MLB
+    # pitches, then score EVERY pitch once. Downstream readers (pitch rows,
+    # pitch details, micro rows) take '_xivb' / '_xhb' off the pitch dict; the
+    # site sums those, it never scores the model, because the basis is
+    # nonlinear in release tilt and scoring at group means is wrong by up to
+    # 3" on gyro sliders.
+    xmove_models = fit_xmove_models(all_pitches)
+    _n_xmove = score_xmove(xmove_models, all_pitches)
+    print(f"\nExpected-movement models fitted for {len(xmove_models)} pitch-type+hand groups; "
+          f"{_n_xmove} of {len(all_pitches)} pitches scored")
+    if not xmove_models:
+        print("  WARNING: 0 expected-movement models (no group reached XMOVE_MIN_N); "
+              "xIVB/xHB/ivbOE/hbOE will be blank everywhere")
+    for _xk, _xs in sorted(xmove_models.items()):
+        print(f"  {_xk}: mlb n={_xs.get('mlb', {}).get('n', 0)}, roc n={_xs.get('roc', {}).get('n', 0)}")
+
     pitch_leaderboard = []
     for (pitcher, team, pitch_type, throws), pitches in pitch_groups.items():
         if not pitch_type:
@@ -1875,6 +1907,27 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         velos = [safe_float(p.get('Velocity')) for p in pitches]
         velos = [v for v in velos if v is not None]
         row['maxVelo'] = round(max(velos), 1) if velos else None
+
+        # Expected movement: mean of the per-pitch expectations, OE against the
+        # row's (rounded) mean movement, same accounting as the site's overlay.
+        _xi = [p['_xivb'] for p in pitches if p.get('_xivb') is not None]
+        _xh = [p['_xhb'] for p in pitches if p.get('_xhb') is not None]
+        if _xi:
+            _xivb = sum(_xi) / len(_xi)
+            row['xIVB'] = round(_xivb, 1)
+            row['ivbOE'] = (round(row['indVertBrk'] - _xivb, 1)
+                            if row.get('indVertBrk') is not None else None)
+        else:
+            row['xIVB'] = None
+            row['ivbOE'] = None
+        if _xh:
+            _xhb = sum(_xh) / len(_xh)
+            row['xHB'] = round(_xhb, 1)
+            row['hbOE'] = (round(row['horzBrk'] - _xhb, 1)
+                           if row.get('horzBrk') is not None else None)
+        else:
+            row['xHB'] = None
+            row['hbOE'] = None
 
         # Observed (Break) Tilt — circular mean of OTilt clock-notation values.
         tilt_minutes = [break_tilt_to_minutes(p.get('OTilt') or p.get('Break Tilt')) for p in pitches]
@@ -1976,153 +2029,6 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         print(f"  {label}: slope={slope:.4f} (within-pitcher, n={len(triples)}, "
               f"pitchers={len(sums)})")
         return {'slope': slope, 'n': len(triples)}
-
-    def mat_inv_general(M):
-        """Invert a square matrix via Gauss-Jordan elimination with partial pivoting."""
-        n = len(M)
-        aug = [list(M[i]) + [1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
-        for col in range(n):
-            max_row = col
-            for r in range(col + 1, n):
-                if abs(aug[r][col]) > abs(aug[max_row][col]):
-                    max_row = r
-            aug[col], aug[max_row] = aug[max_row], aug[col]
-            if abs(aug[col][col]) < 1e-12:
-                return None
-            for r in range(col + 1, n):
-                f = aug[r][col] / aug[col][col]
-                for c in range(2 * n):
-                    aug[r][c] -= f * aug[col][c]
-        for col in range(n - 1, -1, -1):
-            piv = aug[col][col]
-            for c in range(2 * n):
-                aug[col][c] /= piv
-            for r in range(col):
-                f = aug[r][col]
-                for c in range(2 * n):
-                    aug[r][c] -= f * aug[col][c]
-        return [aug[i][n:] for i in range(n)]
-
-    def mvn_conditional(model_params, rel_values):
-        """Compute E[IVB, HB | regressors] using MVN conditional distribution.
-        model_params: dict with 'mu' (list) and 'cov' (list of lists).
-        rel_values: list of regressor values (length = len(mu) - 2).
-        Returns [xIVB, xHB] or None."""
-        mu = model_params['mu']
-        cov = model_params['cov']
-        n_acc = 2  # IVB, HB
-        n_rel = len(mu) - n_acc
-        if len(rel_values) != n_rel:
-            return None
-        sigma_rel = [[cov[n_acc + i][n_acc + j] for j in range(n_rel)] for i in range(n_rel)]
-        sigma_rel_inv = mat_inv_general(sigma_rel)
-        if sigma_rel_inv is None:
-            return None
-        r_diff = [rel_values[k] - mu[n_acc + k] for k in range(n_rel)]
-        sri_rdiff = [sum(sigma_rel_inv[i][j] * r_diff[j] for j in range(n_rel)) for i in range(n_rel)]
-        mu_bar = []
-        for a in range(n_acc):
-            adj = sum(cov[a][n_acc + b] * sri_rdiff[b] for b in range(n_rel))
-            mu_bar.append(mu[a] + adj)
-        return mu_bar
-
-    # Minimum pitches per (pitchType, throws) group. A 5-6 variable
-    # covariance conditioned on 3-4 regressors needs real sample: at the old
-    # floor of 30, Sigma22 inversion produced wildly unstable conditional
-    # slopes for rare groups (early-season ST_L, FS_L, SV). Blank xIVB/xHB
-    # for a rare group is honest; a number from 28 dof is not.
-    MVN_MIN_N = 150
-
-    def fit_mvn_models(all_pitches):
-        """Fit MVN models per (pitchType, throws) for expected movement.
-        MLB model: [IVB, HB, ArmAngle, Extension, Velocity]
-        ROC model: [IVB, HB, RelPosZ, RelPosX, Extension, Velocity]
-        Returns dict keyed by 'pitchType_throws' with 'mlb' and/or 'roc' sub-models.
-
-        Both models are fit on MLB pitches ONLY: the 'roc' variant is the
-        MLB baseline expressed in release-point features, and ROC pitchers
-        are scored against it — so ROC pitches must not contribute to the
-        baseline they're measured against. (Historically the 'roc' variant
-        was ROC's ONLY path because arm angle was absent there; since the
-        minors Statcast backfill (2026-07-25) ROC rows are 96-97% arm-angle
-        populated, so compute_expected_movement's arm-angle-first lookup now
-        serves nearly all ROC rows too and the release-point variant is a
-        thin fallback.)
-
-        Interpretation note: velocity is a conditioning variable, so the OE
-        residuals are "movement vs a typical arm from this slot/extension at
-        this velo" — a uniqueness residual, not a velo-inclusive skill delta."""
-        groups_mlb = defaultdict(list)
-        groups_roc = defaultdict(list)
-        for p in all_pitches:
-            if p.get('_source', 'MLB') != 'MLB':
-                continue
-            pt = p.get('Pitch Type') or p.get('TaggedPitchType')
-            throws = p.get('Throws')
-            ivb = safe_float(p.get('xIndVrtBrk'))
-            hb = safe_float(p.get('xHorzBrk'))
-            if not pt or not throws or ivb is None or hb is None:
-                continue
-            key = pt + '_' + throws
-            aa = safe_float(p.get('ArmAngle'))
-            ext = safe_float(p.get('Extension'))
-            velo = safe_float(p.get('Velocity'))
-            rel_z = safe_float(p.get('RelPosZ'))
-            rel_x = safe_float(p.get('RelPosX'))
-            if aa is not None and ext is not None and velo is not None:
-                groups_mlb[key].append([ivb, hb, aa, ext, velo])
-            if rel_z is not None and rel_x is not None and ext is not None and velo is not None:
-                groups_roc[key].append([ivb, hb, rel_z, rel_x, ext, velo])
-
-        def mad_screen(data, thresh=6.0):
-            """Drop rows more than thresh MADs from the median on any dim.
-            Sample moments are non-robust; a handful of mistracked pitches
-            (extension glitches, velocity spikes) can swing the conditional
-            slopes of smaller groups."""
-            n = len(data)
-            k = len(data[0])
-            meds, mads = [], []
-            for i in range(k):
-                vals = sorted(row[i] for row in data)
-                med = vals[n // 2] if n % 2 else (vals[n // 2 - 1] + vals[n // 2]) / 2
-                devs = sorted(abs(v - med) for v in vals)
-                mad = devs[n // 2] if n % 2 else (devs[n // 2 - 1] + devs[n // 2]) / 2
-                meds.append(med)
-                mads.append(mad)
-            kept = [row for row in data
-                    if all(mads[i] <= 1e-9 or abs(row[i] - meds[i]) <= thresh * mads[i]
-                           for i in range(k))]
-            return kept if len(kept) >= MVN_MIN_N else data
-
-        def compute_mu_cov(data):
-            n = len(data)
-            k = len(data[0])
-            mu = [sum(row[i] for row in data) / n for i in range(k)]
-            cov = [[0.0] * k for _ in range(k)]
-            for row in data:
-                for i in range(k):
-                    for j in range(k):
-                        cov[i][j] += (row[i] - mu[i]) * (row[j] - mu[j])
-            for i in range(k):
-                for j in range(k):
-                    cov[i][j] /= (n - 1)
-            return mu, cov
-
-        models = {}
-        all_keys = set(list(groups_mlb.keys()) + list(groups_roc.keys()))
-        for key in sorted(all_keys):
-            model = {}
-            if key in groups_mlb and len(groups_mlb[key]) >= MVN_MIN_N:
-                data = mad_screen(groups_mlb[key])
-                mu, cov = compute_mu_cov(data)
-                model['mlb'] = {'mu': mu, 'cov': cov, 'n': len(data)}
-            if key in groups_roc and len(groups_roc[key]) >= MVN_MIN_N:
-                data = mad_screen(groups_roc[key])
-                mu, cov = compute_mu_cov(data)
-                model['roc'] = {'mu': mu, 'cov': cov, 'n': len(data)}
-            if model:
-                models[key] = model
-        return models
 
     # --- Fit VAA ~ PlateZ regressions per pitch type (MLB only) ---
     # Within-pitcher (fixed-effects) fit, same estimator as HAA below: the
@@ -2232,58 +2138,6 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 row['nHAA'] = None
         else:
             row['nHAA'] = None
-
-    # --- Fit MVN expected movement models per pitch type + handedness ---
-    mvn_models = fit_mvn_models(all_pitches)
-    print(f"\nMVN models fitted for {len(mvn_models)} pitch-type+hand groups")
-    for mvn_key, mvn_sub in sorted(mvn_models.items()):
-        mlb_n = mvn_sub.get('mlb', {}).get('n', 0)
-        roc_n = mvn_sub.get('roc', {}).get('n', 0)
-        print(f"  {mvn_key}: MLB n={mlb_n}, ROC n={roc_n}")
-
-    def compute_expected_movement(pitch_type, throws, arm_angle, extension, velocity, rel_z, rel_x):
-        """Compute xIVB and xHB using MVN conditional model per pitch type + handedness.
-        Tries MLB model (ArmAngle, Extension, Velocity) first,
-        falls back to ROC model (RelPosZ, RelPosX, Extension, Velocity)."""
-        mvn_key = (pitch_type or '') + '_' + (throws or '')
-        pt_model = mvn_models.get(mvn_key)
-        if not pt_model:
-            return None, None
-        if pt_model.get('mlb') and arm_angle is not None and extension is not None and velocity is not None:
-            result = mvn_conditional(pt_model['mlb'], [arm_angle, extension, velocity])
-            if result:
-                return result[0], result[1]
-        if pt_model.get('roc') and rel_z is not None and rel_x is not None and extension is not None and velocity is not None:
-            result = mvn_conditional(pt_model['roc'], [rel_z, rel_x, extension, velocity])
-            if result:
-                return result[0], result[1]
-        return None, None
-
-    # Compute xIVB/xHB (expected) and IVBOE/HBOE (residual) for each pitch leaderboard row
-    for row in pitch_leaderboard:
-        xivb, xhb = compute_expected_movement(
-            row.get('pitchType'), row.get('throws'),
-            row.get('armAngle'), row.get('extension'), row.get('velocity'),
-            row.get('relPosZ'), row.get('relPosX')
-        )
-        if xivb is not None:
-            row['xIVB'] = round(xivb, 1)
-            if row.get('indVertBrk') is not None:
-                row['ivbOE'] = round(row['indVertBrk'] - xivb, 1)
-            else:
-                row['ivbOE'] = None
-        else:
-            row['xIVB'] = None
-            row['ivbOE'] = None
-        if xhb is not None:
-            row['xHB'] = round(xhb, 1)
-            if row.get('horzBrk') is not None:
-                row['hbOE'] = round(row['horzBrk'] - xhb, 1)
-            else:
-                row['hbOE'] = None
-        else:
-            row['xHB'] = None
-            row['hbOE'] = None
 
     pitch_leaderboard.sort(key=lambda r: r['count'], reverse=True)
     print(f"Pitch leaderboard: {len(pitch_leaderboard)} rows")
@@ -2490,14 +2344,10 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             aa_val = safe_float(p.get('ArmAngle'))
             if aa_val is not None:
                 detail['aa'] = round(aa_val, 1)
-            # Per-pitch expected movement from MVN conditional model
-            ext_val = safe_float(p.get('Extension'))
-            throws_val = p.get('Throws')
-            xivb_val, xhb_val = compute_expected_movement(pt, throws_val, aa_val, ext_val, velo, rel_z, rel_x)
-            if xivb_val is not None:
-                detail['xivb'] = round(xivb_val, 1)
-            if xhb_val is not None:
-                detail['xhb'] = round(xhb_val, 1)
+            # Per-pitch expected movement (pipeline/xmove.py), scored upstream
+            if p.get('_xivb') is not None:
+                detail['xivb'] = round(p['_xivb'], 1)
+                detail['xhb'] = round(p['_xhb'], 1)
             pitch_details[pitcher + '|' + (team or '')].append(detail)
 
     # Synthesize combined (2TM/3TM) pitch details entries
@@ -3992,17 +3842,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                            for pt, r in haa_regressions.items()},
         'sacqZones': sacq_zones_output,
         'sacqLaZones': sacq_la_zones_output,
-        'mvnModels': {
-            key: {
-                variant: {
-                    'mu': [round(v, 6) for v in model['mu']],
-                    'cov': [[round(v, 6) for v in row] for row in model['cov']],
-                    'n': model['n']
-                }
-                for variant, model in sub.items()
-            }
-            for key, sub in mvn_models.items()
-        },
+        'xmoveModels': export_xmove(xmove_models),
         'teamGamesPlayed': team_games_played,
         'sdPlusWeights': sd_weights,
         'ctPlusWeights': ct_weights,

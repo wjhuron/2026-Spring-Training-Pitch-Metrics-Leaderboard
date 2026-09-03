@@ -1,6 +1,11 @@
 # Expected movement (xIVB / xHB, IVBOE / HBOE) — review and rebuild
 
-Status: analysis complete, nothing shipped. Scripts under `scripts/xmove_*.py`.
+Status: the per-class spin + release-axis basis (Finding 5's interior optimum)
+SHIPPED 2026-09-03 as `pipeline/xmove.py`, with a ridge penalty and a 300-pitch
+floor measured that day (`scripts/research/xmove/xmove_ridge_sweep.py`); the
+per-type ladder that closed the remaining candidates is
+`xmove_pertype_ladder.py`. Everything below is the analysis that led there.
+Scripts under `scripts/research/xmove/`.
 Findings 1-5 are the model rebuild; 6 covers whether the pitch-type label can be
 removed (it cannot) and what a retag costs; 7 covers cross-axis break, which is
 the only measurement here that needs no model and no label; 8 renders the two

@@ -1516,8 +1516,9 @@ var PlayerPage = {
         ellipseMeta.push({ color: color.bg, ellipse: ellipse });
       }
 
-      // Expected-movement marker (2026-08-27, per Wally): ghost at the MVN
-      // model expectation, disc at the actual mean, dashed connector between
+      // Expected-movement marker (2026-08-27, per Wally): ghost at the model
+      // expectation (per-pitch xivb/xhb from pipeline/xmove.py, spin + release
+      // axis since 2026-09-03), disc at the actual mean, dashed connector between
       // them — ivbOE/hbOE drawn instead of printed. Needs 10+ modeled pitches;
       // types without model values (draw nothing) degrade silently by design.
       var es2 = expSums[pt];

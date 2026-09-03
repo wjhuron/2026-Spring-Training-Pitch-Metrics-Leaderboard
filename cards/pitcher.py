@@ -766,78 +766,16 @@ def avg_tilt(tilts):
     if h == 0: h = 12
     return f'{h}:{m:02d}'
 
-def _mat_inv(M):
-    """Invert a square matrix via Gauss-Jordan elimination with partial pivoting."""
-    n = len(M)
-    aug = [list(M[i]) + [1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
-    for col in range(n):
-        max_row = col
-        for r in range(col + 1, n):
-            if abs(aug[r][col]) > abs(aug[max_row][col]):
-                max_row = r
-        aug[col], aug[max_row] = aug[max_row], aug[col]
-        if abs(aug[col][col]) < 1e-12:
-            return None
-        for r in range(col + 1, n):
-            f = aug[r][col] / aug[col][col]
-            for c in range(2 * n):
-                aug[r][c] -= f * aug[col][c]
-    for col in range(n - 1, -1, -1):
-        piv = aug[col][col]
-        for c in range(2 * n):
-            aug[col][c] /= piv
-        for r in range(col):
-            f = aug[r][col]
-            for c in range(2 * n):
-                aug[r][c] -= f * aug[col][c]
-    return [aug[i][n:] for i in range(n)]
-
-def _mvn_conditional(model_params, rel_values):
-    """Compute E[IVB, HB | regressors] using MVN conditional distribution."""
-    mu = model_params['mu']
-    cov = model_params['cov']
-    n_acc = 2  # IVB, HB
-    n_rel = len(mu) - n_acc
-    if len(rel_values) != n_rel:
-        return None
-    sigma_rel = [[cov[n_acc + i][n_acc + j] for j in range(n_rel)] for i in range(n_rel)]
-    sigma_rel_inv = _mat_inv(sigma_rel)
-    if sigma_rel_inv is None:
-        return None
-    r_diff = [rel_values[k] - mu[n_acc + k] for k in range(n_rel)]
-    sri_rdiff = [sum(sigma_rel_inv[i][j] * r_diff[j] for j in range(n_rel)) for i in range(n_rel)]
-    mu_bar = []
-    for a in range(n_acc):
-        adj = sum(cov[a][n_acc + b] * sri_rdiff[b] for b in range(n_rel))
-        mu_bar.append(mu[a] + adj)
-    return mu_bar
-
-def compute_expected_movement(mvn_models, pitch_type, throws, arm_angle, extension, velocity, rel_z, rel_x):
-    """Compute xIVB and xHB using MVN conditional model. Returns (xIVB, xHB) or (None, None)."""
-    if not mvn_models:
-        return None, None
-    mvn_key = (pitch_type or '') + '_' + (throws or '')
-    pt_model = mvn_models.get(mvn_key)
-    if not pt_model:
-        return None, None
-    if pt_model.get('mlb') and arm_angle is not None and extension is not None and velocity is not None:
-        result = _mvn_conditional(pt_model['mlb'], [arm_angle, extension, velocity])
-        if result:
-            return result[0], result[1]
-    if pt_model.get('roc') and rel_z is not None and rel_x is not None and extension is not None and velocity is not None:
-        result = _mvn_conditional(pt_model['roc'], [rel_z, rel_x, extension, velocity])
-        if result:
-            return result[0], result[1]
-    return None, None
-
-def load_mvn_models():
-    """Load MVN models from metadata_rs.json."""
+def load_xmove_models():
+    """Expected-movement models (pipeline/xmove.py) from metadata_rs.json.
+    The card no longer scores them (the ghost markers left the card
+    2026-08-27); a non-empty dict is the season-layout switch."""
     try:
         with open(METADATA_PATH) as f:
             meta = json.load(f)
-        return meta.get('mvnModels', {})
-    except Exception as e:
-        print(f"  WARNING: Could not load MVN models from {METADATA_PATH}: {e}")
+        return meta.get('xmoveModels', {})
+    except (OSError, ValueError) as e:
+        print(f"  WARNING: Could not load expected-movement models from {METADATA_PATH}: {e}")
         return {}
 
 def fmt_fi(v):
@@ -2632,7 +2570,7 @@ def render_card(config, pitches, output_file):
     # sparkline; everything below the header block is re-anchored in INCHES so
     # it renders pixel-identical to the classic card (the extra height is
     # absorbed between the boxscore strip and the percentile rail).
-    fig_h = 14.3 if not config.get('mvn_models') else FIG_H + 0.7
+    fig_h = 14.3 if not config.get('xmove_models') else FIG_H + 0.7
     fig = plt.figure(figsize=(FIG_W, fig_h), dpi=DPI)
     fig.patch.set_facecolor(BG)
     ax_main = fig.add_axes([0,0,1,1])
@@ -2671,14 +2609,14 @@ def render_card(config, pitches, output_file):
     # need the linescore endpoint and is deliberately left off.
     _date_txt = config['game_date']
     _opp = config.get('opponent')
-    if _opp and not bool(config.get('mvn_models')):
+    if _opp and not bool(config.get('xmove_models')):
         _date_txt = f"{_date_txt} vs. {_opp}"
     ax_main.text(text_x, photo_top-1.5, _date_txt, fontsize=24, fontfamily='IBM Plex Sans', color=ACCENT, va='top')
 
     # Stat line — season cards widen the 5-cell strip so it spans the bubble
     # column beneath it. Single-game cards have no bubble column, so they use
     # a much tighter column so the (now 8-cell) strip doesn't run too wide.
-    is_season_strip = bool(config.get('mvn_models'))
+    is_season_strip = bool(config.get('xmove_models'))
     # 5-cell strips (hdERA/hpERA season layout) widen to 1.33 so the strip
     # still spans the bubble column; 6-cell (range cards: ERA/FIP/SIERA)
     # keep 1.25 for the same total width.
@@ -2732,7 +2670,7 @@ def render_card(config, pitches, output_file):
     # thin line, dotted season-average reference, "last · avg · max" above,
     # first/mid/last date labels below. Skips gracefully under 3 games. Lives
     # in the 0.7in of extra card height, so nothing below has to yield.
-    if config.get('mvn_models'):
+    if config.get('xmove_models'):
         _FB_POOL = ('FF', 'SI')
         _velo_by_start = defaultdict(list)
         for p in pitches:
@@ -2816,7 +2754,7 @@ def render_card(config, pitches, output_file):
     # Movement plot — right-upper, near-square (movement is read to-scale). Season
     # centers over the location block beneath it; single-game uses the old wider
     # frame that fills to the right edge.
-    if config.get('mvn_models'):
+    if config.get('xmove_models'):
         # Season: classic-frame geometry (fractions of the 17.5in card, fixed
         # in inches) anchored to the TOP of the taller card so the plot keeps
         # its exact size/position relative to the header; the sparkline's
@@ -2840,7 +2778,7 @@ def render_card(config, pitches, output_file):
              fontfamily='IBM Plex Sans')
     ax_plot.axhline(y=0, color=GRID_COLOR, linestyle='--', linewidth=0.6)
     ax_plot.axvline(x=0, color=GRID_COLOR, linestyle='--', linewidth=0.6)
-    _mv_big = bool(config.get('mvn_models'))
+    _mv_big = bool(config.get('xmove_models'))
     # Ellipse minimum, movement scatter and zone plots alike: 4 pitches
     # (2026-08-15, per Wally — season cards included). A 4-pitch type is
     # worth an ellipse; below that the covariance fit has nothing to say.
@@ -2871,7 +2809,7 @@ def render_card(config, pitches, output_file):
     # on one start the readable quantity is drift, not level.
     _season_lb = config.get('season_pitch_lb') or {}
     _ghosted = False
-    if not config.get('mvn_models') and _season_lb:
+    if not config.get('xmove_models') and _season_lb:
         for pt in PITCH_ORDER:
             if pt not in groups:
                 continue
@@ -2891,7 +2829,7 @@ def render_card(config, pitches, output_file):
             _ghosted = True
 
     legend_handles = [mpatches.Patch(color=PITCH_COLORS[pt], label=f'{pt} - {PITCH_NAMES[pt]}') for pt in sorted_types]
-    if config.get('mvn_models'):
+    if config.get('xmove_models'):
         # Season: legend rides just above the plot, under the title.
         leg = ax_plot.legend(handles=legend_handles, loc='lower center', bbox_to_anchor=(0.5, 1.004), ncol=min(len(sorted_types),5), fontsize=9, frameon=False, handlelength=1.2, columnspacing=1.2)
     else:
@@ -2911,7 +2849,7 @@ def render_card(config, pitches, output_file):
     # Location plots. Season: lower-right quadrant under the movement plot (left
     # column holds the bubbles). Single-game: left side (old layout), with the
     # donut/bars above and the usage bars on the right.
-    is_season_loc = bool(config.get('mvn_models'))
+    is_season_loc = bool(config.get('xmove_models'))
     if is_season_loc:
         # Classic-frame inches: titles + top edge unchanged (top at 0.480 of
         # the 17.5in card), bottom edge pulled DOWN to align with the
@@ -3014,7 +2952,7 @@ def render_card(config, pitches, output_file):
                         zorder=10, fontfamily='IBM Plex Sans')
                 _cy -= _row_h
 
-        is_season = bool(config.get('mvn_models'))
+        is_season = bool(config.get('xmove_models'))
         # Location ellipses (1.0σ covariance). Season cards: outline-only, for
         # every pitch type thrown >= 10% of the time vs this handedness (plus
         # the pitch-count minimum below). Single-game keeps the filled look.
@@ -3170,7 +3108,7 @@ def render_card(config, pitches, output_file):
             elif bb == 'popup':
                 pu += 1
         return {'fb': fb, 'hr': hr, 'pu': pu, 'bip': bip} if bip else None
-    if config.get('mvn_models'):
+    if config.get('xmove_models'):
         if p_row:
             # Extension comes off the leaderboard rounded to 0.1 ft, which is
             # 1.2 inches — too coarse once it renders as feet and inches, and
@@ -3233,7 +3171,7 @@ def render_card(config, pitches, output_file):
 
     tc = len(pitches)
     pitch_stats = []
-    is_season = bool(config.get('mvn_models'))
+    is_season = bool(config.get('xmove_models'))
     # Per-pitch-type Loc+ (location quality, 100 = pitch-type group avg). Comes
     # from the pitch-level leaderboard via config; the card can't recompute it
     # (needs the league zone-quality tables). Empty dict → column auto-drops.
@@ -5184,9 +5122,9 @@ def main():
     mlb_cache = load_mlb_id_cache()
 
     # Step 4: Generate cards
-    # Load MVN models for expected movement ellipses
-    mvn_models = load_mvn_models()
-    print(f"  Loaded MVN models for {len(mvn_models)} pitch-type+hand groups")
+    # Expected-movement models: presence is the season-layout switch.
+    xmove_models = load_xmove_models()
+    print(f"  Loaded expected-movement models for {len(xmove_models)} pitch-type+hand groups")
 
     print("\nStep 4: Generating cards...")
     generated = []
@@ -5429,10 +5367,10 @@ def main():
             'league_avgs': league_avgs,
             'overall_avgs': overall_avgs,
             'pitcher_league_avgs': overall_avgs,
-            # mvn_models stays empty for daily → is_season False → daily layout
+            # xmove_models stays empty for daily → is_season False → daily layout
             # (RelZ/RelX kept, no RV pair). Stuff+/Loc+/nVAA/nHAA come
             # from the computed context maps below regardless.
-            'mvn_models': mvn_models if is_multi_game else {},
+            'xmove_models': xmove_models if is_multi_game else {},
             # Date-range card: season layout, but the zone panels take the
             # 1.3x window like a single game (2026-08-22, per Wally).
             'is_date_range': bool(is_multi_game and date_filter is not None),
