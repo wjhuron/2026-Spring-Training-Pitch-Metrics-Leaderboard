@@ -574,13 +574,16 @@ PP_OUTING_K = {'stuff': 42.0, 'loc': 185.0, 'csw': 398.0, 'xrv100': 1581.0}
 # Two floors, deliberately different (2026-08-28, per Wally):
 #   POOL_MIN 20 — the standardization pool keeps the research analysis floor,
 #     so every existing grade is unchanged and the ruler stays the measured one.
-#   MIN_N 5 — the render floor. The n/(n+k) shrinkage already prices a short
-#     outing continuously (a 16-pitch outing grades mostly on stuff and sits
-#     102 +/- 5 league-wide), so a hard 20 on top double-guarded — the same
-#     argument as SEASON_DELTA_MIN above. Below 5, CSW%/xRV arithmetic is
-#     near-empty and the grade would print a meaningless 100, so the dash.
+#   MIN_N 10 — the render floor (5 until 2026-09-02, raised per Wally). The
+#     n/(n+k) shrinkage prices a short outing continuously, so a hard 20 on
+#     top double-guarded — the same argument as SEASON_DELTA_MIN above. But
+#     the true-half refit (data/_pplus_outing_refit_2026_09.md) measured the
+#     5-9 pitch bin at r .052 to the next outing with 59% of grades printed
+#     within 3 points of 100: a measurement-shaped number carrying almost
+#     none. From 10 pitches the bin predicts like a 20-29 pitch outing
+#     (r .076 vs .077). Below 10, the dash.
 PP_OUTING_POOL_MIN = 20
-PP_OUTING_MIN_N = 5
+PP_OUTING_MIN_N = 10
 _PP_CSW_DESCRIPTIONS = ('Called Strike', 'Swinging Strike')
 
 
@@ -4151,7 +4154,7 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
     with open(_bundle_path, 'rb') as f:
         bundle = _pickle.load(f)
     if (any(f not in bundle.get('features', [])
-            for f in ('kin_eff__ff', 'cross', 'height'))
+            for f in ('cross', 'height'))
             or bundle.get('version') != _sv.BUNDLE_VERSION):
         raise RuntimeError(
             f"stuff_models.pkl is version {bundle.get('version')!r}; the "
@@ -4167,15 +4170,7 @@ def _scratch_stuff_scores(norm_by_pitcher, k_shrink=None):
     print(f"  [scratch] Stuff+ bundle {bundle.get('version', '?')} "
           f"(trained through {bundle.get('trained_through', '?')})")
     all_pitches = [p for pl in norm_by_pitcher.values() for p in pl]
-    # v13: 2026 kinematics ride the PitchID sidecar; daily/scratch pitches
-    # come off the sheets without KinEff. Absent sidecar degrades to the
-    # build_df imputation chain (pitcher FF mean -> frame -> league const).
-    _n_kin = _sv.apply_kin_sidecar(all_pitches)
-    if _n_kin >= 0:
-        print(f"  [ctx] kinematics sidecar: {_n_kin} pitches filled")
-    else:
-        print("  [ctx] WARNING: kinematics sidecar absent — kin_eff__ff "
-              "scores from the imputation chain")
+    # v15: no kinematics sidecar (kin_eff__ff retired 2026-09-02).
     df = _sv.build_df(all_pitches)
     overall, per_pt, atoms_by_pid = {}, {}, {}
     if not len(df):

@@ -3,6 +3,7 @@
 
 import gspread
 import json
+import requests
 import os
 import re
 import time as time_module
@@ -207,10 +208,18 @@ def fetch_park_factors(year=2026):
 # ── Google Sheets reading ────────────────────────────────────────────────
 
 def sheets_call_with_retry(fn, max_retries=5):
-    """Run any gspread call with retry logic for rate-limit (429) and
-    transient backend errors (500, 502, 503, 504). Backs off exponentially.
+    """Run a gspread READ call with retry logic for rate-limit (429),
+    transient backend errors (500, 502, 503, 504) and dropped connections
+    (requests ConnectionError / ReadTimeout). Backs off exponentially.
     Google returns sporadic 503s on metadata calls too (open_by_key killed a
-    CI run on 2026-07-13), so every Sheets round-trip goes through this."""
+    CI run on 2026-07-13), so every Sheets round-trip goes through this.
+
+    READS ONLY (per Wally, 2026-09-02): a TCP reset ('Connection reset by
+    peer' on open_by_key killed retrain 33670354371 in its first minute) is
+    safe to retry on a read because a read is idempotent. Do not route a
+    WRITE through this wrapper for its connection-error retry: a write whose
+    response was lost may have succeeded, and a blind retry duplicates rows.
+    The write helpers in scrapers/ keep their own, narrower retry."""
     transient_codes = ('429', '500', '502', '503', '504')
     for attempt in range(max_retries):
         try:
@@ -223,6 +232,15 @@ def sheets_call_with_retry(fn, max_retries=5):
                 label = 'Rate limited' if code == '429' else f'Transient {code}'
                 print(f"    {label}, waiting {wait}s before retry "
                       f"({attempt + 1}/{max_retries - 1})...")
+                time_module.sleep(wait)
+            else:
+                raise
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.ReadTimeout) as e:
+            if attempt < max_retries - 1:
+                wait = min(60, 5 * (2 ** attempt))
+                print(f"    Connection dropped ({type(e).__name__}), waiting "
+                      f"{wait}s before retry ({attempt + 1}/{max_retries - 1})...")
                 time_module.sleep(wait)
             else:
                 raise

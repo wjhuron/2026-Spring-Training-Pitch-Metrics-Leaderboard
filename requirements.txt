@@ -9,7 +9,7 @@ google-auth>=2.0,<3.0
 numpy
 pandas
 scikit-learn
-xgboost==3.3.0
+xgboost==3.4.1
 
 # Cards + report rendering (cards/pitcher.py, cards/hitter.py)
 matplotlib

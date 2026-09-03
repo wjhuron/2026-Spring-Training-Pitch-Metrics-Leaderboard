@@ -165,7 +165,7 @@ data/              # artifacts. _-prefixed = research scratch
 Code is cheap, maintenance is not. Prefer the standard library, then numpy/pandas, then a well-established package.
 
 - `requirements.txt` is the full local environment. CI installs a smaller subset inline in the workflow. Adding a pipeline dependency means editing **both**.
-- `xgboost==3.3.0` is pinned exactly on purpose. Model output is version-sensitive.
+- `xgboost==3.4.1` is pinned exactly on purpose (3.3.0 until 2026-09-02; any pin change owes a retrain, because model output is version-sensitive and a bundle pickled under one version must be scored under the same one).
 - Ask before adding a dependency. Never add one as a side effect of another task.
 - `.venv/` is load-bearing for the IDE. Never delete it.
 

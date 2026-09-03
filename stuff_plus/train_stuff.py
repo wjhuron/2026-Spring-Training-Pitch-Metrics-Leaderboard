@@ -182,7 +182,7 @@ def _harmonize_tags(prior, current):
 # +0.007) while gaining +0.05 reliability in all five.
 BASE_FEATS = ['velocity', 'ivb', 'hb', 'velo_diff', 'ivb_diff', 'hb_diff',
               'spin_rate', 'extension', 'arm_angle', 'vaa', 'vaa_diff',
-              'rel_x', 'cross', 'cross_abs', 'kin_eff__ff', 'height']
+              'rel_x', 'cross', 'cross_abs', 'height']
 
 # v14 (2026-08-23, per Wally): height = pitcher stature in inches (MLB Stats
 # API, data/pitcher_heights.json, refreshed by
@@ -219,8 +219,8 @@ HEIGHT_CLIP = (70.0, 80.0)
 # stored version against this string, so a stale bundle fails closed instead
 # of scoring transformed features with models trained on different ones.
 # v14.1 (2026-08-23) kept 'v14' and the pre-clip local bundle passed every
-# guard for ten days.
-BUNDLE_VERSION = 'v14.1'
+# guard for ten days. v15 = v14.1 minus kin_eff__ff, trained on xgboost 3.4.1.
+BUNDLE_VERSION = 'v15'
 _HEIGHTS = None
 
 
@@ -234,20 +234,20 @@ def load_heights(path=HEIGHTS_PATH):
             _HEIGHTS = json.load(f).get('by_name', {})
     return _HEIGHTS
 
-# v13 (2026-08-14, per Wally): kin_eff__ff = measured active-spin fraction
-# (KinEff), TYPE-GATED to four-seamers — real on FF, NaN elsewhere. The
-# per-type atlas (scripts/research/stuff/stuff_pertype_atlas.py) showed kin_eff carries
-# reliance for every type but is only IRREPLACEABLE on FF (ride quality
-# beyond what ivb/spin/axis imply); gated adds on CU/SI/FC and the global
-# add all failed the LOSO gate, FF-gated passed (fut 4/5, mean +0.0042;
-# 2026 battery: fastball-family desc .3052->.3137, overall flat). Missing
-# values on FF impute like arm angle: pitcher's own FF mean, then the
-# frame's FF mean, then this frozen league constant — so fresh games
-# (sidecar lag) and ROC arms (no MiLB kinematics) never ride a
-# near-unconstrained missing branch (the Jackson Kent debut lesson).
-# Constant measured on 2021-2025 pooled FF (1.16M pitches, seasonal means
-# 0.689-0.721).
-KIN_FF_LEAGUE_MEAN = 0.7038
+# v15 (2026-09-02, per Wally): kin_eff__ff RETIRED. v13 (2026-08-14) had
+# added the measured active-spin fraction type-gated to four-seamers on the
+# per-type LOSO gate (fut 4/5, +0.0042) plus a five-arm placebo. That gate
+# double-adjusted VAA after v12 and scored within-season fut_r, the weaker
+# instrument. On the corrected next-season gate (stuff_gate_v2.py, rendered
+# grade, seed SE) dropping it changes nothing: d_nxt +0.0001 raw / +0.0009
+# rendered, z 0.0 / 0.3, 2/5 — an effect the size of one fit seed (0.0046).
+# Active spin is derived from acceleration and spin rate, which the model
+# already holds as xIVB/xHB + spin_rate, so the trees recombine it. The
+# feature carried a CI sidecar refresh, two release assets, a coverage
+# abort and a three-stage impute for a null; all removed. The kinematics
+# scripts (scripts/ci/build_kinematics_2026.py, kinematics_lib.py) and the
+# raw caches stay for research. Per-pitch KinEff/KinDev/KinCd still pass
+# through build_df as inert columns.
 
 # Frozen nVAA constants: per-type OLS slope of VAA on PlateZ + league mean
 # PlateZ, measured on 2021-2026 pooled (4.05M pitches; 2026-08-09). Frozen
@@ -645,26 +645,10 @@ def build_df(pitches, prefer_true_fastball=True, arm_fallback=None):
                       f'{HEIGHT_LEAGUE_MEAN}: {_who[:8]}'
                       + (' ...' if len(_who) > 8 else ''))
                 out['height'] = out['height'].fillna(HEIGHT_LEAGUE_MEAN)
-    # kin_eff__ff (v13): typed emission + arm-angle-style imputation. Non-FF
-    # rows are NaN BY DESIGN (that is the gating the battery validated); only
-    # FF rows impute, so the feature never rides the missing branch where the
-    # training data would leave it unconstrained.
+    # kin_eff is a passthrough column only (v15): numeric for the research
+    # harnesses that still read it, never a feature.
     if len(out):
         out['kin_eff'] = pd.to_numeric(out['kin_eff'], errors='coerce')
-        out['kin_eff__ff'] = np.where(out['pitch_type'] == 'FF',
-                                      out['kin_eff'], np.nan)
-        _ff = (out['pitch_type'] == 'FF').values
-        _miss = _ff & out['kin_eff__ff'].isna().values
-        if _miss.any():
-            by_p = out.groupby('pitcher')['kin_eff__ff'].transform('mean')
-            out.loc[_miss, 'kin_eff__ff'] = by_p[_miss]
-            _frame = out.loc[_ff, 'kin_eff__ff'].mean()
-            _fill = _frame if np.isfinite(_frame) else KIN_FF_LEAGUE_MEAN
-            _still = _ff & out['kin_eff__ff'].isna().values
-            out.loc[_still, 'kin_eff__ff'] = _fill
-            print(f'  kin_eff__ff impute: {int(_miss.sum())} FF pitches missing '
-                  f'({int(_still.sum())} to frame/league mean '
-                  f'{_fill:.3f})')
     return out
 
 
@@ -746,7 +730,7 @@ def compute_support(df, df_prior):
     the FULL training pool's mean/std; NaN dims imputed at the training
     median.
     """
-    feats = [f for f in BASE_FEATS if f not in ('kin_eff__ff', 'height')]
+    feats = [f for f in BASE_FEATS if f != 'height']
     parts = [df[feats].assign(_pitcher=df['pitcher'].values, _prior=0)]
     if df_prior is not None and len(df_prior):
         parts.append(df_prior[feats].assign(_pitcher=df_prior['pitcher'].values, _prior=1))
@@ -843,24 +827,8 @@ def main():
     _ep = {(p.get('Pitcher'), p.get('PTeam')) for p in D if p.get('Pitch Type') == 'EP'}
     pitches = [p for p in D if p.get('_source') == 'MLB'
                and (p.get('Pitcher'), p.get('PTeam')) not in _ep]
-    # v13: 2026 kinematics ride a PitchID sidecar (the sheet cache has no
-    # kinematics columns). Retrain REQUIRES it — training the FF gate on
-    # imputed-only 2026 rows would quietly unlearn the feature. Score-only
-    # degrades to the build_df imputation chain with a loud warning (fresh
-    # grades drift toward each pitcher's own FF mean until the sidecar
-    # lands, which is the designed behavior for sidecar lag).
-    _n_kin = apply_kin_sidecar(pitches)
-    if _n_kin < 0:
-        if args.score_only:
-            print('  WARNING: kinematics sidecar absent — kin_eff__ff scores '
-                  'from the imputation chain only')
-        else:
-            sys.exit('ABORT: kinematics sidecar absent '
-                     f'({KIN_SIDECAR}) — retrain would train kin_eff__ff on '
-                     'imputed 2026 rows. Run scripts/ci/build_kinematics_2026.py '
-                     '(or download the release asset) first.')
-    else:
-        print(f'  kinematics sidecar: {_n_kin} 2026 pitches filled')
+    # v15: no kinematics sidecar step. apply_kin_sidecar() stays defined for
+    # research callers but nothing in production scoring reads KinEff.
     roc_pitches = [p for p in D if p.get('_source') in ('ROC', 'AAA')
                    and (p.get('Pitcher'), p.get('PTeam')) not in _ep]
     # Scoring-only rows (the NEW tab — arms new to the org) live in their own
@@ -877,14 +845,6 @@ def main():
         _so = [p for p in _so if (p.get('Pitcher'), p.get('PTeam')) not in _ep]
         roc_pitches += _so
         print(f'  + {len(_so)} scoring-only pitches from {_so_path}')
-    # v13 ROC parity: the sidecar carries measured ROC kinematics from the
-    # club-534 minors pull — apply it to the ROC scoring list too, or every
-    # Rochester four-seamer imputes to the league constant. (Caught
-    # 2026-08-14: the first parity deploy applied it to the MLB list only
-    # and ROC grades moved exactly 0.0 — always verify the re-stamp moved.)
-    _n_kin_roc = apply_kin_sidecar(roc_pitches)
-    if _n_kin_roc > 0:
-        print(f'  kinematics sidecar: {_n_kin_roc} ROC/AAA pitches filled')
     # MiLB RunExp currency correction (2026-07-28). Statcast's delta_run_exp
     # is built on each league's own RE matrix, so ROC/AAA RunExp in the raw
     # cache is MiLB-denominated (~1.27x MLB for the identical event).
@@ -947,10 +907,6 @@ def main():
             sys.exit('--score-only bundle predates the v14 config (height, '
                      'depth 6) — refresh the bundle from the latest-data '
                      'release or retrain')
-        if 'kin_eff__ff' not in B.get('features', []):
-            sys.exit('--score-only bundle predates the v13 config '
-                     '(kin_eff__ff) — refresh the bundle from the '
-                     'latest-data release or retrain')
         if 'cross' not in B.get('features', []):
             sys.exit('--score-only bundle predates the v12 config (cross/nVAA/'
                      'velo_diff-mask) — its fold models trained on different '
@@ -994,17 +950,6 @@ def main():
                          f'{_cov:.1%} (<90%) — training pickle likely predates '
                          f'the SpinAxis augmentation; refresh the release '
                          f'assets before retraining')
-            # v13 guard: kin_eff__ff needs KinEff on the prior rows (same
-            # season-shaped-hole logic). Measured on raw kin_eff before the
-            # FF imputation chain masks the gap.
-            _ffm = _d['pitch_type'] == 'FF'
-            _kcov = (_d.loc[_ffm, 'kin_eff'].notna().mean()
-                     if 'kin_eff' in _d.columns and _ffm.any() else 0.0)
-            if _kcov < 0.90:
-                sys.exit(f'ABORT: prior season index {_i} has FF kin_eff '
-                         f'coverage {_kcov:.1%} (<90%) — training pickle '
-                         f'predates the kinematics augmentation; refresh the '
-                         f'release assets before retraining')
     else:
         print('  (no prior-season pickle found — training on current season only)')
 
