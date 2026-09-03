@@ -498,11 +498,12 @@ CHIP_MAX_ASPECT = 4.0
 # Stuff+ is shape-family: measured per-type k = 13 (seeds 12.9-13.8), so 15
 # colors only cells that are >=half signal without hiding real information.
 STUFF_COLOR_MIN_PITCHES = 15
-# Loc+ rides the site's measured per-group gates (re-measured 2026-09-02 on
-# Savant-denominated PlateZ) — keeps card/Arsenal-leaderboard parity.
+# Loc+ rides the site's measured per-group gates (re-measured 2026-09-03 under
+# the 6.0 in / 0.30 bandwidth, Savant PlateZ) — keeps card/Arsenal-leaderboard
+# parity.
 # Mirrors js/aggregator.js QUAL.MIN_PITCH_LOCPLUS + LOCPLUS_GROUP and
 # pipeline/locplus.py STABILIZE_N_PT; the three move together.
-LOCPLUS_COLOR_MIN = {'FF': 73, 'SI': 77, 'FC': 89, 'SL': 68, 'CU': 81, 'CH': 76}
+LOCPLUS_COLOR_MIN = {'FF': 52, 'SI': 59, 'FC': 55, 'SL': 49, 'CU': 62, 'CH': 62}
 LOCPLUS_COLOR_GROUP = {
     'FF': 'FF', 'FA': 'FF', 'SI': 'SI', 'FC': 'FC', 'CF': 'FC',
     'SL': 'SL', 'ST': 'SL', 'SW': 'SL', 'SV': 'SL',

@@ -32,10 +32,10 @@ var QUAL = {
   // Displayed Loc+ is an UNSHRUNK mean (pipeline_locplus.py zeroes N_PRIOR_PT
   // for the coherent-canon ledger property), so reliability at n pitches is
   // n/(n+k) where k is that pitch type's measured split-half r=0.5 crossing.
-  // At 25 pitches an FF cell is only 25/(25+73) = 0.26 reliable and a cutter
-  // 0.25; gating at k itself means "color only when >= half the variance is
+  // At 25 pitches an FF cell is only 25/(25+52) = 0.32 reliable and a cutter
+  // 0.31; gating at k itself means "color only when >= half the variance is
   // signal". Keep in sync with pipeline_locplus.py STABILIZE_N_PT.
-  MIN_PITCH_LOCPLUS:         { FF: 73, SI: 77, FC: 89, SL: 68, CU: 81, CH: 76 },
+  MIN_PITCH_LOCPLUS:         { FF: 52, SI: 59, FC: 55, SL: 49, CU: 62, CH: 62 },
   // Pitch types with NO measured constant (today only EP: 40 cells, largest
   // 105 pitches, so k can't be measured). Policy, not a measurement: don't
   // color what we can't validate. Colors zero cells today either way.
@@ -57,7 +57,7 @@ QUAL.LOCPLUS_GROUP = {
 };
 // Category rows (PITCH_CATEGORIES) pool several types — take the stiffest
 // member gate. Mirrors pipeline_locplus.py STABILIZE_N_CATEGORY.
-QUAL.LOCPLUS_CATEGORY = { Hard: 77, Breaking: 89, Offspeed: 76 };
+QUAL.LOCPLUS_CATEGORY = { Hard: 59, Breaking: 62, Offspeed: 62 };
 
 // Minimum pitches for a pitch-type (or category) Loc+ cell to clear r >= 0.5.
 QUAL.locPlusMinPitches = function (pitchType) {

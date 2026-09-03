@@ -225,8 +225,20 @@ Z_MIN, Z_MAX = -0.6, 1.6           # zone-normalized (0 = bottom, 1 = top)
 # QUARTER-season surfaces the old harness builds. 0.10 stays as a convention.
 BIN_Z = 0.10
 NZ = int(round((Z_MAX - Z_MIN) / BIN_Z))           # 22
-PHYS_X_IN = 4.5                    # physical smoothing bandwidths
-PHYS_Z_FRAC = 0.22
+PHYS_X_IN = 6.0                    # physical smoothing bandwidths
+PHYS_Z_FRAC = 0.30
+# ADOPTED 2026-09-02 (per Wally): 4.5 / 0.22 -> 6.0 / 0.30, the conservative
+# step on the pitcher-level curve below. On full-season surfaces 2021-2026 it
+# wins every pitcher objective: rendered +0.011 (6/6, t 5.7), rendered
+# velo-partial +0.012 (6/6), raw +0.010 (4/6), raw velo-partial +0.011 (5/6),
+# with the smallest SEs of any wider arm, and it improves the live 2026
+# season on all four. 9-13 / 0.40 (the velo-controlled argmax, +0.021) is
+# deferred to a full-2026 re-test: larger but season-heterogeneous. Impact on
+# the 2026 board: pitcher Loc+ r .990 vs the old bandwidth, mean move 0.7
+# pts, max 3.9; per-pitch atoms move ~10 pts on average, so every Sheets
+# grade cell and daily-card Loc+ changed with this commit. Every K_* below is
+# in kernel-weighted units, so this also weakens each K by ~45% (the cell-fit
+# direction); K values were left as they were (pitcher-level flat).
 # PROVENANCE (added 2026-09-02; the values had none). Set in June 2026 on
 # ~3 months of one season by archive/locplus_final_validate.py, grid 3.5-5.5
 # in and 0.17-0.28, on a composite that included reliability. Replicates
@@ -334,7 +346,7 @@ N_PRIOR_PT_DEFAULT = 0
 # above are zeroed. With an UNSHRUNK displayed mean, reliability at n pitches
 # is n/(n+k) for the group's k, so these values ARE the render-time
 # qualification gates the canon note defers to: a 25-pitch FF cell is only
-# 25/(25+73) = 0.26 reliable, which is why pitch-type Loc+ cannot ride the flat
+# 25/(25+52) = 0.32 reliable, which is why pitch-type Loc+ cannot ride the flat
 # 25-pitch outcome gate the other per-pitch metrics use (2026-07-25 audit: 771
 # rows, 30% of all colored pitch-type Loc+ cells, sat below r=0.5).
 # MIRRORED in js/aggregator.js (QUAL.MIN_PITCH_LOCPLUS) — keep the two in
@@ -360,7 +372,14 @@ N_PRIOR_PT_DEFAULT = 0
 # anyone had validated at the cell level.) To start coloring a new type, measure
 # it with scripts/research/locplus/locplus_stabilize_celllevel.py and add it to STABILIZE_N_PT.
 STABILIZE_N_UNVALIDATED = float('inf')
-STABILIZE_N_PT = {'FF': 73, 'SI': 77, 'FC': 89, 'SL': 68, 'CU': 81, 'CH': 76}
+STABILIZE_N_PT = {'FF': 52, 'SI': 59, 'FC': 55, 'SL': 49, 'CU': 62, 'CH': 62}
+# Re-measured AGAIN 2026-09-03 under the 6.0 in / 0.30 bandwidth adopted the
+# same day (same script, 10 seeds, Savant PlateZ, 160 dates): smoother
+# surfaces give less noisy per-pitch atoms, so every group stabilizes ~30%
+# faster than under 4.5 / 0.22 (FF 73 -> 52, SI 77 -> 59, FC 89 -> 55,
+# SL 68 -> 49, CU 81 -> 62, CH 76 -> 62; seed ranges 46-69). The gates are a
+# function of the bandwidth: re-measure them whenever PHYS_X_IN /
+# PHYS_Z_FRAC move.
 # Re-measured 2026-08-15 on the count-aware surfaces (WH_COUNT_LEVEL +
 # XW_COUNT_LEVEL): the new per-pitch atoms are less noisy, so five of six
 # groups stabilize faster (FC 122 -> 74 was the big mover; CH 72 -> 79).
@@ -371,7 +390,7 @@ STABILIZE_N_PT = {'FF': 73, 'SI': 77, 'FC': 89, 'SL': 68, 'CU': 81, 'CH': 76}
 # CH 79 -> 76. Five moved inside their seed spread; FC did not.
 # Leaderboard pitch-CATEGORY rows pool several types (js/aggregator.js
 # PITCH_CATEGORIES), so they take the stiffest member gate.
-STABILIZE_N_CATEGORY = {'Hard': 77, 'Breaking': 89, 'Offspeed': 76}
+STABILIZE_N_CATEGORY = {'Hard': 59, 'Breaking': 62, 'Offspeed': 62}
 
 
 def stabilize_n(pitch_type):
