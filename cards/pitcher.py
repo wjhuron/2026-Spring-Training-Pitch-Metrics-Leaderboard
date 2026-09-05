@@ -183,31 +183,86 @@ def _opponent_label(pitches):
 def _season_pitch_lb_for(pitcher_name, eff_team, pitch_lb_by_pitcher):
     """The pitcher's OWN season per-pitch-type row, for daily cards.
 
+    MERGED ACROSS LEVELS per pitch type (2026-09-05, per Wally): a pitcher
+    with MLB and ROC rows gets one count-weighted average of every pitch of
+    that type at both levels. Before this the largest single row set won
+    outright, which scored Cruz's ROC fastball against his MLB 99.8 (his ROC
+    mean is 97.8) and left any type thrown at only the other level with no
+    baseline at all (Kent SI, Varland CU, Schultz ST rendered unshaded).
+
+    The MLB side is the combined nTM row when one exists, because that row
+    already sums the club stints; otherwise every single-club MLB row. The
+    minor side is every non-MLB row. Means are count-weighted, run-value
+    totals sum, maxVelo takes the max, usagePct is re-derived as the type's
+    share of the merged pitch total, and a percentile (pool-relative, so not
+    mergeable) rides along from the largest contributing row.
+
     Cannot reuse config['pitch_lb']: on a daily card scratch_ctx overwrites it
     with values computed from THIS START's pitches, which would make every
-    delta identically zero. The team key can also disagree (card header says
-    WSH, the leaderboard row is filed under ROC), so fall back to the largest
-    by-name row set rather than returning nothing.
+    delta identically zero.
 
     Caveat: if the pipeline has already run today, the season row INCLUDES
     this start, which shrinks the delta slightly. Worst case is a fastball
     thrown 34 times against a 386-pitch season, so ~9% self-reference.
     """
-    # Largest row set by total pitches, NOT the exact (name, team) match.
-    # Preferring the team match looked right and was wrong for anyone traded
-    # mid-season: Jake Bird's WSH rows are 8 sweepers and 4 sinkers, while his
-    # actual season lives under the combined 2TM key at 208 and 200. The exact
-    # match succeeded, returned 12 pitches, and every pitch type then failed
-    # the sample floor, so the whole block rendered unshaded with no error.
-    #
-    # Caveat: this can cross levels for a prospect with a big AAA sample and a
-    # short MLB stint. That is still the best baseline available for "what does
-    # he normally do", and the SE below widens on thin samples either way.
-    cands = [d for (nm, _tm), d in pitch_lb_by_pitcher.items() if nm == pitcher_name]
-    if not cands:
+    # AAA_TEAMS, not TEAM_ABBREV_TO_ID: the card's club map carries ROC as a
+    # WSH alias for the player search, so it cannot tell the levels apart.
+    from pipeline.utils import is_combined_team as _is_combined, AAA_TEAMS as _aaa
+    sets = {tm: d for (nm, tm), d in pitch_lb_by_pitcher.items() if nm == pitcher_name}
+    if not sets:
         return {}
-    return max(cands, key=lambda d: sum((v or {}).get('count') or 0 for v in d.values()))
 
+    def _total(d):
+        return sum((v or {}).get('count') or 0 for v in d.values())
+
+    multi = [d for tm, d in sets.items() if _is_combined(tm)]
+    mlb = [d for tm, d in sets.items() if tm not in _aaa and not _is_combined(tm)]
+    minor = [d for tm, d in sets.items() if tm in _aaa]
+    use = ([max(multi, key=_total)] if multi else mlb) + minor
+    if not use:
+        use = list(sets.values())
+    if len(use) == 1:
+        return use[0]
+
+    _MEAN = ('velocity', 'nVAA', 'nHAA', 'xRv100', 'rv100', 'xwOBAcon',
+             'stuffScore', 'xrvoe100', 'indVertBrk', 'horzBrk', 'spinRate',
+             'relPosZ', 'relPosX', 'extension')
+    _SUM = ('xRunValue', 'runValue')
+    _PCTL = ('velocity_pctl', 'nVAA_pctl', 'stuffScore_pctl')
+    totals = [_total(d) for d in use]
+    out = {}
+    for pt in set().union(*(d.keys() for d in use)):
+        rows = [(d[pt], tot) for d, tot in zip(use, totals) if d.get(pt)]
+        if len(rows) == 1:
+            out[pt] = dict(rows[0][0])
+            continue
+        m = {'count': sum((r.get('count') or 0) for r, _ in rows)}
+        for k in _MEAN:
+            num = den = 0.0
+            for r, _ in rows:
+                v, c = r.get(k), r.get('count') or 0
+                if v is not None and c > 0:
+                    num += float(v) * c
+                    den += c
+            m[k] = num / den if den > 0 else None
+        for k in _SUM:
+            vals = [float(r[k]) for r, _ in rows if r.get(k) is not None]
+            m[k] = sum(vals) if vals else None
+        mv = [float(r['maxVelo']) for r, _ in rows if r.get('maxVelo') is not None]
+        m['maxVelo'] = max(mv) if mv else None
+        # usagePct * set total = this type's count in the row's own scale, so
+        # the ratio of sums is the merged share in that same scale.
+        num = den = 0.0
+        for r, tot in rows:
+            if r.get('usagePct') is not None and tot > 0:
+                num += float(r['usagePct']) * tot
+                den += tot
+        m['usagePct'] = num / den if den > 0 else None
+        big = max(rows, key=lambda rt: rt[0].get('count') or 0)[0]
+        for k in _PCTL:
+            m[k] = big.get(k)
+        out[pt] = m
+    return out
 
 def _normalize_name(name):
     """Case-fold for name matching (handles 'de Oca' vs 'De Oca')."""
@@ -2240,36 +2295,80 @@ def render_social_card(config, pitches, output_file):
         _drawn.append((mh, mvv))
 
     _placed = []             # label boxes already committed, in data units
-    for pt_, mh, mvv, n_ in _cents:
+    for _ci, (pt_, mh, mvv, n_) in enumerate(_cents):
         col = PITCH_COLORS.get(pt_, '#777')
         # Velo on the centroid label for every card type now that season and
         # range share the daily layout (2026-09-01, per Wally).
         _vt = velo_by_type.get(pt_)
         _lab = f"{pt_} {_vt:.1f}" if _vt is not None else pt_
-        _lw, _lh = _ink_size(_lab, 10.5)
-        _offx = _pts(15)[0]
-        _self = (mh - _crx, mh + _crx, mvv - _cry, mvv + _cry)
-        _others = [b for b in _chip_boxes if b != _self] + _placed
+        # Today's velo against HIS season average for that pitch (2026-09-05,
+        # per Wally), as the one parenthesised vs-baseline delta the display
+        # rules sign both ways. Same merged baseline and sample floor as the
+        # full card's dashed velo lines (SEASON_DELTA_MIN). Daily only: a
+        # season or range card's delta is zero by construction.
+        _dtxt = None
+        if not is_season and _vt is not None:
+            _sbv = (config.get('season_pitch_lb') or {}).get(pt_) or {}
+            if ((_sbv.get('count') or 0) >= SEASON_DELTA_MIN
+                    and _sbv.get('velocity') is not None):
+                _dv = _vt - float(_sbv['velocity'])
+                _dtxt = '(0.0)' if abs(_dv) < 0.05 else f"({_dv:+.1f})"
+        if _dtxt:
+            # STACKED under the velo, not inline (chosen 2026-09-05 over
+            # 'FF 97.8 (+1.4)' on the same 13-card batch): the label keeps
+            # its old width, so a right-edge chip keeps its read-side slot.
+            # Inline sent Cruz SI, Sinclair SI and Lawrence SI to the left.
+            _w1, _h1 = _ink_size(_lab, 10.5)
+            _w2, _h2 = _ink_size(_dtxt, 10.5)
+            _lab = f"{_lab}\n{_dtxt}"
+            # Two lines at matplotlib's default 1.2 linespacing: the block is
+            # the first line's ink plus one line advance.
+            _lw, _lh = max(_w1, _w2), _h1 + _pts(10.5 * 1.2)[1]
+        else:
+            _lw, _lh = _ink_size(_lab, 10.5)
+        # U/D slots clear the chip by radius + gap + half the label block, so
+        # a two-line label does not sit on the disc.
+        _offy_pt = 0.5 * math.sqrt(320) + 4.0 + 0.5 * (_lh / _pts(1.0)[1])
+        _offx, _offy = _pts(15)[0], _pts(_offy_pt)[1]
+        _others = ([b for _j, b in enumerate(_chip_boxes) if _j != _ci]
+                   + _placed)
 
-        def _box(is_right):
-            x1 = mh - _offx if is_right else mh + _offx + _lw
-            return (x1 - _lw, x1, mvv - 0.5 * _lh, mvv + 0.5 * _lh)
+        # Four candidate slots (2026-09-05, per Wally: read-side first).
+        # R = label to the RIGHT of the chip, the reading side, and the
+        # default everywhere; the old rule defaulted any chip past 0.68*lim
+        # to the left side even when the right one fit (Cruz SI, Sinclair
+        # SI). L is the fallback when R runs off the frame or through a
+        # chip. U/D only win when BOTH sides are blocked (a same-spot pair
+        # with neighbours, Lyon SI/CH), so the row-of-labels look holds.
+        def _box(side):
+            if side == 'R':
+                return (mh + _offx, mh + _offx + _lw, mvv - 0.5 * _lh, mvv + 0.5 * _lh)
+            if side == 'L':
+                return (mh - _offx - _lw, mh - _offx, mvv - 0.5 * _lh, mvv + 0.5 * _lh)
+            _yc = mvv + _offy if side == 'U' else mvv - _offy
+            return (mh - 0.5 * _lw, mh + 0.5 * _lw, _yc - 0.5 * _lh, _yc + 0.5 * _lh)
 
         def _score(box):
             # Running off the frame is worse than any overlap inside it.
+            # Both axes: a U/D slot near the top or bottom edge can leave
+            # the frame just as a R/L slot can at the sides.
             out = (max(0.0, (-_lim + 0.4) - box[0])
-                   + max(0.0, box[1] - (_lim - 0.4)))
+                   + max(0.0, box[1] - (_lim - 0.4))
+                   + max(0.0, (-_lim + 0.4) - box[2])
+                   + max(0.0, box[3] - (_lim - 0.4)))
             return sum(_overlap(box, c) for c in _others) + 1000.0 * out
 
-        _default = mh > 0.68 * _lim
-        _cand = [(_score(_box(s)), s != _default, s) for s in (_default, not _default)]
+        _ANN = {'R': ((15, 0), 'left', 'center'), 'L': ((-15, 0), 'right', 'center'),
+                'U': ((0, _offy_pt), 'center', 'center'),
+                'D': ((0, -_offy_pt), 'center', 'center')}
+        _cand = [(_score(_box(s)), _k, s) for _k, s in enumerate('RLUD')]
         _cand.sort()
-        right = _cand[0][2]
-        _b = _box(right)
-        _placed.append(_b)
-        mv.annotate(_lab, (mh, mvv), xytext=(-15 if right else 15, 0),
+        _side = _cand[0][2]
+        _placed.append(_box(_side))
+        _xy, _ha, _va = _ANN[_side]
+        mv.annotate(_lab, (mh, mvv), xytext=_xy,
                     textcoords='offset points', fontsize=10.5, fontweight='bold',
-                    color=col, ha='right' if right else 'left', va='center',
+                    color=col, ha=_ha, va=_va,
                     fontfamily='IBM Plex Sans',
                     path_effects=[__import__('matplotlib.patheffects', fromlist=['withStroke'])
                                   .withStroke(linewidth=2.5, foreground=BG)], zorder=6)
