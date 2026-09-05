@@ -4023,7 +4023,7 @@ def render_card(config, pitches, output_file):
         if 'hdERA' in config.get('stat_headers', []):
             _sp_note += ('\nhdERA = ERA from shrunk xwOBA alone, luck stripped; it describes the season'
                          '\nhpERA is a forward estimate from stuff, role, park, grounders, xRV, '
-                         'location, in-zone whiffs and K%')
+                         'location, in-zone whiffs, K% and pitcher hand')
         fig.text(_sp_x, b - _below_off, _sp_note,
                  fontsize=8, color='#000000', va='top', ha='left', fontfamily='IBM Plex Sans', fontweight='bold', linespacing=1.5)
 
