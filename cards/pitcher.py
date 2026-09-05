@@ -2032,12 +2032,15 @@ def render_social_card(config, pitches, output_file):
                 if v is not None]
         sg = (sum(s_at) / len(s_at)) if s_at else None
         lg_ = (sum(l_at) / len(l_at)) if l_at else None
+        # Tile order per Wally 2026-09-05: IP | H | ER | K | BB, then the
+        # grades — the line reads what happened (hits, runs) before how
+        # (strikeouts, walks).
         line = [
             {'v': ip_str, 'k': 'IP'},
-            {'v': str(box.get('so', '—')), 'k': 'K'},
-            {'v': str(box.get('bb', '—')), 'k': 'BB'},
             {'v': str(box.get('h', '—')), 'k': 'H'},
             {'v': str(box.get('er', '—')), 'k': 'ER'},
+            {'v': str(box.get('so', '—')), 'k': 'K'},
+            {'v': str(box.get('bb', '—')), 'k': 'BB'},
             {'v': '—' if sg is None else f"{sg:.0f}", 'k': 'STUFF+', 'fc': gtint(sg)},
             {'v': '—' if lg_ is None else f"{lg_:.0f}", 'k': 'LOC+', 'fc': gtint(lg_)},
         ]
