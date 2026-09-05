@@ -38,7 +38,11 @@ import xgboost as xgb
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.insert(0, ROOT)
 import stuff_plus.train_stuff as T
-import scripts.stuff_feature_battery_2026_08 as BAT
+# pre-reorg path (scripts.stuff_feature_battery_2026_08) fixed 2026-09-05:
+# the battery module sits in this folder since the 2026-08 reorg.
+import sys as _sys, os as _os
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+import stuff_feature_battery_2026_08 as BAT
 
 SEASONS = (2021, 2022, 2023, 2024, 2025)
 PKL = {y: (T.HIST_PKL.format(year=y) if y != 2025 else T.PRIOR_PKL)

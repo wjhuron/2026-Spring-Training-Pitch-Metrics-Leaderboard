@@ -15,7 +15,7 @@ horizons: next-season transfer cost 0.001). Held-out r: 0.51 next
 season, 0.48 rest-of-season at the 60 IP gate — beats SIERA in all 11
 replicates.
 
-    hpERA = poolERA + sum_c W_PH[c] * z(channel_c)
+    hpERA = poolERA + sum_c W_PH[c] * z(channel_c) + W_LHP * (lhp - poolLHPshare)
 
 Channels (ERA direction, i.e. higher value = more expected runs).
 NOTE (corrected 2026-08-27): xw feeds hdERA only — W_PH carries no xw
@@ -29,6 +29,14 @@ term; the eight hpERA channels are the rest of this table.
            pitcher prior since 2026-07-18,        LG/SCALE constants)
            and W_PH was fit on this input)  gs    starter share (gs/g)
                                             park  home park factor
+    lhp    left-handed pitcher indicator, RAW and centered at the pool's
+           LHP share (2026-09-05): without it LHP beat the forecast by
+           0.11-0.20 ERA in 17 of 22 replicates, because the stuff channel
+           grades their physics ~0.7 SD worse while their outcomes match
+           RHP and Loc+ offsets only part of that. A calibration term for
+           the FORECAST; deliberately not a Stuff+ feature (Loc+ already
+           embeds the LHP outcome premium through its per-hand-pair
+           surfaces, so it would be counted twice here).
 
 The 100-scale twins mirror wRC+/ERA- construction (a labeled convention,
 not a fit): hdERA+ = 200 - 100 * hdERA / poolERA, higher = better,
@@ -38,7 +46,11 @@ information (SD ~23 and ~19), landing naturally in wRC+ territory.
 Shrinkage constants were measured by scripts/research/era/era_shrinkage_sweep.py
 (split-half, interior optima in every replicate season); weights and
 slopes by scripts/research/era/era_weights_final.py; full provenance in
-data/era_final_constants.json and the 2026-08-15 research notes.
+data/era_final_constants.json and the 2026-08-15 research notes. The
+2026-09-05 hand refit: scripts/research/era/era_hand_weight_refit.py on
+replicates rebuilt by era_targets_build.py (MLB Stats API lines), the
+battery/cmdloc/xrv builders and era_stuff_loso_v2.py; result in
+data/_era_hand_refit.json.
 
 Called from stuff_plus/train_stuff.py --inject (needs the fresh
 stuffScore, like Pitcher+). Keys survive process_data-only runs via
@@ -146,11 +158,29 @@ IZSW_PER_PITCH = 0.33  # league iz-swings per pitch (.32-.34, 2021-2026);
 DH_B = 0.917                # LOSO slope, 30+ IP display population
 
 # hpERA fold-mean OLS weights (rest-of-season fit, gate 60), ERA direction.
-# REFIT 2026-08-15 on the production-consistent shrinkage (izwh n0=130,
-# gb 55, xrv 800): fitting on differently-shrunk inputs cost ~.02 held-out
-# r; refit restores ROS .482 / NEXT .512.
-W_PH = {'stuff': 0.297, 'loc': 0.136, 'k': 0.088, 'izwh': 0.117,
-        'xrv': 0.139, 'gb': 0.162, 'gs': 0.277, 'park': 0.168}
+# REFIT 2026-09-05 with the pitcher-hand term below (scripts/research/era/
+# era_hand_weight_refit.py on the rebuilt replicates). Held-out r ROS-60
+# .4525 -> .4545 (4/6), NEXT-60 .5209 -> .5282 (4/5); the point is
+# calibration, not r: the LHP residual goes to zero in every test. These
+# eight are the same fit's fold means (the eight-channel control landed
+# within .03 of the 08-15 set on 7 of 8; park .149 vs .168 because the
+# rebuilt targets carry every stint club, as combined_park_map does). xrv
+# is POSITIVE here: the research harness negates a batter-positive input
+# and reads -0.160 for the same channel. Previous set (2026-08-15, refit on
+# production-consistent shrinkage): stuff .297 loc .136 k .088 izwh .117
+# xrv .139 gb .162 gs .277 park .168.
+W_PH = {'stuff': 0.315, 'loc': 0.105, 'k': 0.053, 'izwh': 0.101,
+        'xrv': 0.160, 'gb': 0.151, 'gs': 0.298, 'park': 0.152}
+# Pitcher-hand term (2026-09-05): ERA credit for a left-hander, applied to
+# the RAW indicator centered at the pool's LHP share, so the pool-mean
+# forecast does not move. Fold-mean -0.211 ROS-60; -0.254 NEXT-60 with SE
+# .013 across the five year-pairs. Kept outside the z-sum on purpose: an
+# indicator's z would tie the weight to the pool share.
+W_LHP = -0.211
+# Scratch/window rows only, when the metadata bundle predates the term:
+# mean LHP share of the 2021-2026 60-IP replicate pools (.314 .269 .247
+# .276 .263 .301). The season path measures the live share.
+LHP_SHARE_FALLBACK = 0.278
 
 # frozen run-environment constants for make_rv_xrv (the values the weight
 # fit used; z-scoring absorbs any drift in the true environment)
@@ -321,6 +351,8 @@ def _channels(row, xrv_map, park, is_combined, combined_park=None):
         ch['xrv'] = None
     g = row.get('g') or 0
     ch['gs'] = ((row.get('gs') or 0) / g) if g > 0 else None
+    # raw indicator, not z-scored (see W_LHP); None when the hand is unknown
+    ch['lhp'] = {'L': 1.0, 'R': 0.0}.get(row.get('throws'))
     if is_combined and combined_park is not None:
         pf = combined_park.get(id(row))
         ch['park'] = (pf if pf is not None else 100.0) / 100.0
@@ -411,6 +443,11 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
         m, sd = mu_sd[c]
         return (val - m) / sd
 
+    # pool LHP share: the centering point of the hand term
+    _lh = [raw[id(r)]['lhp'] for r in pool_rows if raw[id(r)]['lhp'] is not None]
+    lhp_share = (sum(_lh) / len(_lh)) if _lh else LHP_SHARE_FALLBACK
+    n_nohand = 0
+
     for r in rows:
         is_aaa = r.get('team') in aaa
         ch = raw.get(id(r))
@@ -430,6 +467,10 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
         zs = {c: z(c, ch[c]) for c in W_PH}
         if all(zs[c] is not None for c in W_PH):
             ph = anchor + sum(W_PH[c] * zs[c] for c in W_PH)
+            if ch.get('lhp') is None:
+                n_nohand += 1        # unknown hand scores at the pool share
+            else:
+                ph += W_LHP * (ch['lhp'] - lhp_share)
         # hpERA ships for ROC; hdERA does NOT. Measured on ~800 paired
         # pitcher-seasons at both levels, 2023-2025
         # (scripts/research/era/aaa_level_correction.py):
@@ -480,9 +521,13 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
         print('  eraplus WARNING: roc_pitches supplied but 0 ROC rows '
               'scored hpERA — check the xRV channel keying (Pitcher, PTeam)')
     print(f'  eraplus: anchor {anchor:.2f} (pool {len(pool_rows)}), '
-          f'hdERA {n_dh} rows, hpERA {n_ph} rows ({n_roc} of them ROC/AAA)')
+          f'hdERA {n_dh} rows, hpERA {n_ph} rows ({n_roc} of them ROC/AAA), '
+          f'LHP share {lhp_share:.3f}'
+          + (f', {n_nohand} rows with unknown hand scored at the pool share'
+             if n_nohand else ''))
     from pipeline.locplus import LOC_SCALE_K
     return {'anchor': round(anchor, 3), 'dhB': DH_B, 'weights': W_PH,
+            'wLhp': W_LHP, 'lhpShare': round(lhp_share, 4),
             'n0': {'xw': N0_XW, 'k': N0_K}, 'poolMinOuts': POOL_MIN_OUTS,
             # published so window/scratch contexts (NEW-tab cards) can score
             # hdERA/hpERA the way they already score Pitcher+ from its
@@ -585,6 +630,10 @@ def score_scratch_row(row, pitches, g, gs, team, const, season=None):
     # rendering.
     if pa >= SCRATCH_HP_MIN_PA and all(zs.get(c) is not None for c in W_PH):
         ph = anchor + sum(W_PH[c] * zs[c] for c in W_PH)
+        _lh = {'L': 1.0, 'R': 0.0}.get(row.get('throws'))
+        if _lh is not None:
+            ph += (const.get('wLhp', W_LHP)
+                   * (_lh - const.get('lhpShare', LHP_SHARE_FALLBACK)))
     return (round(dh, 2) if dh is not None else None,
             round(ph, 2) if ph is not None else None)
 

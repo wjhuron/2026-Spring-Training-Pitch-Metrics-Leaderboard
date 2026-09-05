@@ -1,0 +1,83 @@
+diff --git a/pipeline/locplus.py b/pipeline/locplus.py
+index 0dae8f437..b56da1d60 100644
+--- a/pipeline/locplus.py
++++ b/pipeline/locplus.py
+@@ -302,6 +302,16 @@ K_SWING_COLL, K_SWING_COUNT, K_CS = 6, 20, 10
+ # branch takes a per-count LEVEL offset instead (below).
+ WH_COUNT_LEVEL = True
+ K_WH_COUNT = 20
++# RESEARCH 2026-09-05 (uncommitted prototype): partial pooling of each
++# (group, batter hand, pitcher hand) collapsed surface toward the MIRRORED
++# surface of its mirror pair (both hands flipped, PlateX negated). 0 = off,
++# which reproduces the shipped surfaces exactly. Kernel-weighted units like
++# every other K. The mirror prior is the pair's stage-1 surface (built with
++# its own scalar prior), so the two priors combine as
++# (K_old*scalar + K_MIRROR*mirror)/(K_old + K_MIRROR) with pseudo-count
++# K_old + K_MIRROR.
++K_MIRROR = 0
++_FLIP = {'L': 'R', 'R': 'L'}
+ # Contact-quality level by count: the BIP branch adds offset(c) = league
+ # mean standardized xwOBA-value on BIP in count c minus the overall mean
+ # (2-strike defensive contact is weaker, hitter-count contact louder).
+@@ -691,12 +701,48 @@ def build_surfaces(baseline, lg_woba, woba_scale):
+     wh_mult = {c: ((v[0] / v[1]) / ov_wh if v[1] and ov_wh else 1.0)
+                for c, v in cnt_wh.items()}
+ 
++    def _mix(scalar, k_old, mirror):
++        """Prior grid + pseudo-count for one collapsed surface: the scalar
++        prior alone (mirror None) or blended with the mirrored pair surface."""
++        if mirror is None or K_MIRROR <= 0:
++            return scalar, k_old
++        kt = k_old + K_MIRROR
++        return ([[(k_old * scalar + K_MIRROR * mirror[i][j]) / kt for j in range(NZ)]
++                 for i in range(NX)], kt)
++
++    def _collapsed(key, a, mir=None):
++        """The four collapsed surfaces of one pair: whiff|swing, foul|swing,
++        contact value|BIP, swing|pitch. `mir` = that pair's mirror-pair
++        surfaces, already mirrored, or None."""
++        kx, kz = _kernels_for(key[0])
++        swn = _gsum(a['swn']); swd = _gsum(a['swd']); bipd = _gsum(a['bipd'])
++        m = mir or (None, None, None, None)
++        pr, k = _mix(_gsum(a['whn']) / max(swn, 1), K_WHIFF, m[0])
++        wh = _smooth(a['whn'], a['swn'], pr, k, kx, kz)
++        pr, k = _mix(_gsum(a['fln']) / max(swn, 1), K_FOUL, m[1])
++        fl = _smooth(a['fln'], a['swn'], pr, k, kx, kz)
++        pr, k = _mix(_gsum(a['bipn']) / max(bipd, 1), K_XWCON, m[2])
++        xw = _smooth(a['bipn'], a['bipd'], pr, k, kx, kz)
++        pr, k = _mix(swn / swd if swd else 0.0, K_SWING_COLL, m[3])
++        sw = _smooth(a['swn'], a['swd'], pr, k, kx, kz)
++        return wh, fl, xw, sw
++
++    coll_by_key = {key: _collapsed(key, a) for key, a in A.items()}
++    if K_MIRROR > 0:
++        stage2 = {}
++        for key, a in A.items():
++            mk = (key[0], _FLIP[key[1]], _FLIP[key[2]])
++            if mk in coll_by_key:
++                mir = tuple([row for row in reversed(g)] for g in coll_by_key[mk])
++                stage2[key] = _collapsed(key, a, mir)
++            else:
++                stage2[key] = coll_by_key[key]
++        coll_by_key = stage2
++
+     WH, FL, XW, SW = {}, {}, {}, {}
+     for key, a in A.items():
+         kx, kz = _kernels_for(key[0])
+-        swn = _gsum(a['swn']); swd = _gsum(a['swd']); bipd = _gsum(a['bipd'])
+-        wh_coll = _smooth(a['whn'], a['swn'], _gsum(a['whn']) / max(swn, 1),
+-                          K_WHIFF, kx, kz)
++        wh_coll, FL[key], XW[key], coll = coll_by_key[key]
+         if WH_COUNT_LEVEL:
+             WH[key] = {}
+             for c in COUNTS:
+@@ -709,9 +755,6 @@ def build_surfaces(baseline, lg_woba, woba_scale):
+                                       K_WH_COUNT, kx, kz))
+         else:
+             WH[key] = {c: wh_coll for c in COUNTS}
+-        FL[key] = _smooth(a['fln'], a['swn'], _gsum(a['fln']) / max(swn, 1), K_FOUL, kx, kz)
+-        XW[key] = _smooth(a['bipn'], a['bipd'], _gsum(a['bipn']) / max(bipd, 1), K_XWCON, kx, kz)
+-        coll = _smooth(a['swn'], a['swd'], swn / swd if swd else 0.0, K_SWING_COLL, kx, kz)
+         if SWING_PRIOR_COUNT_LEVEL:
+             SW[key] = {}
+             for c in COUNTS:

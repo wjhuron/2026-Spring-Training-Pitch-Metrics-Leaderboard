@@ -289,6 +289,10 @@ def prepare(d, slopes, anchor='true'):
             adj[m] = sl * (d.loc[m, 'plate_z'].values - zbar)
     adj = np.where(np.isfinite(adj), adj, 0.0)
     d['vaa'] = (d['vaa_raw'] - adj).astype('float32')
+    # 2026-09-05 handedness battery: pitcher hand as a feature. With
+    # platoon_same already in the design, this identifies all four matchup
+    # cells (bats = platoon_same XOR throws).
+    d['is_lhp'] = (d['throws'] == 'L').astype('float32')
     # acceleration-equivalent movement (derived; priors carry no ax/az).
     # break = 0.5*a*t^2  ->  a ~ 2*break/t^2, t from release to plate at
     # release speed. Units: in/s^2 (scale irrelevant to a tree).
