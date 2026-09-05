@@ -66,7 +66,7 @@ XRVOE_KEYS = ('xrvoe100', 'rvoe100', 'rvoe', 'xrvoe',
               'hdERA', 'hpERA', 'hdERAPlus', 'hpERAPlus',
               # hWAR (deserved pitcher WAR on hdERA) is computed in the same
               # inject step and carried the same way.
-              'hWAR')
+              'hWAR', 'hWAR_se')
 
 # ── Runtime state (set in main) ──────────────────────────────────────────
 WOBA_WEIGHTS = None

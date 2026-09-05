@@ -758,7 +758,7 @@ const Aggregator = {
                      'hdERA', 'hdERA_pctl', 'hpERA', 'hpERA_pctl',
                      'hdERAPlus', 'hdERAPlus_pctl',
                      'hpERAPlus', 'hpERAPlus_pctl',
-                     'hWAR', 'hWAR_pctl',
+                     'hWAR', 'hWAR_pctl', 'hWAR_se',
                      // Command+ is season-level like Pitcher+: targets are
                      // fit on the full season, so filtered views preserve
                      // rather than recompute it.

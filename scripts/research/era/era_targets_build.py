@@ -20,7 +20,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.a
 OUT = os.path.join(ROOT, 'data', '_era_targets.json')
 B = 'https://statsapi.mlb.com/api/v1'
 KEYS = {'outs': 'outs', 'er': 'earnedRuns', 'r': 'runs', 'bf': 'battersFaced', 'so': 'strikeOuts',
-        'bb': 'baseOnBalls', 'g': 'gamesPlayed', 'gs': 'gamesStarted'}
+        'bb': 'baseOnBalls', 'g': 'gamesPlayed', 'gs': 'gamesStarted',
+        # 2026-09-05 hWAR battery: running game, HR and HBP for FIP, IBB, balks, wild pitches
+        'sb': 'stolenBases', 'cs': 'caughtStealing', 'hr': 'homeRuns', 'hbp': 'hitBatsmen',
+        'ibb': 'intentionalWalks', 'bk': 'balks', 'wp': 'wildPitches'}
 
 def get(path, **params):
     for attempt in range(4):

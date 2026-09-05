@@ -66,8 +66,26 @@ hWAR (2026-09-05): a deserved pitcher WAR on hdERA. One pitcher-season:
               the 30-IP pool, whose mean is not the league's)
     RAA     = (lgRA9 - RA9_dp) * IP / 9
     hWAR    = RAA / RPW + REPL * IP / 9
-    RPW     = 4 r / (2 r)^WAR_PYTH_EXP with r = lgRA9      PythagenPat; team records read 10-11.7 (n 30, curvature)
+    RPW     = 4 r / (2 r)^WAR_PYTH_EXP with r = lgRA9, one season constant (the per-pitcher
+              run-environment form is coded behind WAR_DYNAMIC_RPW and held off by decision).
+              Team records read 10-11.7 (n 30, curvature)
+    hWAR_se = shrink x WAR_XW_PA_SD x sqrt(PA) / wOBAscale / RPW      sampling error bar
     REPL    = REPL_RP + (WAR_REPL_SP - REPL_RP) * GS/G,  REPL_RP = WAR_REPL_SP - WAR_ROLE_GAP / RPW
+
+Improvement battery (2026-09-05, scripts/research/era/war_improve_battery.py + _battery2.py,
+war_calibration_slope.py; data/_war_improve_battery*.json). The rate is at a plateau: the
+xwOBA shrink N0 0-1000 moves nothing outside noise (250 stays), the linear-weights form
+(xwRAA) and K%/BB% channels lose, an xRV blend wins two objectives narrowly but loses
+reliability. Per-pitch channels: framing runs RECEIVED are half-stable (rel .43) and carry
+a NEGATIVE next-season weight, so neutralizing the catcher would remove pitcher signal
+(rejected); pulled-air excess predicts next season 5/5 at 60 IP but loses reliability 0/6
+(open: test it as a fixed per-BIP adjustment, not a fitted channel); running game and
+WP/BK lose everywhere; the pitcher's actual home-pitch share changes nothing. Calibration:
+the same-season slope of actual RA9 on the rate reads .86 because of selection on outcomes
+(low-IP arms 1.33, high-IP .76, the winner's-curse signature), not over-dispersion, so
+DH_B stays. Volume stays innings (TBF-based moves nobody more than .6 WAR and credits
+dominance less). Role variable stays start share: innings per appearance explains none
+of the within-pitcher change.
 
 Why hdERA: three WARs built under identical conventions on the 2021-2026 replicates
 (scripts/research/era/war_rate_validation.py, data/_war_rate_validation.json), differing only
@@ -77,10 +95,11 @@ pitchers per season where FIP-WAR and RA9-WAR disagree most .310 vs .270. Actual
 every test (reliability .212). No leverage term, by decision: it credits the manager's
 deployment, the same job-versus-pitcher line Pitcher+ drew. No league correction (one MLB
 pool) and no opponent adjustment. Relievers are not credited for the job; the role split in
-replacement CORRECTS the rate inflation the job gives them (measured 0.64 runs/9 within
-pitcher on role changes; fWAR's split implies about 0.85, a floor because demoted starters
-and promoted relievers both bias the measurement toward zero). ROC rows have no hdERA and
-therefore no hWAR.
+replacement CORRECTS the rate inflation the job gives them (WAR_ROLE_GAP 0.85 runs/9,
+measured within season on swingmen who did both jobs; the adjacent-season version reads
+0.64 and is a floor, because demoted starters rebound and promoted relievers are the good
+ones; fWAR's split implies about the same 0.85). ROC rows have no hdERA and therefore no
+hWAR.
 
 ROC/AAA ROWS SCORE hpERA AND NOT hdERA (2026-08-19). They are scored
 against the MLB pool and never enter it -- no league rate, no z statistic,
@@ -103,6 +122,7 @@ park weight points the WRONG way, so if factors ever improve, re-test
 the retrodictive form, never just activate the channel.
 """
 import json
+import math
 import os
 
 from pipeline.utils import DATA_DIR, TEAM_ABBREV_TO_ID, MLB_TEAMS
@@ -212,12 +232,23 @@ LHP_SHARE_FALLBACK = 0.278
 WAR_PYTH_EXP = 0.287     # PythagenPat exponent; RPW = 4r/(2r)^0.287 = 9.4-9.9 at 2021-2026 run environments
 WAR_REPL_SP = 0.12       # wins per 9 IP a starter earns above replacement (fWAR's .380); the one
                          # convention that sets the league total (~430 WAR with the measured gap)
-WAR_ROLE_GAP = 0.64      # runs per 9 a full role change is worth to the same pitcher, measured
-                         # within pitcher on 1,576 adjacent-season pairs 2021-2026 (positive 5/5
-                         # pairs, .45-.83); relievers are measured against a bar this much higher
+WAR_ROLE_GAP = 0.85      # runs per 9 the reliever job is worth to the same pitcher, measured WITHIN
+                         # SEASON on 281 swingman pitcher-seasons 2021-2025 (>= 50 PA in each role,
+                         # side and starter reconstructed from pitch order; -0.53..-1.28 by season,
+                         # SE .09). The adjacent-season version read 0.64 and is a floor: demoted
+                         # starters rebound and promoted relievers are the good ones. 0.85 puts the
+                         # reliever bar at ~.032 wins/9, fWAR's published .03. Shipped .64 until
+                         # 2026-09-05 (same day).
 WAR_PARK_PASS = 0.91     # share of the PUBLISHED runs park factor that reaches hdERA: LOSO
                          # innings-weighted slope .85-1.05, 2021-2026. (Actual runs move 1.67x the
                          # published factor: Savant's factor is shrunk, so 1.0 here is not "all".)
+WAR_DYNAMIC_RPW = False  # HELD (per Wally 2026-09-05): runs per win stays the season constant a
+                         # reader can check. The dynamic form, (rate + lgRA9)/2 per pitcher as fWAR
+                         # and bWAR do, was built and measured: aces +25% (Misiorowski 7.6 -> 9.6),
+                         # league sum +8%. A convention, not a measurement; the simpler one won.
+WAR_XW_PA_SD = 0.366     # sd of a single PA's xwOBA-against value (2024, 181,704 PA): the sampling
+                         # noise behind hWAR_se = shrink x sd x sqrt(PA) / wOBAscale / RPW, an honest
+                         # error bar (about +/-0.7 WAR at 190 IP, +/-0.4 at 90).
 
 # frozen run-environment constants for make_rv_xrv (the values the weight
 # fit used; z-scoring absorbs any drift in the true environment)
@@ -545,8 +576,9 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
     lg_ra9 = (league_rates or {}).get('lgRA9')
     lg_era = (league_rates or {}).get('lgERA')
     if lg_ra9 and lg_era:
-        rpw = 4.0 * lg_ra9 / (2.0 * lg_ra9) ** WAR_PYTH_EXP
+        rpw = 4.0 * lg_ra9 / (2.0 * lg_ra9) ** WAR_PYTH_EXP        # league environment: replacement split + fallback
         repl_rp = WAR_REPL_SP - WAR_ROLE_GAP / rpw
+        _scale = XRV_SCALE
 
         def _rate_dp(r):
             dh = dh_raw.get(id(r)); ch = raw.get(id(r))
@@ -565,17 +597,27 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
         n_war = 0
         for r in rows:
             if r.get('team') in aaa:
-                r['hWAR'] = None
+                r['hWAR'] = None; r['hWAR_se'] = None
                 continue
             v = _rate_dp(r); o = _ip_outs(r.get('ip')); g = r.get('g') or 0
             if v is None or o <= 0:
-                r['hWAR'] = None
+                r['hWAR'] = None; r['hWAR_se'] = None
                 continue
             ip9 = o / 27.0
             repl = repl_rp + (WAR_REPL_SP - repl_rp) * ((r.get('gs') or 0) / g if g else 0.0)
-            r['hWAR'] = round((lg_ra9 - (v + shift)) * ip9 / rpw + repl * ip9, 2)
+            rate_i = v + shift
+            if WAR_DYNAMIC_RPW:
+                _env = max(0.5 * (rate_i + lg_ra9), 1.0)
+                rpw_i = 4.0 * _env / (2.0 * _env) ** WAR_PYTH_EXP
+            else:
+                rpw_i = rpw
+            r['hWAR'] = round((lg_ra9 - rate_i) * ip9 / rpw_i + repl * ip9, 2)
+            pa = r.get('pa') or r.get('tbf') or 0
+            r['hWAR_se'] = (round((pa / (pa + N0_XW)) * WAR_XW_PA_SD * math.sqrt(pa) / _scale / rpw_i, 2)
+                            if pa > 0 else None)
             n_war += 1
         war_const = {'lgRA9': round(lg_ra9, 4), 'lgERA': round(lg_era, 4), 'rpw': round(rpw, 4),
+                     'dynamicRpw': WAR_DYNAMIC_RPW, 'xwPaSd': WAR_XW_PA_SD,
                      'replSp': WAR_REPL_SP, 'replRp': round(repl_rp, 4), 'roleGap': WAR_ROLE_GAP,
                      'parkPass': WAR_PARK_PASS, 'shift': round(shift, 4), 'pythExp': WAR_PYTH_EXP,
                      'nRows': n_war, 'sum': round(sum(r['hWAR'] for r in mlb if r.get('hWAR') is not None
