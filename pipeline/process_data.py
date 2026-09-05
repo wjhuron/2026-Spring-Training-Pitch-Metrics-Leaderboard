@@ -63,7 +63,10 @@ XRVOE_KEYS = ('xrvoe100', 'rvoe100', 'rvoe', 'xrvoe',
               'pitcherPlus', 'pitcherRuns100', 'pitcherPlusProj',
               # hdERA/hpERA are inject-step metrics too (hpERA consumes the
               # fresh stuffScore); same carry-over contract.
-              'hdERA', 'hpERA', 'hdERAPlus', 'hpERAPlus')
+              'hdERA', 'hpERA', 'hdERAPlus', 'hpERAPlus',
+              # hWAR (deserved pitcher WAR on hdERA) is computed in the same
+              # inject step and carried the same way.
+              'hWAR')
 
 # ── Runtime state (set in main) ──────────────────────────────────────────
 WOBA_WEIGHTS = None
@@ -4565,6 +4568,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     # Exclude MiLB teams from league-wide calculations
     total_outs = 0
     total_er = 0
+    total_r = 0       # runs allowed, for the hWAR league rate (every boxscore, 0-IP arms included)
     for bkey, box in pitcher_box.items():
         # bkey format: "<id-or-name>|TEAM" — team is the last segment.
         box_team = bkey.split('|')[-1] if '|' in bkey else ''
@@ -4575,6 +4579,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             continue
         total_outs += box.get('outs', 0)
         total_er += box.get('er', 0)
+        total_r += box.get('r', 0)
 
     # --- Compute FIP, xFIP, SIERA ---
     # FIP_CONSTANT and WOBA_WEIGHTS are set globally from FanGraphs Guts page
@@ -4719,6 +4724,11 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
     if total_outs > 0:
         total_ip = total_outs / 3.0
         metadata['pitcherLeagueAverages']['era'] = round(total_er * 9 / total_ip, 2)
+        # hWAR league rates (pipeline/eraplus.py): runs and earned runs per 9 over
+        # every MLB boxscore line. The inject step reads them from metadata;
+        # without them hWAR is carried, never recomputed (fail closed).
+        metadata['pitcherLeagueAverages']['lgRA9'] = round(total_r * 9 / total_ip, 4)
+        metadata['pitcherLeagueAverages']['lgERA'] = round(total_er * 9 / total_ip, 4)
 
     # hdERA/hpERA anchor = unweighted mean ERA of the 30+ IP MLB pool (the
     # metrics' z-pool population, see pipeline_eraplus). Published here so

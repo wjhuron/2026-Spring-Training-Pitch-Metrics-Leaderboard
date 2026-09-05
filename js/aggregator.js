@@ -758,6 +758,7 @@ const Aggregator = {
                      'hdERA', 'hdERA_pctl', 'hpERA', 'hpERA_pctl',
                      'hdERAPlus', 'hdERAPlus_pctl',
                      'hpERAPlus', 'hpERAPlus_pctl',
+                     'hWAR', 'hWAR_pctl',
                      // Command+ is season-level like Pitcher+: targets are
                      // fit on the full season, so filtered views preserve
                      // rather than recompute it.
@@ -985,7 +986,7 @@ const Aggregator = {
       let a = acc[p.team];
       if (!a) {
         a = acc[p.team] = { ipThirds: 0, er: null, hrA: null, w: 0, l: 0, sv: 0, hld: 0, gs: 0,
-                            tbf: 0, count: 0, runValue: null, xRunValue: null, sums: {}, wts: {} };
+                            tbf: 0, count: 0, runValue: null, xRunValue: null, hWAR: null, sums: {}, wts: {} };
       }
       const ipF = Utils.parseIP(p.ip);
       a.ipThirds += Math.round(ipF * 3);
@@ -996,6 +997,8 @@ const Aggregator = {
       // RV sums stay full precision; rounding happens only at display
       if (p.runValue != null) a.runValue = (a.runValue || 0) + p.runValue;
       if (p.xRunValue != null) a.xRunValue = (a.xRunValue || 0) + p.xRunValue;
+      // hWAR is a counting stat: a team's value is the sum over its arms
+      if (p.hWAR != null) a.hWAR = (a.hWAR || 0) + p.hWAR;
       for (let wi = 0; wi < IP_W.length; wi++) wadd(a, IP_W[wi], p[IP_W[wi]], ipF);
       for (let pi = 0; pi < PA_W.length; pi++) wadd(a, PA_W[pi], p[PA_W[pi]], p.pa || p.tbf);
       wadd(a, 'twoStrikeWhiffPct', p.twoStrikeWhiffPct, p.nSwings);
@@ -1017,6 +1020,7 @@ const Aggregator = {
         hr9: (a.hrA != null && ipF > 0) ? a.hrA * 9 / ipF : null,
         runValue: a.runValue,
         xRunValue: a.xRunValue,
+        hWAR: a.hWAR,
         rv100: (a.runValue != null && a.count > 0) ? a.runValue / a.count * 100 : null,
         xRv100: (a.xRunValue != null && a.count > 0) ? a.xRunValue / a.count * 100 : null,
         locPlusN: a.wts.locPlus || 0,

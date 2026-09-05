@@ -251,6 +251,7 @@ var PlayerPage = {
     // carries the two house ERAs the leaderboard leads with.
     { key: 'hdERA', label: 'hdERA', format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
     { key: 'hpERA', label: 'hpERA', format: function(v) { return v != null ? v.toFixed(2) : '—'; } },
+    { key: 'hWAR', label: 'hWAR', format: function(v) { return v != null ? v.toFixed(1) : '—'; } },
   ],
 
   // Shown in place of STATS_COLS whenever a handedness is selected. The

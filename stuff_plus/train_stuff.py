@@ -1755,8 +1755,16 @@ def inject(agg, overall, league, xrvoe_pt=None, xrvoe_ov=None,
         # roc_pitches carry MLB-currency RunExp (rescaled in place above),
         # which the xRV channel needs; without them a ROC row has no xRV
         # and hpERA stays None for every Rochester arm.
+        # hWAR needs the league runs rates process_data wrote to metadata.
+        try:
+            _lg_rates = (json.load(open(os.path.join(DATA, 'metadata_rs.json')))
+                         .get('pitcherLeagueAverages') or {})
+        except (OSError, ValueError) as _e:
+            _lg_rates = {}
+            print(f'  eraplus: metadata unreadable ({_e}); hWAR carried')
         _era_const = apply_era_plus(pp, mlb_pitches,
-                                    roc_pitches=_era_roc_pitches)
+                                    roc_pitches=_era_roc_pitches,
+                                    league_rates=_lg_rates)
     else:
         # No pitch list handed in (unexpected caller): keep the carried
         # hdERA/hpERA values rather than dying mid-inject.

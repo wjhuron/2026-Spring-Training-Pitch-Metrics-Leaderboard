@@ -56,6 +56,32 @@ Called from stuff_plus/train_stuff.py --inject (needs the fresh
 stuffScore, like Pitcher+). Keys survive process_data-only runs via
 XRVOE_KEYS carry-over.
 
+hWAR (2026-09-05): a deserved pitcher WAR on hdERA. One pitcher-season:
+
+    RA9_d   = hdERA + (lgRA9 - lgERA)                 earned runs -> runs, the league gap (fWAR does this to FIP)
+    RA9_dp  = RA9_d - WAR_PARK_PASS * (exposure - 1) * lgRA9 + shift
+              exposure = (PF_home/100 + 1)/2 (half the games at home; combined rows resolve
+              through combined_park_map); shift recenters the innings-weighted MLB mean to
+              lgRA9, so runs above average sum to zero across the league (the hdERA anchor is
+              the 30-IP pool, whose mean is not the league's)
+    RAA     = (lgRA9 - RA9_dp) * IP / 9
+    hWAR    = RAA / RPW + REPL * IP / 9
+    RPW     = 4 r / (2 r)^WAR_PYTH_EXP with r = lgRA9      PythagenPat; team records read 10-11.7 (n 30, curvature)
+    REPL    = REPL_RP + (WAR_REPL_SP - REPL_RP) * GS/G,  REPL_RP = WAR_REPL_SP - WAR_ROLE_GAP / RPW
+
+Why hdERA: three WARs built under identical conventions on the 2021-2026 replicates
+(scripts/research/era/war_rate_validation.py, data/_war_rate_validation.json), differing only
+in the rate. hdERA vs FIP: half-season reliability .467 vs .407 (5/6), next-season RA9 at 60 IP
+.355 vs .342 (3/5), at 30 IP .263 vs .229 (5/5), rest-of-season .328 vs .303, and on the 50
+pitchers per season where FIP-WAR and RA9-WAR disagree most .310 vs .270. Actual RA9 loses
+every test (reliability .212). No leverage term, by decision: it credits the manager's
+deployment, the same job-versus-pitcher line Pitcher+ drew. No league correction (one MLB
+pool) and no opponent adjustment. Relievers are not credited for the job; the role split in
+replacement CORRECTS the rate inflation the job gives them (measured 0.64 runs/9 within
+pitcher on role changes; fWAR's split implies about 0.85, a floor because demoted starters
+and promoted relievers both bias the measurement toward zero). ROC rows have no hdERA and
+therefore no hWAR.
+
 ROC/AAA ROWS SCORE hpERA AND NOT hdERA (2026-08-19). They are scored
 against the MLB pool and never enter it -- no league rate, no z statistic,
 no anchor -- the same translation framing Stuff+, Loc+ and xRVOE already
@@ -181,6 +207,17 @@ W_LHP = -0.211
 # mean LHP share of the 2021-2026 60-IP replicate pools (.314 .269 .247
 # .276 .263 .301). The season path measures the live share.
 LHP_SHARE_FALLBACK = 0.278
+
+# ── hWAR (2026-09-05) ────────────────────────────────────────────────────
+WAR_PYTH_EXP = 0.287     # PythagenPat exponent; RPW = 4r/(2r)^0.287 = 9.4-9.9 at 2021-2026 run environments
+WAR_REPL_SP = 0.12       # wins per 9 IP a starter earns above replacement (fWAR's .380); the one
+                         # convention that sets the league total (~430 WAR with the measured gap)
+WAR_ROLE_GAP = 0.64      # runs per 9 a full role change is worth to the same pitcher, measured
+                         # within pitcher on 1,576 adjacent-season pairs 2021-2026 (positive 5/5
+                         # pairs, .45-.83); relievers are measured against a bar this much higher
+WAR_PARK_PASS = 0.91     # share of the PUBLISHED runs park factor that reaches hdERA: LOSO
+                         # innings-weighted slope .85-1.05, 2021-2026. (Actual runs move 1.67x the
+                         # published factor: Savant's factor is shrunk, so 1.0 here is not "all".)
 
 # frozen run-environment constants for make_rv_xrv (the values the weight
 # fit used; z-scoring absorbs any drift in the true environment)
@@ -362,11 +399,14 @@ def _channels(row, xrv_map, park, is_combined, combined_park=None):
 
 
 def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
-                   is_combined_fn=None, season=None, roc_pitches=None):
+                   is_combined_fn=None, season=None, roc_pitches=None,
+                   league_rates=None):
     """Set hdERA / hpERA / hdERAPlus / hpERAPlus (+ _pctl each) in place.
     Returns the constants bundle for metadata, or None if the pool is too
     thin. `pitches` = the MLB+MiLB pitch dicts (sheet schema) for the
-    xRV/100 channel; `is_combined_fn` identifies 2TM/3TM rows."""
+    xRV/100 channel; `is_combined_fn` identifies 2TM/3TM rows.
+    `league_rates` = metadata pitcherLeagueAverages (lgRA9/lgERA) for hWAR;
+    without them hWAR is left as carried and the skip is logged."""
     aaa = set(aaa_teams)
     if is_combined_fn is None:
         def is_combined_fn(team):
@@ -448,6 +488,7 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
     lhp_share = (sum(_lh) / len(_lh)) if _lh else LHP_SHARE_FALLBACK
     n_nohand = 0
 
+    dh_raw = {}
     for r in rows:
         is_aaa = r.get('team') in aaa
         ch = raw.get(id(r))
@@ -491,16 +532,65 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
             r['hdERAPlus'] = None
         else:
             r['hdERA'] = round(dh, 2) if dh is not None else None
+            if dh is not None:
+                dh_raw[id(r)] = dh
             r['hdERAPlus'] = (round(200.0 - 100.0 * dh / anchor)
                               if dh is not None else None)
         r['hpERA'] = round(ph, 2) if ph is not None else None
         r['hpERAPlus'] = (round(200.0 - 100.0 * ph / anchor)
                           if ph is not None else None)
 
+    # ── hWAR: deserved WAR on the unrounded hdERA (module docstring) ──
+    war_const = None
+    lg_ra9 = (league_rates or {}).get('lgRA9')
+    lg_era = (league_rates or {}).get('lgERA')
+    if lg_ra9 and lg_era:
+        rpw = 4.0 * lg_ra9 / (2.0 * lg_ra9) ** WAR_PYTH_EXP
+        repl_rp = WAR_REPL_SP - WAR_ROLE_GAP / rpw
+
+        def _rate_dp(r):
+            dh = dh_raw.get(id(r)); ch = raw.get(id(r))
+            if dh is None or ch is None:
+                return None
+            exposure = (ch['park'] + 1.0) / 2.0
+            return dh + (lg_ra9 - lg_era) - WAR_PARK_PASS * (exposure - 1.0) * lg_ra9
+
+        # recenter so innings-weighted RAA over MLB club rows sums to zero
+        _num = _den = 0.0
+        for r in mlb:
+            v = _rate_dp(r); o = _ip_outs(r.get('ip'))
+            if v is not None and o > 0 and not is_combined_fn(r.get('team')):
+                _num += v * o; _den += o
+        shift = (lg_ra9 - _num / _den) if _den > 0 else 0.0
+        n_war = 0
+        for r in rows:
+            if r.get('team') in aaa:
+                r['hWAR'] = None
+                continue
+            v = _rate_dp(r); o = _ip_outs(r.get('ip')); g = r.get('g') or 0
+            if v is None or o <= 0:
+                r['hWAR'] = None
+                continue
+            ip9 = o / 27.0
+            repl = repl_rp + (WAR_REPL_SP - repl_rp) * ((r.get('gs') or 0) / g if g else 0.0)
+            r['hWAR'] = round((lg_ra9 - (v + shift)) * ip9 / rpw + repl * ip9, 2)
+            n_war += 1
+        war_const = {'lgRA9': round(lg_ra9, 4), 'lgERA': round(lg_era, 4), 'rpw': round(rpw, 4),
+                     'replSp': WAR_REPL_SP, 'replRp': round(repl_rp, 4), 'roleGap': WAR_ROLE_GAP,
+                     'parkPass': WAR_PARK_PASS, 'shift': round(shift, 4), 'pythExp': WAR_PYTH_EXP,
+                     'nRows': n_war, 'sum': round(sum(r['hWAR'] for r in mlb if r.get('hWAR') is not None
+                                                      and not is_combined_fn(r.get('team'))), 1)}
+        print(f"  hWAR: {n_war} rows, RPW {rpw:.2f}, repl SP {WAR_REPL_SP:.3f} / RP {repl_rp:.3f} wins per 9, "
+              f"shift {shift:+.3f}, MLB club-row sum {war_const['sum']:.1f}")
+    else:
+        print('  eraplus WARNING: no lgRA9/lgERA in metadata pitcherLeagueAverages — hWAR '
+              'left as carried (run process_data before the inject)')
+
     # percentiles: qualified MLB non-combined pool, every row ranked
     # (site convention). hdERA/hpERA are lower-is-better -> invert.
     for key, invert in (('hdERA', True), ('hpERA', True),
-                        ('hdERAPlus', False), ('hpERAPlus', False)):
+                        ('hdERAPlus', False), ('hpERAPlus', False),
+                        ('hWAR', False)):
         pool = [r[key] for r in mlb
                 if r.get(key) is not None
                 and not is_combined_fn(r.get('team'))
@@ -528,6 +618,7 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
     from pipeline.locplus import LOC_SCALE_K
     return {'anchor': round(anchor, 3), 'dhB': DH_B, 'weights': W_PH,
             'wLhp': W_LHP, 'lhpShare': round(lhp_share, 4),
+            'war': war_const,
             'n0': {'xw': N0_XW, 'k': N0_K}, 'poolMinOuts': POOL_MIN_OUTS,
             # published so window/scratch contexts (NEW-tab cards) can score
             # hdERA/hpERA the way they already score Pitcher+ from its
