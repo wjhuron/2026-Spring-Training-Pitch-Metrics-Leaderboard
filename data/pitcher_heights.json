@@ -797,6 +797,7 @@
 "Garcia, Maikel": 73.0,
 "Garcia, Rico": 69.0,
 "Garcia, Robert": 76.0,
+"Garcia, Saul": 72.0,
 "Garc\u00eda Jr., Luis": 73.0,
 "Garc\u00eda, Adolis": 72.0,
 "Garc\u00eda, Deivi": 71.0,
@@ -1930,6 +1931,7 @@
 "Ricketts, Caleb": 75.0,
 "Ridings, Stephen": 80.0,
 "Riley, Austin": 73.0,
+"Rincon, Hancel": 74.0,
 "Rincones Jr., Gabriel": 75.0,
 "Ritchie, JR": 74.0,
 "Ritter, Ryan": 73.0,
@@ -5033,6 +5035,9 @@
 ],
 "Garcia, Robert": [
 676395
+],
+"Garcia, Saul": [
+702903
 ],
 "Garc\u00eda Jr., Luis": [
 671277
@@ -8436,6 +8441,9 @@
 "Riley, Austin": [
 663586
 ],
+"Rincon, Hancel": [
+684516
+],
 "Rincones Jr., Gabriel": [
 687282
 ],
@@ -10566,5 +10574,5 @@
 ]
 },
 "league_mean": 73.73,
-"n": 2639
+"n": 2641
 }
