@@ -69,7 +69,10 @@ hWAR (2026-09-05): a deserved pitcher WAR on hdERA. One pitcher-season:
     RPW     = 4 r / (2 r)^WAR_PYTH_EXP with r = lgRA9, one season constant (the per-pitcher
               run-environment form is coded behind WAR_DYNAMIC_RPW and held off by decision).
               Team records read 10-11.7 (n 30, curvature)
-    hWAR_se = shrink x WAR_XW_PA_SD x sqrt(PA) / wOBAscale / RPW      sampling error bar
+    hWAR_se = (DH_B / sd_pool) x shrink x WAR_XW_PA_SD / sqrt(PA) x IP/9 / RPW   sampling error bar,
+              on the runs scale hdERA itself uses (DH_B per pool SD of shrunk xwOBA, about 53
+              runs/9 per xwOBA point; the linear-weights scale PA9/wOBAscale is 31 and reads 1.7x
+              too narrow: war_error_bar.py, split-half variance ratio 1.09 on this scale)
     REPL    = REPL_RP + (WAR_REPL_SP - REPL_RP) * GS/G,  REPL_RP = WAR_REPL_SP - WAR_ROLE_GAP / RPW
 
 Improvement battery (2026-09-05, scripts/research/era/war_improve_battery.py + _battery2.py,
@@ -247,8 +250,10 @@ WAR_DYNAMIC_RPW = False  # HELD (per Wally 2026-09-05): runs per win stays the s
                          # and bWAR do, was built and measured: aces +25% (Misiorowski 7.6 -> 9.6),
                          # league sum +8%. A convention, not a measurement; the simpler one won.
 WAR_XW_PA_SD = 0.366     # sd of a single PA's xwOBA-against value (2024, 181,704 PA): the sampling
-                         # noise behind hWAR_se = shrink x sd x sqrt(PA) / wOBAscale / RPW, an honest
-                         # error bar (about +/-0.7 WAR at 190 IP, +/-0.4 at 90).
+                         # noise behind hWAR_se, converted to runs at hdERA's own DH_B / sd(pool)
+                         # (about +/-1.2 WAR at 190 IP, +/-0.7 at 90). The first version (2026-09-05,
+                         # a0e152658) converted at the wOBA scale and read 1.7x too narrow; the
+                         # split-half check (war_error_bar.py) puts the ratio on the DH_B scale at 1.09.
 
 # frozen run-environment constants for make_rv_xrv (the values the weight
 # fit used; z-scoring absorbs any drift in the true environment)
@@ -578,7 +583,7 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
     if lg_ra9 and lg_era:
         rpw = 4.0 * lg_ra9 / (2.0 * lg_ra9) ** WAR_PYTH_EXP        # league environment: replacement split + fallback
         repl_rp = WAR_REPL_SP - WAR_ROLE_GAP / rpw
-        _scale = XRV_SCALE
+        _xw_sd = mu_sd['xw'][1] if mu_sd.get('xw') else None   # pool SD of shrunk xwOBA against, hdERA's z unit
 
         def _rate_dp(r):
             dh = dh_raw.get(id(r)); ch = raw.get(id(r))
@@ -613,8 +618,8 @@ def apply_era_plus(rows, pitches, aaa_teams=('ROC', 'AAA'),
                 rpw_i = rpw
             r['hWAR'] = round((lg_ra9 - rate_i) * ip9 / rpw_i + repl * ip9, 2)
             pa = r.get('pa') or r.get('tbf') or 0
-            r['hWAR_se'] = (round((pa / (pa + N0_XW)) * WAR_XW_PA_SD * math.sqrt(pa) / _scale / rpw_i, 2)
-                            if pa > 0 else None)
+            r['hWAR_se'] = (round((DH_B / _xw_sd) * (pa / (pa + N0_XW)) * WAR_XW_PA_SD / math.sqrt(pa) * ip9 / rpw_i, 2)
+                            if pa > 0 and _xw_sd else None)
             n_war += 1
         war_const = {'lgRA9': round(lg_ra9, 4), 'lgERA': round(lg_era, 4), 'rpw': round(rpw, 4),
                      'dynamicRpw': WAR_DYNAMIC_RPW, 'xwPaSd': WAR_XW_PA_SD,
