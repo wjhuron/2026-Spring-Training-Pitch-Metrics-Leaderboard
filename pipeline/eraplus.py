@@ -242,9 +242,16 @@ WAR_ROLE_GAP = 0.85      # runs per 9 the reliever job is worth to the same pitc
                          # starters rebound and promoted relievers are the good ones. 0.85 puts the
                          # reliever bar at ~.032 wins/9, fWAR's published .03. Shipped .64 until
                          # 2026-09-05 (same day).
-WAR_PARK_PASS = 0.91     # share of the PUBLISHED runs park factor that reaches hdERA: LOSO
-                         # innings-weighted slope .85-1.05, 2021-2026. (Actual runs move 1.67x the
-                         # published factor: Savant's factor is shrunk, so 1.0 here is not "all".)
+WAR_PARK_PASS = 0.67     # share of the PUBLISHED runs park factor that reaches hdERA, measured WITHIN
+                         # pitcher: his xwOBA against at home minus on the road, against his home
+                         # park minus his road parks, in hdERA's runs currency (DH_B / pool sd), LOSO
+                         # .60-.72, per season .47-1.08, 2021-2026 (war_park_pass_within.py). He is his
+                         # own control, so club quality cancels. The .91 shipped 2026-09-05..06 came
+                         # from the across-pitcher club-exposure design (war_rate_validation.py),
+                         # where club quality rides on the park axis (Seattle's good staff in a
+                         # pitcher park); the same design read the HITTER pass-through negative.
+                         # (Actual runs move 1.67x the published factor: Savant's factor is shrunk,
+                         # so 1.0 here is not "all".) Moved per Wally 2026-09-06.
 WAR_DYNAMIC_RPW = False  # HELD (per Wally 2026-09-05): runs per win stays the season constant a
                          # reader can check. The dynamic form, (rate + lgRA9)/2 per pitcher as fWAR
                          # and bWAR do, was built and measured: aces +25% (Misiorowski 7.6 -> 9.6),
