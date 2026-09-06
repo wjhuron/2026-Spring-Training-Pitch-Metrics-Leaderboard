@@ -4,6 +4,7 @@
 import math
 from collections import defaultdict
 
+from pipeline.hwar import gdp_extra_cost
 from pipeline.utils import (
     safe_float, median, percentile, is_barrel, is_swing,
     spray_angle, spray_direction,
@@ -57,6 +58,7 @@ HITTER_STAT_KEYS = [
     'avgFbDist', 'avgHrDist',
     'sprintSpeed',
     'wRCplus', 'xWRCplus', 'hitterPlus',
+    'hWAR',
     'runValue', 'xRunValue', 'rv100', 'xRv100',
     'hr', 'sb',
 ]
@@ -196,6 +198,10 @@ def compute_expected_stats(pitches, woba_weights=None, xwoba_key='xwOBA'):
     result['xBA'] = round(xba_sum / nonbunt_ab, 3) if (nonbunt_ab > 0 and xba_denom > 0) else None
     result['xSLG'] = round(xslg_sum / nonbunt_ab, 3) if (nonbunt_ab > 0 and xslg_denom > 0) else None
     result['xwOBA'] = round(xwoba_sum / xwoba_denom, 3) if xwoba_denom > 0 else None
+    # private (stripped before the JSON dump): the full-precision rate and its
+    # denominator for pipeline/hwar.py, which must not read the rounded column
+    result['_xwOBAraw'] = xwoba_sum / xwoba_denom if xwoba_denom > 0 else None
+    result['_xwOBAn'] = xwoba_denom
     result['xwOBAcon'] = round(xwobacon_sum / xwobacon_denom, 3) if xwobacon_denom > 0 else None
     return result
 
@@ -466,6 +472,16 @@ def compute_hitter_stats(pitches):
     n_ci = sum(1 for p in pa_pitches if p['Event'] in CI_EVENTS)
 
     n_ab = n_pa - n_bb_all - n_hbp - n_sf - n_sh - n_ci
+    # double plays for hWAR (pipeline/hwar.py): opportunities = runner on first, under two
+    # outs; cost = the second out's run value in that base-out state (RE24)
+    n_gdp = n_gdp_opp = 0; gdp_cost = 0.0
+    for p in pa_pitches:
+        c = gdp_extra_cost(p.get('Runners'), p.get('Outs'))
+        if c is None:
+            continue
+        n_gdp_opp += 1
+        if p['Event'] == 'Grounded Into DP':
+            n_gdp += 1; gdp_cost += c
     xbh = n_2b + n_3b + n_hr
     babip_denom = n_ab - n_k - n_hr + n_sf
     babip = round((n_h - n_hr) / babip_denom, 3) if babip_denom > 0 else None
@@ -635,6 +651,7 @@ def compute_hitter_stats(pitches):
 
     return {
         'pa': n_pa,
+        'gdp': n_gdp, 'gdpOpp': n_gdp_opp, 'gdpCost': round(gdp_cost, 4),
         'ab': n_ab,
         'nSwings': n_swings,
         'nBip': n_bip,

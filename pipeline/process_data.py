@@ -28,6 +28,7 @@ from pipeline.utils import (
     XWOBA_PULLAIR_C, XWOBA_PULLAIR_LA, XWOBA_PULLAIR_LGSHARE,
 )
 from pipeline.fetch import (
+    fetch_fielding_runs, fetch_fielding_innings, fetch_baserunning_runs,
     fetch_guts_constants, fetch_sprint_speed, fetch_park_factors,
     fetch_hitter_positions,
     read_pitches_from_sheet, read_all_pitches_from_sheets, read_new_tab_pitches,
@@ -38,6 +39,8 @@ from pipeline.fetch import (
 )
 from pipeline.xmove import (fit_models as fit_xmove_models, score_all as score_xmove,
                             export as export_xmove)
+from pipeline.hwar import apply_batting_runs, apply_hitter_war
+from pipeline.eraplus import _load_park as load_park_factors_savant
 from pipeline.compute import (
     compute_expected_stats, compute_stats, compute_xrv,
     compute_pitcher_batted_ball, compute_hitter_stats,
@@ -73,6 +76,9 @@ WOBA_WEIGHTS = None
 FIP_CONSTANT = None
 GUTS_EXTRA = None
 PARK_FACTORS = None
+FIELDING_RUNS = None      # Savant FRV by mlbId (hWAR)
+FIELDING_INNINGS = None   # MLB API innings by position (hWAR)
+BASERUNNING_RUNS = None   # Savant baserunning run value by mlbId (hWAR)
 
 
 def _bip_woba_value(event):
@@ -3190,7 +3196,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                         'blastPct', 'squaredUpPct', 'idealAAPct'}
     # Counting stats that should NOT appear on the league-average row (meaningless
     # weighted means of counting totals).
-    hitter_no_lg_avg = {'hr', 'sb'}
+    hitter_no_lg_avg = {'hr', 'sb', 'hWAR'}
 
     def _compute_hitter_lg_avg(stat):
         if stat in hitter_no_lg_avg:
@@ -4173,6 +4179,7 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                           'kPct', 'bbPct', 'bbToK', 'babip'):
                     row.setdefault(k, None)
 
+    hwar_const = None
     # Compute wRC and wRC+ for each hitter (after boxscore merge so wOBA is from official stats)
     # wRC  = (((wOBA - lgWOBA) / wOBAScale) + lgRPA) * PA
     # wRC+ = ((wRAA/PA + lgRPA) + (lgRPA - PF * lgRPA)) / lgR/PA * 100
@@ -4210,6 +4217,15 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
                 row['wRC'] = None
                 row['wRCplus'] = None
                 row['xWRCplus'] = None
+
+    # -- position-player hWAR, batting runs (pipeline/hwar.py). Runs only; the WAR
+    # assembly waits on baserunning, fielding and positional runs. Guts constants
+    # come from the same GUTS_EXTRA wRC+ uses, so a blocked FanGraphs fetch that
+    # blanks wRC+ blanks this too, and hwar.py says so.
+    hwar_const = apply_batting_runs(
+        hitter_leaderboard, park=load_park_factors_savant(2026),
+        lg_rpa=(GUTS_EXTRA or {}).get('lgRPA'), woba_scale=(GUTS_EXTRA or {}).get('wOBAScale'),
+        aaa_teams=AAA_TEAMS)
 
     # FanGraphs override: replace our pipeline-computed wRC+ with canonical
     # FG values. FG has slightly different park-factor / wOBA-weight tuning
@@ -4698,6 +4714,8 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
             'wOBAScale': GUTS_EXTRA.get('wOBAScale'),
             'lgRPA': GUTS_EXTRA.get('lgRPA'),
         }
+    if hwar_const:
+        metadata['hwarConstants'] = hwar_const
 
     # Per-event linear weights, so the website can compute wOBA itself from the
     # hitter micro counters under a handedness or date filter. Without these the
@@ -4729,6 +4747,18 @@ def process_game_type(all_pitches, label, mlb_id_cache, mlb_id_cache_path,
         # without them hWAR is carried, never recomputed (fail closed).
         metadata['pitcherLeagueAverages']['lgRA9'] = round(total_r * 9 / total_ip, 4)
         metadata['pitcherLeagueAverages']['lgERA'] = round(total_er * 9 / total_ip, 4)
+
+        # -- position-player hWAR assembly (pipeline/hwar.py): needs lgRA9 (RPW), the Guts
+        # scale, the fielding / innings / baserunning feeds and the team games played.
+        if hwar_const and not window_mode:
+            _war = apply_hitter_war(
+                hitter_leaderboard, fielding=FIELDING_RUNS or {}, innings=FIELDING_INNINGS or {},
+                baserunning=BASERUNNING_RUNS or {}, lg_ra9=total_r * 9 / total_ip,
+                woba_scale=(GUTS_EXTRA or {}).get('wOBAScale'),
+                team_games=metadata.get('teamGamesPlayed') or {}, aaa_teams=AAA_TEAMS)
+            if _war:
+                hwar_const.update(_war)
+                metadata['hwarConstants'] = hwar_const
 
     # hdERA/hpERA anchor = unweighted mean ERA of the 30+ IP MLB pool (the
     # metrics' z-pool population, see pipeline_eraplus). Published here so
@@ -5377,7 +5407,7 @@ def _load_fg_manual(season):
 
 
 def main():
-    global WOBA_WEIGHTS, FIP_CONSTANT, GUTS_EXTRA, PARK_FACTORS
+    global WOBA_WEIGHTS, FIP_CONSTANT, GUTS_EXTRA, PARK_FACTORS, FIELDING_RUNS, FIELDING_INNINGS, BASERUNNING_RUNS
     os.makedirs(DATA_DIR, exist_ok=True)
 
     # FanGraphs sits behind Cloudflare bot scoring that intermittently
@@ -5440,6 +5470,13 @@ def main():
 
     # Propagate wOBA weights to pipeline_compute module
     # WOBA_WEIGHTS passed explicitly to compute_expected_stats calls
+
+    # hWAR (hitters): fielding, innings by position, baserunning. Each falls back to its
+    # prior pull and says so (pipeline/fetch.py).
+    print("Fetching fielding and baserunning feeds for hWAR...")
+    FIELDING_RUNS = fetch_fielding_runs(2026)
+    FIELDING_INNINGS = fetch_fielding_innings(2026)
+    BASERUNNING_RUNS = fetch_baserunning_runs(2026)
 
     # Fetch park factors
     print("Fetching FanGraphs park factors...")

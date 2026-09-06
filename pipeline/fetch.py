@@ -161,6 +161,165 @@ def fetch_sprint_speed(year=2026):
         return {}
 
 
+FIELDING_RUNS_CACHE_PATH = os.path.join(DATA_DIR, 'fielding_runs_cache.json')
+FIELDING_INNINGS_CACHE_PATH = os.path.join(DATA_DIR, 'fielding_innings_cache.json')
+
+
+def _atomic_json_write(path, obj):
+    tmp = path + '.tmp'
+    with open(tmp, 'w') as f:
+        json.dump(obj, f)
+    os.replace(tmp, path)
+
+
+def _cached_or_empty(path, what):
+    """Fail open on a fetch error: the PRIOR pull from the cache, announced; empty when there is none."""
+    try:
+        with open(path) as f:
+            prior = json.load(f)
+        print(f"  {what}: using the PRIOR pull from {os.path.basename(path)} ({len(prior)} players)")
+        return prior
+    except (OSError, json.JSONDecodeError):
+        print(f"  {what}: no cache either; EMPTY (every fielding value blank this run)")
+        return {}
+
+
+def fetch_fielding_runs(year=2026):
+    """Savant Fielding Run Value per player: {mlb_id(str): {name, team_id, range, arm, dp,
+    catching, framing, throwing, blocking, total, outs_by_pos}}, runs above average.
+
+    The combined leaderboard page serves no CSV (it is JS-rendered), but it embeds the full
+    table as a JSON array in the HTML, which is what this reads. The five component CSVs
+    (outs_above_average, arm-strength, catcher-framing/-throwing/-blocking) exist too, but
+    the arm CSV is arm STRENGTH, not runs, so the embedded table is the one source with
+    every runs component. On any failure the prior pull is used and announced.
+    """
+    url = f'https://baseballsavant.mlb.com/leaderboard/fielding-run-value?type=player&year={year}&min=1'   # min=1: every fielder (311 -> 635 in 2026)
+    try:
+        html = _fetch_with_retry(url, headers={
+            'User-Agent': 'Huronalytics-Leaderboard/1.0 (baseball research; https://huronalytics.com)',
+        }, timeout=30).decode('utf-8', errors='ignore')
+        i = html.find('"range_runs"')
+        if i < 0:
+            raise ValueError('no range_runs key in the page')
+        j = html.rfind('[', 0, i)
+        depth, k = 0, j
+        while k < len(html):
+            if html[k] == '[':
+                depth += 1
+            elif html[k] == ']':
+                depth -= 1
+                if depth == 0:
+                    break
+            k += 1
+        arr = json.loads(html[j:k + 1])
+        out = {}
+        for r in arr:
+            pid = r.get('id')
+            if pid is None:
+                continue
+            f = lambda key: (float(r[key]) if r.get(key) is not None else None)
+            out[str(int(pid))] = {
+                'name': r.get('name'), 'team_id': r.get('team_id'),
+                'range': f('range_runs'), 'arm': f('arm_runs'), 'dp': f('dp_runs'),
+                'catching': f('catching_runs'), 'framing': f('framing_runs'),
+                'throwing': f('throwing_runs'), 'blocking': f('blocking_runs'),
+                'total': f('total_runs'),
+                'outs_by_pos': {str(p): int(r[f'outs_{p}'] or 0) for p in range(2, 10) if r.get(f'outs_{p}') is not None},
+            }
+        if len(out) < 100:
+            raise ValueError(f'only {len(out)} fielders parsed; the page shape changed')
+        _atomic_json_write(FIELDING_RUNS_CACHE_PATH, out)
+        tot = sum(v['total'] for v in out.values() if v['total'] is not None)
+        print(f"  Fielding runs (Savant FRV {year}): {len(out)} players, total {tot:+.1f}")
+        return out
+    except Exception as e:
+        print(f"  WARNING: Could not fetch Savant fielding run value ({type(e).__name__}): {e}")
+        return _cached_or_empty(FIELDING_RUNS_CACHE_PATH, 'Fielding runs')
+
+
+BASERUNNING_CACHE_PATH = os.path.join(DATA_DIR, 'baserunning_runs_cache.json')
+
+
+def fetch_baserunning_runs(year=2026):
+    """Savant Baserunning Run Value per runner: {mlb_id(str): {name, tot, xb, sbx, moved}},
+    runs above average from extra-base advancement (xb) and steal attempts (sbx).
+
+    The endpoint serves the CURRENT season whatever year is passed (measured 2026-09-05:
+    every year parameter returned the same 2026 rows), so `year` is documentation only.
+    Runners under Savant's own minimum are not listed (243 of about 780 hitters in 2026)
+    and score zero, which the caller announces. On any failure the prior pull is used.
+    """
+    url = f'https://baseballsavant.mlb.com/leaderboard/baserunning-run-value?year={year}&csv=true'
+    try:
+        import csv
+        import io
+        raw = _fetch_with_retry(url, headers={
+            'User-Agent': 'Huronalytics-Leaderboard/1.0 (baseball research; https://huronalytics.com)',
+            'Accept': 'text/csv',
+        }, timeout=30).decode('utf-8-sig')
+        out = {}
+        for r in csv.DictReader(io.StringIO(raw)):
+            try:
+                pid = str(int(r['player_id']))
+                out[pid] = {'name': r.get('entity_name'), 'tot': float(r['runner_runs_tot']),
+                            'xb': float(r['runner_runs_XB']), 'sbx': float(r['runner_runs_SBX']),
+                            'moved': int(float(r.get('N_runner_moved') or 0)),
+                            'season': int(r.get('start_year') or 0)}
+            except (KeyError, TypeError, ValueError):
+                continue
+        if len(out) < 100:
+            raise ValueError(f'only {len(out)} runners parsed; the feed shape changed')
+        seasons = {v['season'] for v in out.values()}
+        if seasons and seasons != {year}:
+            raise ValueError(f'feed season {sorted(seasons)} is not {year}')
+        _atomic_json_write(BASERUNNING_CACHE_PATH, out)
+        print(f"  Baserunning runs (Savant {year}): {len(out)} runners, total {sum(v['tot'] for v in out.values()):+.1f}")
+        return out
+    except Exception as e:
+        print(f"  WARNING: Could not fetch Savant baserunning run value ({type(e).__name__}): {e}")
+        return _cached_or_empty(BASERUNNING_CACHE_PATH, 'Baserunning runs')
+
+
+def _innings_to_float(s):
+    """'666.1' -> 666.333 (the .1/.2 suffix is thirds of an inning)."""
+    try:
+        whole, _, frac = str(s).partition('.')
+        return int(whole) + int(frac or 0) / 3.0
+    except ValueError:
+        return 0.0
+
+
+def fetch_fielding_innings(year=2026):
+    """MLB API innings by position: {mlb_id(str): {pos: innings}} (DH rows carry games, not innings).
+
+    stats?stats=season&group=fielding returns one row per player-position, which is what the
+    positional adjustment needs. On any failure the prior pull is used and announced.
+    """
+    url = (f'https://statsapi.mlb.com/api/v1/stats?stats=season&group=fielding&season={year}'
+           f'&sportId=1&limit=10000&playerPool=all')
+    try:
+        data = json.loads(_fetch_with_retry(url, timeout=30).decode('utf-8'))
+        out = {}
+        for sp in data['stats'][0]['splits']:
+            pid = str(sp['player']['id']); pos = sp.get('position', {}).get('abbreviation')
+            if not pos:
+                continue
+            st = sp['stat']
+            rec = out.setdefault(pid, {})
+            rec[pos] = round(rec.get(pos, 0.0) + (_innings_to_float(st.get('innings')) if pos != 'DH' else 0.0), 3)
+            if pos == 'DH':
+                rec['DH_games'] = rec.get('DH_games', 0) + int(st.get('games') or 0)
+        if len(out) < 300:
+            raise ValueError(f'only {len(out)} players; the feed shape changed')
+        _atomic_json_write(FIELDING_INNINGS_CACHE_PATH, out)
+        print(f"  Fielding innings (MLB API {year}): {len(out)} players")
+        return out
+    except Exception as e:
+        print(f"  WARNING: Could not fetch fielding innings ({type(e).__name__}): {e}")
+        return _cached_or_empty(FIELDING_INNINGS_CACHE_PATH, 'Fielding innings')
+
+
 def fetch_park_factors(year=2026):
     """Scrape park factors from FanGraphs."""
     import re as _re

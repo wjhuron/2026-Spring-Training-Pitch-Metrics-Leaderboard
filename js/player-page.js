@@ -97,6 +97,7 @@ var PlayerPage = {
     { key: 'wOBA', label: 'wOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'xwOBA', label: 'xwOBA', format: function(v) { return v != null ? v.toFixed(3).replace(/^0/, '') : '—'; } },
     { key: 'wRCplus', label: 'wRC+', format: function(v) { return v != null ? v : '—'; } },
+    { key: 'hWAR', label: 'hWAR', format: function(v) { return v != null ? v.toFixed(1) : '—'; } },
     { key: 'xWRCplus', label: 'xWRC+', format: function(v) { return v != null ? v : '—'; } },
     { key: 'hitterPlus', label: 'Hitter+', format: function(v) { return v != null ? Math.round(v) : '—'; } },
     { key: 'bbPct', label: 'BB%', format: function(v) { return Utils.formatPct(v); } },

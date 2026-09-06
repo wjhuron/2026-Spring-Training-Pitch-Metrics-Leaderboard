@@ -135,6 +135,8 @@ const COLUMNS = {
     { key: 'ab',          label: 'AB',       format: Utils.formatInt, sortType: 'numeric', noPercentile: true, group: 'info' },
     { key: 'wRCplus',     label: 'wRC+',     format: Utils.formatInt, sortType: 'numeric', sectionStart: true, desc: 'Total offensive production per PA, park-adjusted. 100 = league average and every point is 1% better or worse: 130 = 30% better than average', group: 'expected' },
     { key: 'xWRCplus',    label: 'xWRC+',    format: Utils.formatInt, sortType: 'numeric', desc: 'wRC+ computed from expected wOBA instead of results — judges contact quality rather than outcomes. Printed at 0.85 x wRC+\'s spread, its measured agreement with wRC+ (2021-2026): an estimate never prints wider than the thing it estimates, so values read directly as expected production.', group: 'expected' },
+    { key: 'hWAR',        label: 'hWAR',     format: Utils.formatDecimal(1), sortType: 'numeric', desc: 'Huronalytics WAR for position players: deserved batting runs (xwOBA on the pulled-air hitter basis, shrunk at 77 PA, park at .35 of the published factor), Savant baserunning run value plus double-play runs from the 24-state run table, Savant fielding run value (range, arm, framing, blocking, throwing), the fWAR positional adjustment by innings, and replacement at the 57 percent share of the 1000-WAR pool. Runs per win is the season constant pitcher hWAR uses. Season counting stat: it does not react to filters, and team rows sum it.', group: 'advanced' },
+    { key: 'hWAR_se',     label: 'hWAR ±',   format: Utils.formatDecimal(2), sortType: 'numeric', desc: 'One standard error on hWAR from per-PA xwOBA sampling noise, in wins. Fielding and baserunning noise is not in it, so it is a floor. Two hitters closer than about two of these are not separated by the data.', group: 'advanced' },
     { key: 'hitterPlus',  label: 'Hitter+',  format: Utils.formatInt, sortType: 'numeric', desc: 'Hitter composite: weighted blend of BB+ (contact quality), SD+ (swing decisions), CT+ (contact rate). 100 = league avg and one point is one percent, exactly like wRC+: 115 means 15% better at producing runs. The spread is deflated to r x wRC+\'s SD, with r measured live each run, which is what makes that slope exactly 1 (printing it at wRC+\'s FULL spread would drop the slope to r and make 115 worth only ~12%). A gap vs wRC+ reads as process ahead of/behind results.', group: 'expected' },
     { key: 'wOBA',        label: 'wOBA',     format: Utils.formatDecimal(3), sortType: 'numeric', desc: 'Weighted on-base average — plate outcomes weighted by run value', group: 'stats' },
     { key: 'xwOBA',       label: 'xwOBA',    format: Utils.formatDecimal(3), sortType: 'numeric', desc: 'Expected wOBA (Statcast, EV + LA)', group: 'expected' },
@@ -291,7 +293,7 @@ const Leaderboard = {
     // hrFbPct unhidden 2026-08-27 (per Wally): it completes the visible
     // Barrel% -> HR/FB fortune pair, mirroring the card's Contact Mgmt read.
     pitcherBattedBall:     ['xwOBAsp', 'xBA', 'xSLG', 'maxEVAgainst'],
-    hitterStats:           ['g', 'ab', 'ops', 'iso', 'babip', 'bbToK', 'xwOBAcon', 'xBA', 'xSLG', 'doubles', 'triples', 'cs', 'sbPct'],
+    hitterStats:           ['g', 'ab', 'ops', 'iso', 'babip', 'bbToK', 'xwOBAcon', 'xBA', 'xSLG', 'doubles', 'triples', 'cs', 'sbPct', 'hWAR_se'],
     // sprayVal unhidden 2026-08-27 (per Wally): a novel house metric — the
     // placement-skill trait behind consistent xwOBA-beaters — now reads
     // beside xwOBAsp instead of hiding in the picker.

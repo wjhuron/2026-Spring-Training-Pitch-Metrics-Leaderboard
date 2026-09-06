@@ -2019,6 +2019,8 @@ const Aggregator = {
       a.nCompSwings += h.nCompSwings || 0;
       a.nCompRuns += h.nCompRuns || 0;
       if (h.wRC != null) a.wRC = (a.wRC || 0) + h.wRC;
+      // hWAR is a season counting stat: team rows sum it, filters do not reshape it
+      if (h.hWAR != null) a.hWAR = (a.hWAR || 0) + h.hWAR;
       // RV sums stay full precision; rounding happens only at display
       if (h.runValue != null) a.runValue = (a.runValue || 0) + h.runValue;
       wadd(a, 'wOBA', h.wOBA, h.pa);
@@ -2048,6 +2050,7 @@ const Aggregator = {
         tb: a.tb, sb: a.sb, cs: a.cs,
         sbPct: (a.sb + a.cs) > 0 ? a.sb / (a.sb + a.cs) * 100 : null,
         wRC: a.wRC,
+        hWAR: a.hWAR != null ? a.hWAR : null,
         runValue: a.runValue,
         nCompSwings: a.nCompSwings,
         nCompRuns: a.nCompRuns,
@@ -2183,7 +2186,7 @@ const Aggregator = {
       'twoStrikeWhiffPct', 'firstPitchSwingPct',
       'avgFbDist', 'avgHrDist',
       'sprintSpeed', 'runValue',
-      'wRCplus', 'xWRCplus', 'hitterPlus',
+      'wRCplus', 'xWRCplus', 'hitterPlus', 'hWAR',
       'hr', 'sb',
     ];
     const HITTER_INVERT = {
@@ -2587,7 +2590,9 @@ const Aggregator = {
                         // season values even under filters.
                         'sdPlus', 'sdPlusN', 'sdPlusRaw',
                         'ctPlus', 'ctPlusN', 'ctPlusRaw',
-                        'hitterPlus'];
+                        'hitterPlus',
+                        // hWAR and its components are season-level (pipeline/hwar.py)
+                        'hWAR', 'hWAR_se', 'hBatRuns', 'hBsrRuns', 'hFldRuns', 'hPosRuns', 'hReplRuns'];
     // Rate stats that micro data computes (skip when filtered)
     const hBoxRateStats = ['avg', 'obp', 'slg', 'ops', 'iso', 'babip', 'kPct', 'bbPct', 'bbToK',
                            'doubles', 'triples', 'hr', 'xbh'];
