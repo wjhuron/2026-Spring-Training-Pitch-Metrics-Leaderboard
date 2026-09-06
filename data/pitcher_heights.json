@@ -1796,6 +1796,7 @@
 "Peters, Tristan": 72.0,
 "Petersen, Michael": 79.0,
 "Petersen, Sam": 71.0,
+"Peterson, Austin": 78.0,
 "Peterson, David": 78.0,
 "Peterson, Jace": 72.0,
 "Petit, Yusmeiro": 73.0,
@@ -8036,6 +8037,9 @@
 "Petersen, Sam": [
 695763
 ],
+"Peterson, Austin": [
+804926
+],
 "Peterson, David": [
 656849
 ],
@@ -10574,5 +10578,5 @@
 ]
 },
 "league_mean": 73.73,
-"n": 2641
+"n": 2642
 }
